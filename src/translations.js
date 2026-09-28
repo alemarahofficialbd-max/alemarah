@@ -152,13 +152,38 @@ export const translations = {
         "Enhancing institutional capabilities through skilled workforce and disciplined management"
       ],
       valuesTitle: "Core Corporate Values",
+      valuesSubtitle: "The 6 institutional pillars governing every decision, project, and partnership at Al-Emarah Properties Limited.",
       values: [
-        "Transparency (স্বচ্ছতা)",
-        "Accountability (জবাবদিহিতা)",
-        "Professionalism (পেশাদারিত্ব)",
-        "Trust & Integrity (আস্থা)",
-        "Good Governance (সুশাসন)",
-        "Strategic Foresight (দূরদর্শিতা)"
+        {
+          title: "Transparency",
+          sub: "Open Financial Practices",
+          desc: "Uncompromising openness in project costing, material procurement, audit documentation, and financial disclosures."
+        },
+        {
+          title: "Accountability",
+          sub: "Institutional Responsibility",
+          desc: "Full fiduciary responsibility towards homeowners, landowners, and joint venture partners at every development phase."
+        },
+        {
+          title: "Professionalism",
+          sub: "Excellence in Execution",
+          desc: "Adherence to highest engineering standards, structured project scheduling, and expert architectural execution."
+        },
+        {
+          title: "Good Governance",
+          sub: "Balanced Administrative Control",
+          desc: "Clear demarcation of oversight and executive roles across the Board of Directors and Executive Committee."
+        },
+        {
+          title: "Financial Discipline",
+          sub: "Contractual Security",
+          desc: "Strict adherence to written contracts, structured dividend returns, and guaranteed 90-day capital settlement policy."
+        },
+        {
+          title: "Enduring Trust",
+          sub: "Actions Over Words",
+          desc: "Prioritizing long-term investor confidence and delivery on commitments rather than short-lived commercial promises."
+        }
       ],
       commitmentQuote: "We prioritize action over promises, execution over words, and long-term trust over short-term success.",
       
@@ -638,13 +663,38 @@ export const translations = {
         "দক্ষ জনবল ও সুসংগঠিত ব্যবস্থাপনার মাধ্যমে প্রতিষ্ঠানের সক্ষমতা বৃদ্ধি করা।"
       ],
       valuesTitle: "আমাদের মূল মূল্যবোধ",
+      valuesSubtitle: "আল ইমারাহ প্রোপার্টিজ লিমিটেডের প্রতিটি নীতি, প্রকল্প পরিকল্পনা ও অংশীদারিত্বের ৬টি মৌলিক প্রাতিষ্ঠানিক স্তম্ভ।",
       values: [
-        "স্বচ্ছতা (Transparency)",
-        "জবাবদিহিতা (Accountability)",
-        "পেশাদারিত্ব (Professionalism)",
-        "আস্থা (Trust)",
-        "সুশাসন (Good Governance)",
-        "দূরদর্শিতা (Foresight)"
+        {
+          title: "স্বচ্ছতা",
+          sub: "Transparency",
+          desc: "প্রকল্পের প্রকৃত ব্যয়, নির্মাণ সামগ্রীর মান, অডিট ও আর্থিক লেনদেনের প্রতিটি ধাপে শতভাগ সততা ও উন্মুক্ততা।"
+        },
+        {
+          title: "জবাবদিহিতা",
+          sub: "Accountability",
+          desc: "বিনিয়োগকারী, ফ্ল্যাট ক্রেতা ও জমিদাতাদের প্রতি দায়িত্বশীল, বিশ্বস্ত ও নিয়মতান্ত্রিক প্রাতিষ্ঠানিক দায়বদ্ধতা।"
+        },
+        {
+          title: "পেশাদারিত্ব",
+          sub: "Professionalism",
+          desc: "দক্ষ প্রকৌশলী, স্থপতি ও অভিজ্ঞ ব্যবস্থাপনা দলের সমন্বয়ে আধুনিক নির্মাণ ও সঠিক সময়ে প্রকল্প হস্তান্তর।"
+        },
+        {
+          title: "সুশাসন",
+          sub: "Good Governance",
+          desc: "বোর্ড অব ডিরেক্টরস ও এক্সিকিউটিভ কমিটির মাধ্যমে দায়িত্ব ও ক্ষমতার সুষম প্রশাসনিক বণ্টন ও নিরপেক্ষ পর্যবেক্ষণ।"
+        },
+        {
+          title: "আর্থিক শৃঙ্খলা",
+          sub: "Financial Discipline",
+          desc: "লিখিত চুক্তির শতভাগ বাস্তবায়ন, নিয়মিত ও স্বচ্ছ লভ্যাংশ বণ্টন এবং সর্বোচ্চ ৯০ কার্যদিবসে মূলধন নিষ্পত্তি।"
+        },
+        {
+          title: "দীর্ঘমেয়াদি আস্থা",
+          sub: "Enduring Trust",
+          desc: "কথার চেয়ে বাস্তবায়ন এবং প্রতিশ্রুতির চেয়ে কাজের মাধ্যমে গ্রাহক ও অংশীদারদের সাথে টেকসই সম্পর্ক গড়ে তোলা।"
+        }
       ],
       commitmentQuote: "আমরা প্রতিশ্রুতির চেয়ে কাজকে, কথার চেয়ে বাস্তবায়নকে, এবং স্বল্পমেয়াদি সাফল্যের চেয়ে দীর্ঘমেয়াদি আস্থাকে বেশি গুরুত্ব দিই।",
       

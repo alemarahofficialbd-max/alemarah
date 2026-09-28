@@ -101,23 +101,71 @@ export default function AboutUs({ lang, t }) {
           </div>
         </div>
 
-        {/* Core Values Row */}
-        <div className="p-8 rounded-3xl bg-gray-50 border border-gray-200">
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-bold text-gray-900">{t.about.valuesTitle}</h3>
-            <p className="text-xs text-gray-500 mt-1">
-              {lang === 'en' 
-                ? 'The foundational pillars governing every decision and partnership at Al-Emarah' 
+        {/* Core Values Section */}
+        <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-gray-50 to-white border border-gray-200 shadow-xs">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-50 text-[#CE2028] text-xs font-bold uppercase tracking-wider mb-2">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{lang === 'en' ? 'Core Institutional Pillars' : 'মূল প্রাতিষ্ঠানিক স্তম্ভ'}</span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-[#231F20] tracking-tight">
+              {t.about.valuesTitle}
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-600 mt-2 leading-relaxed">
+              {t.about.valuesSubtitle || (lang === 'en' 
+                ? 'The foundational pillars governing every decision, project, and partnership at Al-Emarah' 
                 : 'আল-ইমারাহ প্রোপার্টিজের প্রতিটি সিদ্ধান্ত ও অংশীদারিত্বের দীর্ঘমেয়াদি ভিত্তি'
-              }
+              )}
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {t.about.values.map((val, idx) => (
-              <div key={idx} className="p-3.5 bg-white rounded-xl border border-gray-200 text-center font-bold text-xs sm:text-sm text-gray-800 shadow-2xs hover:border-[#CE2028] hover:text-[#CE2028] transition-colors">
-                {val}
-              </div>
-            ))}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {t.about.values.map((val, idx) => {
+              const iconsList = [Eye, Scale, Briefcase, Building2, FileCheck2, ShieldCheck];
+              const IconComp = iconsList[idx] || ShieldCheck;
+              const isObj = typeof val === 'object';
+              const title = isObj ? val.title : val;
+              const sub = isObj ? val.sub : '';
+              const desc = isObj ? val.desc : '';
+
+              return (
+                <div 
+                  key={idx} 
+                  className="p-6 bg-white rounded-2xl border border-gray-200 hover:border-[#CE2028]/40 hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-50 to-emerald-50 border border-gray-100 flex items-center justify-center text-[#CE2028] group-hover:scale-110 transition-transform">
+                        <IconComp className="w-6 h-6" />
+                      </div>
+                      <span className="text-xs font-extrabold text-gray-300 group-hover:text-[#CE2028] transition-colors">
+                        0{idx + 1}
+                      </span>
+                    </div>
+
+                    <h4 className="text-lg font-bold text-gray-900 group-hover:text-[#CE2028] transition-colors flex items-center gap-2">
+                      {title}
+                      {sub && (
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 group-hover:bg-red-50 group-hover:text-[#CE2028] transition-colors">
+                          {sub}
+                        </span>
+                      )}
+                    </h4>
+
+                    {desc && (
+                      <p className="text-xs sm:text-sm text-gray-600 mt-2.5 leading-relaxed">
+                        {desc}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="mt-4 pt-3.5 border-t border-gray-100 flex items-center text-xs font-bold text-[#006231]">
+                    <CheckCircle className="w-3.5 h-3.5 mr-1.5 text-[#8EBF40]" />
+                    <span>{lang === 'en' ? 'Institutional Principle' : 'প্রতিষ্ঠানিক মূলনীতি'}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
