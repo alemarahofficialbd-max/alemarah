@@ -29,10 +29,23 @@ export default function Hero({
   };
 
   return (
-    <section id="home" className="relative pt-6 pb-20 md:pt-12 md:pb-28 overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50">
+    <section id="home" className="relative pt-3 pb-20 md:pt-12 md:pb-28 overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50">
       {/* Decorative Subtle Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-red-100/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
       <div className="absolute bottom-10 left-0 w-96 h-96 bg-emerald-100/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+
+      {/* Phone View Skyline Header Image (Only on phone view, followed by headline and text) */}
+      <div className="block md:hidden w-full overflow-hidden mb-4 px-2">
+        <picture className="w-full">
+          <source srcSet="/images/headr_phoneview.webp" type="image/webp" />
+          <img 
+            src="/images/headr_phoneview.png" 
+            alt="Al-Emarah Properties Planned Development" 
+            className="w-full h-auto object-contain max-h-56 sm:max-h-64 mx-auto rounded-xl"
+            loading="eager"
+          />
+        </picture>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Hero Header */}
