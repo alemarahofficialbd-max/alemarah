@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Projects from './components/Projects';
 import ProjectDetailsPage from './components/ProjectDetailsPage';
@@ -130,22 +129,8 @@ export default function App() {
 
   return (
     <div className={`min-h-screen bg-[#FBFBFB] flex flex-col font-${lang === 'bn' ? 'bengali' : 'sans'}`}>
-      {/* Top and Mobile Navbar System - Hidden on Login & Client Dashboard */}
-      {!isPortalMode && (
-        <Navbar
-          currentPage={currentPage}
-          setCurrentPage={navigateTo}
-          lang={lang}
-          setLang={setLang}
-          t={t}
-          onOpenLogin={() => navigateTo(isLoggedIn ? 'dashboard' : 'login')}
-          onOpenBookVisit={() => handleOpenBookVisit()}
-          isLoggedIn={isLoggedIn}
-        />
-      )}
-
       {/* Main Multi-Page Content Area */}
-      <main className="flex-1 pb-16 lg:pb-0">
+      <main className="flex-1">
         {/* ==================================================== */}
         {/* PAGE 1: HOME PAGE                                   */}
         {/* ==================================================== */}
