@@ -278,58 +278,31 @@ export default function Navbar({
         )}
       </header>
 
-      {/* Floating Bottom App Navigation Bar for Phone View (Mobile Footer Navbar) */}
-      <nav className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 py-1 px-2 z-40 lg:hidden shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
-        <div className="flex items-center justify-around max-w-md mx-auto">
-          <button
-            onClick={() => handleNavClick('home')}
-            className={`flex flex-col items-center py-1 px-2 text-[11px] font-semibold transition-colors cursor-pointer ${
-              currentPage === 'home' ? 'text-[#CE2028] font-bold' : 'text-gray-500 hover:text-gray-900'
-            }`}
-          >
-            <Home className="w-5 h-5 mb-0.5" />
-            <span>{t?.nav?.home || 'হোম'}</span>
-          </button>
-
-          <button
-            onClick={() => handleNavClick('projects')}
-            className={`flex flex-col items-center py-1 px-2 text-[11px] font-semibold transition-colors cursor-pointer ${
-              currentPage === 'projects' ? 'text-[#CE2028] font-bold' : 'text-gray-500 hover:text-gray-900'
-            }`}
-          >
-            <Building2 className="w-5 h-5 mb-0.5" />
-            <span>{t?.nav?.projects || 'প্রকল্পসমূহ'}</span>
-          </button>
-
-          {/* Center Site Visit Button */}
-          <button
-            onClick={onOpenBookVisit}
-            className="-mt-5 w-12 h-12 rounded-full bg-[#CE2028] hover:bg-[#A9141B] text-white flex items-center justify-center shadow-lg shadow-[#CE2028]/40 ring-4 ring-white cursor-pointer active:scale-95 transition-transform"
-            aria-label={t?.nav?.bookVisit || 'বুক করুন'}
-            title={t?.nav?.bookVisit || 'বুক করুন'}
-          >
-            <Calendar className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={() => handleNavClick('investment')}
-            className={`flex flex-col items-center py-1 px-2 text-[11px] font-semibold transition-colors cursor-pointer ${
-              currentPage === 'investment' ? 'text-[#CE2028] font-bold' : 'text-gray-500 hover:text-gray-900'
-            }`}
-          >
-            <Coins className="w-5 h-5 mb-0.5" />
-            <span>{lang === 'en' ? 'Invest' : 'বিনিয়োগ'}</span>
-          </button>
-
-          <button
-            onClick={() => handleNavClick(isLoggedIn ? 'dashboard' : 'login')}
-            className={`flex flex-col items-center py-1 px-2 text-[11px] font-semibold transition-colors cursor-pointer ${
-              currentPage === 'login' || currentPage === 'dashboard' ? 'text-[#CE2028] font-bold' : 'text-gray-500 hover:text-gray-900'
-            }`}
-          >
-            <User className={`w-5 h-5 mb-0.5 ${isLoggedIn ? 'text-[#8EBF40]' : ''}`} />
-            <span>{isLoggedIn ? (lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড') : (lang === 'en' ? 'Login' : 'লগইন')}</span>
-          </button>
+      {/* Floating Bottom Navigation Bar for Phone View (Exact 6 items as requested) */}
+      <nav className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 py-1.5 px-1 z-40 lg:hidden shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+        <div className="grid grid-cols-6 items-center max-w-lg mx-auto">
+          {navLinks.map((item) => {
+            const IconComponent = item.icon;
+            const isActive = currentPage === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={`flex flex-col items-center justify-center py-0.5 px-0.5 transition-colors cursor-pointer text-center group ${
+                  isActive ? 'text-[#CE2028]' : 'text-gray-500 hover:text-gray-900'
+                }`}
+              >
+                <div className={`p-1 rounded-lg transition-transform group-active:scale-90 ${isActive ? 'bg-red-50 text-[#CE2028]' : ''}`}>
+                  <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 mx-auto" />
+                </div>
+                <span className={`text-[9.5px] sm:text-[11px] leading-tight mt-0.5 truncate max-w-full block ${
+                  isActive ? 'font-bold text-[#CE2028]' : 'font-medium text-gray-600'
+                }`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </nav>
     </>
