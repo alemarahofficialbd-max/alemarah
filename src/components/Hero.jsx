@@ -158,28 +158,6 @@ export default function Hero({
           </form>
         </div>
 
-        {/* Brand Key Statistics Row */}
-        <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs text-center">
-            <div className="text-3xl sm:text-4xl font-black text-[#CE2028] mb-1">25+</div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600">{t.hero.stats.completed}</div>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs text-center">
-            <div className="text-3xl sm:text-4xl font-black text-[#006231] mb-1">14+</div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600">{t.hero.stats.ongoing}</div>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs text-center">
-            <div className="text-3xl sm:text-4xl font-black text-gray-900 mb-1">2.4M+</div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600">{t.hero.stats.landArea}</div>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs text-center">
-            <div className="text-3xl sm:text-4xl font-black text-[#8EBF40] mb-1">1,200+</div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600">{t.hero.stats.families}</div>
-          </div>
-        </div>
       </div>
     </section>
   );
