@@ -10,6 +10,7 @@ import ContactSection from './components/ContactSection';
 import LoginPage from './components/LoginPage';
 import ClientDashboard from './components/ClientDashboard';
 import JoinJourney from './components/JoinJourney';
+import InvestmentPage from './components/InvestmentPage';
 import Footer from './components/Footer';
 import { translations } from './translations';
 import { projectsData } from './data/projectsData';
@@ -24,7 +25,10 @@ import {
   Sparkles,
   Calendar,
   ChevronRight,
-  MapPin
+  MapPin,
+  Coins,
+  Scale,
+  Award
 } from 'lucide-react';
 
 export default function App() {
@@ -108,120 +112,177 @@ export default function App() {
               onViewAllProjects={() => navigateTo('projects')}
             />
 
-            {/* Emarah Agro Spotlight Banner */}
-            {agroProject && (
-              <section className="py-12 bg-gradient-to-r from-emerald-900 via-[#004724] to-emerald-950 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-[#8EBF40]/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                    <div className="lg:col-span-7 space-y-4">
-                      <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold text-[#8EBF40] border border-white/10">
-                        <Sprout className="w-3.5 h-3.5" />
-                        <span>{lang === 'en' ? 'Sustainable Economic Asset' : 'টেকসই অর্থনৈতিক সম্পদ'}</span>
-                      </div>
-                      <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
-                        {lang === 'en' ? agroProject.nameEn : agroProject.nameBn}
-                      </h2>
-                      <p className="text-sm sm:text-base text-gray-200 leading-relaxed max-w-2xl">
-                        {lang === 'en' ? agroProject.taglineEn : agroProject.taglineBn}
-                      </p>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs sm:text-sm text-gray-200">
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
-                          <span>{lang === 'en' ? 'Dairy Cattle & Livestock Farming' : 'উন্নত জাতের ডেইরি ক্যাটল ও খামার'}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
-                          <span>{lang === 'en' ? 'Minimum Investment: ৳ 1,00,000' : 'সর্বনিম্ন বিনিয়োগ: ৳ ১,০০,০০০'}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
-                          <span>{lang === 'en' ? 'Government Registered Project' : 'সরকারি প্রাণিসম্পদ অধিদপ্তর নিবন্ধিত'}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
-                          <span>{lang === 'en' ? 'Formal Written Profit Contract' : 'আনুষ্ঠানিক লিখিত অংশীদারিত্ব চুক্তি'}</span>
-                        </div>
-                      </div>
+            {/* Why Choose Us Highlights Strip (4 Pillars) */}
+            <section className="py-12 bg-white border-y border-gray-100">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold text-[#CE2028] uppercase tracking-wider">
+                      {lang === 'en' ? 'Pillars of Excellence' : 'আমাদের মূল ভিত্তি ও অঙ্গীকার'}
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl font-black text-gray-900">
+                      {lang === 'en' ? 'Why Al-Emarah Properties?' : 'কেন আল-ইমারাহ প্রোপার্টিজ?'}
+                    </h2>
+                  </div>
+                  <button
+                    onClick={() => navigateTo('why-us')}
+                    className="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-bold text-[#006231] hover:text-[#CE2028] transition-colors cursor-pointer"
+                  >
+                    <span>{lang === 'en' ? 'Read full engineering standards' : 'আমাদের মান ও বিশেষত্ব বিস্তারিত দেখুন'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
 
-                      <div className="pt-4 flex flex-wrap gap-3">
-                        <button
-                          onClick={() => setActiveProjectModal(agroProject)}
-                          className="px-6 py-3 rounded-xl bg-[#8EBF40] hover:bg-[#7ca935] text-gray-950 font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-lg shadow-black/20"
-                        >
-                          {lang === 'en' ? 'Explore Emarah Agro Details' : 'ইমারাহ এগ্রোর বিস্তারিত দেখুন'}
-                        </button>
-                        <button
-                          onClick={() => handleOpenBookVisit(agroProject)}
-                          className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all cursor-pointer"
-                        >
-                          {lang === 'en' ? 'Inquire Investment' : 'বিনিয়োগ সম্পর্কে জানুন'}
-                        </button>
-                      </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                  <div className="p-6 rounded-2xl bg-[#FBFBFB] border border-gray-200/80 hover:border-[#006231] hover:bg-white hover:shadow-lg transition-all group">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center font-bold mb-4 group-hover:scale-110 transition-transform">
+                      <Scale className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#006231] transition-colors">
+                      {lang === 'en' ? '100% Shariah Foundation' : '১০০% হালাল ও নৈতিক ভিত্তি'}
+                    </h3>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      {lang === 'en' ? 'Strictly interest-free, Halal Mudarabah partnership principles.' : 'সুদমুক্ত যৌথ লাভ-ক্ষতির অংশীদারিত্ব ও ইসলামী অর্থনৈতিক মূল্যবোধ।'}
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-2xl bg-[#FBFBFB] border border-gray-200/80 hover:border-[#006231] hover:bg-white hover:shadow-lg transition-all group">
+                    <div className="w-12 h-12 rounded-xl bg-red-50 text-[#CE2028] flex items-center justify-center font-bold mb-4 group-hover:scale-110 transition-transform">
+                      <ShieldCheck className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#CE2028] transition-colors">
+                      {lang === 'en' ? 'BUET Tested Safety' : 'বুয়েট টেস্ট ও সর্বোচ্চ নিরাপত্তা'}
+                    </h3>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      {lang === 'en' ? 'Rigorous soil testing, 7.5+ earthquake resistance, and 60-grade steel.' : '৭.৫+ মাত্রার ভূমিকম্প সহনশীল স্ট্রাকচার ও সর্বোচ্চ গ্রেডের রড-পাথর।'}
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-2xl bg-[#FBFBFB] border border-gray-200/80 hover:border-[#006231] hover:bg-white hover:shadow-lg transition-all group">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center font-bold mb-4 group-hover:scale-110 transition-transform">
+                      <Building2 className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#006231] transition-colors">
+                      {lang === 'en' ? '100% Clear Land Title' : 'নিষ্কণ্টক নিজস্ব জমি'}
+                    </h3>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      {lang === 'en' ? 'Verified municipal approvals, clear mutation deeds, and zero legal disputes.' : 'শতভাগ নির্ভেজাল জমি, রাজউক কমপ্লায়েন্স ও আইনি স্বচ্ছতা।'}
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-2xl bg-[#FBFBFB] border border-gray-200/80 hover:border-[#006231] hover:bg-white hover:shadow-lg transition-all group">
+                    <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold mb-4 group-hover:scale-110 transition-transform">
+                      <Award className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-bold text-gray-900 mb-1 group-hover:text-amber-700 transition-colors">
+                      {lang === 'en' ? 'On-Time Handover' : 'সময়মতো হস্তান্তর অঙ্গীকার'}
+                    </h3>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      {lang === 'en' ? 'Time-bound project milestones and dedicated post-handover facility care.' : 'নির্দিষ্ট সময়ভিত্তিক নির্মাণ এবং হস্তান্তর-পরবর্তী দীর্ঘমেয়াদি যত্ন।'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Halal Investment Teaser Card */}
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <div className="rounded-3xl bg-gradient-to-r from-emerald-950 via-[#004724] to-emerald-900 text-white p-8 sm:p-12 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-[#8EBF40]/15 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-8 space-y-4">
+                    <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold text-[#8EBF40] border border-white/10">
+                      <Coins className="w-3.5 h-3.5" />
+                      <span>{lang === 'en' ? 'Participatory Halal Wealth Creation' : 'পরিকল্পিত বিনিয়োগ, আস্থার সাথে সম্পদ সৃষ্টি'}</span>
                     </div>
 
-                    <div className="lg:col-span-5">
-                      <div className="rounded-3xl overflow-hidden shadow-2xl border-2 border-white/10 aspect-4/3 relative group">
-                        <img
-                          src={agroProject.image}
-                          alt="Emarah Agro Project"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-5">
-                          <span className="text-xs font-bold text-white bg-emerald-700/80 px-3 py-1.5 rounded-lg backdrop-blur-xs">
-                            {lang === 'en' ? 'Active Production Phase' : 'সরাসরি চলমান উৎপাদনমুখী প্রকল্প'}
-                          </span>
-                        </div>
-                      </div>
+                    <h3 className="text-2xl sm:text-4xl font-black text-white">
+                      {lang === 'en' ? 'Grow Your Wealth with Halal Agro & Real Estate Shares' : 'ন্যূনতম ১ লক্ষ টাকা থেকে হালাল যৌথ ব্যবসায় অংশীদার হোন'}
+                    </h3>
+
+                    <p className="text-xs sm:text-sm text-gray-200 leading-relaxed max-w-2xl">
+                      {lang === 'en' 
+                        ? 'Invest in tangible dairy cattle farming and prime apartment developments with guaranteed legal agreements, quarterly accounting audits, and a 90-day capital refund policy.'
+                        : 'আল-ইমারাহ প্রোপার্টিজ ও এগ্রো প্রকল্পে রয়েছে সীমিত আয়ের মানুষ ও প্রবাসীদের জন্য হালাল মুনাফা উপার্জনের সুযোগ। সরকারি স্ট্যাম্পে চুক্তি এবং ৯০ দিনের নোটিশে মূলধন ফেরতের সুদৃঢ় নিশ্চয়তা।'}
+                    </p>
+
+                    <div className="pt-2 flex flex-wrap gap-3">
+                      <button
+                        onClick={() => navigateTo('investment')}
+                        className="px-6 py-3 rounded-xl bg-[#8EBF40] hover:bg-[#7ca935] text-gray-950 font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95"
+                      >
+                        {lang === 'en' ? 'Read Full Investment Policy ➔' : 'বিনিয়োগের সম্পূর্ণ নীতিমালা পড়ুন ➔'}
+                      </button>
+
+                      <a
+                        href="tel:+8801918646575"
+                        className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all flex items-center space-x-2 cursor-pointer"
+                      >
+                        <Phone className="w-4 h-4 text-[#8EBF40]" />
+                        <span>{lang === 'en' ? 'Call: 01918-646575' : 'হটলাইন: ০১৯১৮-৬৪৬৫৭৫'}</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
+                    <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/10 space-y-1">
+                      <div className="text-[11px] font-bold text-[#8EBF40] uppercase">সর্বনিম্ন বিনিয়োগ</div>
+                      <div className="text-2xl font-black text-white">৳ ১,০০,০০০</div>
+                      <div className="text-[11px] text-gray-300">সকল আয়ের মানুষের সুযোগ</div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/10 space-y-1">
+                      <div className="text-[11px] font-bold text-red-300 uppercase">মূলধন প্রত্যাহার</div>
+                      <div className="text-2xl font-black text-white">৯০ দিনের নোটিশ</div>
+                      <div className="text-[11px] text-gray-300">নিরাপদ এক্সিট গ্যারান্টি</div>
                     </div>
                   </div>
                 </div>
-              </section>
-            )}
-
-            {/* Join The Journey - Participatory Wealth Creation Section */}
-            <JoinJourney
-              lang={lang}
-              t={t}
-              onJoinClick={() => navigateTo('contact')}
-              onExplorePolicy={() => navigateTo('why-us')}
-            />
-
-            {/* Why Choose Us Preview Section */}
-            <div className="relative">
-              <WhyChooseUs lang={lang} t={t} />
-              <div className="text-center pb-12 -mt-6">
-                <button
-                  onClick={() => navigateTo('why-us')}
-                  className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-900 text-white hover:bg-[#CE2028] text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
-                >
-                  <span>{lang === 'en' ? 'Read More About Our Engineering Standards' : 'আমাদের ইঞ্জিনিয়ারিং ও কোয়ালিটি স্ট্যান্ডার্ড বিস্তারিত জানুন'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
               </div>
-            </div>
+            </section>
 
-            {/* About Leadership Preview Section */}
-            <div className="relative">
-              <AboutUs lang={lang} t={t} />
-              <div className="text-center pb-12 -mt-6">
-                <button
-                  onClick={() => navigateTo('about')}
-                  className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-900 text-white hover:bg-[#CE2028] text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
-                >
-                  <span>{lang === 'en' ? 'View Corporate Profile & Approvals' : 'আমাদের পরিচিতি ও সম্পূর্ণ পরিচালনা পর্ষদ দেখুন'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+            {/* Signature Amenities Preview */}
+            <Amenities lang={lang} t={t} />
+
+            {/* Quick Contact & Site Visit Invitation Strip */}
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+              <div className="p-8 sm:p-10 rounded-3xl bg-white border border-gray-200 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div className="space-y-2 text-center lg:text-left">
+                  <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-[#CE2028] uppercase tracking-wider">
+                    <MapPin className="w-4 h-4" />
+                    <span>{lang === 'en' ? 'Office Visit & Site Tour' : 'সরাসরি সাইট ভিজিট ও অফিস আমন্ত্রণ'}</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-gray-900">
+                    {lang === 'en' ? 'Schedule a Guided Project Tour with Us' : 'আমাদের যেকোনো প্রকল্পে সরাসরি সাইট ভিজিট করতে চান?'}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-500 max-w-xl">
+                    {lang === 'en'
+                      ? 'Visit our Purana Paltan corporate office or schedule dedicated transport to inspect ongoing construction sites.'
+                      : 'আমাদের পুরানা পল্টন কর্পোরেট অফিসে চা পানের আমন্ত্রণ। আপনার সুবিধাজনক সময়ে সাইট ঘুরিয়ে দেখানোর জন্য আমাদের প্রতিনিধিরা প্রস্তুত।'}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    onClick={() => handleOpenBookVisit()}
+                    className="px-6 py-3.5 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-nowrap active:scale-95"
+                  >
+                    <Calendar className="w-4 h-4 inline-block mr-2" />
+                    <span>{t.nav.bookVisit}</span>
+                  </button>
+
+                  <a
+                    href="https://wa.me/8801918646575"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-6 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center space-x-2 cursor-pointer whitespace-nowrap active:scale-95"
+                  >
+                    <span>{lang === 'en' ? 'Chat on WhatsApp' : 'হোয়াটসঅ্যাপে কথা বলুন'}</span>
+                  </a>
+                </div>
               </div>
-            </div>
-
-            {/* Quick Contact & Consultation Booking Form */}
-            <ContactSection
-              lang={lang}
-              t={t}
-              preselectedProject={preselectedProject}
-            />
+            </section>
           </div>
         )}
 
@@ -264,7 +325,19 @@ export default function App() {
         )}
 
         {/* ==================================================== */}
-        {/* PAGE 3: DEDICATED WHY CHOOSE US PAGE                */}
+        {/* PAGE 3: DEDICATED INVESTMENT & PARTNERSHIP PAGE      */}
+        {/* ==================================================== */}
+        {currentPage === 'investment' && (
+          <InvestmentPage
+            lang={lang}
+            t={t}
+            onNavigateToProjects={() => navigateTo('projects')}
+            onOpenBookVisit={() => handleOpenBookVisit()}
+          />
+        )}
+
+        {/* ==================================================== */}
+        {/* PAGE 4: DEDICATED WHY CHOOSE US PAGE                */}
         {/* ==================================================== */}
         {currentPage === 'why-us' && (
           <div className="animate-fadeIn">

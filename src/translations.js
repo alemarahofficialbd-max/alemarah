@@ -4,8 +4,9 @@ export const translations = {
     nav: {
       home: "Home",
       projects: "Projects",
-      about: "About Us",
+      investment: "Investment",
       whyUs: "Why Al-Emarah",
+      about: "About Us",
       contact: "Contact",
       login: "Client Portal",
       bookVisit: "Schedule Visit",
@@ -19,6 +20,8 @@ export const translations = {
       mobileNav: {
         home: "Home",
         projects: "Projects",
+        investment: "Investment",
+        whyUs: "Why Us",
         about: "About",
         contact: "Contact",
         login: "Login"
@@ -625,11 +628,11 @@ export const translations = {
       rajukMember: "Planned Development, Creating Wealth with Trust",
       links: [
         { label: "Home", href: "#home" },
-        { label: "Ongoing Projects", href: "#projects" },
+        { label: "Signature Projects", href: "#projects" },
+        { label: "Halal Investment", href: "#investment" },
+        { label: "Why Al-Emarah", href: "#why-us" },
         { label: "About Company", href: "#about" },
-        { label: "Quality Standards", href: "#why-us" },
-        { label: "Schedule Consultation", href: "#contact" },
-        { label: "Client Portal", href: "#login" }
+        { label: "Contact & Location", href: "#contact" }
       ],
       legal: [
         "RAJUK Approval Certificates",
@@ -646,8 +649,9 @@ export const translations = {
     nav: {
       home: "হোম",
       projects: "প্রকল্পসমূহ",
-      about: "আমাদের সম্পর্কে",
+      investment: "বিনিয়োগ নীতি ও সুযোগ",
       whyUs: "কেন আল-ইমারাহ",
+      about: "আমাদের পরিচিতি",
       contact: "যোগাযোগ",
       login: "ক্লায়েন্ট পোর্টাল",
       bookVisit: "সাইট ভিজিট বুক করুন",
@@ -660,7 +664,9 @@ export const translations = {
       portalSubtitle: "মালিকদের ড্যাশবোর্ড",
       mobileNav: {
         home: "হোম",
-        projects: "প্রকল্প",
+        projects: "প্রকল্পসমূহ",
+        investment: "বিনিয়োগ",
+        whyUs: "কেন আমরা",
         about: "পরিচিতি",
         contact: "যোগাযোগ",
         login: "লগইন"
@@ -1266,12 +1272,12 @@ export const translations = {
       designedWith: "সেরা স্থাপত্য দক্ষতায় প্রস্তুতকৃত।",
       rajukMember: "পরিকল্পিত উন্নয়ন, আস্থার সঙ্গে সম্পদ সৃষ্টি",
       links: [
-        { label: "হোম", href: "#home" },
-        { label: "চলমান প্রকল্পসমূহ", href: "#projects" },
-        { label: "প্রতিষ্ঠান পরিচিতি", href: "#about" },
-        { label: "গুণগত মান ও নিরাপত্তা", href: "#why-us" },
-        { label: "পরামর্শ ও সাইট ভিজিট", href: "#contact" },
-        { label: "ক্লায়েন্ট লগইন", href: "#login" }
+        { label: "হোম পেজ", href: "#home" },
+        { label: "প্রকল্পসমূহ", href: "#projects" },
+        { label: "হালাল বিনিয়োগ ও অংশীদারিত্ব", href: "#investment" },
+        { label: "কেন আল-ইমারাহ", href: "#why-us" },
+        { label: "আমাদের পরিচিতি", href: "#about" },
+        { label: "যোগাযোগ ও সাইট ভিজিট", href: "#contact" }
       ],
       legal: [
         "রাজউক অনুমোদন সনদপত্র",

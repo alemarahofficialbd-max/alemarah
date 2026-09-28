@@ -12,7 +12,8 @@ import {
   ChevronRight,
   ShieldCheck,
   Compass,
-  Sparkles
+  Sparkles,
+  Coins
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -48,6 +49,7 @@ export default function Navbar({
   const navLinks = [
     { id: 'home', label: t.nav.home, icon: Home },
     { id: 'projects', label: t.nav.projects, icon: Building2 },
+    { id: 'investment', label: t.nav.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ'), icon: Coins },
     { id: 'why-us', label: t.nav.whyUs, icon: ShieldCheck },
     { id: 'about', label: t.nav.about, icon: Compass },
     { id: 'contact', label: t.nav.contact, icon: Phone },
@@ -305,13 +307,13 @@ export default function Navbar({
           </button>
 
           <button
-            onClick={() => handleNavClick('contact')}
+            onClick={() => handleNavClick('investment')}
             className={`flex flex-col items-center py-1 px-2 text-xs font-semibold cursor-pointer ${
-              currentPage === 'contact' ? 'text-[#CE2028] font-bold' : 'text-gray-500'
+              currentPage === 'investment' ? 'text-[#006231] font-bold' : 'text-gray-500'
             }`}
           >
-            <Phone className="w-5 h-5 mb-0.5" />
-            <span>{t.nav.mobileNav.contact}</span>
+            <Coins className="w-5 h-5 mb-0.5" />
+            <span>{t.nav.mobileNav.investment || (lang === 'en' ? 'Invest' : 'বিনিয়োগ')}</span>
           </button>
 
           <button

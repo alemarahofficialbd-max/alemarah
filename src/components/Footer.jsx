@@ -17,6 +17,7 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, isLogg
   const handleLinkClick = (href) => {
     let page = 'home';
     if (href === '#projects') page = 'projects';
+    else if (href === '#investment') page = 'investment';
     else if (href === '#about') page = 'about';
     else if (href === '#why-us') page = 'why-us';
     else if (href === '#contact') page = 'contact';
