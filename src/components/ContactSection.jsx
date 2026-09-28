@@ -1,0 +1,296 @@
+import React, { useState } from 'react';
+import { 
+  Phone, 
+  Mail, 
+  MapPin, 
+  Clock, 
+  Send, 
+  CheckCircle2, 
+  MessageSquare, 
+  Calendar,
+  Building2,
+  Sparkles
+} from 'lucide-react';
+import { projectsData } from '../data/projectsData';
+
+export default function ContactSection({ lang, t, preselectedProject }) {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phone: '',
+    email: '',
+    project: preselectedProject?.id || '',
+    date: '',
+    message: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSubmitted(true);
+      setFormData({
+        fullName: '',
+        phone: '',
+        email: '',
+        project: '',
+        date: '',
+        message: ''
+      });
+    }, 1000);
+  };
+
+  return (
+    <section id="contact" className="py-20 bg-gray-50 border-t border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-50 text-[#CE2028] text-xs font-bold uppercase tracking-wider mb-3">
+            <Phone className="w-3.5 h-3.5" />
+            <span>{t.contact.badge}</span>
+          </div>
+
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#231F20] tracking-tight">
+            {t.contact.title}
+          </h2>
+          <p className="mt-3 text-base text-gray-600">
+            {t.contact.subtitle}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          {/* Left Column: Office Details & Direct Channels */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="bg-white p-7 rounded-2xl border border-gray-200 shadow-xs space-y-6">
+              <h3 className="text-xl font-bold text-gray-900 border-b border-gray-100 pb-3">
+                {t.contact.office.title}
+              </h3>
+
+              {/* Address */}
+              <div className="flex items-start space-x-3.5">
+                <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-[#CE2028] shrink-0 mt-0.5">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div className="text-sm">
+                  <div className="font-bold text-gray-900">{t.contact.office.addressLine1}</div>
+                  <div className="text-gray-600">{t.contact.office.addressLine2}</div>
+                </div>
+              </div>
+
+              {/* Working Hours */}
+              <div className="flex items-start space-x-3.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-[#006231] shrink-0 mt-0.5">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div className="text-sm">
+                  <div className="font-bold text-gray-900">{lang === 'en' ? 'Office Schedule' : 'অফিস সময়সূচি'}</div>
+                  <div className="text-gray-600">{t.contact.office.hours}</div>
+                </div>
+              </div>
+
+              {/* Hotline Numbers */}
+              <div className="flex items-start space-x-3.5">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 mt-0.5">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <div className="text-sm">
+                  <div className="font-bold text-gray-900 mb-1">{lang === 'en' ? 'Direct Hotline & Sales' : 'সরাসরি হটলাইন ও সেলস'}</div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:text-sm font-semibold text-gray-800">
+                    <a href="tel:01918646575" className="hover:text-[#CE2028] transition-colors">
+                      {lang === 'en' ? '01918-646575' : '০১৯১৮-৬৪৬৫৭৫'}
+                    </a>
+                    <a href="tel:01743926926" className="hover:text-[#CE2028] transition-colors">
+                      {lang === 'en' ? '01743-926926' : '০১৭৪৩-৯২৬৯২৬'}
+                    </a>
+                    <a href="tel:01914425073" className="hover:text-[#CE2028] transition-colors">
+                      {lang === 'en' ? '01914-425073' : '০১৯১৪-৪২৫০৭৩'}
+                    </a>
+                    <a href="tel:01833544548" className="hover:text-[#CE2028] transition-colors">
+                      {lang === 'en' ? '01833-544548' : '০১৮৩৩-৫৪৪৫৪৮'}
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Emails */}
+              <div className="flex items-start space-x-3.5">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0 mt-0.5">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div className="text-sm">
+                  <div className="font-bold text-gray-900">{lang === 'en' ? 'Corporate Inquiries' : 'কর্পোরেট ইমেইল'}</div>
+                  <div className="text-gray-600">{t.contact.office.email}</div>
+                  <div className="text-gray-600">{t.contact.office.salesEmail}</div>
+                </div>
+              </div>
+
+              {/* Instant Call / WhatsApp Buttons */}
+              <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <a
+                  href="https://wa.me/8801918646575"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-[#006231] hover:bg-[#004723] text-white text-xs font-bold shadow-md transition-colors"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>{t.contact.form.whatsappBtn}</span>
+                </a>
+
+                <a
+                  href="tel:01918646575"
+                  className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs font-bold shadow-md transition-colors"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>{t.contact.form.callNowBtn}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Interactive Consultation & Visit Booking Form */}
+          <div className="lg:col-span-7">
+            <div className="bg-white p-7 sm:p-9 rounded-2xl border border-gray-200 shadow-lg shadow-black/5">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+                {t.contact.form.title}
+              </h3>
+              <p className="text-sm text-gray-500 mb-6">
+                {lang === 'en' 
+                  ? 'Fill out this brief form and our senior relationship officer will arrange your personalized site walkthrough.' 
+                  : 'নিচের ফর্মটি পূরণ করুন, আমাদের সিনিয়র রিলেশনশিপ অফিসার আপনার সাইট পরিদর্শনের সকল ব্যবস্থা গ্রহণ করবেন।'
+                }
+              </p>
+
+              {submitted ? (
+                <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3 animate-fadeIn">
+                  <div className="w-12 h-12 rounded-full bg-[#006231] text-white flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-7 h-7" />
+                  </div>
+                  <h4 className="text-lg font-bold text-[#006231]">
+                    {lang === 'en' ? 'Request Submitted Successfully!' : 'আবেদন সফলভাবে গৃহীত হয়েছে!'}
+                  </h4>
+                  <p className="text-sm text-emerald-800 max-w-md mx-auto">
+                    {t.contact.form.successMsg}
+                  </p>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="mt-2 text-xs font-bold text-[#CE2028] hover:underline cursor-pointer"
+                  >
+                    {lang === 'en' ? 'Submit another request' : 'অন্য আরেকটি আবেদন জমা দিন'}
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Full Name */}
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        {t.contact.form.fullName} <span className="text-[#CE2028]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        placeholder={t.contact.form.fullNamePlaceholder}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all"
+                      />
+                    </div>
+
+                    {/* Phone */}
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        {t.contact.form.phone} <span className="text-[#CE2028]">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder={t.contact.form.phonePlaceholder}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Email */}
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        {t.contact.form.email}
+                      </label>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder={t.contact.form.emailPlaceholder}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all"
+                      />
+                    </div>
+
+                    {/* Preferred Project */}
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                        {t.contact.form.project}
+                      </label>
+                      <select
+                        value={formData.project}
+                        onChange={(e) => setFormData({ ...formData, project: e.target.value })}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all cursor-pointer"
+                      >
+                        <option value="">{t.contact.form.selectProject}</option>
+                        {projectsData.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {lang === 'en' ? p.nameEn : p.nameBn} ({p.sizeSqft} sqft)
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Preferred Date */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                      {t.contact.form.date}
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all cursor-pointer"
+                    />
+                  </div>
+
+                  {/* Message */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                      {t.contact.form.message}
+                    </label>
+                    <textarea
+                      rows="3"
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder={t.contact.form.messagePlaceholder}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all resize-none"
+                    ></textarea>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white text-sm font-bold shadow-lg shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center space-x-2"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>{loading ? t.contact.form.submitting : t.contact.form.submitBtn}</span>
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
