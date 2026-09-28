@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Projects from './components/Projects';
-import ProjectModal from './components/ProjectModal';
+import ProjectDetailsPage from './components/ProjectDetailsPage';
 import WhyChooseUs from './components/WhyChooseUs';
 import AboutUs from './components/AboutUs';
 import Amenities from './components/Amenities';
@@ -36,7 +36,7 @@ export default function App() {
   const [lang, setLang] = useState('bn'); // 'bn' (Bangla) or 'en' (English)
   const [currentPage, setCurrentPage] = useState('home'); // 'home', 'projects', 'why-us', 'about', 'contact', 'login', 'dashboard'
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeProjectModal, setActiveProjectModal] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [preselectedProject, setPreselectedProject] = useState(null);
   const [searchFilter, setSearchFilter] = useState(null);
   const [showSplash, setShowSplash] = useState(true);
@@ -68,6 +68,11 @@ export default function App() {
   const navigateTo = (pageId) => {
     setCurrentPage(pageId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectProject = (project) => {
+    setSelectedProject(project);
+    navigateTo('project-details');
   };
 
   const handleOpenBookVisit = (project = null) => {
@@ -132,7 +137,7 @@ export default function App() {
               lang={lang}
               t={t}
               searchFilter={searchFilter}
-              onSelectProject={(project) => setActiveProjectModal(project)}
+              onSelectProject={handleSelectProject}
               onOpenBookVisit={(project) => handleOpenBookVisit(project)}
               featured={true}
               onViewAllProjects={() => navigateTo('projects')}
@@ -322,7 +327,7 @@ export default function App() {
               lang={lang}
               t={t}
               searchFilter={searchFilter}
-              onSelectProject={(project) => setActiveProjectModal(project)}
+              onSelectProject={handleSelectProject}
               onOpenBookVisit={(project) => handleOpenBookVisit(project)}
               featured={false}
             />
@@ -475,6 +480,19 @@ export default function App() {
             onNavigateHome={() => navigateTo('home')}
           />
         )}
+        {/* ==================================================== */}
+        {/* PAGE 8: DEDICATED FULL-PAGE PROJECT DETAILS          */}
+        {/* ==================================================== */}
+        {currentPage === 'project-details' && selectedProject && (
+          <ProjectDetailsPage
+            project={selectedProject}
+            lang={lang}
+            t={t}
+            onBack={() => navigateTo('projects')}
+            onSelectProject={handleSelectProject}
+            onBookVisit={(project) => handleOpenBookVisit(project)}
+          />
+        )}
       </main>
 
       {/* Footer - Hidden on Login & Client Dashboard */}
@@ -487,15 +505,6 @@ export default function App() {
           isLoggedIn={isLoggedIn}
         />
       )}
-
-      {/* Project Details Modal */}
-      <ProjectModal
-        project={activeProjectModal}
-        lang={lang}
-        t={t}
-        onClose={() => setActiveProjectModal(null)}
-        onBookVisit={(project) => handleOpenBookVisit(project)}
-      />
 
       {/* App Splash / Flash Screen on Launch */}
       {showSplash && (
