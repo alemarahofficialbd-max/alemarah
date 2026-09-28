@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   MapPin, 
@@ -9,13 +9,20 @@ import {
   CheckCircle2, 
   ShieldCheck, 
   FileText, 
-  Phone,
-  Compass,
-  Download
+  Phone, 
+  Compass, 
+  Download,
+  Image as ImageIcon
 } from 'lucide-react';
 
 export default function ProjectModal({ project, lang, t, onClose, onBookVisit }) {
   if (!project) return null;
+
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  useEffect(() => {
+    setSelectedImage(null);
+  }, [project]);
 
   const statusColors = {
     ongoing: 'bg-amber-100 text-amber-800 border-amber-200',
@@ -28,6 +35,8 @@ export default function ProjectModal({ project, lang, t, onClose, onBookVisit })
     upcoming: t.projects.card.statusUpcoming,
     ready: t.projects.card.statusReady
   };
+
+  const activeDisplayImage = selectedImage || project.image;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 animate-fadeIn">
@@ -65,26 +74,47 @@ export default function ProjectModal({ project, lang, t, onClose, onBookVisit })
             </p>
           </div>
 
-          {/* Image Showcase Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="md:col-span-2 h-64 sm:h-80 rounded-xl overflow-hidden shadow-inner">
+          {/* Interactive Image Showcase & Gallery Strip */}
+          <div className="space-y-3">
+            <div className="relative h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-inner bg-gray-950">
               <img
-                src={project.image}
+                src={activeDisplayImage}
                 alt={project.nameEn}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-all duration-300"
               />
+              <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-semibold text-white">
+                {lang === 'en' ? 'Click thumbnails below to view' : 'নিচের ছবিতে ক্লিক করে গ্যালারি দেখুন'}
+              </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
-              {project.gallery.slice(1, 3).map((img, idx) => (
-                <div key={idx} className="h-30 sm:h-38 rounded-xl overflow-hidden shadow-inner">
-                  <img
-                    src={img}
-                    alt={`${project.nameEn} gallery`}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-              ))}
-            </div>
+
+            {/* Gallery Thumbnails Strip */}
+            {project.gallery && project.gallery.length > 0 && (
+              <div className="flex items-center space-x-2.5 overflow-x-auto pb-2 pt-1 scrollbar-thin">
+                <button
+                  onClick={() => setSelectedImage(project.image)}
+                  className={`relative w-20 h-14 sm:w-24 sm:h-16 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                    activeDisplayImage === project.image 
+                      ? 'border-[#006231] ring-2 ring-[#006231]/30 scale-105' 
+                      : 'border-transparent opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  <img src={project.image} alt="Main preview" className="w-full h-full object-cover" />
+                </button>
+                {project.gallery.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(img)}
+                    className={`relative w-20 h-14 sm:w-24 sm:h-16 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                      activeDisplayImage === img 
+                        ? 'border-[#006231] ring-2 ring-[#006231]/30 scale-105' 
+                        : 'border-transparent opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Quick Specifications Strip */}
@@ -193,6 +223,70 @@ export default function ProjectModal({ project, lang, t, onClose, onBookVisit })
               ))}
             </div>
           </div>
+
+          {/* Dedicated Architectural Floor Plan Section */}
+          {project.floorPlan && (
+            <div className="rounded-2xl border-2 border-emerald-100 bg-emerald-50/20 overflow-hidden shadow-xs">
+              <div className="p-4 bg-emerald-50 border-b border-emerald-100 flex items-center justify-between">
+                <div className="flex items-center space-x-2 text-emerald-950 font-bold text-sm sm:text-base">
+                  <Compass className="w-5 h-5 text-[#006231]" />
+                  <span>{lang === 'en' ? 'Master Architectural Floor Plan' : 'আবাসিক ফ্লোর প্ল্যান ও ইউনিট লেআউট'}</span>
+                </div>
+                <a
+                  href={project.floorPlan}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-bold text-[#006231] hover:underline"
+                >
+                  {lang === 'en' ? 'Open Full Size ↗' : 'পূর্ণাকারে দেখুন ↗'}
+                </a>
+              </div>
+              <div className="p-5 flex justify-center bg-white">
+                <img
+                  src={project.floorPlan}
+                  alt={`${project.nameEn} Floor Plan`}
+                  className="max-h-96 rounded-xl border border-gray-200 shadow-sm object-contain cursor-pointer hover:scale-[1.01] transition-transform"
+                  onClick={() => setSelectedImage(project.floorPlan)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Project Real Photo Gallery Grid */}
+          {project.gallery && project.gallery.length > 3 && (
+            <div className="rounded-2xl border border-gray-200 p-5 bg-white space-y-4 shadow-2xs">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <h4 className="text-sm sm:text-base font-bold text-gray-900 flex items-center space-x-2">
+                  <ImageIcon className="w-4 h-4 text-[#006231]" />
+                  <span>{lang === 'en' ? 'Actual Site & Farm Gallery' : 'প্রকল্পের বাস্তব দৃশ্য ও ফটোগ্যালারি'}</span>
+                </h4>
+                <span className="text-xs font-bold text-[#006231] bg-emerald-50 px-2.5 py-1 rounded-full">
+                  {lang === 'en' ? `${project.gallery.length} Photos` : `মোট ${project.gallery.length}টি বাস্তব ছবি`}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                {project.gallery.map((img, i) => (
+                  <div
+                    key={i}
+                    onClick={() => setSelectedImage(img)}
+                    className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer group shadow-2xs ${
+                      activeDisplayImage === img ? 'border-[#006231] ring-2 ring-[#006231]/30 scale-105' : 'border-gray-200 hover:border-gray-400'
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Site photo ${i + 1}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] font-bold">
+                      {lang === 'en' ? 'View' : 'দেখুন'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Legal Approval Notice */}
           <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200/70 flex items-center space-x-3">

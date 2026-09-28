@@ -172,8 +172,8 @@ export default function AboutUs({ lang, t }) {
         {/* Leadership Messages: Chairman & Managing Director */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Chairman's Message */}
-          <div className="p-8 rounded-3xl bg-white border-2 border-red-100 shadow-lg shadow-red-900/5 relative flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="p-7 sm:p-8 rounded-3xl bg-white border-2 border-red-100 shadow-xl shadow-red-900/5 relative flex flex-col justify-between overflow-hidden">
+            <div className="space-y-5">
               <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#CE2028] flex items-center space-x-1.5">
                   <UserCheck className="w-4 h-4" />
@@ -181,19 +181,36 @@ export default function AboutUs({ lang, t }) {
                 </span>
                 <Quote className="w-7 h-7 text-[#CE2028]/30" />
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed italic font-serif">
-                "{t.about.chairmanQuote}"
-              </p>
+
+              {/* Portrait with seamless bottom gradient fade */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                <div className="relative w-40 sm:w-44 h-52 sm:h-60 shrink-0 rounded-2xl overflow-hidden bg-gradient-to-b from-red-50/40 via-red-50/20 to-white">
+                  <img
+                    src="/images/chairman.png"
+                    alt={t.about.chairmanName}
+                    className="w-full h-full object-cover object-top"
+                  />
+                  {/* Seamless fade overlay to eliminate cut at the bottom */}
+                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none"></div>
+                </div>
+
+                <div className="flex-1 space-y-2 text-center sm:text-left">
+                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic font-serif">
+                    "{t.about.chairmanQuote}"
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="pt-5 mt-6 border-t border-gray-100">
+
+            <div className="pt-4 mt-6 border-t border-gray-100 text-center sm:text-left">
               <div className="text-base font-extrabold text-gray-900">{t.about.chairmanName}</div>
               <div className="text-xs text-gray-500 font-medium mt-0.5">{t.about.chairmanDesignation}</div>
             </div>
           </div>
 
           {/* Managing Director's Message */}
-          <div className="p-8 rounded-3xl bg-white border-2 border-emerald-100 shadow-lg shadow-emerald-900/5 relative flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="p-7 sm:p-8 rounded-3xl bg-white border-2 border-emerald-100 shadow-xl shadow-emerald-900/5 relative flex flex-col justify-between overflow-hidden">
+            <div className="space-y-5">
               <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#006231] flex items-center space-x-1.5">
                   <UserCheck className="w-4 h-4" />
@@ -201,11 +218,28 @@ export default function AboutUs({ lang, t }) {
                 </span>
                 <Quote className="w-7 h-7 text-[#006231]/30" />
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed italic font-serif">
-                "{t.about.mdQuote}"
-              </p>
+
+              {/* Portrait with seamless bottom gradient fade */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                <div className="relative w-40 sm:w-44 h-52 sm:h-60 shrink-0 rounded-2xl overflow-hidden bg-gradient-to-b from-emerald-50/40 via-emerald-50/20 to-white">
+                  <img
+                    src="/images/managing_director.png"
+                    alt={t.about.mdName}
+                    className="w-full h-full object-cover object-top"
+                  />
+                  {/* Seamless fade overlay to eliminate cut at the bottom */}
+                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none"></div>
+                </div>
+
+                <div className="flex-1 space-y-2 text-center sm:text-left">
+                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic font-serif">
+                    "{t.about.mdQuote}"
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="pt-5 mt-6 border-t border-gray-100">
+
+            <div className="pt-4 mt-6 border-t border-gray-100 text-center sm:text-left">
               <div className="text-base font-extrabold text-gray-900">{t.about.mdName}</div>
               <div className="text-xs text-gray-500 font-medium mt-0.5">{t.about.mdDesignation}</div>
             </div>
