@@ -226,16 +226,52 @@ export const translations = {
 
     // Special Project Amenities (From Corporate Profile)
     amenities: {
-      badge: "Signature Project Amenities",
-      title: "Thoughtfully Planned for Serene & Modern Living",
-      subtitle: "Every Al-Emarah project integrates essential civic facilities, spiritual tranquility, and social recreation.",
+      badge: "Signature Features & Amenities",
+      title: "Planned for Serene, Modern & Grand Living",
+      subtitle: "Every Al-Emarah development is master-planned to harmonize civic convenience, spiritual tranquility, and vibrant social bonding.",
+      highlights: [
+        "Rooftop Musalla & Adhan Acoustics",
+        "24/7 CCTV & Multi-Tier Security",
+        "100% Full Generator Backup",
+        "Eco-Friendly Green Rooftops"
+      ],
       items: [
-        { title: "Rooftop Prayer Space (Musalla)", desc: "Dedicated prayer hall on the rooftop with acoustic design allowing adhan to reach all apartments" },
-        { title: "Community Lounge & Hall", desc: "Spacious community space for family gatherings, social events, and resident meetings" },
-        { title: "Children's Secure Play Zone", desc: "Safe, designated indoor and outdoor recreational play area for children" },
-        { title: "Rooftop Family BBQ Zone", desc: "Landscaped rooftop garden with barbecue facilities and panoramic city views" },
-        { title: "Civic Convenience Proximity", desc: "Immediate accessibility to reputed schools, hospitals, daily markets, and mosques" },
-        { title: "Planned Residential & Commercial Mix", desc: "Integrated bottom commercial shopping floors with completely separated, secure residential entries" }
+        {
+          title: "Rooftop Prayer Space (Musalla)",
+          sub: "Spiritual Peace & Adhan",
+          desc: "A tranquil rooftop prayer space designed with natural acoustics ensuring the call to prayer (Adhan) peacefully resonates throughout living units.",
+          tag: "Spiritual Tranquility"
+        },
+        {
+          title: "Spacious Community Lounge",
+          sub: "Social Bonding & Events",
+          desc: "Dedicated resident community hall for family celebrations, social bonding, cultural gatherings, and resident council meetings.",
+          tag: "Community Connection"
+        },
+        {
+          title: "Children's Safe Play Zone",
+          sub: "Indoor & Outdoor Activity",
+          desc: "A child-friendly, secure play area shielded from vehicular movement to support healthy physical growth, joy, and active socialization.",
+          tag: "Child-Safe Environment"
+        },
+        {
+          title: "Landscaped Rooftop Garden & BBQ",
+          sub: "Family Recreation & City View",
+          desc: "Lush botanical landscaping, aesthetic sitting pergolas, and dedicated family barbecue stations with panoramic urban skylines.",
+          tag: "Green Open Living"
+        },
+        {
+          title: "Prime Civic Proximity",
+          sub: "Walking Distance Convenience",
+          desc: "Immediate doorstep proximity to top-tier schools, colleges, specialized medical centers, daily markets, and rapid transit arterials.",
+          tag: "Prime Neighborhood"
+        },
+        {
+          title: "Integrated Dual Security & Private Entry",
+          sub: "24/7 Monitored Protection",
+          desc: "Completely separated, secure private access points for residential families, distinct from ground-level commercial customer traffic.",
+          tag: "Complete Privacy & Safety"
+        }
       ]
     },
 
@@ -832,16 +868,52 @@ export const translations = {
 
     // Special Project Amenities (From Corporate Profile)
     amenities: {
-      badge: "প্রকল্পের বিশেষ সুবিধাসমূহ",
-      title: "পরিকল্পিত সুসংগঠিত ও শান্তিময় জীবনযাপন",
-      subtitle: "আল ইমারাহ-এর প্রতিটি প্রকল্পে আধুনিক নাগরিক সুবিধা, আত্মিক প্রশান্তি ও সামাজিক মেলবন্ধনের নিখুঁত আয়োজন।",
+      badge: "আল-ইমারাহ এর বিশেষত্ব",
+      title: "পরিকল্পিত সুসংগঠিত ও শান্তিময় আধুনিক জীবনযাপন",
+      subtitle: "আল ইমারাহ-এর প্রতিটি প্রকল্পে আধুনিক নাগরিক সুযোগ-সুবিধা, আত্মিক প্রশান্তি ও সামাজিক মেলবন্ধনের নিখুঁত আয়োজন।",
+      highlights: [
+        "ছাদে মুসাল্লা ও আজানের ধ্বনি",
+        "২৪/৭ সিসিটিভি ও স্মার্ট সিকিউরিটি",
+        "নিরবচ্ছিন্ন জেনারেটর ব্যাকআপ",
+        "ল্যান্ডস্কেপড রুফটপ গার্ডেন"
+      ],
       items: [
-        { title: "ছাদে বিশেষ নামাজের স্থান (মুসাল্লা)", desc: "ভবনের ছাদে নিরিবিলি নামাজের স্থান এবং সমগ্র আবাসিক পরিবেশে স্পষ্ট আজানের ধ্বনি পৌঁছানোর ব্যবস্থা" },
-        { title: "সুপ্রশস্ত কমিউনিটি স্পেস", desc: "পারিবারিক অনুষ্ঠান, সামাজিক মেলবন্ধন ও বাসিন্দাদের মতবিনিময়ের জন্য নিজস্ব কমিউনিটি হল" },
-        { title: "শিশুদের সুরক্ষিত খেলার জায়গা", desc: "শিশুদের শারীরিক বিকাশ ও আনন্দের জন্য নিরাপদ ইনডোর ও আউটডোর প্লে জোন" },
-        { title: "ছাদে রুফটপ বারবিকিউ জোন", desc: "মনোরম ল্যান্ডস্কেপিং ছাদ বাগান, বসার নান্দনিক জায়গা ও ফ্যামিলি বারবিকিউ সুবিধা" },
-        { title: "দৈনন্দিন নাগরিক সুবিধার সহজলভ্যতা", desc: "নামকরা স্কুল, কলেজ, হাসপাতাল, বাজার এবং প্রধান যোগাযোগ পথের ঠিক সন্নিকটে অবস্থান" },
-        { title: "আবাসিক ও বাণিজ্যিক সমন্বিত নিরাপত্তা", desc: "নিচের বাণিজ্যিক স্পেসের জন্য আলাদা গ্রাহক পার্কিং ও আবাসিক পরিবারের জন্য সম্পূর্ণ পৃথক নিরাপদ এন্ট্রি" }
+        {
+          title: "ছাদে বিশেষ নামাজের স্থান (মুসাল্লা)",
+          sub: "আজানের পবিত্র সুর ও শান্তিময় পরিবেশ",
+          desc: "ভবনের ছাদে নিরিবিলি নামাজের স্থান এবং সমগ্র আবাসিক পরিবেশে স্পষ্ট আজানের পবিত্র ধ্বনি পৌঁছানোর নিখুঁত ভৌগোলিক ও আর্কিটেকচারাল বিন্যাস।",
+          tag: "আত্মিক ও আধ্যাত্মিক প্রশান্তি"
+        },
+        {
+          title: "সুপ্রশস্ত সুসজ্জিত কমিউনিটি স্পেস",
+          sub: "পারিবারিক অনুষ্ঠান ও সামাজিক মেলবন্ধন",
+          desc: "পারিবারিক যেকোনো অনুষ্ঠান, সামাজিক মেলবন্ধন, মিলাদ মাহফিল ও বাসিন্দাদের মতবিনিময়ের জন্য নিজস্ব আধুনিক কমিউনিটি হল।",
+          tag: "সামাজিক সম্প্রীতি"
+        },
+        {
+          title: "শিশুদের সুরক্ষিত আধুনিক প্লে-জোন",
+          sub: "নিরাপদ আনন্দময় শৈশব",
+          desc: "গাড়ি চলাচলমুক্ত সম্পূর্ণ নিরাপদ পরিবেশে শিশুদের শারীরিক বিকাশ ও মুক্ত আনন্দের জন্য ইনডোর ও আউটডোর শিশুবান্ধব খেলার জায়গা।",
+          tag: "শিশুবান্ধব নিরাপদ জোন"
+        },
+        {
+          title: "ছাদে রুফটপ গার্ডেন ও বারবিকিউ কর্নার",
+          sub: "মনোরম ল্যান্ডস্কেপিং ও ওপেন স্কাই ভিউ",
+          desc: "সবুজ বাগান, দৃষ্টিনন্দন বসার জায়গা, ওপেন স্কাই সিটি ভিউ এবং পারিবারিক আনন্দের জন্য বিশেষ রুফটপ ফ্যামিলি বারবিকিউ সুবিধা।",
+          tag: "সবুজ ও নান্দনিক বিনোদন"
+        },
+        {
+          title: "দৈনন্দিন নাগরিক সুবিধার সহজলভ্যতা",
+          sub: "সবকিছু হাতের নাগালে",
+          desc: "নামকরা স্কুল, কলেজ, বিশেষায়িত হাসপাতাল, কাঁচাবাজার ও প্রধান যোগাযোগ সড়কের ঠিক হাঁটার দূরত্বে কৌশলগত সুবিধাজনক অবস্থান।",
+          tag: "কমিউনিকেশন ও নাগরিক সান্নিধ্য"
+        },
+        {
+          title: "আবাসিক ও বাণিজ্যিক সমন্বিত দ্বিস্তর নিরাপত্তা",
+          sub: "২৪/৭ সার্বক্ষণিক নজরদারি ও প্রাইভেসি",
+          desc: "নিচের বাণিজ্যিক স্পেসের জন্য আলাদা গ্রাহক পার্কিং ও আবাসিক পরিবারের জন্য সম্পূর্ণ পৃথক, সুরক্ষিত ও প্রাইভেট এন্ট্রি পয়েন্ট।",
+          tag: "১০০% পারিবারিক নিরাপত্তা"
+        }
       ]
     },
 
