@@ -34,24 +34,68 @@ export default function Hero({
       <div className="absolute top-0 right-0 w-96 h-96 bg-red-100/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
       <div className="absolute bottom-10 left-0 w-96 h-96 bg-emerald-100/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
-      {/* Phone View Skyline Header Image (Only on phone view, followed by headline and text) */}
-      <div className="block md:hidden w-full overflow-hidden mb-4 px-2">
-        <picture className="w-full">
-          <source srcSet="/images/headr_phoneview.webp" type="image/webp" />
-          <img 
-            src="/images/headr_phoneview.png" 
-            alt="Al-Emarah Properties Planned Development" 
-            className="w-full h-auto object-contain max-h-56 sm:max-h-64 mx-auto rounded-xl"
-            loading="eager"
-          />
-        </picture>
+      {/* Phone View Skyline Hero (Texts and CTAs floating over bottom illustration) */}
+      <div className="relative md:hidden w-full overflow-hidden pt-4 pb-28 px-4">
+        {/* Background Skyline Image at the bottom */}
+        <div className="absolute inset-x-0 bottom-0 pointer-events-none z-0">
+          <picture className="w-full">
+            <source srcSet="/images/headr_phoneview.webp" type="image/webp" />
+            <img 
+              src="/images/headr_phoneview.png" 
+              alt="Al-Emarah Planned Development" 
+              className="w-full h-auto object-cover max-h-64 sm:max-h-72 opacity-95"
+              loading="eager"
+            />
+          </picture>
+          <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/20 to-white/95"></div>
+        </div>
+
+        {/* Floating Content over the skyline */}
+        <div className="relative z-10 text-center space-y-4 max-w-lg mx-auto">
+          {/* Master Headline */}
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#231F20] tracking-tight leading-[1.2]">
+            <span>{t.hero.headlinePrefix} </span>
+            <span className="relative inline-block text-[#CE2028]">
+              {t.hero.headlineHighlight}
+              <svg className="absolute -bottom-1.5 left-0 w-full h-2.5 text-[#8EBF40]/70" viewBox="0 0 100 20" preserveAspectRatio="none">
+                <path d="M0,15 Q50,0 100,15" stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" />
+              </svg>
+            </span>{' '}
+            <span className="text-gray-900">{t.hero.headlineSuffix}</span>
+          </h1>
+
+          {/* Description */}
+          <p className="text-xs sm:text-sm text-gray-700 leading-relaxed font-medium bg-white/70 backdrop-blur-xs rounded-xl p-2.5 shadow-2xs">
+            {t.hero.description}
+          </p>
+
+          {/* Hero CTAs */}
+          <div className="flex items-center justify-center gap-2.5 pt-1">
+            <button
+              onClick={onExploreProjects}
+              className="flex-1 inline-flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#CE2028] text-white text-xs font-bold shadow-md shadow-[#CE2028]/25 hover:bg-[#A9141B] transition-all cursor-pointer"
+            >
+              <Building2 className="w-4 h-4" />
+              <span>{t.hero.exploreBtn}</span>
+              <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
+            </button>
+
+            <button
+              onClick={onOpenBookVisit}
+              className="flex-1 inline-flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-xl bg-white text-gray-800 border border-gray-300 text-xs font-bold hover:border-[#006231] hover:text-[#006231] transition-all cursor-pointer shadow-xs"
+            >
+              <Calendar className="w-4 h-4 text-[#006231]" />
+              <span>{t.hero.consultationBtn}</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main Hero Header */}
-        <div className="text-center max-w-4xl mx-auto space-y-6">
+        {/* Desktop Main Hero Header (Hidden on mobile) */}
+        <div className="hidden md:block text-center max-w-4xl mx-auto space-y-6">
           {/* Master Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-[#231F20] tracking-tight leading-[1.15]">
+          <h1 className="text-4xl lg:text-6xl font-extrabold text-[#231F20] tracking-tight leading-[1.15]">
             <span>{t.hero.headlinePrefix} </span>
             <span className="relative inline-block text-[#CE2028]">
               {t.hero.headlineHighlight}
