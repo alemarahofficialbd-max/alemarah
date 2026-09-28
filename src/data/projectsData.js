@@ -41,9 +41,9 @@ export const projectsData = [
       drawing: "সুবিন্যস্ত ড্রয়িং",
       dining: "আলাদা ডাইনিং"
     },
-    image: "/images/al_quds_tower.jpeg",
+    image: "/images/al_quds_tower.webp",
     gallery: [
-      "/images/al_quds_tower.jpeg",
+      "/images/al_quds_tower.webp",
       "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80",
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"
     ],
@@ -95,11 +95,11 @@ export const projectsData = [
     totalUnitsEn: "27 Residential Units",
     totalUnitsBn: "২৭টি আবাসিক ইউনিট",
     totalFloors: 10,
-    image: "/images/barakah_tower_01.jpeg",
-    floorPlan: "/images/barakah_01_floor_plan.png",
+    image: "/images/barakah_tower_01.webp",
+    floorPlan: "/images/barakah_01_floor_plan.webp",
     gallery: [
-      "/images/barakah_tower_01.jpeg",
-      "/images/barakah_01_floor_plan.png",
+      "/images/barakah_tower_01.webp",
+      "/images/barakah_01_floor_plan.webp",
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"
     ],
     featuresEn: [
@@ -189,15 +189,15 @@ export const projectsData = [
     totalFloors: 1,
     image: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=1000&q=80",
     gallery: [
-      "/images/agro_1.jpeg",
-      "/images/agro_2.jpeg",
-      "/images/agro_3.jpeg",
-      "/images/agro_4.jpeg",
-      "/images/agro_5.jpeg",
-      "/images/agro_6.jpeg",
-      "/images/agro_7.jpeg",
-      "/images/agro_8.jpeg",
-      "/images/agro_9.jpeg"
+      "/images/agro_1.webp",
+      "/images/agro_2.webp",
+      "/images/agro_3.webp",
+      "/images/agro_4.webp",
+      "/images/agro_5.webp",
+      "/images/agro_6.webp",
+      "/images/agro_7.webp",
+      "/images/agro_8.webp",
+      "/images/agro_9.webp"
     ],
     featuresEn: [
       "Modern planned dairy cattle, meat cattle fattening, and poultry farming",

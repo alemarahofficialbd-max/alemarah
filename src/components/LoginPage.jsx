@@ -9,8 +9,7 @@ import {
   PhoneCall, 
   ShieldCheck,
   Building2,
-  CheckCircle2,
-  ArrowLeft
+  CheckCircle2
 } from 'lucide-react';
 
 export default function LoginPage({ 
@@ -56,22 +55,6 @@ export default function LoginPage({
   return (
     <div className="py-12 md:py-20 bg-gradient-to-b from-[#F8F9FA] via-white to-gray-50 flex items-center justify-center px-4 sm:px-6">
       <div className="w-full max-w-lg">
-        {/* Back Link */}
-        <div className="mb-6 flex items-center justify-between">
-          <button
-            onClick={onNavigateHome}
-            className="inline-flex items-center space-x-2 text-xs sm:text-sm font-bold text-gray-600 hover:text-[#CE2028] transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>{t.login.backToHome}</span>
-          </button>
-
-          <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md flex items-center space-x-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#006231]" />
-            <span>{lang === 'en' ? 'Secure Portal' : 'সুরক্ষিত পোর্টাল'}</span>
-          </span>
-        </div>
-
         {/* Login Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl shadow-black/5 border border-gray-100">
           {/* Official Brand Logo and Title */}

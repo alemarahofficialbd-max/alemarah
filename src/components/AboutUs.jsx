@@ -186,7 +186,7 @@ export default function AboutUs({ lang, t }) {
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
                 <div className="relative w-40 sm:w-44 h-52 sm:h-60 shrink-0 rounded-2xl overflow-hidden bg-gradient-to-b from-red-50/40 via-red-50/20 to-white">
                   <img
-                    src="/images/chairman.png"
+                    src="/images/chairman.webp"
                     alt={t.about.chairmanName}
                     className="w-full h-full object-cover object-top"
                   />
@@ -223,7 +223,7 @@ export default function AboutUs({ lang, t }) {
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
                 <div className="relative w-40 sm:w-44 h-52 sm:h-60 shrink-0 rounded-2xl overflow-hidden bg-gradient-to-b from-emerald-50/40 via-emerald-50/20 to-white">
                   <img
-                    src="/images/managing_director.png"
+                    src="/images/managing_director.webp"
                     alt={t.about.mdName}
                     className="w-full h-full object-cover object-top"
                   />

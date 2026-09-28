@@ -330,11 +330,11 @@ export const translations = {
 
     // Client Login Portal
     login: {
-      title: "Client & Investor Portal",
-      subtitle: "Secure digital management portal for Al-Emarah apartment owners, landowners, and investment partners.",
+      title: "Client & Management Portal",
+      subtitle: "Secure digital management portal for Al-Emarah apartment owners and management.",
       backToHome: "Back to Main Website",
       tabOwner: "Homeowner Login",
-      tabInvestor: "Landowner / Partner",
+      tabInvestor: "Management",
       usernameLabel: "Client ID / Registered Mobile",
       usernamePlaceholder: "Enter your Client ID (e.g. AEP-2024-08)",
       passwordLabel: "Account Password",
@@ -975,11 +975,11 @@ export const translations = {
 
     // Client Login Portal
     login: {
-      title: "গ্রাহক ও অংশীদার পোর্টাল",
-      subtitle: "আল-ইমারাহ ফ্ল্যাট মালিক, জমিদাতা ও বিনিয়োগকারীদের জন্য নিরাপদ ডিজিটাল ম্যানেজমেন্ট ড্যাশবোর্ড।",
+      title: "গ্রাহক ও ম্যানেজমেন্ট পোর্টাল",
+      subtitle: "আল-ইমারাহ ফ্ল্যাট মালিক ও অফিসিয়াল ম্যানেজমেন্টের জন্য নিরাপদ ডিজিটাল পোর্টাল।",
       backToHome: "মূল ওয়েবসাইটে ফিরে যান",
       tabOwner: "ফ্ল্যাট মালিক লগইন",
-      tabInvestor: "জমিদাতা / বিনিয়োগকারী",
+      tabInvestor: "ম্যানেজমেন্ট",
       usernameLabel: "ক্লায়েন্ট আইডি বা নিবন্ধিত মোবাইল নম্বর",
       usernamePlaceholder: "আপনার ক্লায়েন্ট আইডি লিখুন (উদাঃ AEP-2024-08)",
       passwordLabel: "একাউন্টের পাসওয়ার্ড",
