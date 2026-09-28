@@ -33,12 +33,12 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
           <div className="lg:col-span-2 space-y-4">
             <button 
               onClick={() => handleLinkClick('#home')} 
-              className="inline-block bg-white p-2.5 rounded-xl shadow-xs cursor-pointer text-left"
+              className="inline-block cursor-pointer text-left transition-opacity hover:opacity-90"
             >
               <img 
-                src="/alemarah_logo_header.svg" 
+                src="/alemarah_logo_footer.svg" 
                 alt="Al-Emarah Properties Limited" 
-                className="h-10 w-auto object-contain"
+                className="h-10 sm:h-12 w-auto object-contain"
               />
             </button>
 

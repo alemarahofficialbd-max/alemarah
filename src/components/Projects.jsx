@@ -152,9 +152,10 @@ export default function Projects({
             return (
               <div
                 key={project.id}
-                className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                onClick={() => onSelectProject(project)}
+                className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300 flex flex-col cursor-pointer"
               >
-                {/* Image Container */}
+                {/* Image Container (Clickable to Details) */}
                 <div className="relative h-64 overflow-hidden bg-gray-100">
                   <img
                     src={project.image}
@@ -233,7 +234,10 @@ export default function Projects({
                   {/* Card Action Buttons */}
                   <div className="pt-2 flex items-center space-x-2">
                     <button
-                      onClick={() => onSelectProject(project)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectProject(project);
+                      }}
                       className="flex-1 flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-colors cursor-pointer"
                     >
                       <Eye className="w-4 h-4 text-gray-600" />
@@ -241,7 +245,10 @@ export default function Projects({
                     </button>
 
                     <button
-                      onClick={() => onOpenBookVisit(project)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenBookVisit(project);
+                      }}
                       className="flex-1 flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs font-bold shadow-md shadow-[#CE2028]/20 transition-all cursor-pointer"
                     >
                       <Calendar className="w-4 h-4 text-white" />
