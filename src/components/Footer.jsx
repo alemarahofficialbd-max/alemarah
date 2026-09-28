@@ -7,7 +7,8 @@ import {
   Building2,
   Coins,
   ShieldCheck,
-  Compass
+  Compass,
+  ArrowUp
 } from 'lucide-react';
 
 export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpenInstallApp, isLoggedIn = false }) {
