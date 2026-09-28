@@ -5,6 +5,7 @@ import {
   Calendar, 
   Maximize2, 
   Bed, 
+  BedDouble,
   Bath, 
   CheckCircle2, 
   ShieldCheck, 
@@ -12,6 +13,7 @@ import {
   Phone, 
   Compass, 
   Download, 
+  Building,
   Building2, 
   Car, 
   Zap, 
@@ -24,81 +26,144 @@ import {
   MessageSquare, 
   ExternalLink,
   Utensils,
+  ChefHat,
+  Sofa,
   Sun,
   ShieldAlert,
   Flame,
-  FileCheck
+  FileCheck,
+  Ruler,
+  Moon,
+  Volume2,
+  Trees,
+  Users,
+  Navigation,
+  Store,
+  Handshake,
+  Cctv,
+  Sprout,
+  Fish,
+  Wheat,
+  Briefcase
 } from 'lucide-react';
 import { projectsData } from '../data/projectsData';
 
-// Helper function to return distinct contextual emojis for features
-const getFeatureEmoji = (text, idx) => {
+// Premium icon mapper providing tailored Lucide vector icons and elegant styling
+const getFeatureIconConfig = (text, idx) => {
   const t = (text || '').toLowerCase();
 
   // Kitchen & Cooking
-  if (t.includes('কিচেন') || t.includes('kitchen') || t.includes('রান্না')) return '🍳';
-  // Dining & Drawing
-  if (t.includes('ডাইনিং') || t.includes('dining')) return '🍽️';
-  if (t.includes('ড্রয়িং') || t.includes('drawing')) return '🛋️';
-
-  // Bed, Bath, Balcony
-  if (t.includes('বেডরুম') || t.includes('bedroom') || t.includes('bed')) return '🛏️';
-  if (t.includes('বাথরুম') || t.includes('bathroom') || t.includes('bath')) return '🚿';
-  if (t.includes('বারান্দা') || t.includes('balcon')) return '🌅';
-
+  if (t.includes('কিচেন') || t.includes('kitchen') || t.includes('রান্না')) {
+    return { Icon: ChefHat, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200/60' };
+  }
+  // Dining
+  if (t.includes('ডাইনিং') || t.includes('dining')) {
+    return { Icon: Utensils, color: 'text-orange-600', bg: 'bg-orange-50 border-orange-200/60' };
+  }
+  // Drawing / Living
+  if (t.includes('ড্রয়িং') || t.includes('drawing')) {
+    return { Icon: Sofa, color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-200/60' };
+  }
+  // Bed & Bath & Balcony
+  if (t.includes('বেডরুম') || t.includes('bedroom') || t.includes('bed')) {
+    return { Icon: BedDouble, color: 'text-[#006231]', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
+  if (t.includes('বাথরুম') || t.includes('bathroom') || t.includes('bath')) {
+    return { Icon: Bath, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200/60' };
+  }
+  if (t.includes('বারান্দা') || t.includes('balcon')) {
+    return { Icon: Sun, color: 'text-amber-500', bg: 'bg-amber-50 border-amber-200/60' };
+  }
   // Land / Clear Title / Plot
-  if (t.includes('জমির') || t.includes('নিষ্কণ্টক') || t.includes('land area') || t.includes('clear title') || t.includes('প্লট') || t.includes('plot')) return '📜';
+  if (t.includes('জমির') || t.includes('নিষ্কণ্টক') || t.includes('land area') || t.includes('clear title') || t.includes('প্লট') || t.includes('plot')) {
+    return { Icon: FileText, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
   // Size / Measurement
-  if (t.includes('সাইজ') || t.includes('size') || t.includes('বর্গফুট') || t.includes('sq. ft') || t.includes('sqft') || t.includes('জফরি')) return '📐';
-
+  if (t.includes('সাইজ') || t.includes('size') || t.includes('বর্গফুট') || t.includes('sq. ft') || t.includes('sqft') || t.includes('জফরি')) {
+    return { Icon: Ruler, color: 'text-[#CE2028]', bg: 'bg-red-50 border-red-200/60' };
+  }
   // Lift / Elevator / Stairs / Escalator
-  if (t.includes('লিফট') || t.includes('lift') || t.includes('elevator') || t.includes('এসকেলেটর') || t.includes('escalator') || t.includes('সিঁড়ি') || t.includes('staircase')) return '🛗';
-
+  if (t.includes('লিফট') || t.includes('lift') || t.includes('elevator') || t.includes('এসকেলেটর') || t.includes('escalator') || t.includes('সিঁড়ি') || t.includes('staircase')) {
+    return { Icon: Layers, color: 'text-purple-600', bg: 'bg-purple-50 border-purple-200/60' };
+  }
   // Parking & Vehicle
-  if (t.includes('পার্কিং') || t.includes('parking') || t.includes('গাড়ি') || t.includes('কার')) return '🅿️';
-
+  if (t.includes('পার্কিং') || t.includes('parking') || t.includes('গাড়ি') || t.includes('কার')) {
+    return { Icon: Car, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200/60' };
+  }
   // BBQ & Landscaping / Rooftop Garden
-  if (t.includes('বারবিকিউ') || t.includes('barbecue') || t.includes('bbq')) return '🍢';
-  if (t.includes('ল্যান্ডস্কেপ') || t.includes('বাগান') || t.includes('garden') || t.includes('সবুজ') || t.includes('green')) return '🌿';
-
+  if (t.includes('বারবিকিউ') || t.includes('barbecue') || t.includes('bbq')) {
+    return { Icon: Flame, color: 'text-orange-600', bg: 'bg-orange-50 border-orange-200/60' };
+  }
+  if (t.includes('ল্যান্ডস্কেপ') || t.includes('বাগান') || t.includes('garden') || t.includes('সবুজ') || t.includes('green')) {
+    return { Icon: Trees, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
   // Prayer, Mosque, Musalla, Adhan
-  if (t.includes('নামাজ') || t.includes('মুসাল্লা') || t.includes('prayer') || t.includes('মসজিদ') || t.includes('mosque')) return '🕌';
-  if (t.includes('আজান') || t.includes('adhan')) return '📢';
-
-  // Play / Children / Family / Community
-  if (t.includes('খেলার') || t.includes('play') || t.includes('শিশু') || t.includes('children')) return '🎠';
-  if (t.includes('পারিবারিক') || t.includes('family') || t.includes('কমিউনিটি') || t.includes('community')) return '👨‍👩‍👧‍👦';
-
+  if (t.includes('নামাজ') || t.includes('মুসাল্লা') || t.includes('prayer') || t.includes('মসজিদ') || t.includes('mosque')) {
+    return { Icon: Moon, color: 'text-emerald-800', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
+  if (t.includes('আজান') || t.includes('adhan')) {
+    return { Icon: Volume2, color: 'text-teal-600', bg: 'bg-teal-50 border-teal-200/60' };
+  }
+  // Play / Children
+  if (t.includes('খেলার') || t.includes('play') || t.includes('শিশু') || t.includes('children')) {
+    return { Icon: Sparkles, color: 'text-pink-600', bg: 'bg-pink-50 border-pink-200/60' };
+  }
+  // Family / Community
+  if (t.includes('পারিবারিক') || t.includes('family') || t.includes('কমিউনিটি') || t.includes('community')) {
+    return { Icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-200/60' };
+  }
   // Generator & Electricity & AC
-  if (t.includes('জেনারেটর') || t.includes('generator') || t.includes('বিদ্যুৎ') || t.includes('electric') || t.includes('এসি') || t.includes(' ac')) return '⚡';
-
+  if (t.includes('জেনারেটর') || t.includes('generator') || t.includes('বিদ্যুৎ') || t.includes('electric') || t.includes('এসি') || t.includes(' ac')) {
+    return { Icon: Zap, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200/60' };
+  }
   // Road & Accessibility
-  if (t.includes('রাস্তা') || t.includes('সড়ক') || t.includes('road') || t.includes('frontage') || t.includes('যোগাযোগ') || t.includes('access')) return '🛣️';
-
+  if (t.includes('রাস্তা') || t.includes('সড়ক') || t.includes('road') || t.includes('frontage') || t.includes('যোগাযোগ') || t.includes('access')) {
+    return { Icon: Navigation, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200/60' };
+  }
   // Commercial / Shop / Market / Plaza / Retail
-  if (t.includes('মার্কেট') || t.includes('দোকান') || t.includes('শপিং') || t.includes('বাণিজ্যিক') || t.includes('retail') || t.includes('plaza') || t.includes('mall') || t.includes('commercial')) return '🛍️';
-
+  if (t.includes('মার্কেট') || t.includes('দোকান') || t.includes('শপিং') || t.includes('বাণিজ্যিক') || t.includes('retail') || t.includes('plaza') || t.includes('mall') || t.includes('commercial')) {
+    return { Icon: Store, color: 'text-[#CE2028]', bg: 'bg-red-50 border-red-200/60' };
+  }
   // Financial, Rental, Income, Agreement, Investment
-  if (t.includes('ভাড়া') || t.includes('লভ্যাংশ') || t.includes('আয়') || t.includes('income') || t.includes('lease') || t.includes('টাকা') || t.includes('চুক্তি') || t.includes('agreement') || t.includes('অংশীদারিত্ব') || t.includes('ownership')) return '🤝';
-
+  if (t.includes('ভাড়া') || t.includes('লভ্যাংশ') || t.includes('আয়') || t.includes('income') || t.includes('lease') || t.includes('টাকা')) {
+    return { Icon: Coins, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
+  if (t.includes('চুক্তি') || t.includes('agreement') || t.includes('অংশীদারিত্ব') || t.includes('ownership')) {
+    return { Icon: Handshake, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200/60' };
+  }
   // Security, CCTV, Surveillance
-  if (t.includes('সিসিটিভি') || t.includes('cctv') || t.includes('surveillance') || t.includes('নিরাপদ') || t.includes('security') || t.includes('guard')) return '📹';
-
+  if (t.includes('সিসিটিভি') || t.includes('cctv') || t.includes('surveillance') || t.includes('নিরাপদ') || t.includes('security') || t.includes('guard')) {
+    return { Icon: Cctv, color: 'text-slate-800', bg: 'bg-slate-100 border-slate-200' };
+  }
   // Residential Units / Apartment
-  if (t.includes('ইউনিট') || t.includes('unit') || t.includes('আবাসিক') || t.includes('apartment')) return '🏢';
-
+  if (t.includes('ইউনিট') || t.includes('unit') || t.includes('আবাসিক') || t.includes('apartment')) {
+    return { Icon: Building, color: 'text-[#CE2028]', bg: 'bg-red-50 border-red-200/60' };
+  }
   // Agro, Cattle, Dairy, Livestock
-  if (t.includes('গরু') || t.includes('দুগ্ধ') || t.includes('ক্যাটল') || t.includes('cattle') || t.includes('dairy') || t.includes('মাংস')) return '🐄';
+  if (t.includes('গরু') || t.includes('দুগ্ধ') || t.includes('ক্যাটল') || t.includes('cattle') || t.includes('dairy') || t.includes('মাংস')) {
+    return { Icon: Sprout, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
+  // Fisheries / Fish
+  if (t.includes('মাছ') || t.includes('fish')) {
+    return { Icon: Fish, color: 'text-cyan-700', bg: 'bg-cyan-50 border-cyan-200/60' };
+  }
+  // Agriculture / Crops
+  if (t.includes('মুরগি') || t.includes('হাঁস') || t.includes('ডিম') || t.includes('poultry') || t.includes('egg') || t.includes('duck') || t.includes('কৃষি') || t.includes('খামার') || t.includes('farm') || t.includes('agro') || t.includes('agriculture')) {
+    return { Icon: Wheat, color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200/60' };
+  }
+  // Employment
+  if (t.includes('কর্মসংস্থান') || t.includes('employment') || t.includes('job')) {
+    return { Icon: Briefcase, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200/60' };
+  }
 
-  // Poultry, Duck, Fish
-  if (t.includes('মাছ') || t.includes('fish')) return '🐟';
-  if (t.includes('মুরগি') || t.includes('হাঁস') || t.includes('ডিম') || t.includes('poultry') || t.includes('egg') || t.includes('duck')) return '🐣';
-  if (t.includes('কৃষি') || t.includes('খামার') || t.includes('farm') || t.includes('agro') || t.includes('agriculture')) return '🌾';
-  if (t.includes('কর্মসংস্থান') || t.includes('employment') || t.includes('job')) return '💼';
-
-  // Distinct fallback emojis based on index
-  const fallbackEmojis = ['✨', '💎', '🌟', '🎯', '🏆', '🔑', '⭐', '🌈', '🎖️', '🏅'];
-  return fallbackEmojis[idx % fallbackEmojis.length];
+  // Fallback distinct configs based on index
+  const fallbacks = [
+    { Icon: Sparkles, color: 'text-[#CE2028]', bg: 'bg-red-50 border-red-200/60' },
+    { Icon: ShieldCheck, color: 'text-[#006231]', bg: 'bg-emerald-50 border-emerald-200/60' },
+    { Icon: CheckCircle2, color: 'text-[#8EBF40]', bg: 'bg-lime-50 border-lime-200/60' },
+    { Icon: Compass, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200/60' }
+  ];
+  return fallbacks[idx % fallbacks.length];
 };
 
 export default function ProjectDetailsPage({ 
@@ -417,21 +482,24 @@ export default function ProjectDetailsPage({
                 </div>
               </div>
 
-              {/* Specific breakdown grid with distinct contextual emojis */}
+              {/* Specific breakdown grid with distinct premium vector icons */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
-                {(isEn ? project.featuresEn : project.featuresBn).map((feature, idx) => (
-                  <div 
-                    key={idx} 
-                    className="p-4 rounded-2xl bg-gray-50/80 border border-gray-100 hover:border-[#8EBF40]/40 hover:bg-white hover:shadow-xs transition-all flex items-start space-x-3.5 group"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-white shadow-2xs border border-gray-200/90 flex items-center justify-center shrink-0 text-xl group-hover:scale-110 group-hover:border-[#006231]/30 transition-all select-none">
-                      <span role="img" aria-label="Feature icon">{getFeatureEmoji(feature, idx)}</span>
+                {(isEn ? project.featuresEn : project.featuresBn).map((feature, idx) => {
+                  const { Icon: FeatureIcon, color, bg } = getFeatureIconConfig(feature, idx);
+                  return (
+                    <div 
+                      key={idx} 
+                      className="p-4 rounded-2xl bg-white border border-gray-100 shadow-2xs hover:shadow-md hover:border-gray-200 transition-all flex items-start space-x-3.5 group"
+                    >
+                      <div className={`w-10 h-10 rounded-xl ${bg} border flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform`}>
+                        <FeatureIcon className={`w-5 h-5 ${color}`} />
+                      </div>
+                      <div className="text-xs sm:text-sm font-semibold text-gray-800 leading-relaxed pt-2">
+                        {feature}
+                      </div>
                     </div>
-                    <div className="text-xs sm:text-sm font-semibold text-gray-800 leading-relaxed pt-1.5">
-                      {feature}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Structural Safety & Engineering Assurance */}
