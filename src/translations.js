@@ -8,7 +8,8 @@ export const translations = {
       whyUs: "Why Al-Emarah",
       about: "About Us",
       contact: "Contact",
-      login: "Client Portal",
+      login: "Client Dashboard",
+      installApp: "Install App",
       bookVisit: "Schedule Visit",
       callUs: "Hotline",
       phoneNo: "01918-646575",
@@ -22,9 +23,9 @@ export const translations = {
         projects: "Projects",
         investment: "Investment",
         whyUs: "Why Us",
-        about: "About",
+        about: "About Us",
         contact: "Contact",
-        login: "Login"
+        login: "Client Dashboard"
       }
     },
 
@@ -649,11 +650,12 @@ export const translations = {
     nav: {
       home: "হোম",
       projects: "প্রকল্পসমূহ",
-      investment: "বিনিয়োগ নীতি ও সুযোগ",
+      investment: "বিনিয়োগ ও শেয়ার",
       whyUs: "কেন আল-ইমারাহ",
-      about: "আমাদের পরিচিতি",
+      about: "আমাদের সম্পর্কে",
       contact: "যোগাযোগ",
-      login: "ক্লায়েন্ট পোর্টাল",
+      login: "সাইন ইন / ড্যাশবোর্ড",
+      installApp: "অ্যাপ ডাউনলোড",
       bookVisit: "সাইট ভিজিট বুক করুন",
       callUs: "হটলাইন",
       phoneNo: "০১৯১৮-৬৪৬৫৭৫",
@@ -665,11 +667,11 @@ export const translations = {
       mobileNav: {
         home: "হোম",
         projects: "প্রকল্পসমূহ",
-        investment: "বিনিয়োগ",
-        whyUs: "কেন আমরা",
-        about: "পরিচিতি",
+        investment: "বিনিয়োগ ও শেয়ার",
+        whyUs: "কেন আল-ইমারাহ",
+        about: "আমাদের সম্পর্কে",
         contact: "যোগাযোগ",
-        login: "লগইন"
+        login: "সাইন ইন / ড্যাশবোর্ড"
       }
     },
 
@@ -1274,9 +1276,9 @@ export const translations = {
       links: [
         { label: "হোম পেজ", href: "#home" },
         { label: "প্রকল্পসমূহ", href: "#projects" },
-        { label: "হালাল বিনিয়োগ ও অংশীদারিত্ব", href: "#investment" },
+        { label: "বিনিয়োগ ও শেয়ার", href: "#investment" },
         { label: "কেন আল-ইমারাহ", href: "#why-us" },
-        { label: "আমাদের পরিচিতি", href: "#about" },
+        { label: "আমাদের সম্পর্কে", href: "#about" },
         { label: "যোগাযোগ ও সাইট ভিজিট", href: "#contact" }
       ],
       legal: [

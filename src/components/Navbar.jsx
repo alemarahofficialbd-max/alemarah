@@ -9,11 +9,13 @@ import {
   Globe, 
   User, 
   Calendar, 
-  ChevronRight,
-  ShieldCheck,
-  Compass,
-  Sparkles,
-  Coins
+  ChevronRight, 
+  ShieldCheck, 
+  Compass, 
+  Sparkles, 
+  Coins,
+  Download,
+  Smartphone
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -24,6 +26,7 @@ export default function Navbar({
   t, 
   onOpenLogin, 
   onOpenBookVisit,
+  onOpenInstallApp,
   isLoggedIn = false 
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -49,11 +52,10 @@ export default function Navbar({
   const navLinks = [
     { id: 'home', label: t.nav.home, icon: Home },
     { id: 'projects', label: t.nav.projects, icon: Building2 },
-    { id: 'investment', label: t.nav.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ'), icon: Coins },
+    { id: 'investment', label: t.nav.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ ও শেয়ার'), icon: Coins },
     { id: 'why-us', label: t.nav.whyUs, icon: ShieldCheck },
     { id: 'about', label: t.nav.about, icon: Compass },
-    { id: 'contact', label: t.nav.contact, icon: Phone },
-    ...(isLoggedIn ? [{ id: 'dashboard', label: lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড', icon: Sparkles, isBadge: true }] : [])
+    { id: 'contact', label: t.nav.contact, icon: Phone }
   ];
 
   const handleNavClick = (pageId) => {
@@ -80,6 +82,17 @@ export default function Navbar({
           </div>
 
           <div className="flex items-center space-x-4">
+            {onOpenInstallApp && (
+              <button 
+                onClick={onOpenInstallApp}
+                className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors cursor-pointer"
+                title={lang === 'en' ? 'Install Web App' : 'অ্যাপ ডাউনলোড করুন'}
+              >
+                <Download className="w-3.5 h-3.5 text-[#8EBF40]" />
+                <span>{lang === 'en' ? 'Install App' : 'অ্যাপ ডাউনলোড'}</span>
+              </button>
+            )}
+
             <button 
               onClick={toggleLanguage}
               className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors font-medium cursor-pointer"
@@ -114,42 +127,25 @@ export default function Navbar({
             {/* Brand Logo */}
             <button 
               onClick={() => handleNavClick('home')}
-              className="flex items-center space-x-3 group cursor-pointer text-left"
+              className="flex items-center space-x-3 group cursor-pointer text-left shrink-0"
             >
               <img 
                 src="/alemarah_logo_header.svg" 
                 alt="Al-Emarah Properties Limited" 
-                className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+                className="h-9 sm:h-11 w-auto object-contain transition-transform group-hover:scale-[1.02]"
               />
             </button>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-1">
+            {/* Desktop Navigation Links (6 exact items) */}
+            <nav className="hidden xl:flex items-center space-x-1">
               {navLinks.map((item) => {
                 const IconComponent = item.icon;
                 const isActive = currentPage === item.id;
-                if (item.isBadge) {
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleNavClick(item.id)}
-                      className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
-                        isActive 
-                          ? 'text-[#006231] bg-emerald-50 font-bold shadow-2xs' 
-                          : 'text-gray-700 hover:text-[#006231] hover:bg-emerald-50/50'
-                      }`}
-                    >
-                      <IconComponent className="w-4 h-4 text-[#8EBF40]" />
-                      <span>{item.label}</span>
-                      <span className="w-2 h-2 rounded-full bg-[#8EBF40] animate-pulse"></span>
-                    </button>
-                  );
-                }
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
-                    className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                    className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                       isActive 
                         ? 'text-[#CE2028] bg-red-50/80 font-bold shadow-2xs' 
                         : 'text-gray-700 hover:text-[#CE2028] hover:bg-gray-50'
@@ -162,20 +158,79 @@ export default function Navbar({
               })}
             </nav>
 
-            {/* Desktop Right CTAs */}
-            <div className="hidden lg:flex items-center space-x-3">
+            {/* Compact Desktop Navigation Links for medium screens (lg to xl) */}
+            <nav className="hidden lg:flex xl:hidden items-center space-x-0.5">
+              {navLinks.map((item) => {
+                const isActive = currentPage === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavClick(item.id)}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                      isActive 
+                        ? 'text-[#CE2028] bg-red-50/80 font-bold' 
+                        : 'text-gray-700 hover:text-[#CE2028] hover:bg-gray-50'
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Desktop Right CTAs: App Download, Sign In/Dashboard Corner, Schedule Visit */}
+            <div className="hidden lg:flex items-center space-x-2.5 shrink-0">
+              {/* Install App Button */}
+              {onOpenInstallApp && (
+                <button
+                  onClick={onOpenInstallApp}
+                  className="flex items-center space-x-1.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 bg-gray-50/70 hover:bg-gray-100 text-gray-700 text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
+                  title={lang === 'en' ? 'Download App for PC, Android & iOS' : 'পিসি, অ্যান্ড্রয়েড ও আইফোনের জন্য অ্যাপ ডাউনলোড'}
+                >
+                  <Download className="w-3.5 h-3.5 text-[#006231]" />
+                  <span>{t.nav.installApp || (lang === 'en' ? 'App' : 'অ্যাপ')}</span>
+                </button>
+              )}
+
+              {/* Sign In / Client Dashboard Corner Button */}
+              <button
+                onClick={() => handleNavClick(isLoggedIn ? 'dashboard' : 'login')}
+                className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                  isLoggedIn
+                    ? 'bg-emerald-50 text-[#006231] border-emerald-200 hover:bg-emerald-100'
+                    : 'bg-white text-gray-800 border-gray-200 hover:border-[#CE2028] hover:text-[#CE2028]'
+                }`}
+              >
+                <User className={`w-4 h-4 ${isLoggedIn ? 'text-[#006231]' : 'text-[#CE2028]'}`} />
+                <span>{isLoggedIn ? (lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড') : t.nav.login}</span>
+                {isLoggedIn && (
+                  <span className="w-2 h-2 rounded-full bg-[#8EBF40] animate-pulse"></span>
+                )}
+              </button>
+
               {/* Schedule Visit Primary Button */}
               <button
                 onClick={onOpenBookVisit}
-                className="flex items-center space-x-2.5 px-6 py-3 rounded-xl bg-[#CE2028] text-white text-sm font-bold shadow-lg shadow-[#CE2028]/25 hover:bg-[#A9141B] hover:shadow-xl hover:shadow-[#CE2028]/35 transition-all duration-200 active:scale-95 cursor-pointer whitespace-nowrap"
+                className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#CE2028] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#CE2028]/25 hover:bg-[#A9141B] hover:shadow-lg hover:shadow-[#CE2028]/35 transition-all duration-200 active:scale-95 cursor-pointer whitespace-nowrap"
               >
-                <Calendar className="w-5 h-5 text-white" />
+                <Calendar className="w-4 h-4 text-white" />
                 <span>{t.nav.bookVisit}</span>
               </button>
             </div>
 
             {/* Mobile Header Controls (Phone View) */}
             <div className="flex items-center space-x-2 lg:hidden">
+              {onOpenInstallApp && (
+                <button
+                  onClick={onOpenInstallApp}
+                  className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-[#006231] text-xs font-bold cursor-pointer"
+                  title={lang === 'en' ? 'App' : 'অ্যাপ'}
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>{lang === 'en' ? 'App' : 'অ্যাপ'}</span>
+                </button>
+              )}
+
               {/* Mobile Language Button */}
               <button
                 onClick={toggleLanguage}
@@ -247,6 +302,19 @@ export default function Navbar({
 
               {/* CTA Action Buttons */}
               <div className="pt-2 space-y-2 border-t border-gray-100">
+                {onOpenInstallApp && (
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenInstallApp();
+                    }}
+                    className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-200 text-xs sm:text-sm font-bold cursor-pointer"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>{lang === 'en' ? 'Download Mobile & PC App' : 'অ্যাপ ডাউনলোড করুন (Android/iOS/PC)'}</span>
+                  </button>
+                )}
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
@@ -323,7 +391,7 @@ export default function Navbar({
             }`}
           >
             <User className={`w-5 h-5 mb-0.5 ${isLoggedIn ? 'text-[#006231]' : ''}`} />
-            <span>{isLoggedIn ? (lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড') : t.nav.mobileNav.login}</span>
+            <span>{isLoggedIn ? (lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড') : (lang === 'en' ? 'Login' : 'লগইন')}</span>
           </button>
         </div>
       </div>

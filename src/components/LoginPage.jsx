@@ -3,6 +3,7 @@ import {
   User, 
   Lock, 
   ArrowRight, 
+  ArrowLeft,
   Eye, 
   EyeOff, 
   Sparkles, 
@@ -53,8 +54,19 @@ export default function LoginPage({
   };
 
   return (
-    <div className="py-12 md:py-20 bg-gradient-to-b from-[#F8F9FA] via-white to-gray-50 flex items-center justify-center px-4 sm:px-6">
+    <div className="min-h-screen py-10 md:py-16 bg-gradient-to-b from-[#F8F9FA] via-white to-gray-50 flex items-center justify-center px-4 sm:px-6">
       <div className="w-full max-w-lg">
+        {/* Quick return button */}
+        <div className="mb-4 flex items-center justify-between">
+          <button
+            onClick={onNavigateHome}
+            className="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-bold text-gray-700 hover:text-[#CE2028] transition-colors py-2 px-3 rounded-xl bg-white border border-gray-200 hover:border-gray-300 shadow-2xs cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 text-[#CE2028]" />
+            <span>{lang === 'en' ? '← Back to Main Website' : '← মূল ওয়েবসাইটে ফিরে যান'}</span>
+          </button>
+        </div>
+
         {/* Login Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl shadow-black/5 border border-gray-100">
           {/* Official Brand Logo and Title */}

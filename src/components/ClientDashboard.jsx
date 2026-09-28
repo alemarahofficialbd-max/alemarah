@@ -27,35 +27,62 @@ export default function ClientDashboard({ lang, setLang, t, onLogout, onNavigate
 
   return (
     <div className="min-h-screen bg-[#F4F5F7] text-gray-900 flex flex-col font-sans animate-fadeIn">
-      {/* Dashboard Sub-Bar */}
-      <div className="bg-white border-b border-gray-200 py-3 px-4 sm:px-6 lg:px-8 shadow-xs">
+      {/* Dedicated Standalone Dashboard Header */}
+      <header className="bg-white border-b border-gray-200 py-3.5 px-4 sm:px-6 lg:px-8 shadow-xs sticky top-0 z-30">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
             <button
               onClick={onNavigateHome}
-              className="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-bold text-gray-700 hover:text-[#CE2028] transition-colors p-1.5 rounded-lg hover:bg-gray-100 cursor-pointer"
+              className="flex items-center space-x-2 group cursor-pointer text-left"
+              title={lang === 'en' ? 'Return to Website' : 'ওয়েবসাইটে ফিরে যান'}
             >
-              <ArrowLeft className="w-4 h-4 text-[#CE2028]" />
-              <span>{d.backToHome}</span>
+              <img 
+                src="/alemarah_logo_header.svg" 
+                alt="Al-Emarah Properties" 
+                className="h-9 sm:h-10 w-auto object-contain"
+              />
             </button>
             <span className="text-gray-300 hidden sm:inline">|</span>
-            <span className="text-xs sm:text-sm font-bold text-gray-900 hidden sm:flex items-center space-x-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#8EBF40]" />
-              <span>{d.title}</span>
-            </span>
+            <div className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-[#006231] text-xs font-bold border border-emerald-100">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#8EBF40]" />
+              <span>{lang === 'en' ? 'Secured Client Portal' : 'সুরক্ষিত ক্লায়েন্ট ড্যাশবোর্ড'}</span>
+            </div>
           </div>
 
           <div className="flex items-center space-x-3">
+            {/* Language Switcher */}
+            {setLang && (
+              <button
+                onClick={() => setLang(lang === 'en' ? 'bn' : 'en')}
+                className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold transition-colors cursor-pointer"
+                title={lang === 'en' ? 'Switch to Bangla' : 'Switch to English'}
+              >
+                <Globe className="w-3.5 h-3.5 text-[#006231]" />
+                <span>{lang === 'en' ? 'বাংলা' : 'EN'}</span>
+              </button>
+            )}
+
+            {/* Return to Website Button */}
+            <button
+              onClick={onNavigateHome}
+              className="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-bold text-gray-700 hover:text-[#CE2028] transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4 text-[#CE2028]" />
+              <span className="hidden sm:inline">{d.backToHome}</span>
+              <span className="sm:hidden">{lang === 'en' ? 'Website' : 'ওয়েবসাইট'}</span>
+            </button>
+
+            {/* Logout Button */}
             <button
               onClick={onLogout}
-              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-red-50 text-[#CE2028] hover:bg-[#CE2028] hover:text-white transition-all text-xs font-bold border border-red-200 cursor-pointer"
+              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-red-50 text-[#CE2028] hover:bg-[#CE2028] hover:text-white transition-all text-xs font-bold border border-red-200 cursor-pointer shadow-2xs"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>{d.logout}</span>
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Dashboard Workspace */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -418,6 +445,25 @@ export default function ClientDashboard({ lang, setLang, t, onLogout, onNavigate
           </div>
         )}
       </main>
+
+      {/* Standalone Dashboard Footer */}
+      <footer className="mt-auto border-t border-gray-200 bg-white py-4 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+          <div className="flex items-center space-x-2">
+            <ShieldCheck className="w-4 h-4 text-[#8EBF40]" />
+            <span>
+              {lang === 'en' 
+                ? '© 2026 Al-Emarah Properties Limited • Secured Client Portal. 256-Bit SSL Encrypted.' 
+                : '© ২০২৬ আল-ইমারাহ প্রোপার্টিজ লিমিটেড • সিকিউরড ক্লায়েন্ট পোর্টাল | ২৫৬-বিট এসএসএল এনক্রিপ্টেড।'}
+            </span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <span className="text-gray-400">
+              {lang === 'en' ? 'Support Desk: 01743-926926' : 'সাপোর্ট ডেস্ক: ০১৭৪৩-৯২৬৯২৬'}
+            </span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Projects from './components/Projects';
@@ -12,6 +12,8 @@ import ClientDashboard from './components/ClientDashboard';
 import JoinJourney from './components/JoinJourney';
 import InvestmentPage from './components/InvestmentPage';
 import Footer from './components/Footer';
+import SplashScreen from './components/SplashScreen';
+import InstallAppModal from './components/InstallAppModal';
 import { translations } from './translations';
 import { projectsData } from './data/projectsData';
 import { 
@@ -38,6 +40,20 @@ export default function App() {
   const [activeProjectModal, setActiveProjectModal] = useState(null);
   const [preselectedProject, setPreselectedProject] = useState(null);
   const [searchFilter, setSearchFilter] = useState(null);
+  const [showSplash, setShowSplash] = useState(true);
+  const [installPromptEvent, setInstallPromptEvent] = useState(null);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstall = (e) => {
+      e.preventDefault();
+      setInstallPromptEvent(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+  }, []);
+
+  const isPortalMode = currentPage === 'login' || currentPage === 'dashboard';
 
   const t = translations[lang];
 
@@ -73,17 +89,20 @@ export default function App() {
 
   return (
     <div className={`min-h-screen bg-[#FBFBFB] flex flex-col font-${lang === 'bn' ? 'bengali' : 'sans'}`}>
-      {/* Top and Mobile Navbar System */}
-      <Navbar
-        currentPage={currentPage}
-        setCurrentPage={navigateTo}
-        lang={lang}
-        setLang={setLang}
-        t={t}
-        onOpenLogin={() => navigateTo(isLoggedIn ? 'dashboard' : 'login')}
-        onOpenBookVisit={() => handleOpenBookVisit()}
-        isLoggedIn={isLoggedIn}
-      />
+      {/* Top and Mobile Navbar System - Hidden on Login & Client Dashboard */}
+      {!isPortalMode && (
+        <Navbar
+          currentPage={currentPage}
+          setCurrentPage={navigateTo}
+          lang={lang}
+          setLang={setLang}
+          t={t}
+          onOpenLogin={() => navigateTo(isLoggedIn ? 'dashboard' : 'login')}
+          onOpenBookVisit={() => handleOpenBookVisit()}
+          onOpenInstallApp={() => setIsInstallModalOpen(true)}
+          isLoggedIn={isLoggedIn}
+        />
+      )}
 
       {/* Main Multi-Page Content Area */}
       <main className="flex-1">
@@ -451,14 +470,17 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <Footer
-        lang={lang}
-        setLang={setLang}
-        t={t}
-        onNavigate={navigateTo}
-        isLoggedIn={isLoggedIn}
-      />
+      {/* Footer - Hidden on Login & Client Dashboard */}
+      {!isPortalMode && (
+        <Footer
+          lang={lang}
+          setLang={setLang}
+          t={t}
+          onNavigate={navigateTo}
+          onOpenInstallApp={() => setIsInstallModalOpen(true)}
+          isLoggedIn={isLoggedIn}
+        />
+      )}
 
       {/* Project Details Modal */}
       <ProjectModal
@@ -468,6 +490,19 @@ export default function App() {
         onClose={() => setActiveProjectModal(null)}
         onBookVisit={(project) => handleOpenBookVisit(project)}
       />
+
+      {/* PWA App Installation Guide & Trigger Modal */}
+      <InstallAppModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+        lang={lang}
+        installPromptEvent={installPromptEvent}
+      />
+
+      {/* App Splash / Flash Screen on Launch */}
+      {showSplash && (
+        <SplashScreen onFinish={() => setShowSplash(false)} minDuration={1600} />
+      )}
     </div>
   );
 }
