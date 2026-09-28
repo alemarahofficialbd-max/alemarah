@@ -97,40 +97,42 @@ export const translations = {
       }
     },
 
-    // Why Choose Us
+    // Why Choose Us (Authentic from Corporate Profile PDF)
     whyUs: {
-      badge: "The Al-Emarah Difference",
-      title: "Why Elite Homeowners Trust Us",
-      subtitle: "We prioritize uncompromising structural integrity, green sustainability, and guaranteed timely handover.",
+      badge: "Why Al-Emarah Properties",
+      title: "Planned Operations, Multi-Faceted Assets & Lasting Trust",
+      subtitle: "Why investors and homeowners choose Al-Emarah: structured execution, transparent written contracts, and ethical corporate governance.",
+      wayForwardTitle: "The Way Forward",
+      wayForwardText: "Al-Emarah Properties is expanding beyond residential and commercial towers into integrated housing, master-planned land development, and productive agro assets.",
       features: [
         {
-          title: "Earthquake & Wind Resistant",
-          desc: "Rigorous BUET-tested structural engineering adhering strictly to BNBC codes with 7.5+ Richter scale tolerance."
+          title: "Planned Operations",
+          desc: "Project-based disciplined planning and professional execution ensuring maximum space efficiency and safety."
         },
         {
-          title: "100% On-Time Handover",
-          desc: "Dedicated project management teams ensuring every milestone is achieved on schedule without delays."
+          title: "Multi-Faceted Assets",
+          desc: "Integrated operations across luxury real estate, planned housing, land development, and sustainable agro assets."
         },
         {
-          title: "Clear Legal Title & Approvals",
-          desc: "Absolute legal transparency with complete RAJUK approval, civil aviation clearance, and flawless land ownership."
+          title: "Participatory Opportunities",
+          desc: "Creating wealth generation opportunities accessible even from modest starting capital (starting ৳ 1 Lac)."
         },
         {
-          title: "Green & Eco-Friendly Design",
-          desc: "35% open green spaces, rainwater harvesting systems, and natural daylight optimization in every unit."
+          title: "Written Legal Framework",
+          desc: "All investments and equity partnerships are governed by formal, legally binding written agreements and policies."
         },
         {
-          title: "World-Class Materials & Fittings",
-          desc: "European standard elevators, BSRM 500W steel, Lafarge cement, and premium branded sanitary fittings."
+          title: "Governance & Accountability",
+          desc: "Adherence to a balanced administrative structure of responsibility, executive authority, and regular audits."
         },
         {
-          title: "Lifetime After-Sales Support",
-          desc: "Dedicated facility management, 24/7 security systems, and structural maintenance warranty for your peace of mind."
+          title: "Long-Term Vision",
+          desc: "A steadfast commitment to establishing an enduring, resilient, and multi-dimensional institution for generations."
         }
       ]
     },
 
-    // About Us & Corporate Profile
+    // About Us & Corporate Profile (Authentic from Corporate Profile PDF)
     about: {
       badge: "Corporate Profile",
       title: "Planned Development, Creating Wealth with Trust",
@@ -139,13 +141,15 @@ export const translations = {
       philosophyText: "Connecting human financial capability with productive wealth creation. Making high-value real estate accessible to middle and limited-income families through structured, participatory investment.",
       visionTitle: "Our Vision",
       visionText: "To emerge as a trusted, disciplined, and multi-faceted asset development institution creating enduring value across residential, commercial, housing, land, and sustainable agro assets.",
-      missionTitle: "Our Mission",
+      missionTitle: "Our Mission (7 Core Objectives)",
       missions: [
-        "Planned & quality real estate development with functional architectural space management",
-        "Ensuring optimum utility and long-term appreciation of residential and commercial assets",
-        "Creating participatory wealth generation opportunities starting from BDT 1,00,000",
-        "Developing productive agro-based and dairy cattle assets for employment and regular yields",
-        "Maintaining absolute transparency, financial discipline, accountability, and good governance"
+        "Planned & quality real estate development ensuring optimal structural standards",
+        "Ensuring the most effective and functional utilization of residential and commercial assets",
+        "Creating participatory wealth generation opportunities for limited and middle-income families",
+        "Generating compounding long-term capital appreciation in land and housing developments",
+        "Developing productive agro assets for economic growth, food security, and direct employment",
+        "Maintaining uncompromising transparency, financial discipline, and corporate accountability",
+        "Enhancing institutional capabilities through skilled workforce and disciplined management"
       ],
       valuesTitle: "Core Corporate Values",
       values: [
@@ -160,13 +164,13 @@ export const translations = {
       
       // Chairman's Message
       chairmanTitle: "Message from the Honorable Chairman",
-      chairmanQuote: "The core philosophy of Al-Emarah Properties is planned development, responsible management, and sustainable wealth creation. Real estate is not merely land and brick structures; it is deeply intertwined with human lives, urbanization, and shaping the future. In every venture, we uphold transparency, accountability, professionalism, and ethical governance to build a dependable, multi-faceted institution for generations.",
+      chairmanQuote: "The core philosophy of Al-Emarah Properties is planned development, responsible management, and sustainable wealth creation. We believe real estate is not merely land and brick structures; it is deeply intertwined with human lives, urbanization, and shaping the future. In every venture, we uphold transparency, accountability, professionalism, and ethical governance to build a dependable, multi-faceted institution for generations.",
       chairmanName: "Sheikh Fazlul Karim Maroof",
       chairmanDesignation: "Chairman, Al-Emarah Properties (Public Administration, University of Dhaka)",
       
       // Managing Director's Message
       mdTitle: "Message from the Managing Director",
-      mdQuote: "As the Managing Director, my primary duty is advancing our organization into a powerful, multifaceted, and publicly trusted enterprise through sound planning, skilled management, and pragmatic execution. Alongside residential and commercial towers like Al Quds Tower and Barakah Tower 01, we are pioneering Emarah Agro to convert agriculture into organized, profitable asset structures with participatory returns.",
+      mdQuote: "As the Managing Director, my primary duty is advancing our organization into a powerful, multifaceted, and publicly trusted enterprise through sound planning, skilled management, and pragmatic execution. Alongside residential and commercial towers like Al Quds Tower and Barakah Tower 01, our Emarah Agro initiative is opening new frontiers in sustainable agriculture and participatory returns. Because behind a person's savings lie their hard work, their family's future, and their aspiration to build something lasting. From that accountability, our journey continues from planning to execution, from a single initiative toward multi-asset development.",
       mdName: "Talukdar Tariq Masud",
       mdDesignation: "Managing Director, Al-Emarah Properties"
     },
@@ -566,62 +570,66 @@ export const translations = {
       }
     },
 
-    // Why Choose Us
+    // Why Choose Us (Authentic from Corporate Profile PDF)
     whyUs: {
-      badge: "আল-ইমারাহ এর বিশেষত্ব",
-      title: "কেন আল-ইমারাহ গ্রাহকদের প্রথম পছন্দ",
-      subtitle: "আমরা শুধু ফ্ল্যাট বানাই না, গড়ে তুলি আধুনিক, পরিবেশবান্ধব ও শতভাগ নিরাপদ পারিবারিক আবাস।",
+      badge: "কেন আল ইমারাহ প্রোপার্টিজ",
+      title: "পরিকল্পিত কার্যক্রম, বহুমুখী সম্পদ ও দীর্ঘমেয়াদি আস্থা",
+      subtitle: "আল ইমারাহ প্রোপার্টিজের পথচলার মূল দর্শন পরিকল্পিত উন্নয়ন, দায়িত্বশীল ব্যবস্থাপনা এবং দীর্ঘমেয়াদি সম্পদ সৃষ্টি।",
+      wayForwardTitle: "সামনে এগিয়ে যাওয়ার পথ",
+      wayForwardText: "আল ইমারাহ প্রোপার্টিজের কার্যক্রম আবাসিক ও বাণিজ্যিক রিয়েল এস্টেটের পাশাপাশি হাউজিং, ভূমি উন্নয়ন এবং কৃষিভিত্তিক সম্পদ উন্নয়নের দিকে সম্প্রসারিত হচ্ছে।",
       features: [
         {
-          title: "ভূমিকম্প ও ঝড় সহনশীল কাঠামো",
-          desc: "বাংলাদেশ ন্যাশনাল বিল্ডিং কোড (BNBC) অনুযায়ী বুয়েট পরীক্ষিত রড ও সিমেন্ট ব্যবহারে ৭.৫+ রিখটার স্কেল সহনশীল ডিজাইন।"
+          title: "পরিকল্পিত কার্যক্রম",
+          desc: "প্রকল্পভিত্তিক সুসংগঠিত পরিকল্পনা ও আধুনিক ব্যবস্থাপনা।"
         },
         {
-          title: "নির্দিষ্ট সময়ে হস্তান্তরের নিশ্চয়তা",
-          desc: "দক্ষ প্রজেক্ট ম্যানেজমেন্ট ও আধুনিক নির্মাণ প্রকৌশলীদের সার্বক্ষণিক তত্ত্বাবধানে যথাসময়ে চাবি বুঝিয়ে দেওয়ার অঙ্গীকার।"
+          title: "বহুমুখী কার্যক্রম",
+          desc: "রিয়েল এস্টেট, হাউজিং, ভূমি উন্নয়ন ও কৃষিভিত্তিক সম্পদ উন্নয়নের সমন্বিত কার্যক্রম।"
         },
         {
-          title: "শতভাগ নিষ্কণ্টক জমি ও রাজউক অনুমোদন",
-          desc: "জমি ক্রয় থেকে শুরু করে রাজউক, পরিবেশ অধিদপ্তর ও ফায়ার সার্ভিসের সকল ক্লিয়ারেন্স শতভাগ স্বচ্ছ ও বৈধ।"
+          title: "অংশগ্রহণের সুযোগ",
+          desc: "তুলনামূলকভাবে সীমিত মূলধন থেকেও সম্পদ উন্নয়ন কার্যক্রমে যুক্ত হওয়ার সুযোগ (১ লক্ষ টাকা থেকে শুরু)।"
         },
         {
-          title: "পরিবেশবান্ধব ও সবুজ স্থাপত্য",
-          desc: "পর্যাপ্ত আলো-বাতাস, বৃষ্টির পানি সংরক্ষণ, সৌর বিদ্যুৎ এবং ৩৫% খোলামেলা ও সবুজ ল্যান্ডস্কেপিং ব্যবস্থা।"
+          title: "লিখিত কাঠামো",
+          desc: "বিনিয়োগ ও অংশীদারিত্ব সংশ্লিষ্ট শতভাগ লিখিত চুক্তি ও প্রাতিষ্ঠানিক নীতিমালার মাধ্যমে পরিচালিত হয়।"
         },
         {
-          title: "আমদানিকৃত উন্নত ফিটিংস ও লিফট",
-          desc: "ইউরোপীয় স্ট্যান্ডার্ড আধুনিক লিফট, বিএসআরএম ৫০০ ডব্লিউ রিবার, ব্র্যান্ডেড টাইলস ও স্যানিটারি ফিটিংসের ব্যবহার।"
+          title: "সুশাসন ও জবাবদিহিতা",
+          desc: "দায়িত্ব, কর্তৃত্ব ও পর্যবেক্ষণের একটি ভারসাম্যপূর্ণ প্রশাসনিক কাঠামো অনুসরণ করা হয়।"
         },
         {
-          title: "আজীবন বিক্রয়োত্তর সেবা ও গ্যারান্টি",
-          desc: "ফ্ল্যাট হস্তান্তরের পরও ডেডিকেটেড ফ্যাসিলিটি ম্যানেজমেন্ট, সার্বক্ষণিক নিরাপত্তা ও স্ট্রাকচারাল ওয়ারেন্টি।"
+          title: "দীর্ঘমেয়াদি দৃষ্টিভঙ্গি",
+          desc: "স্বল্পমেয়াদি কার্যক্রমের পাশাপাশি একটি স্থিতিশীল ও বহুমুখী প্রতিষ্ঠান গড়ে তোলার দৃঢ় প্রত্যয়।"
         }
       ]
     },
 
-    // About Us & Corporate Profile
+    // About Us & Corporate Profile (Authentic from Corporate Profile PDF)
     about: {
       badge: "কর্পোরেট পরিচিতি",
       title: "পরিকল্পিত উন্নয়ন, আস্থার সঙ্গে সম্পদ সৃষ্টি",
-      subtitle: "আল ইমারাহ প্রোপার্টিজ একটি পরিকল্পিত রিয়েল এস্টেট ও অ্যাসেট ডেভেলপমেন্ট প্রতিষ্ঠান, যার মূল লক্ষ্য মানুষের সামর্থ্যকে সম্পদ সৃষ্টির সঙ্গে যুক্ত করা।",
+      subtitle: "আল ইমারাহ প্রোপার্টিজ একটি পরিকল্পিত রিয়েল এস্টেট ডেভেলপমেন্ট প্রতিষ্ঠান, যার মূল লক্ষ্য ভূমি, আবাসন ও বাণিজ্যিক সম্পদ উন্নয়নের মাধ্যমে দীর্ঘমেয়াদি ও বাস্তবভিত্তিক সম্পদ সৃষ্টির সুযোগ তৈরি করা।",
       philosophyTitle: "আমাদের দর্শন",
-      philosophyText: "মানুষের সামর্থ্যকে সম্পদ সৃষ্টির সঙ্গে যুক্ত করা। ঢাকার মতো দ্রুত বিকাশমান নগরে একটি নিজস্ব ঠিকানা বা সম্পদ তৈরি করা অনেকের স্বপ্ন। সীমিত আয়ের মানুষকেও অংশীদারিত্বমূলক সম্পদ সৃষ্টিতে যুক্ত করতেই আমাদের প্রয়াস।",
+      philosophyText: "মানুষের সামর্থ্যকে সম্পদ সৃষ্টির সঙ্গে যুক্ত করা। ঢাকার মতো দ্রুত বিকাশমান নগরে একটি নিজস্ব সম্পদ বা নিজের একটি ঠিকানা তৈরি করা অনেক মানুষের দীর্ঘদিনের স্বপ্ন। কিন্তু সীমিত আয়ের মানুষের জন্য বড় অঙ্কের এককালীন বিনিয়োগ সবসময় সহজ নয়। এই বাস্তবতাকে বিবেচনায় রেখে আল ইমারাহ প্রোপার্টিজ এমন প্রকল্পভিত্তিক অংশগ্রহণের সুযোগ তৈরি করছে, যেখানে তুলনামূলকভাবে সীমিত মূলধন থেকেও মানুষ রিয়েল এস্টেট ও সম্পদ উন্নয়নের সঙ্গে যুক্ত হওয়ার সুযোগ পেতে পারে। আমাদের কাছে বিনিয়োগ শুধু অর্থের হিসাব নয়—এটি একজন মানুষের পরিশ্রম, সঞ্চয়, প্রত্যাশা এবং ভবিষ্যৎ পরিকল্পনার সঙ্গে জড়িত একটি দায়িত্ব।",
       visionTitle: "আমাদের ভিশন",
       visionText: "একটি বিশ্বস্ত, সুসংগঠিত ও বহুমুখী সম্পদ উন্নয়ন প্রতিষ্ঠান হিসেবে প্রতিষ্ঠিত হওয়া—যেখানে আবাসন, রিয়েল এস্টেট, ভূমি উন্নয়ন ও কৃষিভিত্তিক সম্পদ উন্নয়নের মাধ্যমে দীর্ঘমেয়াদি মূল্য সৃষ্টি হবে।",
-      missionTitle: "আমাদের মিশন",
+      missionTitle: "আমাদের মিশন (৭টি মূল লক্ষ্য)",
       missions: [
-        "পরিকল্পিত ও মানসম্মত রিয়েল এস্টেট এবং কার্যকর স্পেস উন্নয়ন নিশ্চিত করা",
-        "আবাসিক ও বাণিজ্যিক সম্পদের সর্বোত্তম ব্যবহার ও দীর্ঘমেয়াদি মূল্য বৃদ্ধি",
-        "সীমিত ও মধ্যম আয়ের মানুষের জন্য ১,০০,০০০ টাকা থেকে অংশীদারিত্বমূলক সম্পদ সৃষ্টির সুযোগ",
-        "ইমারাহ এগ্রো উদ্যোগের মাধ্যমে টেকসই কৃষি, ডেইরি ক্যাটল ও উৎপাদনশীল কর্মসংস্থান সৃষ্টি",
-        "স্বচ্ছতা, আর্থিক জবাবদিহিতা, সুশাসন ও পেশাদারিত্বের সর্বোচ্চ চর্চা বজায় রাখা"
+        "পরিকল্পিত ও মানসম্মত রিয়েল এস্টেট উন্নয়ন।",
+        "আবাসিক ও বাণিজ্যিক সম্পদের কার্যকর ব্যবহার নিশ্চিত করা।",
+        "সীমিত ও মধ্যম আয়ের মানুষের জন্য অংশগ্রহণমূলক সম্পদ সৃষ্টির সুযোগ তৈরি করা।",
+        "ভূমি ও আবাসন উন্নয়নে দীর্ঘমেয়াদি মূল্য সৃষ্টি করা।",
+        "কৃষিভিত্তিক সম্পদ উন্নয়নের মাধ্যমে নতুন অর্থনৈতিক কার্যক্রম ও কর্মসংস্থানের সুযোগ তৈরি করা।",
+        "স্বচ্ছতা, জবাবদিহিতা ও আর্থিক শৃঙ্খলা বজায় রাখা।",
+        "দক্ষ জনবল ও সুসংগঠিত ব্যবস্থাপনার মাধ্যমে প্রতিষ্ঠানের সক্ষমতা বৃদ্ধি করা।"
       ],
       valuesTitle: "আমাদের মূল মূল্যবোধ",
       values: [
         "স্বচ্ছতা (Transparency)",
         "জবাবদিহিতা (Accountability)",
         "পেশাদারিত্ব (Professionalism)",
-        "আস্থা ও বিশ্বস্ততা (Trust)",
+        "আস্থা (Trust)",
         "সুশাসন (Good Governance)",
         "দূরদর্শিতা (Foresight)"
       ],
@@ -629,13 +637,13 @@ export const translations = {
       
       // Chairman's Message
       chairmanTitle: "চেয়ারম্যানের বক্তব্য",
-      chairmanQuote: "আল ইমারাহ প্রোপার্টিজের পথচলার মূল দর্শন পরিকল্পিত উন্নয়ন, দায়িত্বশীল ব্যবস্থাপনা এবং দীর্ঘমেয়াদি সম্পদ সৃষ্টি। আমরা বিশ্বাস করি, রিয়েল এস্টেট শুধু জমি ও ভবনের বিষয় নয়; এটি মানুষের জীবন, নগরায়ণ এবং ভবিষ্যৎ নির্মাণের সঙ্গে গভীরভাবে সম্পৃক্ত। তাই আমাদের প্রতিটি উদ্যোগে স্বচ্ছতা, জবাবদিহিতা, পেশাদারিত্ব ও সুশাসনকে সর্বোচ্চ গুরুত্ব দেওয়া হয়। আমাদের উদ্দেশ্য শুধু প্রকল্পকেন্দ্রিক একটি ব্যবসা পরিচালনা করা নয়; বরং সময়ের সঙ্গে একটি বিশ্বস্ত, সুসংগঠিত ও স্থায়ী প্রতিষ্ঠান হিসেবে নিজেদের প্রতিষ্ঠিত করা এবং মানুষের জন্য সহজ শর্তে আবাসন ও সম্পদ সৃষ্টি করা।",
+      chairmanQuote: "আল ইমারাহ প্রোপার্টিজের পথচলার মূল দর্শন পরিকল্পিত উন্নয়ন, দায়িত্বশীল ব্যবস্থাপনা এবং দীর্ঘমেয়াদি সম্পদ সৃষ্টি। আমরা বিশ্বাস করি, রিয়েল এস্টেট শুধু জমি ও ভবনের বিষয় নয়; এটি মানুষের জীবন, নগরায়ণ এবং ভবিষ্যৎ নির্মাণের সঙ্গে গভীরভাবে সম্পৃক্ত। তাই আমাদের প্রতিটি উদ্যোগে স্বচ্ছতা, জবাবদিহিতা, পেশাদারিত্ব ও সুশাসনকে সর্বোচ্চ গুরুত্ব দেওয়া হয়। আমাদের উদ্দেশ্য শুধু প্রকল্পকেন্দ্রিক একটি ব্যবসা পরিচালনা করা নয়; বরং সময়ের সঙ্গে একটি বিশ্বস্ত, সুসংগঠিত ও স্থায়ী প্রতিষ্ঠান হিসেবে নিজেদের প্রতিষ্ঠিত করা এবং মানুষের জন্য সহজ শর্তে আবাসন নির্মাণ করা।",
       chairmanName: "শেখ ফজলুল করিম মারুফ",
       chairmanDesignation: "চেয়ারম্যান, আল ইমারাহ প্রোপার্টিজ (লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়)",
       
       // Managing Director's Message
       mdTitle: "ব্যবস্থাপনা পরিচালকের বক্তব্য",
-      mdQuote: "আল ইমারাহ প্রোপার্টিজের ব্যবস্থাপনা পরিচালক হিসেবে আমার প্রধান দায়িত্ব হলো—সুষ্ঠু পরিকল্পনা, দক্ষ ব্যবস্থাপনা ও কার্যকর বাস্তবায়নের মাধ্যমে প্রতিষ্ঠানকে একটি শক্তিশালী, বহুমুখী ও জনআস্থাসম্পন্ন প্রতিষ্ঠানে এগিয়ে নেওয়া। আল কুদস টাওয়ার ও বারাকাহ টাওয়ার ০১-এর মতো আবাসিক ও বাণিজ্যিক কার্যক্রমের পাশাপাশি ইমারাহ এগ্রো উদ্যোগের মাধ্যমে কৃষি, ডেইরি ও অংশীদারিত্বের এক নতুন সম্ভাবনাময় দিগন্ত আমরা উন্মোচন করেছি।",
+      mdQuote: "আল ইমারাহ প্রোপার্টিজের ব্যবস্থাপনা পরিচালক হিসেবে আমার প্রধান দায়িত্ব হলো—সুষ্ঠু পরিকল্পনা, দক্ষ ব্যবস্থাপনা ও কার্যকর বাস্তবায়নের মাধ্যমে প্রতিষ্ঠানকে একটি শক্তিশালী, বহুমুখী ও জনআস্থাসম্পন্ন প্রতিষ্ঠানে এগিয়ে নেওয়া। আবাসিক ও বাণিজ্যিক কার্যক্রমের পাশাপাশি রিয়েল এস্টেট ডেভেলপমেন্ট অ্যান্ড হাউজিং, পরিকল্পিত আবাসন, ভূমি উন্নয়ন এবং কৃষিভিত্তিক সম্পদ উন্নয়ন খাতেও আমাদের কার্যক্রম সম্প্রসারিত হচ্ছে। বিশেষ করে আল ইমারাহ এগ্রো উদ্যোগের মাধ্যমে কৃষি, উৎপাদন ও অংশীদারিত্বের নতুন সম্ভাবনা তৈরি হচ্ছে। কারণ মানুষের সঞ্চয়ের সঙ্গে জড়িয়ে থাকে তার পরিশ্রম, পরিবারের ভবিষ্যৎ এবং নিজের জন্য কিছু গড়ে তোলার আকাঙ্ক্ষা। সেই দায়বদ্ধতা থেকেই আমরা এমন একটি প্রতিষ্ঠান গড়ে তুলতে চাই, যেখানে মানুষের অংশগ্রহণ ভবিষ্যতের একটি সম্পদ ও সম্ভাবনার সঙ্গে যুক্ত হবে। পরিকল্পনা থেকে বাস্তবায়নে, একটি উদ্যোগ থেকে বহুমুখী সম্পদ উন্নয়নের দিকে আমাদের পথচলা চলমান।",
       mdName: "তালুকদার তারিক মাসউদ",
       mdDesignation: "ব্যবস্থাপনা পরিচালক, আল ইমারাহ প্রোপার্টিজ"
     },

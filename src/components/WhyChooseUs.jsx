@@ -83,6 +83,17 @@ export default function WhyChooseUs({ lang, t }) {
           })}
         </div>
 
+        {/* The Way Forward Strip (Authentic from Corporate Profile PDF) */}
+        <div className="p-6 sm:p-7 rounded-2xl bg-white border border-gray-200 shadow-xs flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#006231] to-[#8EBF40] text-white flex items-center justify-center shrink-0 shadow-sm">
+            <TrendingUp className="w-6 h-6" />
+          </div>
+          <div>
+            <h4 className="text-sm sm:text-base font-bold text-gray-900">{t.whyUs.wayForwardTitle}</h4>
+            <p className="text-xs sm:text-sm text-gray-600 mt-0.5 leading-relaxed">{t.whyUs.wayForwardText}</p>
+          </div>
+        </div>
+
         {/* ========================================================= */}
         {/* NEW SECTION: PROJECT SELECTION PRIORITIES (PDF PROFILE)   */}
         {/* ========================================================= */}
