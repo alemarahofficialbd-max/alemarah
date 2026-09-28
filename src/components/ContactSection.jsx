@@ -368,8 +368,9 @@ export default function ContactSection({ lang, t, preselectedProject }) {
                 </span>
               ))}
             </div>
-            <div className="text-gray-500 font-medium">
-              📍 ৩/১, স্কাই ভিউ হেনোলাক্স সেন্টার, পুরানা পল্টন, ঢাকা
+            <div className="text-gray-500 font-medium flex items-center justify-center space-x-1.5">
+              <MapPin className="w-4 h-4 text-[#CE2028]" />
+              <span>৩/১, স্কাই ভিউ হেনোলাক্স সেন্টার, পুরানা পল্টন, ঢাকা</span>
             </div>
           </div>
         </div>

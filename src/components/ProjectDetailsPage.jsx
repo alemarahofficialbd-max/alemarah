@@ -94,7 +94,7 @@ export default function ProjectDetailsPage({
             className="inline-flex items-center space-x-2 text-xs sm:text-sm font-bold text-gray-700 hover:text-[#CE2028] bg-gray-50 hover:bg-red-50/50 px-3.5 py-1.5 rounded-xl border border-gray-200 transition-all cursor-pointer group"
           >
             <ArrowLeft className="w-4 h-4 text-[#CE2028] group-hover:-translate-x-1 transition-transform" />
-            <span>{isEn ? '← Back to All Projects' : '← সকল প্রকল্পে ফিরে যান'}</span>
+            <span>{isEn ? 'Back to All Projects' : 'সকল প্রকল্পে ফিরে যান'}</span>
           </button>
 
           <div className="flex items-center space-x-2 text-xs font-semibold text-gray-500">
@@ -436,18 +436,20 @@ export default function ProjectDetailsPage({
                   <Phone className="w-3.5 h-3.5 text-[#006231]" />
                   <span>{isEn ? 'Dedicated Hotline Desk:' : 'সরাসরি হটলাইনে কল দিন:'}</span>
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5 pt-1">
                   <a 
                     href="tel:01918646575" 
-                    className="block text-sm font-bold text-gray-900 hover:text-[#CE2028] transition-colors"
+                    className="flex items-center space-x-2 text-sm font-bold text-gray-900 hover:text-[#CE2028] transition-colors"
                   >
-                    📞 01918-646575
+                    <Phone className="w-3.5 h-3.5 text-[#CE2028]" />
+                    <span>01918-646575</span>
                   </a>
                   <a 
                     href="tel:01743926926" 
-                    className="block text-sm font-bold text-gray-900 hover:text-[#CE2028] transition-colors"
+                    className="flex items-center space-x-2 text-sm font-bold text-gray-900 hover:text-[#CE2028] transition-colors"
                   >
-                    📞 01743-926926
+                    <Phone className="w-3.5 h-3.5 text-[#CE2028]" />
+                    <span>01743-926926</span>
                   </a>
                 </div>
               </div>

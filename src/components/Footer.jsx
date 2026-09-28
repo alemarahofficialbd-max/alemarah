@@ -161,7 +161,7 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
                 <span>
                   {t.contact.office.addressLine1}, {t.contact.office.addressLine2}
                   <span className="block text-[11px] text-[#8EBF40] underline mt-0.5">
-                    {lang === 'en' ? 'Open in Google Maps ↗' : 'গুগল ম্যাপে দেখুন ↗'}
+                    {lang === 'en' ? 'Open in Google Maps' : 'গুগল ম্যাপে দেখুন'}
                   </span>
                 </span>
               </a>

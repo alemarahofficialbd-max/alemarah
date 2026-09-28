@@ -24,15 +24,18 @@ export default function LoginPage({
   const [passwordInput, setPasswordInput] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [statusMessage, setStatusMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (!clientInput || !passwordInput) {
+      setIsSuccess(false);
       setStatusMessage(lang === 'en' ? 'Please enter both your Client ID and Password.' : 'অনুগ্রহ করে ক্লায়েন্ট আইডি এবং পাসওয়ার্ড লিখুন।');
       return;
     }
     setIsSubmitting(true);
+    setIsSuccess(false);
     setStatusMessage(lang === 'en' ? 'Verifying credentials with Al-Emarah Central Server...' : 'আল-ইমারাহ সেন্ট্রাল সার্ভারের সাথে তথ্য যাচাই করা হচ্ছে...');
     
     setTimeout(() => {
@@ -49,7 +52,8 @@ export default function LoginPage({
       setClientInput('INV-AGRO-2024-104');
       setPasswordInput('Partner@2026');
     }
-    setStatusMessage(lang === 'en' ? '✓ Demo credentials filled. Click "Access Owner Dashboard" below.' : '✓ ডেমো আইডি ও পাসওয়ার্ড বসানো হয়েছে। নিচের বাটনে ক্লিক করে ড্যাশবোর্ডে প্রবেশ করুন।');
+    setIsSuccess(true);
+    setStatusMessage(lang === 'en' ? 'Demo credentials filled. Click "Access Owner Dashboard" below.' : 'ডেমো আইডি ও পাসওয়ার্ড বসানো হয়েছে। নিচের বাটনে ক্লিক করে ড্যাশবোর্ডে প্রবেশ করুন।');
   };
 
   return (
@@ -115,12 +119,13 @@ export default function LoginPage({
 
           {/* Status Feedback Banner */}
           {statusMessage && (
-            <div className={`p-3.5 rounded-xl mb-5 text-xs sm:text-sm font-medium text-center ${
-              statusMessage.includes('✓') 
+            <div className={`p-3.5 rounded-xl mb-5 text-xs sm:text-sm font-medium text-center flex items-center justify-center space-x-2 ${
+              isSuccess 
                 ? 'bg-emerald-50 border border-emerald-200 text-[#006231]' 
                 : 'bg-red-50 border border-red-200 text-[#CE2028]'
             }`}>
-              {statusMessage}
+              {isSuccess && <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />}
+              <span>{statusMessage}</span>
             </div>
           )}
 

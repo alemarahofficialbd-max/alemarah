@@ -241,9 +241,10 @@ export default function App() {
                     <div className="pt-2 flex flex-wrap gap-3">
                       <button
                         onClick={() => navigateTo('investment')}
-                        className="px-6 py-3 rounded-xl bg-[#8EBF40] hover:bg-[#7ca935] text-gray-950 font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95"
+                        className="px-6 py-3 rounded-xl bg-[#8EBF40] hover:bg-[#7ca935] text-gray-950 font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95 inline-flex items-center space-x-2"
                       >
-                        {lang === 'en' ? 'Read Full Investment Policy ➔' : 'বিনিয়োগের সম্পূর্ণ নীতিমালা পড়ুন ➔'}
+                        <span>{lang === 'en' ? 'Read Full Investment Policy' : 'বিনিয়োগের সম্পূর্ণ নীতিমালা পড়ুন'}</span>
+                        <ArrowRight className="w-4 h-4" />
                       </button>
 
                       <a
