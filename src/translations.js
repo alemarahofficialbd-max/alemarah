@@ -101,33 +101,57 @@ export const translations = {
     whyUs: {
       badge: "Why Al-Emarah Properties",
       title: "Planned Operations, Multi-Faceted Assets & Lasting Trust",
-      subtitle: "Why investors and homeowners choose Al-Emarah: structured execution, transparent written contracts, and ethical corporate governance.",
-      wayForwardTitle: "The Way Forward",
-      wayForwardText: "Al-Emarah Properties is expanding beyond residential and commercial towers into integrated housing, master-planned land development, and productive agro assets.",
+      subtitle: "The core foundational reasons why homeowners, landowners, and investment partners choose Al-Emarah Properties Limited over conventional builders.",
+      stats: [
+        { label: "Clear Land Title", value: "100%", sub: "Zero legal dispute" },
+        { label: "Minimum Entry", value: "৳ 1,00,000", sub: "Participatory wealth" },
+        { label: "Capital Settlement", value: "Max 90 Days", sub: "Guaranteed process" },
+        { label: "Legal Framework", value: "Written", sub: "Binding agreements" }
+      ],
+      wayForwardBadge: "Strategic Growth Roadmap",
+      wayForwardTitle: "The Way Forward (সামনে এগিয়ে যাওয়ার পথ)",
+      wayForwardText: "Al-Emarah Properties is continuously expanding beyond individual towers into master-planned housing, land development, and sustainable agro assets through our organized multi-asset development platform.",
+      wayForwardPillars: [
+        { title: "Residential & Commercial", desc: "Barakah Tower 01 & Al Quds Tower" },
+        { title: "Planned Housing & Land", desc: "Strategic land acquisition & development" },
+        { title: "Al-Emarah Agro Valley", desc: "Dairy, livestock, poultry & aquaculture" }
+      ],
       features: [
         {
           title: "Planned Operations",
-          desc: "Project-based disciplined planning and professional execution ensuring maximum space efficiency and safety."
+          sub: "পরিকল্পিত কার্যক্রম",
+          desc: "Project-based disciplined planning and professional engineering execution ensuring maximum space efficiency, safety, and strict delivery milestones.",
+          tag: "Disciplined Engineering"
         },
         {
           title: "Multi-Faceted Assets",
-          desc: "Integrated operations across luxury real estate, planned housing, land development, and sustainable agro assets."
+          sub: "বহুমুখী কার্যক্রম",
+          desc: "Synergistic operations combining residential apartments, commercial plazas, planned housing, land development, and high-yield agro assets.",
+          tag: "Diversified Asset Base"
         },
         {
           title: "Participatory Opportunities",
-          desc: "Creating wealth generation opportunities accessible even from modest starting capital (starting ৳ 1 Lac)."
+          sub: "অংশগ্রহণের সুযোগ",
+          desc: "Empowering families and individual investors to participate in structured wealth development starting from a modest threshold of ৳ 1,00,000.",
+          tag: "Accessible from ৳ 1 Lac"
         },
         {
           title: "Written Legal Framework",
-          desc: "All investments and equity partnerships are governed by formal, legally binding written agreements and policies."
+          sub: "লিখিত কাঠামো",
+          desc: "All equity investments, owner shares, and operations are governed exclusively through formal, audited written agreements and legal policies.",
+          tag: "100% Legally Binding"
         },
         {
           title: "Governance & Accountability",
-          desc: "Adherence to a balanced administrative structure of responsibility, executive authority, and regular audits."
+          sub: "সুশাসন ও জবাবদিহিতা",
+          desc: "Balanced institutional governance with clear demarcation of authority across the Board of Directors, Executive Committee, and Senior Leadership.",
+          tag: "Independent Oversight"
         },
         {
           title: "Long-Term Vision",
-          desc: "A steadfast commitment to establishing an enduring, resilient, and multi-dimensional institution for generations."
+          sub: "দীর্ঘমেয়াদি দৃষ্টিভঙ্গি",
+          desc: "A steadfast commitment to building a durable, resilient institution focused on real economic productivity and lasting trust over short-term speculation.",
+          tag: "Generational Durability"
         }
       ]
     },
@@ -656,33 +680,57 @@ export const translations = {
     whyUs: {
       badge: "কেন আল ইমারাহ প্রোপার্টিজ",
       title: "পরিকল্পিত কার্যক্রম, বহুমুখী সম্পদ ও দীর্ঘমেয়াদি আস্থা",
-      subtitle: "আল ইমারাহ প্রোপার্টিজের পথচলার মূল দর্শন পরিকল্পিত উন্নয়ন, দায়িত্বশীল ব্যবস্থাপনা এবং দীর্ঘমেয়াদি সম্পদ সৃষ্টি।",
-      wayForwardTitle: "সামনে এগিয়ে যাওয়ার পথ",
-      wayForwardText: "আল ইমারাহ প্রোপার্টিজের কার্যক্রম আবাসিক ও বাণিজ্যিক রিয়েল এস্টেটের পাশাপাশি হাউজিং, ভূমি উন্নয়ন এবং কৃষিভিত্তিক সম্পদ উন্নয়নের দিকে সম্প্রসারিত হচ্ছে।",
+      subtitle: "গতানুগতিক ডেভেলপারদের ভিড়ে আল ইমারাহ প্রোপার্টিজ লিমিটেড কেন গ্রাহক, জমিদাতা ও বিনিয়োগকারীদের প্রথম পছন্দ—আমাদের ৬টি মৌলিক প্রাতিষ্ঠানিক ভিত্তি।",
+      stats: [
+        { label: "নিষ্কণ্টক জমি", value: "১০০%", sub: "সম্পূর্ণ আইনি যাচাইকৃত" },
+        { label: "ন্যূনতম বিনিয়োগ", value: "৳ ১,০০,০০০", sub: "অংশগ্রহণমূলক সুযোগ" },
+        { label: "মূলধন নিষ্পত্তি", value: "সর্বোচ্চ ৯০ দিন", sub: "নির্ধারিত কার্যদিবস" },
+        { label: "আইনি কাঠামো", value: "লিখিত চুক্তি", sub: "শতভাগ প্রাতিষ্ঠানিক চুক্তি" }
+      ],
+      wayForwardBadge: "কৌশলগত সম্প্রসারণ রোডম্যাপ",
+      wayForwardTitle: "সামনে এগিয়ে যাওয়ার পথ (The Way Forward)",
+      wayForwardText: "আল ইমারাহ প্রোপার্টিজের কার্যক্রম শুধু একটি নির্দিষ্ট ভবনের মধ্যে সীমাবদ্ধ নয়; আবাসিক ও বাণিজ্যিক রিয়েল এস্টেটের পাশাপাশি হাউজিং, পরিকল্পিত ভূমি উন্নয়ন এবং উৎপাদনশীল কৃষিভিত্তিক সম্পদ উন্নয়নের সমন্বয়ে একটি শক্তিশালী বহুমুখী প্ল্যাটফর্ম হিসেবে আমরা এগিয়ে চলেছি।",
+      wayForwardPillars: [
+        { title: "আবাসিক ও বাণিজ্যিক টাওয়ার", desc: "বারাকাহ টাওয়ার ০১ এবং আল কুদস টাওয়ার" },
+        { title: "পরিকল্পিত হাউজিং ও ভূমি উন্নয়ন", desc: "কৌশলগত জমি সংগ্রহ ও টেকসই উন্নয়ন" },
+        { title: "আল ইমারাহ এগ্রো ভ্যালি", desc: "ডেইরি, ক্যাটল, পোল্ট্রি ও সমন্বিত মৎস্য প্রকল্প" }
+      ],
       features: [
         {
           title: "পরিকল্পিত কার্যক্রম",
-          desc: "প্রকল্পভিত্তিক সুসংগঠিত পরিকল্পনা ও আধুনিক ব্যবস্থাপনা।"
+          sub: "প্রকল্পভিত্তিক সুসংগঠিত পরিকল্পনা",
+          desc: "প্রতিটি প্রকল্পের জন্য সুনির্দিষ্ট মাস্টারপ্ল্যান, আর্কিটেকচারাল উপযোগিতা এবং অভিজ্ঞ প্রকৌশলীদের সার্বক্ষণিক তত্ত্বাবধানে সময়মতো শতভাগ গুণগত বাস্তবায়ন।",
+          tag: "সুসংগঠিত পরিকল্পনা"
         },
         {
           title: "বহুমুখী কার্যক্রম",
-          desc: "রিয়েল এস্টেট, হাউজিং, ভূমি উন্নয়ন ও কৃষিভিত্তিক সম্পদ উন্নয়নের সমন্বিত কার্যক্রম।"
+          sub: "সমন্বিত বহুমুখী সম্পদ প্ল্যাটফর্ম",
+          desc: "আবাসিক ফ্ল্যাট, বাণিজ্যিক প্লাজা, পরিকল্পিত আবাসন, ভূমি উন্নয়ন এবং কৃষিভিত্তিক উৎপাদনশীল সম্পদের সমন্বয়ে একটি শক্তিশালী ও স্থিতিশীল পোর্টফোলিও।",
+          tag: "বহুমুখী সম্পদ খাত"
         },
         {
           title: "অংশগ্রহণের সুযোগ",
-          desc: "তুলনামূলকভাবে সীমিত মূলধন থেকেও সম্পদ উন্নয়ন কার্যক্রমে যুক্ত হওয়ার সুযোগ (১ লক্ষ টাকা থেকে শুরু)।"
+          sub: "সীমিত মূলধনে সম্পদ সৃষ্টির সুযোগ",
+          desc: "সাধারণ ও সীমিত আয়ের মানুষের জন্য তুলনামূলকভাবে সীমিত মূলধন (ন্যূনতম ১ লক্ষ টাকা) থেকেই বড় রিয়েল এস্টেট ও লাভজনক প্রকল্পে অংশীদারিত্বের সুযোগ।",
+          tag: "ন্যূনতম ১ লাখ থেকে শুরু"
         },
         {
           title: "লিখিত কাঠামো",
-          desc: "বিনিয়োগ ও অংশীদারিত্ব সংশ্লিষ্ট শতভাগ লিখিত চুক্তি ও প্রাতিষ্ঠানিক নীতিমালার মাধ্যমে পরিচালিত হয়।"
+          sub: "শতভাগ লিখিত চুক্তি ও প্রাতিষ্ঠানিক নীতি",
+          desc: "প্রতিটি বিনিয়োগ, ফ্ল্যাট বুকিং ও অংশীদারিত্ব পরিচালিত হয় আইনগতভাবে সুরক্ষিত লিখিত চুক্তিপত্র, নিয়মিত অডিট এবং সুস্পষ্ট সরকারি বিধিমালার ভিত্তিতে।",
+          tag: "আইনগত সুরক্ষিত চুক্তি"
         },
         {
           title: "সুশাসন ও জবাবদিহিতা",
-          desc: "দায়িত্ব, কর্তৃত্ব ও পর্যবেক্ষণের একটি ভারসাম্যপূর্ণ প্রশাসনিক কাঠামো অনুসরণ করা হয়।"
+          sub: "দায়িত্ব, কর্তৃত্ব ও পর্যবেক্ষণের ভারসাম্য",
+          desc: "বোর্ড অব ডিরেক্টরস এবং এক্সিকিউটিভ কমিটির যৌথ তত্ত্বাবধানে আর্থিক শৃঙ্খলা, স্বচ্ছ ব্যবস্থাপনা ও প্রতিটি টাকার দায়িত্বশীল ব্যবহার নিশ্চিতকরণ।",
+          tag: "সুশাসন ও নিয়মিত অডিট"
         },
         {
           title: "দীর্ঘমেয়াদি দৃষ্টিভঙ্গি",
-          desc: "স্বল্পমেয়াদি কার্যক্রমের পাশাপাশি একটি স্থিতিশীল ও বহুমুখী প্রতিষ্ঠান গড়ে তোলার দৃঢ় প্রত্যয়।"
+          sub: "স্থায়ী ও টেকসই প্রতিষ্ঠান গড়ার প্রত্যয়",
+          desc: "স্বল্পমেয়াদি বাণিজ্যিক মোহের চেয়ে গ্রাহক ও অংশীদারদের দীর্ঘমেয়াদি আস্থা এবং সময়ের সাথে সাথে টিকে থাকার সক্ষমতাকে সর্বোচ্চ অগ্রাধিকার প্রদান।",
+          tag: "টেকসই প্রাতিষ্ঠানিক সক্ষমতা"
         }
       ]
     },

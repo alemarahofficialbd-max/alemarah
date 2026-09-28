@@ -16,7 +16,10 @@ import {
   ChevronRight,
   TrendingUp,
   FileText,
-  Quote
+  Quote,
+  Compass,
+  Users,
+  ArrowRight
 } from 'lucide-react';
 
 export default function WhyChooseUs({ lang, t }) {
@@ -40,59 +43,127 @@ export default function WhyChooseUs({ lang, t }) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-50 text-[#006231] text-xs font-bold uppercase tracking-wider mb-3">
+        <div className="text-center max-w-3xl mx-auto space-y-3">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-50 text-[#006231] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5 text-[#8EBF40]" />
             <span>{t.whyUs.badge}</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#231F20] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#231F20] tracking-tight">
             {t.whyUs.title}
           </h2>
-          <p className="mt-3 text-base text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
             {t.whyUs.subtitle}
           </p>
         </div>
 
+        {/* 4-Stat Institutional Metrics Bar */}
+        {t.whyUs.stats && (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {t.whyUs.stats.map((stat, sIdx) => (
+              <div 
+                key={sIdx} 
+                className="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-xs hover:border-[#006231] transition-colors text-center space-y-1"
+              >
+                <div className="text-2xl sm:text-3xl font-black text-[#006231]">
+                  {stat.value}
+                </div>
+                <div className="text-xs sm:text-sm font-bold text-gray-900">
+                  {stat.label}
+                </div>
+                <div className="text-[11px] text-gray-500 font-medium">
+                  {stat.sub}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* 6 Core Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {t.whyUs.features.map((feature, idx) => {
-            const IconComponent = icons[idx] || ShieldCheck;
+            const pillarIcons = [
+              Compass,
+              TrendingUp,
+              Users,
+              FileCheck2,
+              Scale,
+              Award
+            ];
+            const IconComponent = pillarIcons[idx] || ShieldCheck;
+
             return (
               <div
                 key={idx}
-                className="bg-white p-7 rounded-2xl border border-gray-200 shadow-xs hover:shadow-lg hover:border-gray-300 transition-all duration-300 group flex flex-col justify-between"
+                className="bg-white p-7 rounded-2xl border border-gray-200 shadow-xs hover:shadow-xl hover:border-[#CE2028]/40 transition-all duration-300 group flex flex-col justify-between"
               >
-                <div>
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-red-50 to-emerald-50 border border-gray-100 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-                    <IconComponent className="w-6 h-6 text-[#CE2028]" />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-red-50 to-emerald-50 border border-gray-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <IconComponent className="w-6 h-6 text-[#CE2028]" />
+                    </div>
+                    <span className="text-xs font-black text-gray-300 group-hover:text-[#CE2028] transition-colors">
+                      0{idx + 1}
+                    </span>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#CE2028] transition-colors mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#CE2028] transition-colors">
+                      {feature.title}
+                    </h3>
+                    {feature.sub && (
+                      <span className="inline-block text-xs font-semibold text-gray-500 mt-0.5">
+                        {feature.sub}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                     {feature.desc}
                   </p>
                 </div>
 
-                <div className="mt-5 pt-4 border-t border-gray-100 flex items-center text-xs font-bold text-[#006231]">
-                  <CheckCircle2 className="w-4 h-4 mr-1 text-[#8EBF40]" />
-                  <span>{lang === 'en' ? 'Quality Guaranteed' : 'মানসম্মত নিশ্চয়তা'}</span>
+                <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
+                  <span className="inline-flex items-center text-xs font-bold text-[#006231]">
+                    <CheckCircle2 className="w-4 h-4 mr-1.5 text-[#8EBF40]" />
+                    <span>{feature.tag || (lang === 'en' ? 'Verified Pillar' : 'যাচাইকৃত স্তম্ভ')}</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#CE2028] group-hover:translate-x-1 transition-all" />
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* The Way Forward Strip (Authentic from Corporate Profile PDF) */}
-        <div className="p-6 sm:p-7 rounded-2xl bg-white border border-gray-200 shadow-xs flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#006231] to-[#8EBF40] text-white flex items-center justify-center shrink-0 shadow-sm">
-            <TrendingUp className="w-6 h-6" />
+        {/* The Way Forward Section (Strategic Multi-Asset Roadmap) */}
+        <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-[#004723] via-[#006231] to-[#002e16] text-white space-y-6 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-[#8EBF40]/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="relative z-10 max-w-3xl space-y-2">
+            <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-bold text-[#8EBF40] border border-white/10">
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>{t.whyUs.wayForwardBadge || (lang === 'en' ? 'Strategic Roadmap' : 'কৌশলগত রোডম্যাপ')}</span>
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
+              {t.whyUs.wayForwardTitle}
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+              {t.whyUs.wayForwardText}
+            </p>
           </div>
-          <div>
-            <h4 className="text-sm sm:text-base font-bold text-gray-900">{t.whyUs.wayForwardTitle}</h4>
-            <p className="text-xs sm:text-sm text-gray-600 mt-0.5 leading-relaxed">{t.whyUs.wayForwardText}</p>
-          </div>
+
+          {/* 3 Pillars Roadmap Cards */}
+          {t.whyUs.wayForwardPillars && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 relative z-10">
+              {t.whyUs.wayForwardPillars.map((pillar, pIdx) => (
+                <div key={pIdx} className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 space-y-1.5 hover:bg-white/15 transition-all">
+                  <div className="text-xs font-black text-[#8EBF40]">0{pIdx + 1}</div>
+                  <h4 className="text-sm font-bold text-white">{pillar.title}</h4>
+                  <p className="text-xs text-gray-300">{pillar.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ========================================================= */}
