@@ -68,7 +68,7 @@ export default function Navbar({
           <div className="flex items-center space-x-6">
             <span className="flex items-center space-x-1.5 text-gray-300">
               <span className="w-2 h-2 rounded-full bg-[#8EBF40] animate-pulse"></span>
-              <span>{lang === 'en' ? 'RAJUK Enlisted Developer & REHAB Member' : 'রাজউক নিবন্ধিত ও রিহ্যাব সদস্য ডেভেলপার'}</span>
+              <span className="font-medium">{lang === 'en' ? 'Planned Development, Creating Wealth with Trust' : 'পরিকল্পিত উন্নয়ন, আস্থার সঙ্গে সম্পদ সৃষ্টি'}</span>
             </span>
             <span className="text-gray-500">|</span>
             <a href="tel:+8801918646575" className="flex items-center space-x-1 hover:text-white transition-colors">

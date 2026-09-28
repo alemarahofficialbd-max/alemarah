@@ -27,7 +27,7 @@ export const translations = {
 
     // Hero Section
     hero: {
-      badge: "RAJUK Approved & ISO Certified Developer",
+      badge: "Planned Development, Creating Wealth with Trust",
       headlinePrefix: "Crafting Architectural",
       headlineHighlight: "Landmarks",
       headlineSuffix: "for Luxury Living & Investment",
@@ -586,7 +586,7 @@ export const translations = {
       contactInfo: "Head Office",
       allRights: "All Rights Reserved.",
       designedWith: "Crafted with architectural precision.",
-      rajukMember: "REHAB & RAJUK Enlisted Developer",
+      rajukMember: "Planned Development, Creating Wealth with Trust",
       links: [
         { label: "Home", href: "#home" },
         { label: "Ongoing Projects", href: "#projects" },
@@ -633,7 +633,7 @@ export const translations = {
 
     // Hero Section
     hero: {
-      badge: "রাজউক অনুমোদিত ও আইএসও সার্টিফাইড রিয়েল এস্টেট ডেভেলপার",
+      badge: "পরিকল্পিত উন্নয়ন, আস্থার সঙ্গে সম্পদ সৃষ্টি",
       headlinePrefix: "নিরাপদ বসবাস ও দীর্ঘমেয়াদী বিনিয়োগে",
       headlineHighlight: "স্থাপত্যের শ্রেষ্ঠত্ব",
       headlineSuffix: "নিয়ে আল-ইমারাহ",
@@ -1192,7 +1192,7 @@ export const translations = {
       contactInfo: "প্রধান কার্যালয়",
       allRights: "সর্বস্বত্ব সংরক্ষিত।",
       designedWith: "সেরা স্থাপত্য দক্ষতায় প্রস্তুতকৃত।",
-      rajukMember: "রিহ্যাব (REHAB) ও রাজউক নিবন্ধিত ডেভেলপার",
+      rajukMember: "পরিকল্পিত উন্নয়ন, আস্থার সঙ্গে সম্পদ সৃষ্টি",
       links: [
         { label: "হোম", href: "#home" },
         { label: "চলমান প্রকল্পসমূহ", href: "#projects" },
