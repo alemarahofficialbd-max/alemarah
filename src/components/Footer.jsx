@@ -6,8 +6,7 @@ import {
   Mail, 
   ShieldCheck, 
   CheckCircle2, 
-  ArrowUp, 
-  Globe 
+  ArrowUp
 } from 'lucide-react';
 
 export default function Footer({ lang, setLang, t, onNavigate = () => {}, isLoggedIn = false }) {
@@ -204,13 +203,17 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, isLogg
           </div>
 
           <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setLang(lang === 'en' ? 'bn' : 'en')}
-              className="flex items-center space-x-1.5 text-gray-400 hover:text-white transition-colors cursor-pointer"
-            >
-              <Globe className="w-3.5 h-3.5 text-[#8EBF40]" />
-              <span>{lang === 'en' ? 'বাংলা ভার্সন' : 'English Version'}</span>
-            </button>
+            <span className="text-xs text-gray-400">
+              {lang === 'en' ? 'Design & Development: ' : 'ডিজাইন ও ডেভেলপমেন্ট : '}
+              <a
+                href="https://wa.me/8801969343158"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[#8EBF40] hover:text-white font-bold transition-colors underline hover:no-underline"
+              >
+                CodeHive Studio
+              </a>
+            </span>
 
             <button
               onClick={scrollToTop}
