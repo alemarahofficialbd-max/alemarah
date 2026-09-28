@@ -3,7 +3,6 @@ import {
   User, 
   Lock, 
   ArrowRight, 
-  ArrowLeft,
   Eye, 
   EyeOff, 
   Sparkles, 
@@ -56,26 +55,22 @@ export default function LoginPage({
   return (
     <div className="min-h-screen py-10 md:py-16 bg-gradient-to-b from-[#F8F9FA] via-white to-gray-50 flex items-center justify-center px-4 sm:px-6">
       <div className="w-full max-w-lg">
-        {/* Quick return button */}
-        <div className="mb-4 flex items-center justify-between">
-          <button
-            onClick={onNavigateHome}
-            className="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-bold text-gray-700 hover:text-[#CE2028] transition-colors py-2 px-3 rounded-xl bg-white border border-gray-200 hover:border-gray-300 shadow-2xs cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4 text-[#CE2028]" />
-            <span>{lang === 'en' ? '← Back to Main Website' : '← মূল ওয়েবসাইটে ফিরে যান'}</span>
-          </button>
-        </div>
-
         {/* Login Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl shadow-black/5 border border-gray-100">
           {/* Official Brand Logo and Title */}
           <div className="text-center mb-6">
-            <img 
-              src="/alemarah_logo_header.svg" 
-              alt="Al-Emarah Logo" 
-              className="h-11 sm:h-12 w-auto object-contain mx-auto mb-3"
-            />
+            <button 
+              type="button" 
+              onClick={onNavigateHome} 
+              className="inline-block cursor-pointer group"
+              title="Al-Emarah Properties"
+            >
+              <img 
+                src="/alemarah_logo_header.svg" 
+                alt="Al-Emarah Logo" 
+                className="h-11 sm:h-12 w-auto object-contain mx-auto mb-3 transition-transform group-hover:scale-105"
+              />
+            </button>
             
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#231F20]">
               {t.login.title}
