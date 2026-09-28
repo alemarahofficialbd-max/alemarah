@@ -1,11 +1,8 @@
 import React from 'react';
 import { 
-  Building2, 
   MapPin, 
   Phone, 
   Mail, 
-  ShieldCheck, 
-  CheckCircle2, 
   ArrowUp
 } from 'lucide-react';
 
@@ -30,7 +27,7 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, isLogg
   return (
     <footer className="bg-[#161516] text-gray-300 pt-16 pb-24 lg:pb-12 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
           {/* Brand Info (Span 2) */}
           <div className="lg:col-span-2 space-y-4">
             <button 
@@ -141,21 +138,6 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, isLogg
                   >
                     {link.label}
                   </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Legal Approvals */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider">
-              {t.footer.legalLinks}
-            </h4>
-            <ul className="space-y-2.5 text-xs text-gray-400">
-              {t.footer.legal.map((item, idx) => (
-                <li key={idx} className="flex items-center space-x-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#8EBF40] shrink-0" />
-                  <span>{item}</span>
                 </li>
               ))}
             </ul>
