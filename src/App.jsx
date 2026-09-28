@@ -61,12 +61,40 @@ export default function App() {
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
   }, []);
 
+  // Synchronize browser history and hash navigation (back/forward button support)
+  useEffect(() => {
+    const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'project-details'];
+    const initialHash = window.location.hash.replace('#', '');
+    
+    if (initialHash && validPages.includes(initialHash)) {
+      setCurrentPage(initialHash);
+      window.history.replaceState({ page: initialHash }, '', `#${initialHash}`);
+    } else {
+      window.history.replaceState({ page: 'home' }, '', window.location.pathname);
+    }
+
+    const handlePopState = (event) => {
+      const pageFromState = event.state?.page;
+      const hash = window.location.hash.replace('#', '');
+      const targetPage = pageFromState || (hash && validPages.includes(hash) ? hash : 'home');
+      setCurrentPage(targetPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const isPortalMode = currentPage === 'login' || currentPage === 'dashboard';
 
   const t = translations[lang];
 
-  const navigateTo = (pageId) => {
+  const navigateTo = (pageId, addToHistory = true) => {
     setCurrentPage(pageId);
+    if (addToHistory) {
+      const url = pageId === 'home' ? window.location.pathname : `#${pageId}`;
+      window.history.pushState({ page: pageId }, '', url);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

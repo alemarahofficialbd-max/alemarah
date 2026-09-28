@@ -3,6 +3,7 @@ import {
   User, 
   Lock, 
   ArrowRight, 
+  ArrowLeft,
   Eye, 
   EyeOff, 
   Sparkles, 
@@ -60,7 +61,24 @@ export default function LoginPage({
     <div className="min-h-screen py-10 md:py-16 bg-gradient-to-b from-[#F8F9FA] via-white to-gray-50 flex items-center justify-center px-4 sm:px-6">
       <div className="w-full max-w-lg">
         {/* Login Card */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl shadow-black/5 border border-gray-100">
+        <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl shadow-black/5 border border-gray-100 relative">
+          {/* Quick Back Button */}
+          <button
+            type="button"
+            onClick={() => {
+              if (window.history.length > 1) {
+                window.history.back();
+              } else {
+                onNavigateHome();
+              }
+            }}
+            className="absolute top-5 left-5 p-2 rounded-xl text-gray-400 hover:text-[#CE2028] hover:bg-red-50 transition-colors cursor-pointer"
+            title={lang === 'en' ? 'Back' : 'পূর্ববর্তী পেজে ফিরে যান'}
+            aria-label="Back"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+
           {/* Official Brand Logo and Title */}
           <div className="text-center mb-6">
             <button 
