@@ -31,6 +31,76 @@ import {
 } from 'lucide-react';
 import { projectsData } from '../data/projectsData';
 
+// Helper function to return distinct contextual emojis for features
+const getFeatureEmoji = (text, idx) => {
+  const t = (text || '').toLowerCase();
+
+  // Kitchen & Cooking
+  if (t.includes('কিচেন') || t.includes('kitchen') || t.includes('রান্না')) return '🍳';
+  // Dining & Drawing
+  if (t.includes('ডাইনিং') || t.includes('dining')) return '🍽️';
+  if (t.includes('ড্রয়িং') || t.includes('drawing')) return '🛋️';
+
+  // Bed, Bath, Balcony
+  if (t.includes('বেডরুম') || t.includes('bedroom') || t.includes('bed')) return '🛏️';
+  if (t.includes('বাথরুম') || t.includes('bathroom') || t.includes('bath')) return '🚿';
+  if (t.includes('বারান্দা') || t.includes('balcon')) return '🌅';
+
+  // Land / Clear Title / Plot
+  if (t.includes('জমির') || t.includes('নিষ্কণ্টক') || t.includes('land area') || t.includes('clear title') || t.includes('প্লট') || t.includes('plot')) return '📜';
+  // Size / Measurement
+  if (t.includes('সাইজ') || t.includes('size') || t.includes('বর্গফুট') || t.includes('sq. ft') || t.includes('sqft') || t.includes('জফরি')) return '📐';
+
+  // Lift / Elevator / Stairs / Escalator
+  if (t.includes('লিফট') || t.includes('lift') || t.includes('elevator') || t.includes('এসকেলেটর') || t.includes('escalator') || t.includes('সিঁড়ি') || t.includes('staircase')) return '🛗';
+
+  // Parking & Vehicle
+  if (t.includes('পার্কিং') || t.includes('parking') || t.includes('গাড়ি') || t.includes('কার')) return '🅿️';
+
+  // BBQ & Landscaping / Rooftop Garden
+  if (t.includes('বারবিকিউ') || t.includes('barbecue') || t.includes('bbq')) return '🍢';
+  if (t.includes('ল্যান্ডস্কেপ') || t.includes('বাগান') || t.includes('garden') || t.includes('সবুজ') || t.includes('green')) return '🌿';
+
+  // Prayer, Mosque, Musalla, Adhan
+  if (t.includes('নামাজ') || t.includes('মুসাল্লা') || t.includes('prayer') || t.includes('মসজিদ') || t.includes('mosque')) return '🕌';
+  if (t.includes('আজান') || t.includes('adhan')) return '📢';
+
+  // Play / Children / Family / Community
+  if (t.includes('খেলার') || t.includes('play') || t.includes('শিশু') || t.includes('children')) return '🎠';
+  if (t.includes('পারিবারিক') || t.includes('family') || t.includes('কমিউনিটি') || t.includes('community')) return '👨‍👩‍👧‍👦';
+
+  // Generator & Electricity & AC
+  if (t.includes('জেনারেটর') || t.includes('generator') || t.includes('বিদ্যুৎ') || t.includes('electric') || t.includes('এসি') || t.includes(' ac')) return '⚡';
+
+  // Road & Accessibility
+  if (t.includes('রাস্তা') || t.includes('সড়ক') || t.includes('road') || t.includes('frontage') || t.includes('যোগাযোগ') || t.includes('access')) return '🛣️';
+
+  // Commercial / Shop / Market / Plaza / Retail
+  if (t.includes('মার্কেট') || t.includes('দোকান') || t.includes('শপিং') || t.includes('বাণিজ্যিক') || t.includes('retail') || t.includes('plaza') || t.includes('mall') || t.includes('commercial')) return '🛍️';
+
+  // Financial, Rental, Income, Agreement, Investment
+  if (t.includes('ভাড়া') || t.includes('লভ্যাংশ') || t.includes('আয়') || t.includes('income') || t.includes('lease') || t.includes('টাকা') || t.includes('চুক্তি') || t.includes('agreement') || t.includes('অংশীদারিত্ব') || t.includes('ownership')) return '🤝';
+
+  // Security, CCTV, Surveillance
+  if (t.includes('সিসিটিভি') || t.includes('cctv') || t.includes('surveillance') || t.includes('নিরাপদ') || t.includes('security') || t.includes('guard')) return '📹';
+
+  // Residential Units / Apartment
+  if (t.includes('ইউনিট') || t.includes('unit') || t.includes('আবাসিক') || t.includes('apartment')) return '🏢';
+
+  // Agro, Cattle, Dairy, Livestock
+  if (t.includes('গরু') || t.includes('দুগ্ধ') || t.includes('ক্যাটল') || t.includes('cattle') || t.includes('dairy') || t.includes('মাংস')) return '🐄';
+
+  // Poultry, Duck, Fish
+  if (t.includes('মাছ') || t.includes('fish')) return '🐟';
+  if (t.includes('মুরগি') || t.includes('হাঁস') || t.includes('ডিম') || t.includes('poultry') || t.includes('egg') || t.includes('duck')) return '🐣';
+  if (t.includes('কৃষি') || t.includes('খামার') || t.includes('farm') || t.includes('agro') || t.includes('agriculture')) return '🌾';
+  if (t.includes('কর্মসংস্থান') || t.includes('employment') || t.includes('job')) return '💼';
+
+  // Distinct fallback emojis based on index
+  const fallbackEmojis = ['✨', '💎', '🌟', '🎯', '🏆', '🔑', '⭐', '🌈', '🎖️', '🏅'];
+  return fallbackEmojis[idx % fallbackEmojis.length];
+};
+
 export default function ProjectDetailsPage({ 
   project, 
   lang = 'bn', 
@@ -347,17 +417,17 @@ export default function ProjectDetailsPage({
                 </div>
               </div>
 
-              {/* Specific breakdown grid with rich icons */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Specific breakdown grid with distinct contextual emojis */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
                 {(isEn ? project.featuresEn : project.featuresBn).map((feature, idx) => (
                   <div 
                     key={idx} 
-                    className="p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all flex items-start space-x-3 group"
+                    className="p-4 rounded-2xl bg-gray-50/80 border border-gray-100 hover:border-[#8EBF40]/40 hover:bg-white hover:shadow-xs transition-all flex items-start space-x-3.5 group"
                   >
-                    <div className="w-8 h-8 rounded-xl bg-white shadow-2xs border border-gray-200 text-[#006231] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 group-hover:border-[#006231] transition-transform">
-                      <CheckCircle2 className="w-4 h-4 text-[#8EBF40]" />
+                    <div className="w-10 h-10 rounded-xl bg-white shadow-2xs border border-gray-200/90 flex items-center justify-center shrink-0 text-xl group-hover:scale-110 group-hover:border-[#006231]/30 transition-all select-none">
+                      <span role="img" aria-label="Feature icon">{getFeatureEmoji(feature, idx)}</span>
                     </div>
-                    <div className="text-xs sm:text-sm font-semibold text-gray-800 leading-relaxed pt-1">
+                    <div className="text-xs sm:text-sm font-semibold text-gray-800 leading-relaxed pt-1.5">
                       {feature}
                     </div>
                   </div>
