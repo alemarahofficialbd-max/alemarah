@@ -13,7 +13,6 @@ import JoinJourney from './components/JoinJourney';
 import InvestmentPage from './components/InvestmentPage';
 import Footer from './components/Footer';
 import SplashScreen from './components/SplashScreen';
-import InstallAppModal from './components/InstallAppModal';
 import { translations } from './translations';
 import { projectsData } from './data/projectsData';
 import { 
@@ -41,13 +40,22 @@ export default function App() {
   const [preselectedProject, setPreselectedProject] = useState(null);
   const [searchFilter, setSearchFilter] = useState(null);
   const [showSplash, setShowSplash] = useState(true);
-  const [installPromptEvent, setInstallPromptEvent] = useState(null);
-  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstall = (e) => {
       e.preventDefault();
-      setInstallPromptEvent(e);
+      // Auto prompt user to install app on website entry without any manual button
+      const hasPrompted = sessionStorage.getItem('aep_install_prompted');
+      if (!hasPrompted) {
+        setTimeout(() => {
+          try {
+            e.prompt();
+            sessionStorage.setItem('aep_install_prompted', 'true');
+          } catch (err) {
+            console.log('Install prompt notice:', err);
+          }
+        }, 2200);
+      }
     };
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
@@ -99,7 +107,6 @@ export default function App() {
           t={t}
           onOpenLogin={() => navigateTo(isLoggedIn ? 'dashboard' : 'login')}
           onOpenBookVisit={() => handleOpenBookVisit()}
-          onOpenInstallApp={() => setIsInstallModalOpen(true)}
           isLoggedIn={isLoggedIn}
         />
       )}
@@ -477,7 +484,6 @@ export default function App() {
           setLang={setLang}
           t={t}
           onNavigate={navigateTo}
-          onOpenInstallApp={() => setIsInstallModalOpen(true)}
           isLoggedIn={isLoggedIn}
         />
       )}
@@ -489,14 +495,6 @@ export default function App() {
         t={t}
         onClose={() => setActiveProjectModal(null)}
         onBookVisit={(project) => handleOpenBookVisit(project)}
-      />
-
-      {/* PWA App Installation Guide & Trigger Modal */}
-      <InstallAppModal
-        isOpen={isInstallModalOpen}
-        onClose={() => setIsInstallModalOpen(false)}
-        lang={lang}
-        installPromptEvent={installPromptEvent}
       />
 
       {/* App Splash / Flash Screen on Launch */}

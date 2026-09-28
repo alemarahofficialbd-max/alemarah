@@ -12,8 +12,7 @@ import {
   ChevronRight, 
   ShieldCheck, 
   Compass, 
-  Coins,
-  Download
+  Coins
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -24,7 +23,6 @@ export default function Navbar({
   t, 
   onOpenLogin, 
   onOpenBookVisit,
-  onOpenInstallApp,
   isLoggedIn = false 
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -80,17 +78,6 @@ export default function Navbar({
           </div>
 
           <div className="flex items-center space-x-4">
-            {onOpenInstallApp && (
-              <button 
-                onClick={onOpenInstallApp}
-                className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors cursor-pointer"
-                title={lang === 'en' ? 'Install App' : 'অ্যাপ ডাউনলোড'}
-              >
-                <Download className="w-3.5 h-3.5 text-[#8EBF40]" />
-                <span>{t.nav.installApp}</span>
-              </button>
-            )}
-
             <button 
               onClick={toggleLanguage}
               className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors font-medium cursor-pointer"
@@ -165,24 +152,12 @@ export default function Navbar({
               })}
             </nav>
 
-            {/* Right Corner Buttons: অ্যাপ ডাউনলোড, সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড, সাইট ভিজিট বুক করুন */}
-            <div className="hidden lg:flex items-center space-x-2 shrink-0">
-              {/* অ্যাপ ডাউনলোড বাটন */}
-              {onOpenInstallApp && (
-                <button
-                  onClick={onOpenInstallApp}
-                  className="flex items-center space-x-1.5 px-3 py-2 rounded-xl border border-gray-200 hover:border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap"
-                  title={lang === 'en' ? 'Download App for PC, Android & iOS' : 'পিসি, অ্যান্ড্রয়েড ও আইফোনের জন্য অ্যাপ ডাউনলোড'}
-                >
-                  <Download className="w-4 h-4 text-gray-600" />
-                  <span>{t.nav.installApp}</span>
-                </button>
-              )}
-
+            {/* Right Corner Buttons: সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড, সাইট ভিজিট বুক করুন */}
+            <div className="hidden lg:flex items-center space-x-2.5 shrink-0">
               {/* সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড বাটন */}
               <button
                 onClick={() => handleNavClick(isLoggedIn ? 'dashboard' : 'login')}
-                className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap ${
                   isLoggedIn
                     ? 'bg-red-50 text-[#CE2028] border-red-200 font-bold'
                     : 'bg-gray-50 text-gray-800 border-gray-200 hover:border-[#CE2028] hover:text-[#CE2028] hover:bg-white'
@@ -195,7 +170,7 @@ export default function Navbar({
               {/* সাইট ভিজিট বুক করুন বাটন */}
               <button
                 onClick={onOpenBookVisit}
-                className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#CE2028]/25 transition-all active:scale-95 cursor-pointer whitespace-nowrap"
+                className="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#CE2028]/25 transition-all active:scale-95 cursor-pointer whitespace-nowrap"
               >
                 <Calendar className="w-4 h-4 text-white" />
                 <span>{t.nav.bookVisit}</span>
@@ -204,17 +179,6 @@ export default function Navbar({
 
             {/* Mobile Header Controls */}
             <div className="flex items-center space-x-2 lg:hidden">
-              {onOpenInstallApp && (
-                <button
-                  onClick={onOpenInstallApp}
-                  className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-xs font-semibold cursor-pointer"
-                  title={t.nav.installApp}
-                >
-                  <Download className="w-3.5 h-3.5 text-gray-700" />
-                  <span>{lang === 'en' ? 'App' : 'অ্যাপ'}</span>
-                </button>
-              )}
-
               <button
                 onClick={toggleLanguage}
                 className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-xs font-semibold cursor-pointer"
@@ -282,22 +246,8 @@ export default function Navbar({
                 })}
               </div>
 
-              {/* The 3 Action Buttons */}
+              {/* Action Buttons */}
               <div className="pt-2 space-y-2 border-t border-gray-100">
-                {/* অ্যাপ ডাউনলোড বাটন */}
-                {onOpenInstallApp && (
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      onOpenInstallApp();
-                    }}
-                    className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 text-xs sm:text-sm font-semibold hover:bg-gray-100 cursor-pointer"
-                  >
-                    <Download className="w-4 h-4 text-gray-600" />
-                    <span>{t.nav.installApp}</span>
-                  </button>
-                )}
-
                 {/* সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড বাটন */}
                 <button
                   onClick={() => {

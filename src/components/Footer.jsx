@@ -123,19 +123,6 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
                 </a>
               </div>
             </div>
-
-            {/* App Download Action */}
-            {onOpenInstallApp && (
-              <div className="pt-2">
-                <button
-                  onClick={onOpenInstallApp}
-                  className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-[#006231] text-white text-xs font-bold transition-all border border-white/10 hover:border-transparent cursor-pointer shadow-xs"
-                >
-                  <Download className="w-3.5 h-3.5 text-[#8EBF40]" />
-                  <span>{lang === 'en' ? 'Download Web App' : 'আল-ইমারাহ অ্যাপ ডাউনলোড'}</span>
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Quick Links */}
