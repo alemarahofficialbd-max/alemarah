@@ -53,7 +53,7 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, isLogg
               <div className="flex items-center space-x-2.5">
                 {/* Facebook */}
                 <a
-                  href="https://www.facebook.com"
+                  href="https://www.facebook.com/AlEmarahproperties/"
                   target="_blank"
                   rel="noreferrer"
                   className="w-9 h-9 rounded-xl bg-white/5 hover:bg-[#1877F2] text-gray-300 hover:text-white flex items-center justify-center transition-all border border-white/10 hover:border-transparent hover:scale-110 shadow-xs"
