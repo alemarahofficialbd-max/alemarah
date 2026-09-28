@@ -94,10 +94,21 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, isLogg
               {t.footer.contactInfo}
             </h4>
             <div className="space-y-3 text-xs sm:text-sm text-gray-400">
-              <div className="flex items-start space-x-2.5">
-                <MapPin className="w-4 h-4 text-[#CE2028] mt-0.5 shrink-0" />
-                <span>{t.contact.office.addressLine1}, {t.contact.office.addressLine2}</span>
-              </div>
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=Sky+View+Henolux+Center,+Purana+Paltan,+Dhaka" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="flex items-start space-x-2.5 hover:text-white group transition-colors"
+                title={lang === 'en' ? 'View on Google Maps' : 'গুগল ম্যাপে দেখুন'}
+              >
+                <MapPin className="w-4 h-4 text-[#CE2028] mt-0.5 shrink-0 group-hover:scale-110 transition-transform" />
+                <span>
+                  {t.contact.office.addressLine1}, {t.contact.office.addressLine2}
+                  <span className="block text-[11px] text-[#8EBF40] underline mt-0.5">
+                    {lang === 'en' ? 'Open in Google Maps ↗' : 'গুগল ম্যাপে দেখুন ↗'}
+                  </span>
+                </span>
+              </a>
               <div className="flex items-center space-x-2.5">
                 <Phone className="w-4 h-4 text-[#8EBF40] shrink-0" />
                 <div className="flex flex-col">

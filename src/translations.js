@@ -224,6 +224,19 @@ export const translations = {
         hotline: "01918-646575, 01743-926926",
         phoneSecondary: "01914-425073, 01833-544548",
         phonesList: ["01918-646575", "01743-926926", "01914-425073", "01833-544548"]
+      },
+      map: {
+        badge: "Interactive Google Map",
+        title: "Find Our Corporate Office on Google Maps",
+        subtitle: "Visit our corporate headquarters at Sky View Henolux Center, Purana Paltan, Dhaka for in-person project walkthroughs and consultations.",
+        directionsBtn: "Get Directions on Google Maps",
+        viewLarge: "Open Full Map",
+        landmarksTitle: "Nearby Landmarks:",
+        landmarks: [
+          "2 minutes walk from Paltan Intersection",
+          "Beside Dainik Bangla Mor",
+          "Near Motijheel Commercial Area & Metro Secretariat Station"
+        ]
       }
     },
 
@@ -697,6 +710,19 @@ export const translations = {
         hotline: "০১৯১৮-৬৪৬৫৭৫, ০১৭৪৩-৯২৬৯২৬",
         phoneSecondary: "০১৯১৪-৪২৫০৭৩, ০১৮৩৩-৫৪৪৫৪৮",
         phonesList: ["০১৯১৮-৬৪৬৫৭৫", "০১৭৪৩-৯২৬৯২৬", "০১৯১৪-৪২৫০৭৩", "০১৮৩৩-৫৪৪৫৪৮"]
+      },
+      map: {
+        badge: "ইন্টারেক্টিভ গুগল ম্যাপ",
+        title: "গুগল ম্যাপে আমাদের প্রধান কার্যালয়",
+        subtitle: "সরাসরি প্রকল্প ও বিনিয়োগ বিষয়ক আলোচনার জন্য পুরানা পল্টনের স্কাই ভিউ হেনোলাক্স সেন্টারে আমাদের কর্পোরেট অফিসে আপনাকে সাদর আমন্ত্রণ।",
+        directionsBtn: "গুগল ম্যাপে ডিরেকশন দেখুন",
+        viewLarge: "ম্যাপ বড় করে দেখুন",
+        landmarksTitle: "নিকটবর্তী ল্যান্ডমার্কসমূহ:",
+        landmarks: [
+          "পল্টন মোড় থেকে মাত্র ২ মিনিট হাঁটার দূরত্ব",
+          "দৈনিক বাংলা মোড় সংলগ্ন",
+          "মতিঝিল বাণিজ্যিক এলাকা ও বাংলাদেশ সচিবালয় মেট্রোরেল স্টেশন কাছাকাছি"
+        ]
       }
     },
 

@@ -9,7 +9,9 @@ import {
   MessageSquare, 
   Calendar,
   Building2,
-  Sparkles
+  Sparkles,
+  ExternalLink,
+  Navigation
 } from 'lucide-react';
 import { projectsData } from '../data/projectsData';
 
@@ -287,6 +289,75 @@ export default function ContactSection({ lang, t, preselectedProject }) {
                   </button>
                 </form>
               )}
+            </div>
+          </div>
+        </div>
+
+        {/* Google Map Section */}
+        <div className="mt-14 bg-white rounded-2xl border border-gray-200 shadow-md overflow-hidden">
+          <div className="p-6 sm:p-8 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-gray-50/80 to-white">
+            <div>
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-50 text-[#006231] text-xs font-bold uppercase tracking-wider mb-2">
+                <MapPin className="w-3.5 h-3.5" />
+                <span>{t.contact.map?.badge || 'Google Map'}</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
+                {t.contact.map?.title || (lang === 'en' ? 'Find Our Corporate Office on Google Maps' : 'গুগল ম্যাপে আমাদের প্রধান কার্যালয়')}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {t.contact.map?.subtitle || (lang === 'en' ? 'Sky View Henolux Center, Purana Paltan, Dhaka' : '৩/১, স্কাই ভিউ হেনোলাক্স সেন্টার, পুরানা পল্টন, ঢাকা')}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Sky+View+Henolux+Center,+Purana+Paltan,+Dhaka"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-[#006231] hover:bg-[#004723] text-white text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-[1.02] cursor-pointer"
+              >
+                <Navigation className="w-4 h-4" />
+                <span>{t.contact.map?.directionsBtn || (lang === 'en' ? 'Get Directions' : 'ডিরেকশন দেখুন')}</span>
+              </a>
+              <a
+                href="https://maps.google.com/?q=Sky+View+Henolux+Center,+Purana+Paltan,+Dhaka"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+              >
+                <ExternalLink className="w-4 h-4 text-gray-600" />
+                <span>{t.contact.map?.viewLarge || (lang === 'en' ? 'Open in Map' : 'ম্যাপ ওপেন করুন')}</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Interactive Google Map iframe */}
+          <div className="relative w-full h-[380px] sm:h-[450px] bg-gray-100">
+            <iframe
+              title="Al-Emarah Properties Corporate Headquarters Location Map"
+              src="https://maps.google.com/maps?q=Sky+View+Henolux+Center,+Purana+Paltan,+Dhaka&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              className="w-full h-full border-0"
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+
+          {/* Map Footer: Landmarks & Assistance */}
+          <div className="p-4 sm:p-5 bg-gray-50 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-700">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <span className="font-bold text-gray-900 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#CE2028]" />
+                {t.contact.map?.landmarksTitle || (lang === 'en' ? 'Nearby Landmarks:' : 'নিকটবর্তী ল্যান্ডমার্কসমূহ:')}
+              </span>
+              {(t.contact.map?.landmarks || []).map((landmark, idx) => (
+                <span key={idx} className="bg-white px-2.5 py-1 rounded-md border border-gray-200 text-gray-700 font-medium shadow-2xs">
+                  {landmark}
+                </span>
+              ))}
+            </div>
+            <div className="text-gray-500 font-medium">
+              📍 ৩/১, স্কাই ভিউ হেনোলাক্স সেন্টার, পুরানা পল্টন, ঢাকা
             </div>
           </div>
         </div>
