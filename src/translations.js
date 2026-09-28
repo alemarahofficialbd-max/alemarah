@@ -406,35 +406,62 @@ export const translations = {
 
     // INVESTMENT POLICY
     investmentPolicy: {
-      badge: "INVESTMENT POLICY",
+      badge: "OFFICIAL INVESTMENT POLICY",
       title: "Structured, Transparent & Contract-Backed Investment Framework",
-      intro: "The investment framework of Al-Emarah Properties is project-based and governed by legally binding written contracts. Every project's nature, asset class, equity participation, return on investment, capital liquidation, exit terms, and conditions are clearly established through individual written agreements.",
+      subtitle: "The investment framework of Al-Emarah Properties Limited is project-based and strictly governed by written contracts. Every project's nature, asset class, equity participation, return on investment, capital liquidation, exit terms, and conditions are clearly established through individual written agreements.",
+      minInvestmentLabel: "Minimum Investment",
+      minInvestmentValue: "BDT 1,00,000",
+      minInvestmentSub: "Participatory asset creation for all income brackets",
+      settlementLabel: "Capital Settlement",
+      settlementValue: "Max 90 Business Days",
+      settlementSub: "Post final audit & reconciliation clearance",
       points: [
         {
-          title: "Minimum Investment: BDT 1,00,000",
-          desc: "Accessible asset creation starting from a modest threshold of ৳ 1 Lac, opening institutional real estate to everyone."
+          clause: "Clause 01",
+          title: "Project-Based Written Agreement",
+          sub: "Individual Legal Contract",
+          desc: "Every project's nature, mode of investment, participation amount, dividend distribution, capital liquidation, and exit conditions are clearly stipulated through an individual written contract.",
+          tag: "100% Written Legal Deed"
         },
         {
-          title: "Formal Written Contracts",
-          desc: "Every partnership is formalized under clear legal deeds defining terms, equity, rights, and profit timelines."
+          clause: "Clause 02",
+          title: "Minimum Participation Threshold",
+          sub: "Accessible from BDT 1,00,000",
+          desc: "The minimum investment amount is BDT 1,00,000 (One Lac Taka), designed specifically so individuals with limited savings can access real estate and asset development.",
+          tag: "Min ৳ 1,00,000 Entry"
         },
         {
+          clause: "Clause 03",
           title: "Performance & Yield Distribution",
-          desc: "Investors receive returns on schedule based on genuine project revenues, audited financials, and written agreements."
+          sub: "Real Activity & Net Accounts",
+          desc: "Investors receive returns and profit dividends in accordance with contract terms, project execution timeline, audited revenues, and financial statements.",
+          tag: "Audited Financial Returns"
         },
         {
-          title: "Early Exit & Settlement Protocol",
-          desc: "Pre-maturity withdrawals and capital settlements are processed in accordance with company policy and deed stipulations."
+          clause: "Clause 04",
+          title: "Early Withdrawal & Reconciliation",
+          sub: "Company Policy & Contract Terms",
+          desc: "In case of emergency, pre-maturity withdrawal, accounts adjustment, and capital liquidation will be executed strictly pursuant to company policies and contractual covenants.",
+          tag: "Regulated Exit Policy"
         },
         {
-          title: "Maximum 90-Day Capital Settlement",
-          desc: "Upon final audit reconciliation and entitlement clearance, capital liquidation is completed within 90 business days."
+          clause: "Clause 05",
+          title: "Guaranteed 90-Day Capital Settlement",
+          sub: "Maximum 90 Working Days",
+          desc: "Upon final audit, reconciliation, and verification of entitlements, capital settlement will be completed within a maximum of 90 working days under the applicable contract.",
+          tag: "Max 90 Business Days"
         },
         {
-          title: "Diversified Asset Growth Platform",
-          desc: "Our vision expands beyond a single sector into a resilient, multi-dimensional asset development engine across housing, land, and agro."
+          clause: "Clause 06",
+          title: "Multi-Asset Development Platform",
+          sub: "Long-term Institutional Resilience",
+          desc: "Our vision expands beyond a single sector into a resilient, multi-asset development engine integrating residential towers, planned housing, land, and sustainable agro assets.",
+          tag: "Multi-Asset Security"
         }
-      ]
+      ],
+      legalFooter: "All investments are governed under the company's verified corporate framework, institutional audit standards, and legally enforceable contractual agreements.",
+      inquireBtn: "Inquire About Investment Agreements",
+      callOfficerBtn: "Speak to Investment Relations"
     },
 
     // JOIN THE JOURNEY
@@ -985,35 +1012,62 @@ export const translations = {
 
     // INVESTMENT POLICY (বিনিয়োগ নীতি)
     investmentPolicy: {
-      badge: "বিনিয়োগ নীতি",
-      title: "প্রকল্পভিত্তিক স্বচ্ছ লিখিত বিনিয়োগ কাঠামো",
-      intro: "আল ইমারাহ প্রোপার্টিজের বিনিয়োগ কাঠামো প্রকল্পভিত্তিক এবং লিখিত চুক্তিনির্ভর। প্রতিটি প্রকল্পের প্রকৃতি, বিনিয়োগের ধরন, অংশগ্রহণের পরিমাণ, মুনাফা বা লভ্যাংশ, মূলধন নিষ্পত্তি, প্রত্যাহার এবং অন্যান্য শর্ত স্বতন্ত্র লিখিত চুক্তির মাধ্যমে নির্ধারিত হবে।",
+      badge: "বিনিয়োগ নীতি ও রূপরেখা",
+      title: "প্রকল্পভিত্তিক স্বচ্ছ ও শতভাগ লিখিত চুক্তিনির্ভর বিনিয়োগ কাঠামো",
+      subtitle: "আল ইমারাহ প্রোপার্টিজের বিনিয়োগ কাঠামো প্রকল্পভিত্তিক এবং আইনগতভাবে লিখিত চুক্তিনির্ভর। প্রতিটি প্রকল্পের প্রকৃতি, বিনিয়োগের ধরন, অংশগ্রহণের পরিমাণ, মুনাফা বা লভ্যাংশ, মূলধন নিষ্পত্তি, প্রত্যাহার এবং অন্যান্য শর্ত স্বতন্ত্র লিখিত চুক্তির মাধ্যমে চূড়ান্ত নির্ধারিত হয়।",
+      minInvestmentLabel: "সর্বনিম্ন বিনিয়োগের পরিমাণ",
+      minInvestmentValue: "৳ ১,০০,০০০ (এক লক্ষ টাকা)",
+      minInvestmentSub: "সীমিত আয়ের মানুষের সম্পদ সৃষ্টির অংশীদারিত্ব",
+      settlementLabel: "মূলধন নিষ্পত্তি নিশ্চয়তা",
+      settlementValue: "সর্বোচ্চ ৯০ কার্যদিবস",
+      settlementSub: "চূড়ান্ত হিসাব, সমন্বয় ও নিরীক্ষা নিষ্পত্তির পর",
       points: [
         {
-          title: "সর্বনিম্ন বিনিয়োগ ১,০০,০০০ (এক লক্ষ) টাকা",
-          desc: "তুলনামূলকভাবে সীমিত মূলধন থেকেও সাধারণ মানুষ যেন রিয়েল এস্টেট ও সম্পদ উন্নয়নের সঙ্গে যুক্ত হওয়ার সুযোগ পেতে পারেন।"
+          clause: "ধারা ০১",
+          title: "প্রকল্পভিত্তিক স্বতন্ত্র লিখিত চুক্তি",
+          sub: "আইনি ও আনুষ্ঠানিক চুক্তিপত্র",
+          desc: "প্রতিটি প্রকল্পের প্রকৃতি, বিনিয়োগের ধরন, অংশগ্রহণের পরিমাণ, মুনাফা বা লভ্যাংশ, মূলধন নিষ্পত্তি, প্রত্যাহার এবং অন্যান্য সকল শর্ত স্বতন্ত্র লিখিত চুক্তির মাধ্যমে নিশ্চিত করা হবে।",
+          tag: "১০০% লিখিত আইনি চুক্তি"
         },
         {
-          title: "স্বতন্ত্র লিখিত চুক্তি",
-          desc: "প্রতিটি বিনিয়োগের জন্য আনুষ্ঠানিক লিখিত চুক্তিপত্র প্রদান করা হয়, যেখানে শর্ত ও অধিকার সুস্পষ্টভাবে উল্লেখিত থাকে।"
+          clause: "ধারা ০২",
+          title: "সর্বনিম্ন বিনিয়োগ ১,০০,০০০ টাকা",
+          sub: "সহজ ও অংশগ্রহণমূলক সুযোগ",
+          desc: "সর্বনিম্ন বিনিয়োগের পরিমাণ মাত্র ১,০০,০০০ (এক লক্ষ) টাকা; যাতে তুলনামূলক সীমিত সামর্থ্যের মানুষও পরিকল্পিত রিয়েল এস্টেট ও লাভজনক সম্পদ উন্নয়নের সঙ্গে সহজে যুক্ত হতে পারেন।",
+          tag: "ন্যূনতম ১ লাখ টাকা এন্ট্রি"
         },
         {
-          title: "মুনাফা ও লভ্যাংশ বণ্টন",
-          desc: "চুক্তির শর্ত অনুযায়ী বিনিয়োগকারী নির্ধারিত সময় ও পদ্ধতিতে প্রকল্পের বাস্তব আয়-ব্যয় এবং ফলাফলের ভিত্তিতে লভ্যাংশ পাবেন।"
+          clause: "ধারা ০৩",
+          title: "বাস্তব আয় ও ফলাফলের ভিত্তিতে লভ্যাংশ",
+          sub: "নির্ধারিত সময় ও পদ্ধতিতে বণ্টন",
+          desc: "চুক্তির শর্ত অনুযায়ী বিনিয়োগকারী নির্ধারিত সময় ও পদ্ধতিতে মুনাফা বা লভ্যাংশ গ্রহণের সুযোগ পাবেন। মুনাফা বা বিনিয়োগের ফলাফল সংশ্লিষ্ট প্রকল্পের বাস্তব কার্যক্রম, আয়-ব্যয় এবং চুক্তির শর্তের ওপর নির্ভরশীল।",
+          tag: "বাস্তব প্রকল্পভিত্তিক ফলাফল"
         },
         {
+          clause: "ধারা ০৪",
           title: "মেয়াদপূর্ব প্রত্যাহার ও হিসাব সমন্বয়",
-          desc: "জরুরি প্রয়োজনে মেয়াদপূর্ব প্রত্যাহার ও মূলধন নিষ্পত্তি প্রতিষ্ঠানের প্রযোজ্য নীতিমালা ও লিখিত চুক্তির শর্তানুযায়ী পরিচালিত হবে।"
+          sub: "নীতিমালা ও চুক্তির সুস্পষ্ট শর্তাধীন",
+          desc: "জরুরি প্রয়োজনে মেয়াদপূর্ব প্রত্যাহার, হিসাব সমন্বয় এবং মূলধন নিষ্পত্তি প্রতিষ্ঠানের প্রযোজ্য নীতিমালা ও লিখিত চুক্তির শর্ত অনুযায়ী সুশৃঙ্খলভাবে সম্পন্ন করা হবে।",
+          tag: "নিয়মতান্ত্রিক প্রত্যাহার নীতি"
         },
         {
-          title: "সর্বোচ্চ ৯০ কার্যদিবসের মধ্যে মূলধন নিষ্পত্তি",
-          desc: "চূড়ান্ত হিসাব, সমন্বয় ও প্রাপ্যতা নির্ধারণের পর মূলধন নিষ্পত্তি সর্বোচ্চ ৯০ কার্যদিবসের মধ্যে সম্পন্ন করার ব্যবস্থা থাকবে।"
+          clause: "ধারা ০৫",
+          title: "সর্বোচ্চ ৯০ কার্যদিবসে মূলধন নিষ্পত্তি",
+          sub: "চূড়ান্ত নিরীক্ষা ও প্রাপ্যতা নিষ্পত্তির পর",
+          desc: "চূড়ান্ত হিসাব, সমন্বয় ও প্রাপ্যতা নির্ধারণের পর মূলধন নিষ্পত্তি সর্বোচ্চ ৯০ কার্যদিবসের মধ্যে সম্পন্ন করার সুনির্দিষ্ট প্রাতিষ্ঠানিক ব্যবস্থা থাকবে, প্রযোজ্য চুক্তি ও প্রক্রিয়ার অধীন।",
+          tag: "সর্বোচ্চ ৯০ কার্যদিবস"
         },
         {
+          clause: "ধারা ০৬",
           title: "বহুমুখী সম্পদ উন্নয়ন প্ল্যাটফর্ম",
-          desc: "আমাদের লক্ষ্য একটি নির্দিষ্ট খাতের মধ্যে সীমাবদ্ধ না থেকে আবাসন, ভূমি উন্নয়ন ও কৃষির সমন্বয়ে একটি স্থায়ী প্রাতিষ্ঠানিক সক্ষমতা তৈরি করা।"
+          sub: "দীর্ঘস্থায়ী প্রাতিষ্ঠানিক সক্ষমতা",
+          desc: "আমাদের লক্ষ্য একটি নির্দিষ্ট খাতের মধ্যে সীমাবদ্ধ না থেকে ধীরে ধীরে একটি বহুমুখী সম্পদ উন্নয়ন প্ল্যাটফর্ম (আবাসন, ভূমি উন্নয়ন ও এগ্রো সম্পদ) হিসেবে টেকসই প্রতিষ্ঠান গড়ে তোলা।",
+          tag: "বহুমুখী সম্পদ নিরাপত্তা"
         }
-      ]
+      ],
+      legalFooter: "সকল বিনিয়োগ প্রতিষ্ঠানের অনুমোদিত কর্পোরেট কাঠামো, নিরীক্ষিত হিসাবরক্ষণ এবং বাংলাদেশ সরকারের প্রচলিত আইন ও লিখিত দলিলের অধীনে শতভাগ সুরক্ষিত।",
+      inquireBtn: "বিনিয়োগ চুক্তিপত্র ও পলিসি সম্পর্কে জানুন",
+      callOfficerBtn: "বিনিয়োগ কর্মকর্তার সাথে কথা বলুন"
     },
 
     // JOIN THE JOURNEY (আমাদের সাথে যুক্ত হওয়া)

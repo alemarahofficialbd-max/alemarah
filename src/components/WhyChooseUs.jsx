@@ -19,7 +19,9 @@ import {
   Quote,
   Compass,
   Users,
-  ArrowRight
+  ArrowRight,
+  Phone,
+  MessageSquare
 } from 'lucide-react';
 
 export default function WhyChooseUs({ lang, t }) {
@@ -280,46 +282,130 @@ export default function WhyChooseUs({ lang, t }) {
         {/* ========================================================= */}
         {/* NEW SECTION: INVESTMENT POLICY (PDF PROFILE)              */}
         {/* ========================================================= */}
-        <div className="bg-gradient-to-br from-emerald-950 via-[#004724] to-emerald-950 text-white p-8 sm:p-12 rounded-3xl shadow-xl space-y-8 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-emerald-950 via-[#004724] to-emerald-950 text-white p-8 sm:p-12 rounded-3xl shadow-2xl space-y-10 relative overflow-hidden border border-emerald-800/40">
           <div className="absolute top-0 right-0 w-96 h-96 bg-[#8EBF40]/10 rounded-full blur-3xl pointer-events-none"></div>
 
+          {/* Header */}
           <div className="max-w-3xl space-y-3 relative z-10">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold text-[#8EBF40] border border-white/10">
               <Coins className="w-3.5 h-3.5" />
               <span>{ip.badge}</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-black text-white">
+            <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
               {ip.title}
             </h3>
             <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-              {ip.intro}
+              {ip.subtitle || ip.intro}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10">
-            {ip.points.map((pt, idx) => (
-              <div key={idx} className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 space-y-2">
-                <div className="flex items-center space-x-2 text-[#8EBF40] text-xs font-bold">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
-                  <span>{pt.title}</span>
+          {/* 2 Strategic Highlights: Min Investment & Settlement Guarantee */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 relative z-10">
+            <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-[#8EBF40]/30 flex items-start space-x-4">
+              <div className="w-12 h-12 rounded-xl bg-[#8EBF40] text-emerald-950 flex items-center justify-center shrink-0 font-bold shadow-md">
+                <Coins className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-bold uppercase tracking-wider text-[#8EBF40]">
+                  {ip.minInvestmentLabel || (lang === 'en' ? 'Minimum Investment' : 'সর্বনিম্ন বিনিয়োগের পরিমাণ')}
                 </div>
-                <p className="text-xs text-gray-200 leading-relaxed">
-                  {pt.desc}
+                <div className="text-2xl sm:text-3xl font-black text-white">
+                  {ip.minInvestmentValue || (lang === 'en' ? 'BDT 1,00,000' : '৳ ১,০০,০০০ (এক লক্ষ)')}
+                </div>
+                <p className="text-xs text-gray-300">
+                  {ip.minInvestmentSub || (lang === 'en' ? 'Participatory asset creation for all income levels' : 'সীমিত আয়ের মানুষের সম্পদ সৃষ্টির অংশীদারিত্ব')}
                 </p>
+              </div>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-start space-x-4">
+              <div className="w-12 h-12 rounded-xl bg-[#CE2028] text-white flex items-center justify-center shrink-0 font-bold shadow-md">
+                <Clock className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-bold uppercase tracking-wider text-red-300">
+                  {ip.settlementLabel || (lang === 'en' ? 'Capital Settlement Guarantee' : 'মূলধন নিষ্পত্তি নিশ্চয়তা')}
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-white">
+                  {ip.settlementValue || (lang === 'en' ? 'Max 90 Business Days' : 'সর্বোচ্চ ৯০ কার্যদিবস')}
+                </div>
+                <p className="text-xs text-gray-300">
+                  {ip.settlementSub || (lang === 'en' ? 'Post final audit & reconciliation clearance' : 'চূড়ান্ত হিসাব ও নিরীক্ষা সমন্বয়ের পর সম্পন্ন')}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 6 Formal Policy Clauses Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10">
+            {ip.points.map((pt, idx) => (
+              <div 
+                key={idx} 
+                className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 hover:border-[#8EBF40]/60 hover:bg-white/15 transition-all duration-300 flex flex-col justify-between space-y-4"
+              >
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-0.5 rounded-md bg-[#8EBF40]/20 text-[#8EBF40] text-xs font-bold border border-[#8EBF40]/30">
+                      {pt.clause || `0${idx + 1}`}
+                    </span>
+                    <FileCheck2 className="w-4 h-4 text-gray-400" />
+                  </div>
+
+                  <div>
+                    <h4 className="text-base font-bold text-white leading-snug">
+                      {pt.title}
+                    </h4>
+                    {pt.sub && (
+                      <span className="inline-block text-xs font-semibold text-[#8EBF40] mt-0.5">
+                        {pt.sub}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-gray-200 leading-relaxed">
+                    {pt.desc}
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-white/10 flex items-center text-[11px] font-bold text-[#8EBF40]">
+                  <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                  <span>{pt.tag || (lang === 'en' ? 'Verified Clause' : 'অনুমোদিত ধারা')}</span>
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-xs text-gray-300 flex items-center justify-between flex-wrap gap-3 relative z-10">
-            <span>
-              {lang === 'en' 
-                ? '★ Guaranteed Capital Settlement within 90 Working Days post audit reconciliation.'
-                : '★ চূড়ান্ত হিসাব নিরীক্ষা ও প্রাপ্যতা নিষ্পত্তির পর সর্বোচ্চ ৯০ কার্যদিবসের মধ্যে মূলধন পরিশোধের নিশ্চয়তা।'
-              }
-            </span>
-            <span className="font-bold text-[#8EBF40]">
-              {lang === 'en' ? 'Minimum: BDT 1,00,000' : 'সর্বনিম্ন বিনিয়োগ: ৳ ১,০০,০০০'}
-            </span>
+          {/* Bottom Legal Guarantee & Investor Action Bar */}
+          <div className="p-6 rounded-2xl bg-black/30 backdrop-blur-md border border-white/15 flex flex-col lg:flex-row items-center justify-between gap-5 relative z-10">
+            <div className="flex items-start space-x-3 text-xs text-gray-300 max-w-2xl">
+              <ShieldCheck className="w-5 h-5 text-[#8EBF40] shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                {ip.legalFooter || (lang === 'en' 
+                  ? 'All investments are governed under verified written legal contracts, institutional accounting, and applicable regulatory frameworks.' 
+                  : 'সকল বিনিয়োগ প্রতিষ্ঠানের অনুমোদিত কর্পোরেট কাঠামো, নিরীক্ষিত হিসাবরক্ষণ এবং বাংলাদেশ সরকারের প্রচলিত আইন ও লিখিত দলিলের অধীনে শতভাগ সুরক্ষিত।'
+                )}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <a
+                href="https://wa.me/8801918646575?text=Hello%20Al-Emarah%20Properties,%20I%20would%20like%20to%20know%20more%20about%20your%20Investment%20Policy"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-[#006231] hover:bg-[#004d26] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+              >
+                <MessageSquare className="w-4 h-4 text-[#8EBF40]" />
+                <span>{lang === 'en' ? 'Chat on WhatsApp' : 'হোয়াটসঅ্যাপে জানুন'}</span>
+              </a>
+
+              <a
+                href="tel:01918646575"
+                className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+              >
+                <Phone className="w-4 h-4" />
+                <span>{lang === 'en' ? 'Call Investment Desk' : 'বিনিয়োগ হটলাইন'}</span>
+              </a>
+            </div>
           </div>
         </div>
 
