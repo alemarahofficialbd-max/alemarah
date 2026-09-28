@@ -472,14 +472,58 @@ export const translations = {
     // PROJECT SELECTION PRIORITIES
     projectSelection: {
       badge: "PROJECT SELECTION PRIORITIES",
-      title: "Not Just a Building; A Planned Asset Architecture",
-      intro: "Before acquiring or designing any development, our planning committee rigorously evaluates critical viability factors:",
+      title: "Not Just a Concrete Building; A Planned Asset Architecture",
+      subtitle: "At Al-Emarah Properties, every project represents a carefully structured wealth platform. Before undertaking any land development or construction, we strictly assess 8 indispensable criteria.",
+      quote: "To us, a real estate project is not merely an isolated building—it is an enduring asset framework designed for generations. Location, legal title, civic usability, and long-term appreciation are verified with utmost precision.",
       factors: [
-        { title: "Location & Road Connectivity", desc: "Frontage on wide access roads (e.g. 22-foot roads, Signboard-Sanarpar arterial highway) with easy transport transit." },
-        { title: "100% Clear Land Title", desc: "Undisputed land ownership, proper mutation, approved zoning, and RAJUK sanction suitability." },
-        { title: "Urbanization Velocity & Demand", desc: "Locating projects in rapid growth commercial and residential corridors with high rental and resale demand." },
-        { title: "Functional Usability & Living Ambience", desc: "Immediate proximity to reputed schools, hospitals, markets, and acoustic access for adhan in prayer spaces." },
-        { title: "Long-Term Asset Appreciation", desc: "Engineered to deliver compounding capital growth and generational security for all owners and partners." }
+        {
+          title: "Prime Location & Highway Connectivity",
+          sub: "Strategic Positioning",
+          desc: "Frontage on 22+ ft wide roads, direct connection to major Dhaka arterial highways (Signboard-Sanarpar expressway), and effortless transport transit."
+        },
+        {
+          title: "100% Clear & Verified Land Title",
+          sub: "Undisputed Ownership",
+          desc: "Rigorous vetting of CS, SA, RS, and City Jorip records, undisputed land ownership, flawless mutation, and complete legal clearance before project launch."
+        },
+        {
+          title: "Urbanization Velocity & Growth Corridor",
+          sub: "High Appreciation Zone",
+          desc: "Locating projects in rapid-growth zones where commercial expansion, business districts, and population inflow guarantee surging capital appreciation."
+        },
+        {
+          title: "Living Usability & Civic Proximity",
+          sub: "Holistic Lifestyle",
+          desc: "Immediate doorstep access to renowned schools, colleges, specialized hospitals, shopping hubs, and vital municipal infrastructure."
+        },
+        {
+          title: "Strong Market Demand & High Rental Yield",
+          sub: "Immediate Liquidity",
+          desc: "Tailoring residential layouts and commercial frontage to address surging tenant and buyer demand, ensuring continuous high rental occupancy."
+        },
+        {
+          title: "Neighborhood Infrastructure Development",
+          sub: "Surrounding Growth",
+          desc: "Meticulous evaluation of surrounding planned drainage, future road expansions, continuous civic utilities, and green environmental buffers."
+        },
+        {
+          title: "Spiritual Serenity & Adhan Acoustics",
+          sub: "Peaceful Living Environment",
+          desc: "Ensuring natural acoustic reach of daily Adhan within living spaces and integrating dedicated rooftop prayer facilities (Musalla) with tranquil ambience."
+        },
+        {
+          title: "Long-Term Compounding Asset Value",
+          sub: "Generational Wealth",
+          desc: "Engineered to deliver compounding capital growth, high resale viability, and sustainable long-term financial security for generations to come."
+        }
+      ],
+      checklistTitle: "5-Step Rigorous Feasibility Audit",
+      checklist: [
+        "Pre-acquisition Legal Verification",
+        "Soil & Structural Engineering Audit",
+        "RAJUK & Environmental Compliance",
+        "Fixed-Timeline Delivery Milestones",
+        "Post-Handover Facility Management"
       ]
     },
 
@@ -984,13 +1028,57 @@ export const translations = {
     projectSelection: {
       badge: "প্রকল্প নির্বাচনে আমাদের অগ্রাধিকার",
       title: "একটি প্রকল্প শুধু একটি ভবন নয়; এটি একটি পরিকল্পিত সম্পদ কাঠামো",
-      intro: "প্রতিটি প্রকল্প গ্রহণের আগে আমরা স্থান, যোগাযোগ, জমির আইনি স্থিতি ও ভবিষ্যৎ চাহিদাকে সর্বোচ্চ গুরুত্ব দিয়ে বিবেচনা করি:",
+      subtitle: "আল ইমারাহ প্রোপার্টিজ-এ প্রতিটি প্রকল্প ভবিষ্যৎ প্রজন্মের জন্য একটি স্থায়ী সম্পদ। তাই যেকোনো জমি বা উন্নয়ন প্রকল্প গ্রহণের পূর্বে আমরা ৮টি অপরিহার্য মানদণ্ড শতভাগ কঠোরতার সাথে যাচাই করি।",
+      quote: "আমাদের কাছে একটি প্রকল্প শুধু একটি ইট-সিমেন্টের ভবন নয়; এটি একটি পরিকল্পিত সম্পদ কাঠামো। তাই প্রকল্প গ্রহণের আগে অবস্থান, যোগাযোগব্যবস্থা, আশেপাশের উন্নয়ন, ব্যবহারযোগ্যতা এবং ভবিষ্যৎ সম্ভাবনাকে গভীর গুরুত্বের সঙ্গে বিবেচনা করা হয়।",
       factors: [
-        { title: "লোকেশন ও সুগম যোগাযোগ", desc: "প্রধান সড়ক, ২২ ফুট প্রশস্ত রাস্তা এবং হাইওয়ের সরাসরি সংযোগে সুবিধাজনক গ্রাহক প্রবেশাধিকার।" },
-        { title: "জমির শতভাগ আইনি স্বচ্ছতা", desc: "নিষ্কণ্টক জমি, সিএস, এসএ, আরএস খতিয়ান ও রাজউক অনুমোদিত স্ট্রাকচারাল ডিজাইন।" },
-        { title: "নগরায়নের গতি ও বাজারচাহিদা", desc: "ঢাকার দ্রুত বিকাশমান আবাসিক ও বাণিজ্যিক করিডোর যেখানে রেন্টাল ভ্যালু ও রিসেল ভ্যালু দ্রুত বৃদ্ধি পায়।" },
-        { title: "ব্যবহারযোগ্যতা ও নাগরিক সুবিধা", desc: "স্কুল, কলেজ, হাসপাতাল, বাজার এবং মসিজদের আজানের ধ্বনি পৌঁছানোর পরিকল্পিত পরিবেশ।" },
-        { title: "দীর্ঘমেয়াদি সম্পদমূল্য", desc: "ভবিষ্যত প্রজন্মের জন্য একটি নিরাপদ, বহুমুখী ও লাভজনক স্থায়ী আর্থিক সম্পদ।" }
+        {
+          title: "প্রাইম লোকেশন ও সুগম যোগাযোগ",
+          sub: "Prime Location",
+          desc: "২২+ ফুট প্রশস্ত প্রধান সড়ক, ঢাকা-চট্টগ্রাম ও সাইনবোর্ড-সানারপাড় প্রধান মহাসড়কের সাথে সরাসরি সহজ সংযোগ ও দ্রুততম যাতায়াত সুবিধা।"
+        },
+        {
+          title: "জমির শতভাগ নিষ্কণ্টক আইনি মালিকানা",
+          sub: "100% Clear Legal Title",
+          desc: "সিএস, এসএ, আরএস ও সিটি জরিপের সূক্ষ্ম যাচাই, নির্ভেজাল মালিকানা স্বত্ব, হালনাগাদ নামজারি ও প্রকল্পের জন্য রাজউকসহ প্রয়োজনীয় সকল আইনি ছাড়পত্র।"
+        },
+        {
+          title: "নগরায়ণের গতি ও ভবিষ্যৎ সম্প্রসারণ",
+          sub: "Urbanization Velocity",
+          desc: "ঢাকার দ্রুত বিকাশমান প্রধান আবাসিক ও বাণিজ্যিক করিডোর নির্বাচন, যা সময়ের সাথে সাথে দ্রুত মূলধনী মূল্যবৃদ্ধির পূর্ণ নিশ্চয়তা প্রদান করে।"
+        },
+        {
+          title: "বাস্তব ব্যবহারযোগ্যতা ও নাগরিক সান্নিধ্য",
+          sub: "Living Usability",
+          desc: "শীর্ষস্থানীয় শিক্ষাপ্রতিষ্ঠান, বিশেষায়িত হাসপাতাল, সুপারশপ, কাঁচাবাজার ও প্রধান নাগরিক সুযোগ-সুবিধার ঠিক হাঁটার দূরত্বে অবস্থান।"
+        },
+        {
+          title: "উচ্চ বাজারচাহিদা ও আকর্ষণীয় ভাড়ামূল্য",
+          sub: "High Rental Yield",
+          desc: "আধুনিক আর্কিটেকচারাল লেআউট ও বাণিজ্যিক স্পেস, যার রয়েছে ব্যাপক ক্রেতা গ্রহণযোগ্যতা এবং নিয়মিত আকর্ষণীয় ভাড়া আয়ের নির্ভরযোগ্য সুযোগ।"
+        },
+        {
+          title: "আশপাশের পরিবেশ ও অবকাঠামোগত উন্নয়ন",
+          sub: "Neighborhood Growth",
+          desc: "সুপরিকল্পিত পয়ঃনিষ্কাশন, টেকসই ড্রেনেজ ব্যবস্থা, নিরবচ্ছিন্ন বিদ্যুৎ ও গ্যাস সংযোগ এবং আধুনিক খোলামেলা স্বাস্থ্যকর নাগরিক পরিবেশের নিশ্চয়তা।"
+        },
+        {
+          title: "আজানের পবিত্র সুর ও আধ্যাত্মিক পরিবেশ",
+          sub: "Spiritual Harmony",
+          desc: "আবাসিক প্রতিটি ইউনিটে নিয়মিত পাঁচ ওয়াক্ত আজানের পবিত্র ধ্বনি পৌঁছানোর নিখুঁত ভৌগোলিক অবস্থান এবং ভবনের ছাদে বিশেষ নিরিবিলি মুসাল্লা (নামাজের স্থান)।"
+        },
+        {
+          title: "দীর্ঘমেয়াদি টেকসই সম্পদমূল্য",
+          sub: "Long-term Wealth",
+          desc: "স্বল্পমেয়াদি প্রচারণার চেয়ে বাস্তব কাজের মাধ্যমে ভবিষ্যৎ প্রজন্মের জন্য একটি স্থায়ী, সুরক্ষিত, বহুমুখী ও লাভজনক পারিবারিক সম্পদ কাঠামো।"
+        }
+      ],
+      checklistTitle: "৫-দফা কঠোর প্রজেক্ট স্ক্রিনিং ও গুণগত নিরীক্ষা",
+      checklist: [
+        "জমি ক্রয়ের পূর্বে শতভাগ আইনি ও নথিপত্র যাচাই",
+        "মৃত্তিকা পরীক্ষা ও স্ট্রাকচারাল ইঞ্জিনিয়ারিং অডিট",
+        "রাজউক ও পরিবেশ অধিদপ্তরের পূর্ণাঙ্গ কমপ্লায়েন্স",
+        "নির্দিষ্ট সময়ভিত্তিক নির্মাণ ও সময়মতো হ্যান্ডওভার",
+        "হস্তান্তর-পরবর্তী দীর্ঘমেয়াদি রক্ষণাবেক্ষণ ও কেয়ার"
       ]
     },
 

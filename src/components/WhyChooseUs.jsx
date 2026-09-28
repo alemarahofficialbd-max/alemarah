@@ -15,7 +15,8 @@ import {
   Coins,
   ChevronRight,
   TrendingUp,
-  FileText
+  FileText,
+  Quote
 } from 'lucide-react';
 
 export default function WhyChooseUs({ lang, t }) {
@@ -97,30 +98,112 @@ export default function WhyChooseUs({ lang, t }) {
         {/* ========================================================= */}
         {/* NEW SECTION: PROJECT SELECTION PRIORITIES (PDF PROFILE)   */}
         {/* ========================================================= */}
-        <div className="bg-white p-8 sm:p-12 rounded-3xl border border-gray-200 shadow-xs space-y-8">
-          <div className="text-center max-w-3xl mx-auto space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#CE2028] bg-red-50 px-3 py-1 rounded-full">
-              {ps.badge}
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-[#231F20]">
+        <div className="bg-white p-8 sm:p-12 rounded-3xl border border-gray-200 shadow-md space-y-10">
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-50 text-[#CE2028] text-xs font-bold uppercase tracking-wider">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>{ps.badge}</span>
+            </div>
+            <h3 className="text-2xl sm:text-4xl font-extrabold text-[#231F20] tracking-tight">
               {ps.title}
             </h3>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              {ps.intro}
+            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed max-w-2xl mx-auto">
+              {ps.subtitle || ps.intro}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {ps.factors.map((factor, idx) => (
-              <div key={idx} className="p-5 rounded-2xl bg-gray-50 border border-gray-100 hover:border-[#006231] transition-colors space-y-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-[#006231] flex items-center justify-center font-bold text-xs">
-                  {idx + 1}
-                </div>
-                <h4 className="text-sm font-bold text-gray-900">{factor.title}</h4>
-                <p className="text-xs text-gray-600 leading-relaxed">{factor.desc}</p>
+          {/* Official Quote Banner from PDF Profile */}
+          {ps.quote && (
+            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-red-50/70 via-amber-50/40 to-emerald-50/70 border border-gray-200 flex items-start space-x-4 shadow-xs">
+              <div className="w-10 h-10 rounded-xl bg-[#CE2028] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                <Quote className="w-5 h-5" />
               </div>
-            ))}
+              <p className="text-xs sm:text-sm text-gray-700 italic font-medium leading-relaxed">
+                "{ps.quote}"
+              </p>
+            </div>
+          )}
+
+          {/* 8 Factor Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {ps.factors.map((factor, idx) => {
+              const factorIcons = [
+                MapPin,
+                FileCheck2,
+                TrendingUp,
+                Building,
+                Coins,
+                Sparkles,
+                Award,
+                ShieldCheck
+              ];
+              const IconComp = factorIcons[idx] || CheckCircle2;
+
+              return (
+                <div 
+                  key={idx} 
+                  className="p-6 rounded-2xl bg-gray-50/80 border border-gray-200 hover:border-[#006231] hover:bg-white hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="w-11 h-11 rounded-xl bg-white border border-gray-200 text-[#006231] flex items-center justify-center group-hover:scale-110 group-hover:bg-[#006231] group-hover:text-white transition-all shadow-2xs">
+                        <IconComp className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-black text-gray-400 group-hover:text-[#CE2028] transition-colors">
+                        0{idx + 1}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm sm:text-base font-bold text-gray-900 group-hover:text-[#006231] transition-colors">
+                        {factor.title}
+                      </h4>
+                      {factor.sub && (
+                        <span className="inline-block text-[11px] font-semibold text-gray-500 mt-0.5">
+                          {factor.sub}
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      {factor.desc}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-gray-200/60 flex items-center text-[11px] font-bold text-[#006231]">
+                    <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-[#8EBF40]" />
+                    <span>{lang === 'en' ? 'Verified Criterion' : 'যাচাইকৃত মানদণ্ড'}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
+
+          {/* 5-Step Feasibility Audit Bar */}
+          {ps.checklist && (
+            <div className="p-6 sm:p-7 rounded-2xl bg-emerald-950 text-white space-y-4 shadow-md">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div className="flex items-center space-x-2">
+                  <ShieldCheck className="w-5 h-5 text-[#8EBF40]" />
+                  <h4 className="text-sm sm:text-base font-bold text-white">
+                    {ps.checklistTitle}
+                  </h4>
+                </div>
+                <span className="text-xs text-[#8EBF40] font-semibold">
+                  {lang === 'en' ? 'Zero Compromise Policy' : '১০০% আপসহীন প্রাতিষ্ঠানিক পলিসি'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
+                {ps.checklist.map((item, cIdx) => (
+                  <div key={cIdx} className="flex items-start space-x-2 p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-200">
+                    <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ========================================================= */}
