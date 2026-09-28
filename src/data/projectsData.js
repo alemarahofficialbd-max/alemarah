@@ -43,9 +43,7 @@ export const projectsData = [
     },
     image: "/images/al_quds_tower.webp",
     gallery: [
-      "/images/al_quds_tower.webp",
-      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"
+      "/images/al_quds_tower.webp"
     ],
     featuresEn: [
       "Land Area: 17.40 Decimals (100% Clear Title)",
@@ -99,8 +97,7 @@ export const projectsData = [
     floorPlan: "/images/barakah_01_floor_plan.webp",
     gallery: [
       "/images/barakah_tower_01.webp",
-      "/images/barakah_01_floor_plan.webp",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"
+      "/images/barakah_01_floor_plan.webp"
     ],
     featuresEn: [
       "Total 27 exclusive residential apartment units with optimized space management",
