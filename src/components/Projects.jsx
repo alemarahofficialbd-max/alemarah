@@ -81,7 +81,7 @@ export default function Projects({
   };
 
   return (
-    <section id="projects" className="py-20 bg-white">
+    <section id="projects" className="pt-4 sm:pt-8 pb-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">

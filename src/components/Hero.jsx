@@ -29,7 +29,7 @@ export default function Hero({
   };
 
   return (
-    <section id="home" className="relative pt-3 pb-20 md:pt-12 md:pb-28 overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50">
+    <section id="home" className="relative pt-2 pb-4 sm:pb-8 md:pt-10 md:pb-14 overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50">
       {/* Decorative Subtle Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-red-100/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
       <div className="absolute bottom-10 left-0 w-96 h-96 bg-emerald-100/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
@@ -133,7 +133,7 @@ export default function Hero({
         </div>
 
         {/* Dynamic Property Search Box */}
-        <div className="mt-10 sm:mt-14 max-w-5xl mx-auto bg-white rounded-2xl shadow-xl shadow-black/5 p-4 sm:p-6 border border-gray-100">
+        <div className="mt-5 sm:mt-10 max-w-5xl mx-auto bg-white rounded-2xl shadow-xl shadow-black/5 p-4 sm:p-6 border border-gray-100">
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
             <h2 className="text-sm sm:text-base font-bold text-gray-900 flex items-center space-x-2">
               <Search className="w-4 h-4 text-[#CE2028]" />
