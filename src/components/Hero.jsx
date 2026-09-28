@@ -8,7 +8,6 @@ import {
   Sparkles, 
   ArrowRight, 
   Home, 
-  Calendar,
   CheckCircle2
 } from 'lucide-react';
 
@@ -70,22 +69,14 @@ export default function Hero({
           </p>
 
           {/* Hero CTAs */}
-          <div className="flex items-center justify-center gap-2.5 pt-1">
+          <div className="flex items-center justify-center pt-1">
             <button
               onClick={onExploreProjects}
-              className="flex-1 inline-flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#CE2028] text-white text-xs font-bold shadow-md shadow-[#CE2028]/25 hover:bg-[#A9141B] transition-all cursor-pointer"
+              className="inline-flex items-center justify-center space-x-2 px-6 py-2.5 rounded-xl bg-[#CE2028] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#CE2028]/25 hover:bg-[#A9141B] transition-all cursor-pointer"
             >
               <Building2 className="w-4 h-4" />
               <span>{t.hero.exploreBtn}</span>
               <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
-            </button>
-
-            <button
-              onClick={onOpenBookVisit}
-              className="flex-1 inline-flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-xl bg-white text-gray-800 border border-gray-300 text-xs font-bold hover:border-[#006231] hover:text-[#006231] transition-all cursor-pointer shadow-xs"
-            >
-              <Calendar className="w-4 h-4 text-[#006231]" />
-              <span>{t.hero.consultationBtn}</span>
             </button>
           </div>
         </div>
@@ -112,22 +103,14 @@ export default function Hero({
           </p>
 
           {/* Hero CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <div className="flex items-center justify-center pt-2">
             <button
               onClick={onExploreProjects}
-              className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-xl bg-[#CE2028] text-white text-base font-bold shadow-lg shadow-[#CE2028]/25 hover:bg-[#A9141B] transition-all cursor-pointer"
+              className="inline-flex items-center justify-center space-x-2 px-8 py-3.5 rounded-xl bg-[#CE2028] text-white text-base font-bold shadow-lg shadow-[#CE2028]/25 hover:bg-[#A9141B] transition-all cursor-pointer"
             >
               <Building2 className="w-5 h-5" />
               <span>{t.hero.exploreBtn}</span>
               <ArrowRight className="w-4 h-4 ml-1" />
-            </button>
-
-            <button
-              onClick={onOpenBookVisit}
-              className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-xl bg-white text-gray-800 border-2 border-gray-200 text-base font-bold hover:border-[#006231] hover:text-[#006231] transition-all cursor-pointer shadow-xs"
-            >
-              <Calendar className="w-5 h-5 text-[#006231]" />
-              <span>{t.hero.consultationBtn}</span>
             </button>
           </div>
         </div>
