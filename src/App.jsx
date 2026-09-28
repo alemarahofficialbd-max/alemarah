@@ -145,7 +145,7 @@ export default function App() {
       )}
 
       {/* Main Multi-Page Content Area */}
-      <main className="flex-1">
+      <main className="flex-1 pb-16 lg:pb-0">
         {/* ==================================================== */}
         {/* PAGE 1: HOME PAGE                                   */}
         {/* ==================================================== */}

@@ -17,12 +17,12 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
   };
 
   const footerNavLinks = [
-    { id: 'home', label: t.nav.home, icon: Home },
-    { id: 'projects', label: t.nav.projects, icon: Building2 },
-    { id: 'investment', label: t.nav.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ ও শেয়ার'), icon: Coins },
-    { id: 'why-us', label: t.nav.whyUs, icon: ShieldCheck },
-    { id: 'about', label: t.nav.about, icon: Compass },
-    { id: 'contact', label: t.nav.contact, icon: Phone }
+    { id: 'home', label: t?.nav?.home || (lang === 'en' ? 'Home' : 'হোম'), icon: Home },
+    { id: 'projects', label: t?.nav?.projects || (lang === 'en' ? 'Projects' : 'প্রকল্পসমূহ'), icon: Building2 },
+    { id: 'investment', label: t?.nav?.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ ও শেয়ার'), icon: Coins },
+    { id: 'why-us', label: t?.nav?.whyUs || (lang === 'en' ? 'Why Us' : 'কেন আল-ইমারাহ'), icon: ShieldCheck },
+    { id: 'about', label: t?.nav?.about || (lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'), icon: Compass },
+    { id: 'contact', label: t?.nav?.contact || (lang === 'en' ? 'Contact' : 'যোগাযোগ'), icon: Phone }
   ];
 
   const handleLinkClick = (href) => {
