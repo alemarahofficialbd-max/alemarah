@@ -3,14 +3,26 @@ import {
   MapPin, 
   Phone, 
   Mail, 
-  ArrowUp,
-  Download
+  Home,
+  Building2,
+  Coins,
+  ShieldCheck,
+  Compass
 } from 'lucide-react';
 
 export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpenInstallApp, isLoggedIn = false }) {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const footerNavLinks = [
+    { id: 'home', label: t.nav.home, icon: Home },
+    { id: 'projects', label: t.nav.projects, icon: Building2 },
+    { id: 'investment', label: t.nav.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ ও শেয়ার'), icon: Coins },
+    { id: 'why-us', label: t.nav.whyUs, icon: ShieldCheck },
+    { id: 'about', label: t.nav.about, icon: Compass },
+    { id: 'contact', label: t.nav.contact, icon: Phone }
+  ];
 
   const handleLinkClick = (href) => {
     let page = 'home';
@@ -28,7 +40,7 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
   return (
     <footer className="bg-[#161516] text-gray-300 py-12 sm:pt-16 sm:pb-12 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 pb-12 border-b border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 pb-12 border-b border-white/10">
           {/* Brand Info (Span 2) */}
           <div className="lg:col-span-2 space-y-4">
             <button 
@@ -122,6 +134,31 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
                   </svg>
                 </a>
               </div>
+            </div>
+          </div>
+
+          {/* Navigation Categories (As requested with icons) */}
+          <div className="lg:col-span-1 space-y-4">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+              {lang === 'en' ? 'Quick Navigation' : 'ক্যাটাগরি / মেনু'}
+            </h4>
+            <div className="space-y-1">
+              {footerNavLinks.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      onNavigate(item.id);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="flex items-center space-x-3 w-full px-2.5 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all text-xs sm:text-sm font-semibold cursor-pointer text-left group"
+                  >
+                    <IconComponent className="w-4 h-4 text-gray-400 group-hover:text-[#CE2028] transition-colors shrink-0" />
+                    <span className="transition-colors">{item.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
