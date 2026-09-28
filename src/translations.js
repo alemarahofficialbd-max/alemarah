@@ -654,7 +654,7 @@ export const translations = {
       whyUs: "কেন আল-ইমারাহ",
       about: "আমাদের সম্পর্কে",
       contact: "যোগাযোগ",
-      login: "সাইন ইন / ড্যাশবোর্ড",
+      login: "সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড",
       installApp: "অ্যাপ ডাউনলোড",
       bookVisit: "সাইট ভিজিট বুক করুন",
       callUs: "হটলাইন",
@@ -671,7 +671,7 @@ export const translations = {
         whyUs: "কেন আল-ইমারাহ",
         about: "আমাদের সম্পর্কে",
         contact: "যোগাযোগ",
-        login: "সাইন ইন / ড্যাশবোর্ড"
+        login: "সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড"
       }
     },
 

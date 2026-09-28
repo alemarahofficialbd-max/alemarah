@@ -12,10 +12,8 @@ import {
   ChevronRight, 
   ShieldCheck, 
   Compass, 
-  Sparkles, 
   Coins,
-  Download,
-  Smartphone
+  Download
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -86,10 +84,10 @@ export default function Navbar({
               <button 
                 onClick={onOpenInstallApp}
                 className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors cursor-pointer"
-                title={lang === 'en' ? 'Install Web App' : 'অ্যাপ ডাউনলোড করুন'}
+                title={lang === 'en' ? 'Install App' : 'অ্যাপ ডাউনলোড'}
               >
                 <Download className="w-3.5 h-3.5 text-[#8EBF40]" />
-                <span>{lang === 'en' ? 'Install App' : 'অ্যাপ ডাউনলোড'}</span>
+                <span>{t.nav.installApp}</span>
               </button>
             )}
 
@@ -101,17 +99,6 @@ export default function Navbar({
               <Globe className="w-3.5 h-3.5 text-[#8EBF40]" />
               <span>{t.nav.langName}</span>
             </button>
-
-            <button 
-              onClick={() => handleNavClick(isLoggedIn ? 'dashboard' : 'login')}
-              className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors cursor-pointer"
-            >
-              <User className={`w-3.5 h-3.5 ${isLoggedIn ? 'text-[#8EBF40]' : 'text-[#CE2028]'}`} />
-              <span>{isLoggedIn ? (lang === 'en' ? 'My Dashboard' : 'আমার ড্যাশবোর্ড') : t.nav.login}</span>
-              {isLoggedIn && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#8EBF40] animate-pulse"></span>
-              )}
-            </button>
           </div>
         </div>
       </div>
@@ -120,10 +107,10 @@ export default function Navbar({
       <header className={`sticky top-0 z-40 transition-all duration-300 ${
         scrolled 
           ? 'glass-nav shadow-lg shadow-black/5 py-2.5 border-b border-gray-100' 
-          : 'bg-white py-3.5 border-b border-gray-100'
+          : 'bg-white py-3 border-b border-gray-100'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             {/* Brand Logo */}
             <button 
               onClick={() => handleNavClick('home')}
@@ -158,7 +145,7 @@ export default function Navbar({
               })}
             </nav>
 
-            {/* Compact Desktop Navigation Links for medium screens (lg to xl) */}
+            {/* Medium screens navigation (lg to xl) */}
             <nav className="hidden lg:flex xl:hidden items-center space-x-0.5">
               {navLinks.map((item) => {
                 const isActive = currentPage === item.id;
@@ -178,69 +165,64 @@ export default function Navbar({
               })}
             </nav>
 
-            {/* Desktop Right CTAs: App Download, Sign In/Dashboard Corner, Schedule Visit */}
-            <div className="hidden lg:flex items-center space-x-2.5 shrink-0">
-              {/* Install App Button */}
+            {/* Right Corner Buttons: অ্যাপ ডাউনলোড, সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড, সাইট ভিজিট বুক করুন */}
+            <div className="hidden lg:flex items-center space-x-2 shrink-0">
+              {/* অ্যাপ ডাউনলোড বাটন */}
               {onOpenInstallApp && (
                 <button
                   onClick={onOpenInstallApp}
-                  className="flex items-center space-x-1.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 bg-gray-50/70 hover:bg-gray-100 text-gray-700 text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
+                  className="flex items-center space-x-1.5 px-3 py-2 rounded-xl border border-gray-200 hover:border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap"
                   title={lang === 'en' ? 'Download App for PC, Android & iOS' : 'পিসি, অ্যান্ড্রয়েড ও আইফোনের জন্য অ্যাপ ডাউনলোড'}
                 >
-                  <Download className="w-3.5 h-3.5 text-[#006231]" />
-                  <span>{t.nav.installApp || (lang === 'en' ? 'App' : 'অ্যাপ')}</span>
+                  <Download className="w-4 h-4 text-gray-600" />
+                  <span>{t.nav.installApp}</span>
                 </button>
               )}
 
-              {/* Sign In / Client Dashboard Corner Button */}
+              {/* সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড বাটন */}
               <button
                 onClick={() => handleNavClick(isLoggedIn ? 'dashboard' : 'login')}
-                className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap ${
                   isLoggedIn
-                    ? 'bg-emerald-50 text-[#006231] border-emerald-200 hover:bg-emerald-100'
-                    : 'bg-white text-gray-800 border-gray-200 hover:border-[#CE2028] hover:text-[#CE2028]'
+                    ? 'bg-red-50 text-[#CE2028] border-red-200 font-bold'
+                    : 'bg-gray-50 text-gray-800 border-gray-200 hover:border-[#CE2028] hover:text-[#CE2028] hover:bg-white'
                 }`}
               >
-                <User className={`w-4 h-4 ${isLoggedIn ? 'text-[#006231]' : 'text-[#CE2028]'}`} />
-                <span>{isLoggedIn ? (lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড') : t.nav.login}</span>
-                {isLoggedIn && (
-                  <span className="w-2 h-2 rounded-full bg-[#8EBF40] animate-pulse"></span>
-                )}
+                <User className="w-4 h-4 text-[#CE2028]" />
+                <span>{isLoggedIn ? (lang === 'en' ? 'Client Dashboard' : 'ক্লায়েন্ট ড্যাশবোর্ড') : t.nav.login}</span>
               </button>
 
-              {/* Schedule Visit Primary Button */}
+              {/* সাইট ভিজিট বুক করুন বাটন */}
               <button
                 onClick={onOpenBookVisit}
-                className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#CE2028] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#CE2028]/25 hover:bg-[#A9141B] hover:shadow-lg hover:shadow-[#CE2028]/35 transition-all duration-200 active:scale-95 cursor-pointer whitespace-nowrap"
+                className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#CE2028]/25 transition-all active:scale-95 cursor-pointer whitespace-nowrap"
               >
                 <Calendar className="w-4 h-4 text-white" />
                 <span>{t.nav.bookVisit}</span>
               </button>
             </div>
 
-            {/* Mobile Header Controls (Phone View) */}
+            {/* Mobile Header Controls */}
             <div className="flex items-center space-x-2 lg:hidden">
               {onOpenInstallApp && (
                 <button
                   onClick={onOpenInstallApp}
-                  className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-[#006231] text-xs font-bold cursor-pointer"
-                  title={lang === 'en' ? 'App' : 'অ্যাপ'}
+                  className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-xs font-semibold cursor-pointer"
+                  title={t.nav.installApp}
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  <Download className="w-3.5 h-3.5 text-gray-700" />
                   <span>{lang === 'en' ? 'App' : 'অ্যাপ'}</span>
                 </button>
               )}
 
-              {/* Mobile Language Button */}
               <button
                 onClick={toggleLanguage}
-                className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-xs font-bold cursor-pointer"
+                className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-xs font-semibold cursor-pointer"
               >
                 <Globe className="w-3.5 h-3.5 text-[#006231]" />
                 <span>{lang === 'en' ? 'বাংলা' : 'EN'}</span>
               </button>
 
-              {/* Hamburger Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 rounded-lg text-gray-700 hover:text-[#CE2028] hover:bg-gray-100 transition-colors cursor-pointer"
@@ -254,28 +236,28 @@ export default function Navbar({
 
         {/* Mobile Slide-Down Drawer Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-x-0 top-[60px] bg-white border-b border-gray-200 shadow-2xl z-50 animate-fadeIn overflow-y-auto max-h-[85vh]">
+          <div className="lg:hidden fixed inset-x-0 top-[57px] bg-white border-b border-gray-200 shadow-2xl z-50 animate-fadeIn overflow-y-auto max-h-[85vh]">
             <div className="p-4 space-y-3">
-              {/* Hot Contact Info */}
+              {/* Hotline Contact Info */}
               <div className="p-3 bg-gray-50 rounded-xl flex items-center justify-between border border-gray-100">
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-9 h-9 rounded-lg bg-[#CE2028]/10 flex items-center justify-center text-[#CE2028]">
+                  <div className="w-8 h-8 rounded-lg bg-[#CE2028]/10 flex items-center justify-center text-[#CE2028]">
                     <Phone className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 font-medium">{t.nav.callUs}</div>
-                    <a href="tel:+8801918646575" className="text-sm font-bold text-gray-900">{t.nav.phoneNo}</a>
+                    <a href="tel:+8801918646575" className="text-xs sm:text-sm font-bold text-gray-900">{t.nav.phoneNo}</a>
                   </div>
                 </div>
                 <button
                   onClick={toggleLanguage}
-                  className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-[#006231] shadow-xs cursor-pointer"
+                  className="px-2.5 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-[#006231] shadow-xs cursor-pointer"
                 >
                   {t.nav.langSwitchTo}
                 </button>
               </div>
 
-              {/* Nav Links */}
+              {/* The 6 Main Navigation Links */}
               <div className="space-y-1">
                 {navLinks.map((item) => {
                   const IconComponent = item.icon;
@@ -284,7 +266,7 @@ export default function Navbar({
                     <button
                       key={item.id}
                       onClick={() => handleNavClick(item.id)}
-                      className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-semibold text-sm transition-colors text-left cursor-pointer ${
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-colors text-left cursor-pointer ${
                         isActive 
                           ? 'bg-red-50 text-[#CE2028] font-bold' 
                           : 'text-gray-800 hover:bg-gray-50'
@@ -300,21 +282,35 @@ export default function Navbar({
                 })}
               </div>
 
-              {/* CTA Action Buttons */}
+              {/* The 3 Action Buttons */}
               <div className="pt-2 space-y-2 border-t border-gray-100">
+                {/* অ্যাপ ডাউনলোড বাটন */}
                 {onOpenInstallApp && (
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
                       onOpenInstallApp();
                     }}
-                    className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-200 text-xs sm:text-sm font-bold cursor-pointer"
+                    className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 text-xs sm:text-sm font-semibold hover:bg-gray-100 cursor-pointer"
                   >
-                    <Download className="w-4 h-4" />
-                    <span>{lang === 'en' ? 'Download Mobile & PC App' : 'অ্যাপ ডাউনলোড করুন (Android/iOS/PC)'}</span>
+                    <Download className="w-4 h-4 text-gray-600" />
+                    <span>{t.nav.installApp}</span>
                   </button>
                 )}
 
+                {/* সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড বাটন */}
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleNavClick(isLoggedIn ? 'dashboard' : 'login');
+                  }}
+                  className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 text-xs sm:text-sm font-semibold hover:bg-gray-100 cursor-pointer"
+                >
+                  <User className="w-4 h-4 text-[#CE2028]" />
+                  <span>{isLoggedIn ? (lang === 'en' ? 'Client Dashboard' : 'ক্লায়েন্ট ড্যাশবোর্ড') : t.nav.login}</span>
+                </button>
+
+                {/* সাইট ভিজিট বুক করুন বাটন */}
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
@@ -325,76 +321,11 @@ export default function Navbar({
                   <Calendar className="w-4 h-4" />
                   <span>{t.nav.bookVisit}</span>
                 </button>
-
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    handleNavClick(isLoggedIn ? 'dashboard' : 'login');
-                  }}
-                  className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-gray-100 text-gray-800 text-sm font-semibold hover:bg-gray-200 cursor-pointer"
-                >
-                  <User className={`w-4 h-4 ${isLoggedIn ? 'text-[#006231]' : 'text-gray-600'}`} />
-                  <span>{isLoggedIn ? (lang === 'en' ? 'My Dashboard' : 'আমার ড্যাশবোর্ড') : t.nav.login}</span>
-                </button>
               </div>
             </div>
           </div>
         )}
       </header>
-
-      {/* Floating Bottom App-like Navigation Bar for Phone View */}
-      <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 py-1.5 px-3 z-30 lg:hidden shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
-        <div className="flex items-center justify-around">
-          <button
-            onClick={() => handleNavClick('home')}
-            className={`flex flex-col items-center py-1 px-2 text-xs font-semibold cursor-pointer ${
-              currentPage === 'home' ? 'text-[#CE2028] font-bold' : 'text-gray-500'
-            }`}
-          >
-            <Home className="w-5 h-5 mb-0.5" />
-            <span>{t.nav.mobileNav.home}</span>
-          </button>
-
-          <button
-            onClick={() => handleNavClick('projects')}
-            className={`flex flex-col items-center py-1 px-2 text-xs font-semibold cursor-pointer ${
-              currentPage === 'projects' ? 'text-[#CE2028] font-bold' : 'text-gray-500'
-            }`}
-          >
-            <Building2 className="w-5 h-5 mb-0.5" />
-            <span>{t.nav.mobileNav.projects}</span>
-          </button>
-
-          {/* Quick Schedule Center Action Button */}
-          <button
-            onClick={() => handleNavClick('contact')}
-            className="-mt-5 w-11 h-11 rounded-full bg-[#CE2028] text-white flex items-center justify-center shadow-lg shadow-[#CE2028]/40 ring-4 ring-white cursor-pointer active:scale-95"
-            aria-label={t.nav.bookVisit}
-          >
-            <Calendar className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={() => handleNavClick('investment')}
-            className={`flex flex-col items-center py-1 px-2 text-xs font-semibold cursor-pointer ${
-              currentPage === 'investment' ? 'text-[#006231] font-bold' : 'text-gray-500'
-            }`}
-          >
-            <Coins className="w-5 h-5 mb-0.5" />
-            <span>{t.nav.mobileNav.investment || (lang === 'en' ? 'Invest' : 'বিনিয়োগ')}</span>
-          </button>
-
-          <button
-            onClick={() => handleNavClick(isLoggedIn ? 'dashboard' : 'login')}
-            className={`flex flex-col items-center py-1 px-2 text-xs font-semibold cursor-pointer ${
-              currentPage === 'login' || currentPage === 'dashboard' ? 'text-[#CE2028] font-bold' : 'text-gray-500'
-            }`}
-          >
-            <User className={`w-5 h-5 mb-0.5 ${isLoggedIn ? 'text-[#006231]' : ''}`} />
-            <span>{isLoggedIn ? (lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড') : (lang === 'en' ? 'Login' : 'লগইন')}</span>
-          </button>
-        </div>
-      </div>
     </>
   );
 }
