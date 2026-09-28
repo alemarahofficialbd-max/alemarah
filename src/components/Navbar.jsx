@@ -62,7 +62,7 @@ export default function Navbar({
 
   return (
     <>
-      {/* Top Notification / Hotline Strip */}
+      {/* Top Notification / Hotline Strip (Desktop) */}
       <div className="bg-[#1C1819] text-gray-300 text-xs py-2 px-4 border-b border-white/10 hidden md:block">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-6">
@@ -89,7 +89,7 @@ export default function Navbar({
 
             <span className="text-gray-600">|</span>
 
-            {/* সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড */}
+            {/* সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড বাটন */}
             <button 
               onClick={() => handleNavClick(isLoggedIn ? 'dashboard' : 'login')}
               className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors cursor-pointer group"
@@ -104,14 +104,14 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* Main Desktop Navbar */}
+      {/* Main Navbar Header */}
       <header className={`sticky top-0 z-40 transition-all duration-300 ${
         scrolled 
-          ? 'glass-nav shadow-lg shadow-black/5 py-2.5 border-b border-gray-100' 
-          : 'bg-white py-3 border-b border-gray-100'
+          ? 'glass-nav shadow-md shadow-black/5 py-2 border-b border-gray-100' 
+          : 'bg-white py-2.5 border-b border-gray-100'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
             {/* Brand Logo */}
             <button 
               onClick={() => handleNavClick('home')}
@@ -120,7 +120,7 @@ export default function Navbar({
               <img 
                 src="/alemarah_logo_header.svg" 
                 alt="Al-Emarah Properties Limited" 
-                className="h-9 sm:h-11 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+                className="h-8 sm:h-11 w-auto object-contain transition-transform group-hover:scale-[1.02]"
               />
             </button>
 
@@ -166,7 +166,7 @@ export default function Navbar({
               })}
             </nav>
 
-            {/* Right Corner Button: সাইট ভিজিট বুক করুন */}
+            {/* Right Corner Button: সাইট ভিজিট বুক করুন (Desktop) */}
             <div className="hidden lg:flex items-center shrink-0">
               <button
                 onClick={onOpenBookVisit}
@@ -177,30 +177,159 @@ export default function Navbar({
               </button>
             </div>
 
-            {/* Mobile Header Controls */}
-            <div className="flex items-center space-x-2 lg:hidden">
+            {/* Mobile Header Quick Actions */}
+            <div className="flex items-center space-x-1 sm:space-x-2 lg:hidden">
+              {/* Call Hotline Icon */}
+              <a
+                href="tel:+8801918646575"
+                className="p-2 rounded-lg text-gray-700 hover:text-[#CE2028] hover:bg-gray-100 transition-colors"
+                aria-label="Call Hotline"
+                title="01918-646575"
+              >
+                <Phone className="w-4 h-4 text-[#8EBF40]" />
+              </a>
+
+              {/* Client Dashboard / Login Quick Link */}
+              <button
+                onClick={() => handleNavClick(isLoggedIn ? 'dashboard' : 'login')}
+                className="p-2 rounded-lg text-gray-700 hover:text-[#CE2028] hover:bg-gray-100 transition-colors cursor-pointer relative"
+                aria-label={isLoggedIn ? 'Dashboard' : 'Login'}
+                title={isLoggedIn ? 'ক্লায়েন্ট ড্যাশবোর্ড' : 'লগইন'}
+              >
+                <User className={`w-4 h-4 ${isLoggedIn ? 'text-[#8EBF40]' : 'text-gray-700'}`} />
+                {isLoggedIn && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#8EBF40] ring-2 ring-white"></span>
+                )}
+              </button>
+
+              {/* Language Switch */}
               <button
                 onClick={toggleLanguage}
-                className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-xs font-semibold cursor-pointer"
+                className="flex items-center space-x-1 px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-xs font-semibold cursor-pointer"
               >
                 <Globe className="w-3.5 h-3.5 text-[#006231]" />
                 <span>{lang === 'en' ? 'বাংলা' : 'EN'}</span>
               </button>
 
+              {/* Hamburger Menu Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-lg text-gray-700 hover:text-[#CE2028] hover:bg-gray-100 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-gray-700 hover:text-[#CE2028] hover:bg-gray-100 transition-colors cursor-pointer"
                 aria-label="Toggle Navigation Menu"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-6 h-6 text-[#CE2028]" /> : <Menu className="w-6 h-6" />}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Slide-Down Drawer Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-x-0 top-[57px] bg-white border-b border-gray-200 shadow-2xl z-50 animate-fadeIn overflow-y-auto max-h-[85vh]">
+        {/* Mobile Horizontal Category / Navigation Scroll Bar (Always visible in Phone View) */}
+        <div className="lg:hidden mt-2 pt-2 border-t border-gray-100 px-3 overflow-x-auto no-scrollbar">
+          <div className="flex items-center space-x-1.5 min-w-max pb-1">
+            {navLinks.map((item) => {
+              const IconComponent = item.icon;
+              const isActive = currentPage === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                    isActive 
+                      ? 'bg-[#CE2028] text-white shadow-xs font-bold' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <IconComponent className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-gray-500'}`} />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </header>
+
+      {/* Floating Bottom App Navigation Bar for Phone View */}
+      <nav className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 py-1 px-2 z-40 lg:hidden shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+        <div className="flex items-center justify-around max-w-md mx-auto">
+          <button
+            onClick={() => handleNavClick('home')}
+            className={`flex flex-col items-center py-1 px-2 text-[11px] font-semibold transition-colors cursor-pointer ${
+              currentPage === 'home' ? 'text-[#CE2028] font-bold' : 'text-gray-500 hover:text-gray-900'
+            }`}
+          >
+            <Home className="w-5 h-5 mb-0.5" />
+            <span>{t.nav.home}</span>
+          </button>
+
+          <button
+            onClick={() => handleNavClick('projects')}
+            className={`flex flex-col items-center py-1 px-2 text-[11px] font-semibold transition-colors cursor-pointer ${
+              currentPage === 'projects' ? 'text-[#CE2028] font-bold' : 'text-gray-500 hover:text-gray-900'
+            }`}
+          >
+            <Building2 className="w-5 h-5 mb-0.5" />
+            <span>{t.nav.projects}</span>
+          </button>
+
+          {/* Center Site Visit Button */}
+          <button
+            onClick={onOpenBookVisit}
+            className="-mt-5 w-12 h-12 rounded-full bg-[#CE2028] hover:bg-[#A9141B] text-white flex items-center justify-center shadow-lg shadow-[#CE2028]/40 ring-4 ring-white cursor-pointer active:scale-95 transition-transform"
+            aria-label={t.nav.bookVisit}
+            title={t.nav.bookVisit}
+          >
+            <Calendar className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={() => handleNavClick('investment')}
+            className={`flex flex-col items-center py-1 px-2 text-[11px] font-semibold transition-colors cursor-pointer ${
+              currentPage === 'investment' ? 'text-[#CE2028] font-bold' : 'text-gray-500 hover:text-gray-900'
+            }`}
+          >
+            <Coins className="w-5 h-5 mb-0.5" />
+            <span>{lang === 'en' ? 'Invest' : 'বিনিয়োগ'}</span>
+          </button>
+
+          <button
+            onClick={() => handleNavClick(isLoggedIn ? 'dashboard' : 'login')}
+            className={`flex flex-col items-center py-1 px-2 text-[11px] font-semibold transition-colors cursor-pointer ${
+              currentPage === 'login' || currentPage === 'dashboard' ? 'text-[#CE2028] font-bold' : 'text-gray-500 hover:text-gray-900'
+            }`}
+          >
+            <User className={`w-5 h-5 mb-0.5 ${isLoggedIn ? 'text-[#8EBF40]' : ''}`} />
+            <span>{isLoggedIn ? (lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড') : (lang === 'en' ? 'Login' : 'লগইন')}</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Slide-Down Drawer Menu (Fixed overlay outside header to prevent clipping) */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-start">
+          {/* Dark Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          {/* Menu Sheet Container */}
+          <div className="relative z-50 bg-white border-b border-gray-200 shadow-2xl overflow-y-auto max-h-[85vh] animate-fadeIn">
+            {/* Header bar inside drawer */}
+            <div className="p-4 flex items-center justify-between border-b border-gray-100">
+              <img 
+                src="/alemarah_logo_header.svg" 
+                alt="Al-Emarah" 
+                className="h-8 w-auto object-contain" 
+              />
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 cursor-pointer"
+                aria-label="Close menu"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
             <div className="p-4 space-y-3">
               {/* Hotline Contact Info */}
               <div className="p-3 bg-gray-50 rounded-xl flex items-center justify-between border border-gray-100">
@@ -214,7 +343,10 @@ export default function Navbar({
                   </div>
                 </div>
                 <button
-                  onClick={toggleLanguage}
+                  onClick={() => {
+                    toggleLanguage();
+                    setMobileMenuOpen(false);
+                  }}
                   className="px-2.5 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-[#006231] shadow-xs cursor-pointer"
                 >
                   {t.nav.langSwitchTo}
@@ -274,8 +406,8 @@ export default function Navbar({
               </div>
             </div>
           </div>
-        )}
-      </header>
+        </div>
+      )}
     </>
   );
 }
