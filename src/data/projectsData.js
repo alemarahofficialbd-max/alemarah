@@ -15,8 +15,13 @@ export const projectsData = [
     landAreaEn: "17.40 Decimals",
     landAreaBn: "১৭.৪০ শতাংশ",
     beds: 3,
-    baths: 3,
-    sizeSqft: "1,650 - 2,150",
+    baths: 2,
+    balconies: 2,
+    lifts: 2,
+    stairs: 1,
+    sizeSqft: "1,265",
+    sizeNoteEn: "1,265 Sq. Ft. (Jofri measurement)",
+    sizeNoteBn: "১২৬৫ বর্গফুট (জফরি মাপে)",
     handoverEn: "December 2027",
     handoverBn: "ডিসেম্বর ২০২৭",
     buildingTypeEn: "BG+12 (Basement + Ground + 12 Floors)",
@@ -24,6 +29,18 @@ export const projectsData = [
     commercialFloorsEn: "Bottom 2 floors commercial shopping plaza",
     commercialFloorsBn: "নিচের ২টি তলা আধুনিক বাণিজ্যিক স্পেস",
     totalFloors: 14,
+    unitSpecs: {
+      landArea: "১৭.৪০ শতাংশ",
+      flatSize: "১২৬৫ বর্গফুট (জফরি মাপে)",
+      lifts: "০২টি",
+      stairs: "০১টি",
+      beds: "০৩টি",
+      baths: "০২টি",
+      balconies: "০২টি",
+      kitchen: "পরিপাটি কিচেন স্পেস",
+      drawing: "সুবিন্যস্ত ড্রয়িং",
+      dining: "আলাদা ডাইনিং"
+    },
     image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80",
     gallery: [
       "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80",
@@ -31,18 +48,24 @@ export const projectsData = [
       "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1000&q=80"
     ],
     featuresEn: [
-      "3 Bedrooms, 3 Bathrooms, Drawing, Dining, Kitchen & 2 Balconies in each unit",
-      "Prime location in rapidly developing Signboard-Sanarpar commercial corridor",
+      "Land Area: 17.40 Decimals (100% Clear Title)",
+      "Flat Size: 1,265 Sq. Ft. (Jofri measurement)",
+      "3 Bedrooms, 2 Bathrooms, 2 Balconies",
+      "Tidy, well-planned kitchen space",
+      "Well-arranged drawing room & separate dining space",
+      "2 High-speed Passenger Lifts & 1 Dedicated Staircase",
       "Basement parking and bottom 2 floors dedicated to shopping & commercial plaza",
-      "Rooftop prayer zone (Musalla), community space, and children's play area",
-      "Modern residential environment with easy access to schools, hospitals & markets"
+      "Rooftop prayer zone (Musalla), community space, and children's play area"
     ],
     featuresBn: [
-      "প্রতিটি ইউনিটে ৩টি বেডরুম, ৩টি বাথরুম, ড্রয়িং, ডাইনিং, রান্নাঘর ও ২টি বারান্দা",
-      "ঢাকার দ্রুত বিকাশমান সাইনবোর্ড-সানারপাড় প্রধান সড়কের সাথে চমৎকার সংযোগ",
+      "জমির পরিমাণ: ১৭.৪০ শতাংশ (শতভাগ নিষ্কণ্টক জমি)",
+      "ফ্ল্যাটের সাইজ জফরি মাপে: ১২৬৫ বর্গফুট",
+      "০৩টি বেডরুম, ০২টি বাথরুম ও ০২টি বারান্দা",
+      "পরিপাটি কিচেন স্পেস ও সুবিন্যস্ত ড্রয়িং",
+      "আলাদা ডাইনিং স্পেস",
+      "০২টি আধুনিক লিফট ও ০১টি প্রশস্ত সিঁড়ি",
       "বেসমেন্ট কার পার্কিং এবং নিচের ২টি ফ্লোরে আধুনিক বাণিজ্যিক মার্কেট",
-      "ছাদে বিশেষ নামাজের স্থান (মুসাল্লা), কমিউনিটি হল ও শিশুদের খেলার জায়গা",
-      "স্কুল, কলেজ, হাসপাতাল ও বাজারের সন্নিকটে নিরাপদ ও রুচিশীল আবাসন"
+      "ছাদে বিশেষ নামাজের স্থান (মুসাল্লা), কমিউনিটি হল ও শিশুদের খেলার জায়গা"
     ],
     rajukApprovalEn: "Approved Structural Design & Clear Land Title",
     rajukApprovalBn: "অনুমোদিত স্ট্রাকচারাল ডিজাইন ও শতভাগ নিষ্কণ্টক জমি"

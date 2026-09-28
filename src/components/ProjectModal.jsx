@@ -124,6 +124,60 @@ export default function ProjectModal({ project, lang, t, onClose, onBookVisit })
             </div>
           </div>
 
+          {/* Authentic Floor & Unit Specifications (Leaflet Details) */}
+          {project.unitSpecs && (
+            <div className="rounded-2xl border-2 border-[#006231]/30 overflow-hidden shadow-xs bg-gradient-to-b from-emerald-50/50 to-white">
+              <div className="bg-[#006231] text-white px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 shadow-sm">
+                <span className="text-base sm:text-lg font-black tracking-wide">
+                  {lang === 'en' ? `Land Area: ${project.landAreaEn}` : `জমির পরিমাণ ${project.unitSpecs.landArea}।`}
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-[#8EBF40]">
+                  {lang === 'en' ? `Flat Size (Jofri): ${project.sizeSqft} Sq. Ft.` : `ফ্ল্যাটের সাইজ জফরি মাপে ${project.sizeSqft} বর্গফুট`}
+                </span>
+              </div>
+
+              <div className="p-5 grid grid-cols-2 gap-4 text-xs sm:text-sm">
+                <div className="space-y-2.5 border-r border-gray-200/80 pr-4">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-gray-100">
+                    <span className="text-gray-600">{lang === 'en' ? 'Lifts' : 'লিফট'}</span>
+                    <span className="font-bold text-gray-900">: {project.unitSpecs.lifts}</span>
+                  </div>
+                  <div className="flex items-center justify-between pb-1.5 border-b border-gray-100">
+                    <span className="text-gray-600">{lang === 'en' ? 'Stairs' : 'সিঁড়ি'}</span>
+                    <span className="font-bold text-gray-900">: {project.unitSpecs.stairs}</span>
+                  </div>
+                  <div className="flex items-center justify-between pb-1.5 border-b border-gray-100">
+                    <span className="text-gray-600">{lang === 'en' ? 'Bedrooms' : 'বেডরুম'}</span>
+                    <span className="font-bold text-gray-900">: {project.unitSpecs.beds}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">{lang === 'en' ? 'Bathrooms' : 'বাথরুম'}</span>
+                    <span className="font-bold text-gray-900">: {project.unitSpecs.baths}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 pl-2">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-gray-100">
+                    <span className="text-gray-600">{lang === 'en' ? 'Balconies' : 'বারান্দা'}</span>
+                    <span className="font-bold text-gray-900">: {project.unitSpecs.balconies}</span>
+                  </div>
+                  <div className="flex items-center justify-between pb-1.5 border-b border-gray-100">
+                    <span className="text-gray-600">{lang === 'en' ? 'Kitchen' : 'কিচেন'}</span>
+                    <span className="font-bold text-gray-900">{project.unitSpecs.kitchen}</span>
+                  </div>
+                  <div className="flex items-center justify-between pb-1.5 border-b border-gray-100">
+                    <span className="text-gray-600">{lang === 'en' ? 'Drawing' : 'ড্রয়িং'}</span>
+                    <span className="font-bold text-gray-900">{project.unitSpecs.drawing}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">{lang === 'en' ? 'Dining' : 'ডাইনিং'}</span>
+                    <span className="font-bold text-gray-900">{project.unitSpecs.dining}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Key Features & Amenities */}
           <div>
             <h4 className="text-base font-bold text-gray-900 mb-3 flex items-center space-x-2">
