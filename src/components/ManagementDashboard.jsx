@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Building2, 
   Users, 
   DollarSign, 
-  TrendingUp, 
   HardHat, 
   Plus, 
   Check, 
@@ -13,15 +12,10 @@ import {
   Calendar, 
   CheckCircle2, 
   Clock, 
-  Edit3, 
-  Trash2, 
   ShieldCheck, 
-  Phone, 
-  Layers, 
   Wallet,
   Coins,
-  ChevronRight,
-  ArrowRight
+  ChevronRight
 } from 'lucide-react';
 import { 
   getManagementData, 
@@ -38,9 +32,10 @@ export default function ManagementDashboard({
   const [data, setData] = useState(() => getManagementData());
   const [activeTab, setActiveTab] = useState('clients'); // 'clients', 'payments', 'projects', 'expenses', 'team'
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Feedback alerts
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [successAlert, setSuccessAlert] = useState('');
+
+  const profileRef = useRef(null);
 
   const triggerAlert = (msg) => {
     setSuccessAlert(msg);
@@ -54,6 +49,17 @@ export default function ManagementDashboard({
       return updated;
     });
   };
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // -------------------------------------------------------------
   // FORM STATES
@@ -111,7 +117,6 @@ export default function ManagementDashboard({
   // -------------------------------------------------------------
   // HANDLERS
   // -------------------------------------------------------------
-  // Handle Add Client
   const handleAddClient = (e) => {
     e.preventDefault();
     if (!clientForm.name || !clientForm.phone || !clientForm.totalPrice) {
@@ -165,7 +170,6 @@ export default function ManagementDashboard({
     triggerAlert(`নতুন কাস্টমার ${newClient.name} (আইডি: ${newId}) সফলভাবে যোগ হয়েছে!`);
   };
 
-  // Handle Receive Payment Entry
   const handleReceivePayment = (e) => {
     e.preventDefault();
     const payAmount = Number(paymentForm.amount);
@@ -206,7 +210,6 @@ export default function ManagementDashboard({
     });
   };
 
-  // Handle Add Project
   const handleAddProject = (e) => {
     e.preventDefault();
     if (!projectForm.name || !projectForm.budget) {
@@ -240,7 +243,6 @@ export default function ManagementDashboard({
     triggerAlert(`নতুন প্রজেক্ট "${newProj.name}" সফলভাবে যুক্ত হয়েছে!`);
   };
 
-  // Handle Update Project Progress
   const handleUpdateProjectProgress = (projId, newProgress, newStage) => {
     updateStore((prev) => ({
       ...prev,
@@ -258,12 +260,11 @@ export default function ManagementDashboard({
     triggerAlert('প্রকল্পের কাজের অগ্রগতি সফলভাবে আপডেট হয়েছে!');
   };
 
-  // Handle Add Project Short Expense
   const handleAddExpense = (e) => {
     e.preventDefault();
     const expAmount = Number(expenseForm.amount);
     if (!expenseForm.title || !expAmount || expAmount <= 0) {
-      alert('খরচের খাত (যেমন: ১ম-৫ম তলা ঢালাই) এবং টাকার পরিমাণ লিখুন।');
+      alert('খরচের খাত এবং টাকার পরিমাণ লিখুন।');
       return;
     }
 
@@ -295,7 +296,6 @@ export default function ManagementDashboard({
     triggerAlert('প্রজেক্ট খরচের এন্ট্রি সফলভাবে যুক্ত হয়েছে!');
   };
 
-  // Handle Add Team Member
   const handleAddTeam = (e) => {
     e.preventDefault();
     if (!teamForm.name || !teamForm.phone) {
@@ -350,13 +350,22 @@ export default function ManagementDashboard({
   const projectTotalExpense = (selectedProjForExpense?.expenses || []).reduce((acc, e) => acc + (e.amount || 0), 0);
   const projectRemainingBudget = (selectedProjForExpense?.budget || 0) - projectTotalExpense;
 
+  // Management Footer Navbar items
+  const managementNavItems = [
+    { id: 'clients', label: '১. ক্লায়েন্ট', icon: Users },
+    { id: 'payments', label: '২. জমা এন্ট্রি', icon: DollarSign },
+    { id: 'projects', label: '৩. প্রজেক্ট', icon: Building2 },
+    { id: 'expenses', label: '৪. বাজেট ও খরচ', icon: Wallet },
+    { id: 'team', label: '৫. টিম', icon: HardHat }
+  ];
+
   return (
-    <div className="min-h-screen bg-[#F4F5F7] text-gray-900 flex flex-col font-sans animate-fadeIn">
+    <div className="min-h-screen bg-[#F4F5F7] text-gray-900 flex flex-col font-sans animate-fadeIn pb-24">
       
       {/* ========================================================= */}
-      {/* 1. TOP HEADER                                             */}
+      {/* 1. TOP HEADER (JUST LOGO & PURE CIRCULAR AVATAR - NO BOX) */}
       {/* ========================================================= */}
-      <header className="bg-white border-b border-gray-200 py-3.5 px-4 sm:px-6 lg:px-8 shadow-xs sticky top-0 z-40">
+      <header className="bg-white border-b border-gray-200 py-3 px-4 sm:px-6 lg:px-8 shadow-2xs sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           
           {/* Logo & Portal Badge */}
@@ -375,36 +384,68 @@ export default function ManagementDashboard({
             <span className="text-gray-300 hidden sm:inline">|</span>
             <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#CE2028] text-xs font-bold border border-red-100">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>ম্যানেজমেন্ট কন্ট্রোল প্যানেল</span>
+              <span>ম্যানেজমেন্ট প্যানেল</span>
             </div>
           </div>
 
-          {/* Admin Profile & Actions */}
-          <div className="flex items-center space-x-3">
-            <div className="hidden sm:block text-right">
-              <div className="text-xs font-bold text-gray-900">
-                {admin?.name || 'অ্যাডমিন ইউজার'}
-              </div>
-              <div className="text-2xs text-[#006231] font-semibold">
-                {admin?.role || 'ম্যানেজমেন্ট টিম'}
-              </div>
-            </div>
-
+          {/* Right: PURE CIRCULAR AVATAR (NO BOX / NO BUTTON BORDER BOX) */}
+          <div className="relative" ref={profileRef}>
             <button
-              onClick={onNavigateHome}
-              className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition-colors cursor-pointer flex items-center space-x-1"
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="relative cursor-pointer rounded-full p-0 border-0 bg-transparent focus:outline-none transition-transform hover:scale-105 active:scale-95 block"
+              aria-expanded={isProfileOpen}
+              title="ম্যানেজমেন্ট মেনু"
             >
-              <Home className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">ওয়েবসাইট</span>
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-[#CE2028] to-[#A9141B] text-white flex items-center justify-center font-black text-sm ring-2 ring-[#CE2028] shadow-sm hover:ring-[#006231] transition-all">
+                {admin?.name ? admin.name.slice(0, 2) : 'ম্যা'}
+              </div>
+              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
             </button>
 
-            <button
-              onClick={onLogout}
-              className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white text-xs font-bold border border-red-200 transition-all cursor-pointer flex items-center space-x-1"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>লগআউট</span>
-            </button>
+            {/* Profile Dropdown Popup Menu */}
+            {isProfileOpen && (
+              <div className="absolute right-0 mt-2.5 w-72 bg-white rounded-3xl shadow-2xl border border-gray-100 py-3 z-50 animate-fadeIn divide-y divide-gray-100">
+                <div className="px-4 py-3">
+                  <div className="text-sm font-black text-gray-900 truncate">
+                    {admin?.name || 'অ্যাডমিন কর্মকর্তা'}
+                  </div>
+                  <div className="text-xs text-[#006231] font-semibold mt-0.5">
+                    {admin?.role || 'ম্যানেজমেন্ট টিম'}
+                  </div>
+                  <div className="text-2xs text-gray-400 mt-0.5">
+                    মোবাইল: {admin?.phone || '০১৯১৮-৬৪৬৫৭৫'}
+                  </div>
+                </div>
+
+                <div className="p-2 space-y-1 text-xs font-bold text-gray-700">
+                  <button
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      onNavigateHome();
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-gray-100 hover:text-gray-900 transition-colors text-left cursor-pointer"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center">
+                      <Home className="w-3.5 h-3.5" />
+                    </div>
+                    <span>ওয়েবসাইটে ফিরে যান</span>
+                  </button>
+                </div>
+
+                <div className="p-2">
+                  <button
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      onLogout();
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white transition-all text-xs font-bold text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>লগআউট</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -420,135 +461,64 @@ export default function ManagementDashboard({
       {/* ========================================================= */}
       {/* 2. STATS OVERVIEW CARDS                                   */}
       {/* ========================================================= */}
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-          {/* Card 1 */}
-          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
             <div className="flex items-center justify-between text-gray-500 text-xs font-bold">
               <span>মোট ক্লায়েন্ট</span>
               <Users className="w-4 h-4 text-blue-600" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-gray-900 mt-1">
+            <div className="text-lg sm:text-2xl font-black text-gray-900 mt-1">
               {totalClientsCount} জন
             </div>
-            <div className="text-2xs text-gray-400 mt-0.5">নিবন্ধিত ফ্ল্যাট ক্রেতা</div>
+            <div className="text-2xs text-gray-400">নিবন্ধিত ফ্ল্যাট ক্রেতা</div>
           </div>
 
-          {/* Card 2 */}
-          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-200/80 bg-gradient-to-b from-white to-emerald-50/20 shadow-xs">
+          <div className="bg-white p-4 rounded-2xl border border-emerald-200/80 bg-gradient-to-b from-white to-emerald-50/20 shadow-xs">
             <div className="flex items-center justify-between text-[#006231] text-xs font-bold">
               <span>মোট সংগৃহীত টাকা</span>
               <DollarSign className="w-4 h-4 text-[#006231]" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-[#006231] mt-1">
+            <div className="text-lg sm:text-2xl font-black text-[#006231] mt-1">
               {formatBDT(totalCollections)}
             </div>
-            <div className="text-2xs text-[#006231] font-semibold mt-0.5">সকল ক্লায়েন্টের মোট পরিশোধ</div>
+            <div className="text-2xs text-[#006231] font-semibold">মোট পরিশোধ জমা</div>
           </div>
 
-          {/* Card 3 */}
-          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/20 shadow-xs">
+          <div className="bg-white p-4 rounded-2xl border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/20 shadow-xs">
             <div className="flex items-center justify-between text-amber-800 text-xs font-bold">
               <span>মোট বকেয়া কিস্তি</span>
               <Clock className="w-4 h-4 text-amber-600" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-amber-700 mt-1">
+            <div className="text-lg sm:text-2xl font-black text-amber-700 mt-1">
               {formatBDT(totalDues)}
             </div>
-            <div className="text-2xs text-amber-700 font-semibold mt-0.5">ভবিষ্যত সম্ভাব্য কিস্তি আদায়</div>
+            <div className="text-2xs text-amber-700 font-semibold">ভবিষ্যত প্রাপ্য কিস্তি</div>
           </div>
 
-          {/* Card 4 */}
-          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
+          <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
             <div className="flex items-center justify-between text-gray-500 text-xs font-bold">
-              <span>প্রজেক্টে এ পর্যন্ত ব্যয়</span>
+              <span>প্রজেক্টে মোট ব্যয়</span>
               <HardHat className="w-4 h-4 text-[#CE2028]" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-[#CE2028] mt-1">
+            <div className="text-lg sm:text-2xl font-black text-[#CE2028] mt-1">
               {formatBDT(totalConstructionSpent)}
             </div>
-            <div className="text-2xs text-gray-400 mt-0.5">{data.projects.length}টি সক্রিয় প্রজেক্টে খরচ</div>
+            <div className="text-2xs text-gray-400">{data.projects.length}টি প্রজেক্টে এ পর্যন্ত ব্যয়</div>
           </div>
         </div>
       </div>
 
       {/* ========================================================= */}
-      {/* 3. MANAGEMENT NAVIGATION TABS                             */}
+      {/* 3. MAIN WORKSPACE (SWITCHED VIA FOOTER NAVBAR)            */}
       {/* ========================================================= */}
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="flex items-center space-x-2 overflow-x-auto pb-2 border-b border-gray-200">
-          <button
-            onClick={() => setActiveTab('clients')}
-            className={`flex items-center space-x-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeTab === 'clients'
-                ? 'bg-[#CE2028] text-white shadow-md shadow-[#CE2028]/25'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>১. ক্লায়েন্ট ম্যানেজমেন্ট</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('payments')}
-            className={`flex items-center space-x-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeTab === 'payments'
-                ? 'bg-[#CE2028] text-white shadow-md shadow-[#CE2028]/25'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-            }`}
-          >
-            <DollarSign className="w-4 h-4" />
-            <span>২. টাকা জমার এন্ট্রি</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('projects')}
-            className={`flex items-center space-x-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeTab === 'projects'
-                ? 'bg-[#CE2028] text-white shadow-md shadow-[#CE2028]/25'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-            }`}
-          >
-            <Building2 className="w-4 h-4" />
-            <span>৩. প্রজেক্ট ও অগ্রগতি</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('expenses')}
-            className={`flex items-center space-x-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeTab === 'expenses'
-                ? 'bg-[#CE2028] text-white shadow-md shadow-[#CE2028]/25'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-            }`}
-          >
-            <Wallet className="w-4 h-4" />
-            <span>৪. প্রজেক্ট বাজেট ও খরচ</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('team')}
-            className={`flex items-center space-x-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeTab === 'team'
-                ? 'bg-[#CE2028] text-white shadow-md shadow-[#CE2028]/25'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-            }`}
-          >
-            <HardHat className="w-4 h-4" />
-            <span>৫. ম্যানেজমেন্ট টিম</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ========================================================= */}
-      {/* 4. TAB CONTENTS                                           */}
-      {/* ========================================================= */}
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 flex-1">
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-6 flex-1">
         
         {/* ======================================================= */}
         {/* TAB 1: CLIENT MANAGEMENT                                */}
         {/* ======================================================= */}
         {activeTab === 'clients' && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-fadeIn">
             {/* Action Bar */}
             <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="relative w-full sm:w-80">
@@ -641,7 +611,7 @@ export default function ManagementDashboard({
         {/* TAB 2: PAYMENT COLLECTION ENTRY                         */}
         {/* ======================================================= */}
         {activeTab === 'payments' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fadeIn">
             {/* Payment Entry Form (5 cols) */}
             <div className="lg:col-span-5 bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs space-y-4">
               <div className="border-b border-gray-100 pb-3">
@@ -655,7 +625,6 @@ export default function ManagementDashboard({
               </div>
 
               <form onSubmit={handleReceivePayment} className="space-y-4">
-                {/* Select Client */}
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                     কাস্টমার নির্বাচন করুন *
@@ -676,7 +645,6 @@ export default function ManagementDashboard({
                   </select>
                 </div>
 
-                {/* Amount */}
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                     টাকা জমার পরিমাণ (BDT) *
@@ -691,7 +659,6 @@ export default function ManagementDashboard({
                   />
                 </div>
 
-                {/* Date & Payment Method */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
@@ -723,7 +690,6 @@ export default function ManagementDashboard({
                   </div>
                 </div>
 
-                {/* Note / Receipt No */}
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                     রসিদ নম্বর বা নোট (ঐচ্ছিক)
@@ -792,7 +758,7 @@ export default function ManagementDashboard({
         {/* TAB 3: PROJECT MANAGEMENT & PROGRESS UPDATE             */}
         {/* ======================================================= */}
         {activeTab === 'projects' && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-fadeIn">
             <div className="flex items-center justify-between bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
               <div>
                 <h3 className="text-base font-bold text-gray-900">চলমান ও আসন্ন প্রজেক্টসমূহ</h3>
@@ -823,7 +789,6 @@ export default function ManagementDashboard({
                       </div>
                     </div>
 
-                    {/* Progress Slider & Input */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-xs font-bold text-gray-700">
                         <span>কাজের অগ্রগতি পরিবর্তন করুন:</span>
@@ -839,22 +804,18 @@ export default function ManagementDashboard({
                       />
                     </div>
 
-                    {/* Current Stage Text Input */}
                     <div>
                       <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">
                         বর্তমান চলমান কাজের বিবরণ (ফ্লোর/ফেজ)
                       </label>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="text"
-                          defaultValue={proj.currentStage}
-                          onBlur={(e) => handleUpdateProjectProgress(proj.id, proj.progress, e.target.value)}
-                          className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        defaultValue={proj.currentStage}
+                        onBlur={(e) => handleUpdateProjectProgress(proj.id, proj.progress, e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                      />
                     </div>
 
-                    {/* Budget & Client Summary */}
                     <div className="grid grid-cols-2 gap-2 pt-2 text-xs">
                       <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
                         <div className="text-2xs text-gray-400 font-bold">মোট বাজেট</div>
@@ -876,7 +837,7 @@ export default function ManagementDashboard({
         {/* TAB 4: PROJECT EXPENSE & SHORT BUDGET BREAKDOWN         */}
         {/* ======================================================= */}
         {activeTab === 'expenses' && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-fadeIn">
             {/* Top Project Selector & Budget Summary */}
             <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
@@ -921,7 +882,7 @@ export default function ManagementDashboard({
               <form onSubmit={handleAddExpense} className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-1 items-end">
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                    খরচের খাত / পর্যায় (যেমন: পাইলিং, ১ম-৫ম তলা ঢালাই) *
+                    খরচের পর্যায় / বিবরণ (যেমন: পাইলিং, ১ম-৫ম তলা ঢালাই) *
                   </label>
                   <input
                     type="text"
@@ -1017,7 +978,7 @@ export default function ManagementDashboard({
         {/* TAB 5: MANAGEMENT TEAM                                  */}
         {/* ======================================================= */}
         {activeTab === 'team' && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-fadeIn">
             <div className="flex items-center justify-between bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
               <div>
                 <h3 className="text-base font-bold text-gray-900">ম্যানেজমেন্ট টিম ও দায়িত্বপ্রাপ্ত কর্মকর্তাগণ</h3>
@@ -1036,7 +997,7 @@ export default function ManagementDashboard({
               {data.managementTeam.map((mem) => (
                 <div key={mem.id} className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs space-y-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 rounded-xl bg-red-50 text-[#CE2028] flex items-center justify-center font-black text-lg">
+                    <div className="w-12 h-12 rounded-full bg-red-50 text-[#CE2028] flex items-center justify-center font-black text-lg">
                       <HardHat className="w-6 h-6" />
                     </div>
                     <div>
@@ -1056,6 +1017,38 @@ export default function ManagementDashboard({
         )}
 
       </main>
+
+      {/* ========================================================= */}
+      {/* 4. STICKY FOOTER NAVBAR (ALL 5 MANAGEMENT OPTIONS AT BOTTOM) */}
+      {/* ========================================================= */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl py-1.5 px-2">
+        <div className="grid grid-cols-5 max-w-lg mx-auto gap-1">
+          {managementNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all cursor-pointer relative ${
+                  isActive 
+                    ? 'text-[#CE2028] font-black' 
+                    : 'text-gray-500 hover:text-gray-800 font-semibold'
+                }`}
+              >
+                {/* Active indicator dot */}
+                {isActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
+                )}
+                <Icon className={`w-5 h-5 ${isActive ? 'scale-110 text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
+                <span className="text-3xs mt-1 tracking-tight text-center truncate max-w-full">
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
 
       {/* ========================================================= */}
       {/* MODAL 1: ADD CLIENT                                       */}
