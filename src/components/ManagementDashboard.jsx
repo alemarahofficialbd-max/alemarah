@@ -381,123 +381,250 @@ export default function ManagementDashboard({
 
   // Management Footer Navbar items (Exactly 5 icons)
   const managementNavItems = [
-    { id: 'clients', label: '১. ক্লায়েন্ট', icon: Users },
-    { id: 'payments', label: '২. জমা এন্ট্রি', icon: DollarSign },
-    { id: 'projects', label: '৩. প্রজেক্ট', icon: Building2 },
-    { id: 'expenses', label: '৪. বাজেট ও খরচ', icon: Wallet },
-    { id: 'team', label: '৫. টিম', icon: HardHat }
+    { id: 'clients', label: '১. ক্লায়েন্ট তালিকা ও নতুন এন্ট্রি', shortLabel: 'ক্লায়েন্ট', icon: Users },
+    { id: 'payments', label: '২. কিস্তি ও জমা এন্ট্রি', shortLabel: 'জমা এন্ট্রি', icon: DollarSign },
+    { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল ও স্টেজ', shortLabel: 'প্রজেক্ট', icon: Building2 },
+    { id: 'expenses', label: '৪. প্রজেক্ট বাজেট ও খরচ', shortLabel: 'বাজেট ও খরচ', icon: Wallet },
+    { id: 'team', label: '৫. ম্যানেজমেন্ট টিম ও অফিসার', shortLabel: 'টিম', icon: HardHat }
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans animate-fadeIn pb-28">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row font-sans animate-fadeIn">
       
       {/* ========================================================= */}
-      {/* 1. TOP APP BAR (HEADER)                                   */}
+      {/* 1. WEB VIEW: LEFT SIDEBAR NAVIGATION (SOFTWARE / ERP STYLE)*/}
       {/* ========================================================= */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-2xs py-2.5 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          
-          {/* Logo & Portal Status */}
-          <div className="flex items-center space-x-3">
+      <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-white border-r border-slate-200/80 h-screen sticky top-0 shrink-0 z-30 justify-between p-5 select-none">
+        
+        {/* Top: Logo & Manager Mini Card */}
+        <div className="space-y-6">
+          {/* Logo & Software Tag */}
+          <div>
             <button
               onClick={onNavigateHome}
-              className="flex items-center space-x-2 group cursor-pointer active:scale-95 transition-transform"
+              className="flex items-center space-x-2 group cursor-pointer text-left"
               title="ওয়েবসাইটে ফিরে যান"
             >
               <img 
                 src="/alemarah_logo_header.svg" 
                 alt="Al-Emarah Properties" 
-                className="h-8 sm:h-9 w-auto object-contain"
+                className="h-9 w-auto object-contain"
               />
             </button>
-            <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#CE2028] text-2xs sm:text-xs font-bold border border-red-200/60">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>ম্যানেজমেন্ট প্যানেল</span>
+            <div className="mt-2.5 inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#CE2028] text-3xs font-bold border border-red-200/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] animate-pulse"></span>
+              <span>ম্যানেজমেন্ট সফটওয়্যার v2.0</span>
             </div>
           </div>
 
-          {/* Right: Circular Manager Avatar & Menu */}
-          <div className="relative" ref={profileRef}>
-            <button
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="relative cursor-pointer rounded-full p-0 border-0 bg-transparent focus:outline-none transition-transform hover:scale-105 active:scale-95 block"
-              aria-expanded={isProfileOpen}
-              title="ম্যানেজমেন্ট মেনু"
-            >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white flex items-center justify-center font-black text-sm ring-2 ring-[#CE2028]/30 shadow-md">
+          {/* Manager Mini Profile Card in Sidebar */}
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center space-x-3">
+            <div className="relative shrink-0">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white flex items-center justify-center font-black text-sm shadow-2xs">
                 {admin?.name ? admin.name.slice(0, 2) : 'ম্যা'}
               </div>
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+              <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-xs font-black text-slate-900 truncate">
+                {admin?.name || 'অ্যাডমিন কর্মকর্তা'}
+              </div>
+              <div className="text-3xs text-[#006231] font-bold truncate">
+                {admin?.role || 'ম্যানেজমেন্ট টিম'}
+              </div>
+              <div className="text-3xs text-slate-400 font-semibold truncate">
+                {admin?.phone || '০১৯১৮-৬৪৬৫৭৫'}
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar Navigation Menu (All 5 Options on the Left) */}
+          <nav className="space-y-1.5 pt-1">
+            <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">
+              নেভিগেশন মেনু
+            </div>
+            {managementNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl transition-all text-xs font-bold cursor-pointer ${
+                    isActive
+                      ? 'bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white shadow-md shadow-[#CE2028]/25 scale-[1.02]'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {isActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Bottom Sidebar Actions */}
+        <div className="space-y-2 pt-4 border-t border-slate-100">
+          <a
+            href="tel:01918646575"
+            className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-2xs font-semibold transition-colors"
+          >
+            <Phone className="w-3.5 h-3.5 text-[#006231]" />
+            <span>হটলাইন: ০১৯১৮-৬৪৬৫৭৫</span>
+          </a>
+
+          <button
+            onClick={onNavigateHome}
+            className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+          >
+            <Home className="w-4 h-4 text-[#CE2028]" />
+            <span>ওয়েবসাইটে ফিরে যান</span>
+          </button>
+
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white text-xs font-bold transition-all cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>লগআউট</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* ========================================================= */}
+      {/* 2. MAIN WORKSPACE / CONTENT AREA (RIGHT SIDE IN WEB VIEW)  */}
+      {/* ========================================================= */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen pb-28 md:pb-10">
+
+        {/* Mobile-Only Top App Bar: Clean with Logo and Avatar (Badge removed) */}
+        <header className="md:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-2xs py-2.5 px-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={onNavigateHome}
+              className="flex items-center cursor-pointer text-left transition-transform active:scale-95"
+              title="ওয়েবসাইটে ফিরে যান"
+            >
+              <img 
+                src="/alemarah_logo_header.svg" 
+                alt="Al-Emarah Properties" 
+                className="h-8 w-auto object-contain"
+              />
             </button>
 
-            {/* Mobile Backdrop Overlay */}
-            {isProfileOpen && (
-              <div 
-                className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs sm:hidden"
-                onClick={() => setIsProfileOpen(false)}
-              />
-            )}
+            {/* Right: Circular Manager Avatar & Menu for Mobile */}
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="relative cursor-pointer rounded-full p-0 border-0 bg-transparent focus:outline-none transition-transform hover:scale-105 active:scale-95 block"
+                aria-expanded={isProfileOpen}
+                title="ম্যানেজমেন্ট মেনু"
+              >
+                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white flex items-center justify-center font-black text-xs ring-2 ring-[#CE2028]/30 shadow-xs">
+                  {admin?.name ? admin.name.slice(0, 2) : 'ম্যা'}
+                </div>
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+              </button>
 
-            {/* Manager Profile Popup Drawer / Dropdown */}
-            {isProfileOpen && (
-              <div className="fixed inset-x-4 top-16 sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2.5 w-auto sm:w-72 max-w-sm mx-auto sm:mx-0 bg-white rounded-3xl shadow-2xl border border-slate-100 py-3 z-50 animate-fadeIn divide-y divide-slate-100">
-                <div className="px-5 py-3">
-                  <div className="text-sm font-black text-slate-900 truncate">
-                    {admin?.name || 'অ্যাডমিন কর্মকর্তা'}
+              {/* Mobile Backdrop Overlay */}
+              {isProfileOpen && (
+                <div 
+                  className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs"
+                  onClick={() => setIsProfileOpen(false)}
+                />
+              )}
+
+              {/* Manager Profile Popup Drawer / Dropdown */}
+              {isProfileOpen && (
+                <div className="fixed inset-x-4 top-16 max-w-sm mx-auto bg-white rounded-3xl shadow-2xl border border-slate-100 py-3 z-50 animate-fadeIn divide-y divide-slate-100">
+                  <div className="px-5 py-3">
+                    <div className="text-sm font-black text-slate-900 truncate">
+                      {admin?.name || 'অ্যাডমিন কর্মকর্তা'}
+                    </div>
+                    <div className="text-xs text-[#006231] font-semibold mt-0.5">
+                      {admin?.role || 'ম্যানেজমেন্ট টিম'}
+                    </div>
+                    <div className="text-2xs text-slate-400 mt-0.5">
+                      মোবাইল: {admin?.phone || '০১৯১৮-৬৪৬৫৭৫'}
+                    </div>
                   </div>
-                  <div className="text-xs text-[#006231] font-semibold mt-0.5">
-                    {admin?.role || 'ম্যানেজমেন্ট টিম'}
+
+                  <div className="p-2 space-y-1 text-xs font-bold text-slate-700">
+                    <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        onNavigateHome();
+                      }}
+                      className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left cursor-pointer"
+                    >
+                      <Home className="w-4 h-4 text-[#CE2028]" />
+                      <span>ওয়েবসাইটে ফিরে যান</span>
+                    </button>
+                    <a
+                      href="tel:01918646575"
+                      className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left"
+                    >
+                      <Phone className="w-4 h-4 text-[#006231]" />
+                      <span>সাইট হটলাইনে কল করুন</span>
+                    </a>
                   </div>
-                  <div className="text-2xs text-slate-400 mt-0.5">
-                    মোবাইল: {admin?.phone || '০১৯১৮-৬৪৬৫৭৫'}
+
+                  <div className="p-2">
+                    <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        onLogout();
+                      }}
+                      className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white transition-all text-xs font-bold text-left cursor-pointer active:scale-95"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>লগআউট</span>
+                    </button>
                   </div>
                 </div>
-
-                <div className="p-2 space-y-1 text-xs font-bold text-slate-700">
-                  <button
-                    onClick={() => {
-                      setIsProfileOpen(false);
-                      onNavigateHome();
-                    }}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left cursor-pointer"
-                  >
-                    <Home className="w-4 h-4 text-[#CE2028]" />
-                    <span>ওয়েবসাইটে ফিরে যান</span>
-                  </button>
-                  <a
-                    href="tel:01918646575"
-                    className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left"
-                  >
-                    <Phone className="w-4 h-4 text-[#006231]" />
-                    <span>সাইট হটলাইনে কল করুন</span>
-                  </a>
-                </div>
-
-                <div className="p-2">
-                  <button
-                    onClick={() => {
-                      setIsProfileOpen(false);
-                      onLogout();
-                    }}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white transition-all text-xs font-bold text-left cursor-pointer active:scale-95"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>লগআউট</span>
-                  </button>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Floating Success Toast Alert */}
-      {successAlert && (
-        <div className="fixed top-16 right-4 z-50 bg-[#006231] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-2 text-xs sm:text-sm font-bold animate-fadeIn">
-          <CheckCircle2 className="w-5 h-5 text-[#8EBF40]" />
-          <span>{successAlert}</span>
-        </div>
-      )}
+        {/* Desktop-Only Subtle Top Bar (Breadcrumb & Live Project Tag) */}
+        <header className="hidden md:flex items-center justify-between px-6 lg:px-8 py-4 bg-white/60 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-20">
+          <div>
+            <h1 className="text-base font-black text-slate-900">
+              {managementNavItems.find(i => i.id === activeTab)?.label}
+            </h1>
+            <p className="text-2xs text-slate-500">
+              সিস্টেম স্ট্যাটাস: <strong className="text-slate-800">কেন্দ্রীয় ডেটাবেজ লাইভ সিঙ্কড</strong>
+            </p>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-red-50 text-[#CE2028] text-xs font-bold border border-red-200/60">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>অ্যাডমিন কন্ট্রোল এক্সেস</span>
+            </div>
+            <button
+              onClick={onNavigateHome}
+              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+            >
+              <Home className="w-3.5 h-3.5 text-[#8EBF40]" />
+              <span>ওয়েবসাইট</span>
+            </button>
+          </div>
+        </header>
+
+        {/* Floating Success Toast Alert */}
+        {successAlert && (
+          <div className="fixed top-16 right-4 z-50 bg-[#006231] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-2 text-xs sm:text-sm font-bold animate-fadeIn">
+            <CheckCircle2 className="w-5 h-5 text-[#8EBF40]" />
+            <span>{successAlert}</span>
+          </div>
+        )}
 
       {/* ========================================================= */}
       {/* 2. STATS OVERVIEW CARDS (PHONE OPTIMIZED)                 */}
@@ -1197,11 +1324,12 @@ export default function ManagementDashboard({
         )}
 
       </main>
+      </div>
 
       {/* ========================================================= */}
-      {/* 4. FLOATING PILL FOOTER NAVBAR (EXACTLY 5 ICONS)          */}
+      {/* 4. FLOATING PILL FOOTER NAVBAR (EXACTLY 5 ICONS - PHONE ONLY) */}
       {/* ========================================================= */}
-      <nav className="fixed bottom-3 left-4 right-4 z-50 max-w-sm sm:max-w-md mx-auto">
+      <nav className="md:hidden fixed bottom-3 left-4 right-4 z-50 max-w-sm sm:max-w-md mx-auto">
         <div className="bg-white/95 backdrop-blur-2xl border border-slate-200 shadow-2xl rounded-full py-1.5 px-3 flex items-center justify-around ring-1 ring-black/5">
           {managementNavItems.map((item) => {
             const Icon = item.icon;
@@ -1210,7 +1338,7 @@ export default function ManagementDashboard({
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                aria-label={item.label}
+                aria-label={item.shortLabel || item.label}
                 title={item.label}
                 className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
                   isActive 
