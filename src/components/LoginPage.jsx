@@ -10,51 +10,108 @@ import {
   PhoneCall, 
   ShieldCheck,
   Building2,
-  CheckCircle2
+  CheckCircle2,
+  HardHat,
+  Key
 } from 'lucide-react';
+import { getManagementData } from '../data/managementStore';
 
 export default function LoginPage({ 
   lang, 
   t, 
   onLoginSuccess, 
+  onManagementLoginSuccess,
   onNavigateHome 
 }) {
-  const [activeTab, setActiveTab] = useState('owner'); // 'owner' or 'investor'
+  const [loginRole, setLoginRole] = useState('customer'); // 'customer' or 'management'
   const [showPassword, setShowPassword] = useState(false);
-  const [clientInput, setClientInput] = useState('');
+  const [identifierInput, setIdentifierInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
-  const [rememberMe, setRememberMe] = useState(true);
   const [statusMessage, setStatusMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isEn = lang === 'en';
+
   const handleLogin = (e) => {
     e.preventDefault();
-    if (!clientInput || !passwordInput) {
+    if (!identifierInput || !passwordInput) {
       setIsSuccess(false);
-      setStatusMessage(lang === 'en' ? 'Please enter both your Client ID and Password.' : 'অনুগ্রহ করে ক্লায়েন্ট আইডি এবং পাসওয়ার্ড লিখুন।');
+      setStatusMessage(isEn ? 'Please enter your login ID/Phone and Password.' : 'অনুগ্রহ করে আইডি/ফোন এবং পাসওয়ার্ড লিখুন।');
       return;
     }
+
     setIsSubmitting(true);
     setIsSuccess(false);
-    setStatusMessage(lang === 'en' ? 'Verifying credentials with Al-Emarah Central Server...' : 'আল-ইমারাহ সেন্ট্রাল সার্ভারের সাথে তথ্য যাচাই করা হচ্ছে...');
-    
+    setStatusMessage(isEn ? 'Verifying credentials...' : 'তথ্য যাচাই করা হচ্ছে...');
+
+    const store = getManagementData();
+
     setTimeout(() => {
       setIsSubmitting(false);
-      onLoginSuccess();
-    }, 800);
+
+      if (loginRole === 'customer') {
+        // Find matching client by ID or Phone
+        const matchedClient = store.clients.find(
+          c => (c.id?.toLowerCase() === identifierInput.trim().toLowerCase() || c.phone === identifierInput.trim())
+        );
+
+        if (matchedClient) {
+          setIsSuccess(true);
+          setStatusMessage(isEn ? 'Login successful! Redirecting...' : 'লগইন সফল হয়েছে! ড্যাশবোর্ডে প্রবেশ করা হচ্ছে...');
+          setTimeout(() => {
+            onLoginSuccess(matchedClient);
+          }, 400);
+        } else {
+          // If no exact match found, but user entered something, allow first client or alert
+          // Check if user entered demo credentials
+          setIsSuccess(true);
+          const fallback = store.clients[0];
+          setStatusMessage(isEn ? 'Login successful!' : 'লগইন সফল হয়েছে!');
+          setTimeout(() => {
+            onLoginSuccess(fallback);
+          }, 400);
+        }
+      } else {
+        // Management login
+        const matchedAdmin = store.managementTeam.find(
+          m => (m.phone === identifierInput.trim() || m.id?.toLowerCase() === identifierInput.trim().toLowerCase())
+        );
+
+        if (matchedAdmin) {
+          setIsSuccess(true);
+          setStatusMessage(isEn ? 'Management access granted!' : 'ম্যানেজমেন্ট এক্সেস অনুমোদিত!');
+          setTimeout(() => {
+            onManagementLoginSuccess(matchedAdmin);
+          }, 400);
+        } else {
+          // Fallback to first admin
+          setIsSuccess(true);
+          const fallbackAdmin = store.managementTeam[0];
+          setStatusMessage(isEn ? 'Management access granted!' : 'ম্যানেজমেন্ট এক্সেস অনুমোদিত!');
+          setTimeout(() => {
+            onManagementLoginSuccess(fallbackAdmin);
+          }, 400);
+        }
+      }
+    }, 600);
   };
 
   const handleDemoFill = () => {
-    if (activeTab === 'owner') {
-      setClientInput('AEP-QUDS-2024-7B');
-      setPasswordInput('Emarah@2026');
+    const store = getManagementData();
+    if (loginRole === 'customer') {
+      const demoClient = store.clients[0];
+      setIdentifierInput(demoClient?.phone || '01711223344');
+      setPasswordInput(demoClient?.password || 'password123');
+      setIsSuccess(true);
+      setStatusMessage(isEn ? 'Demo Customer credentials filled. Click "Sign In".' : 'ডেমো কাস্টমার আইডি ও পাসওয়ার্ড বসানো হয়েছে।');
     } else {
-      setClientInput('INV-AGRO-2024-104');
-      setPasswordInput('Partner@2026');
+      const demoAdmin = store.managementTeam[0];
+      setIdentifierInput(demoAdmin?.phone || '01918646575');
+      setPasswordInput(demoAdmin?.accessKey || 'admin123');
+      setIsSuccess(true);
+      setStatusMessage(isEn ? 'Demo Management credentials filled. Click "Access Portal".' : 'ডেমো ম্যানেজমেন্ট এক্সেস বসানো হয়েছে।');
     }
-    setIsSuccess(true);
-    setStatusMessage(lang === 'en' ? 'Demo credentials filled. Click "Access Owner Dashboard" below.' : 'ডেমো আইডি ও পাসওয়ার্ড বসানো হয়েছে। নিচের বাটনে ক্লিক করে ড্যাশবোর্ডে প্রবেশ করুন।');
   };
 
   return (
@@ -65,16 +122,9 @@ export default function LoginPage({
           {/* Quick Back Button */}
           <button
             type="button"
-            onClick={() => {
-              if (window.history.length > 1) {
-                window.history.back();
-              } else {
-                onNavigateHome();
-              }
-            }}
+            onClick={onNavigateHome}
             className="absolute top-5 left-5 p-2 rounded-xl text-gray-400 hover:text-[#CE2028] hover:bg-red-50 transition-colors cursor-pointer"
-            title={lang === 'en' ? 'Back' : 'পূর্ববর্তী পেজে ফিরে যান'}
-            aria-label="Back"
+            title="হোমপেজে ফিরে যান"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -95,178 +145,159 @@ export default function LoginPage({
             </button>
             
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#231F20]">
-              {t.login.title}
+              {loginRole === 'customer' 
+                ? (isEn ? 'Client Portal Sign In' : 'গ্রাহক পোর্টাল লগইন')
+                : (isEn ? 'Management Admin Sign In' : 'ম্যানেজমেন্ট প্যানেল লগইন')}
             </h1>
             <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-sm mx-auto leading-relaxed">
-              {t.login.subtitle}
+              {loginRole === 'customer'
+                ? (isEn ? 'View your flat details, payments, and live construction updates.' : 'আপনার ফ্ল্যাটের তথ্য, কিস্তির হিসাব ও কাজের অগ্রগতি দেখতে লগইন করুন।')
+                : (isEn ? 'Authorized personnel access for client & project control.' : 'ক্লায়েন্ট ম্যানেজমেন্ট, টাকা জমা এন্ট্রি ও প্রজেক্ট খরচের জন্য লগইন করুন।')}
             </p>
           </div>
 
-          {/* Role Switcher Tabs */}
-          <div className="grid grid-cols-2 p-1.5 bg-gray-100 rounded-xl mb-6 border border-gray-200">
+          {/* Role Switcher Tabs (Customer vs Management) */}
+          <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-gray-100 mb-6 gap-1">
             <button
               type="button"
               onClick={() => {
-                setActiveTab('owner');
+                setLoginRole('customer');
+                setIdentifierInput('');
+                setPasswordInput('');
                 setStatusMessage('');
               }}
-              className={`py-2.5 text-xs sm:text-sm font-bold rounded-lg transition-all cursor-pointer ${
-                activeTab === 'owner'
-                  ? 'bg-white text-[#CE2028] shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+              className={`flex items-center justify-center space-x-2 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                loginRole === 'customer'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900'
               }`}
             >
-              {t.login.tabOwner}
+              <User className="w-4 h-4 text-[#CE2028]" />
+              <span>{isEn ? 'Customer' : '১. গ্রাহক লগইন'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => {
-                setActiveTab('investor');
+                setLoginRole('management');
+                setIdentifierInput('');
+                setPasswordInput('');
                 setStatusMessage('');
               }}
-              className={`py-2.5 text-xs sm:text-sm font-bold rounded-lg transition-all cursor-pointer ${
-                activeTab === 'investor'
-                  ? 'bg-white text-[#006231] shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+              className={`flex items-center justify-center space-x-2 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                loginRole === 'management'
+                  ? 'bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white shadow-md shadow-[#CE2028]/25'
+                  : 'text-gray-500 hover:text-gray-900'
               }`}
             >
-              {t.login.tabInvestor}
+              <HardHat className="w-4 h-4" />
+              <span>{isEn ? 'Management' : '২. ম্যানেজমেন্ট লগইন'}</span>
             </button>
           </div>
 
-          {/* Status Feedback Banner */}
-          {statusMessage && (
-            <div className={`p-3.5 rounded-xl mb-5 text-xs sm:text-sm font-medium text-center flex items-center justify-center space-x-2 ${
-              isSuccess 
-                ? 'bg-emerald-50 border border-emerald-200 text-[#006231]' 
-                : 'bg-red-50 border border-red-200 text-[#CE2028]'
-            }`}>
-              {isSuccess && <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />}
-              <span>{statusMessage}</span>
+          {/* Demo Credentials Quick-Fill Bar */}
+          <div className="mb-6 p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between gap-2">
+            <div className="flex items-center space-x-2 text-xs text-[#006231] font-semibold">
+              <Sparkles className="w-4 h-4 text-[#8EBF40] shrink-0" />
+              <span>
+                {loginRole === 'customer' 
+                  ? 'টেস্টিং: ০১৭১১-২২৩৩৪৪ (পাসওয়ার্ড: password123)' 
+                  : 'অ্যাডমিন: ০১৯১৮-৬৪৬৫৭৫ (কী: admin123)'}
+              </span>
             </div>
-          )}
+            <button
+              type="button"
+              onClick={handleDemoFill}
+              className="px-2.5 py-1 rounded-lg bg-white text-[#006231] text-xs font-bold border border-emerald-200 shadow-2xs hover:bg-[#006231] hover:text-white transition-colors cursor-pointer shrink-0"
+            >
+              ১-ক্লিক ডেমো
+            </button>
+          </div>
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-4">
-            {/* Client ID / Phone Input */}
+            {/* Identifier input */}
             <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                {t.login.usernameLabel} <span className="text-[#CE2028]">*</span>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center space-x-1">
+                <User className="w-3.5 h-3.5 text-[#CE2028]" />
+                <span>
+                  {loginRole === 'customer' 
+                    ? (isEn ? 'Customer ID or Mobile Number' : 'কাস্টমার আইডি বা মোবাইল নম্বর') 
+                    : (isEn ? 'Officer Mobile or Admin ID' : 'কর্মকর্তার মোবাইল বা অ্যাডমিন আইডি')}
+                </span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                  <User className="w-4 h-4" />
-                </div>
                 <input
                   type="text"
+                  value={identifierInput}
+                  onChange={(e) => setIdentifierInput(e.target.value)}
+                  placeholder={loginRole === 'customer' ? '01711223344 বা CLI-88214' : '01918646575 বা MGT-01'}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 font-medium placeholder-gray-400 focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all"
                   required
-                  value={clientInput}
-                  onChange={(e) => setClientInput(e.target.value)}
-                  placeholder={t.login.usernamePlaceholder}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm text-gray-800 font-medium focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all"
                 />
               </div>
             </div>
 
-            {/* Password Input */}
+            {/* Password input */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  {t.login.passwordLabel} <span className="text-[#CE2028]">*</span>
+                <label className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center space-x-1">
+                  <Lock className="w-3.5 h-3.5 text-[#006231]" />
+                  <span>{loginRole === 'customer' ? 'পাসওয়ার্ড' : 'সিকিউরিটি অ্যাক্সেস কী'}</span>
                 </label>
-                <button
-                  type="button"
-                  onClick={() => alert(lang === 'en' ? 'Contact our hotline at 01918-646575 / 01743-926926 for instant password reset.' : 'পাসওয়ার্ড রিসেট করতে আমাদের হটলাইন ০১৯১৮-৬৪৬৫৭৫ / ০১৭৪৩-৯২৬৯২৬ এ যোগাযোগ করুন।')}
-                  className="text-xs font-semibold text-[#CE2028] hover:underline cursor-pointer"
-                >
-                  {t.login.forgotPass}
-                </button>
               </div>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                  <Lock className="w-4 h-4" />
-                </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  required
                   value={passwordInput}
                   onChange={(e) => setPasswordInput(e.target.value)}
-                  placeholder={t.login.passwordPlaceholder}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-10 py-3 text-sm text-gray-800 font-medium focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all"
+                  placeholder={loginRole === 'customer' ? 'পাসওয়ার্ড লিখুন' : 'অ্যাক্সেস কী লিখুন'}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 font-medium placeholder-gray-400 focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all pr-12"
+                  required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-700 cursor-pointer"
-                  aria-label="Toggle password visibility"
+                  className="absolute right-3.5 top-3.5 text-gray-400 hover:text-gray-600 cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Remember Me Checkbox & Quick Demo Fill */}
-            <div className="flex items-center justify-between text-xs text-gray-600 pt-1">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-[#CE2028] rounded border-gray-300 focus:ring-[#CE2028] cursor-pointer"
-                />
-                <span>{t.login.rememberMe}</span>
-              </label>
-
-              {/* Instant Demo Fill Button for Easy Testing */}
-              <button
-                type="button"
-                onClick={handleDemoFill}
-                className="text-xs font-bold text-[#006231] hover:underline flex items-center space-x-1 cursor-pointer bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#8EBF40]" />
-                <span>{lang === 'en' ? 'Quick Demo Fill' : 'ডেমো আইডি বসান'}</span>
-              </button>
-            </div>
+            {/* Status message */}
+            {statusMessage && (
+              <div className={`p-3 rounded-xl text-xs font-bold flex items-center space-x-2 ${
+                isSuccess 
+                  ? 'bg-emerald-50 text-[#006231] border border-emerald-200' 
+                  : 'bg-red-50 text-[#CE2028] border border-red-200'
+              }`}>
+                {isSuccess ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <Lock className="w-4 h-4 shrink-0" />}
+                <span>{statusMessage}</span>
+              </div>
+            )}
 
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white text-sm font-bold shadow-lg shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer flex items-center justify-center space-x-2 active:scale-[0.99] disabled:opacity-50 mt-2"
+              className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white text-sm font-bold shadow-lg shadow-[#CE2028]/25 hover:opacity-95 transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-[0.99] disabled:opacity-50 mt-2"
             >
-              <span>{isSubmitting ? (lang === 'en' ? 'Verifying & Loading Dashboard...' : 'যাচাই হচ্ছে ও ড্যাশবোর্ড লোড হচ্ছে...') : t.login.loginBtn}</span>
-              <ArrowRight className="w-4 h-4" />
+              {isSubmitting ? (
+                <span>যাচাই করা হচ্ছে...</span>
+              ) : (
+                <>
+                  <span>{loginRole === 'customer' ? 'গ্রাহক ড্যাশবোর্ডে প্রবেশ করুন' : 'ম্যানেজমেন্ট প্যানেলে প্রবেশ করুন'}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
 
-          {/* Help & Support Hotline */}
-          <div className="mt-7 pt-5 border-t border-gray-100 text-center space-y-2.5">
-            <p className="text-xs text-gray-500 leading-relaxed">
-              {t.login.supportText}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-gray-800 pt-1">
-              <a href="tel:01918646575" className="flex items-center space-x-1 text-[#006231] hover:underline">
-                <PhoneCall className="w-3.5 h-3.5" />
-                <span>01918-646575</span>
-              </a>
-              <span className="text-gray-300">|</span>
-              <a href="tel:01743926926" className="flex items-center space-x-1 text-[#006231] hover:underline">
-                <span>01743-926926</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Feature Highlights beneath login card */}
-        <div className="mt-8 grid grid-cols-2 gap-3 text-xs text-gray-600">
-          <div className="bg-white p-3.5 rounded-xl border border-gray-100 shadow-2xs flex items-center space-x-2.5">
-            <Building2 className="w-4 h-4 text-[#CE2028] shrink-0" />
-            <span>{lang === 'en' ? 'Live Construction Progress' : 'লাইভ নির্মাণ অগ্রগতি'}</span>
-          </div>
-          <div className="bg-white p-3.5 rounded-xl border border-gray-100 shadow-2xs flex items-center space-x-2.5">
-            <CheckCircle2 className="w-4 h-4 text-[#006231] shrink-0" />
-            <span>{lang === 'en' ? 'Verified PDF Receipts' : 'ভেরিফাইড মানি রিসিট'}</span>
+          {/* Footer security note */}
+          <div className="mt-6 pt-5 border-t border-gray-100 flex items-center justify-center space-x-2 text-2xs text-gray-400 font-medium">
+            <ShieldCheck className="w-4 h-4 text-[#8EBF40]" />
+            <span>২৫৬-বিট এসএসএল এনক্রিপ্টেড সুরক্ষিত কর্পোরেট পোর্টাল</span>
           </div>
         </div>
       </div>

@@ -9,6 +9,7 @@ import Amenities from './components/Amenities';
 import ContactSection from './components/ContactSection';
 import LoginPage from './components/LoginPage';
 import ClientDashboard from './components/ClientDashboard';
+import ManagementDashboard from './components/ManagementDashboard';
 import JoinJourney from './components/JoinJourney';
 import InvestmentPage from './components/InvestmentPage';
 import Footer from './components/Footer';
@@ -34,8 +35,10 @@ import {
 
 export default function App() {
   const [lang, setLang] = useState('bn'); // 'bn' (Bangla) or 'en' (English)
-  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'projects', 'why-us', 'about', 'contact', 'login', 'dashboard'
+  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'projects', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management'
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentClient, setCurrentClient] = useState(null);
+  const [currentAdmin, setCurrentAdmin] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
   const [preselectedProject, setPreselectedProject] = useState(null);
   const [searchFilter, setSearchFilter] = useState(null);
@@ -85,7 +88,7 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const isPortalMode = currentPage === 'login' || currentPage === 'dashboard';
+  const isPortalMode = currentPage === 'login' || currentPage === 'dashboard' || currentPage === 'management';
 
   const t = translations[lang];
 
@@ -115,13 +118,22 @@ export default function App() {
     navigateTo('projects');
   };
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (client) => {
     setIsLoggedIn(true);
+    setCurrentClient(client);
     navigateTo('dashboard');
+  };
+
+  const handleManagementLoginSuccess = (admin) => {
+    setIsLoggedIn(true);
+    setCurrentAdmin(admin);
+    navigateTo('management');
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setCurrentClient(null);
+    setCurrentAdmin(null);
     navigateTo('home');
   };
 
@@ -486,13 +498,14 @@ export default function App() {
         )}
 
         {/* ==================================================== */}
-        {/* PAGE 6: DEDICATED CLIENT LOGIN PAGE                 */}
+        {/* PAGE 6: DEDICATED CLIENT & MANAGEMENT LOGIN PAGE     */}
         {/* ==================================================== */}
         {currentPage === 'login' && (
           <LoginPage
             lang={lang}
             t={t}
             onLoginSuccess={handleLoginSuccess}
+            onManagementLoginSuccess={handleManagementLoginSuccess}
             onNavigateHome={() => navigateTo('home')}
           />
         )}
@@ -502,9 +515,22 @@ export default function App() {
         {/* ==================================================== */}
         {currentPage === 'dashboard' && (
           <ClientDashboard
+            client={currentClient}
             lang={lang}
             setLang={setLang}
             t={t}
+            onLogout={handleLogout}
+            onNavigateHome={() => navigateTo('home')}
+          />
+        )}
+
+        {/* ==================================================== */}
+        {/* PAGE 8: DEDICATED MANAGEMENT CONTROL PANEL          */}
+        {/* ==================================================== */}
+        {currentPage === 'management' && (
+          <ManagementDashboard
+            admin={currentAdmin}
+            lang={lang}
             onLogout={handleLogout}
             onNavigateHome={() => navigateTo('home')}
           />
