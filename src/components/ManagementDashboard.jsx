@@ -21,7 +21,9 @@ import {
   Check, 
   Sparkles,
   TrendingUp,
-  FileSpreadsheet
+  FileSpreadsheet,
+  MapPin,
+  CreditCard
 } from 'lucide-react';
 import { 
   formatBDT, 
@@ -688,7 +690,7 @@ export default function ManagementDashboard({
         {activeTab === 'clients' && (
           <div className="space-y-4 animate-fadeIn">
             {/* Search & Project Filter Bar */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3.5">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="relative w-full sm:w-80">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -697,7 +699,7 @@ export default function ManagementDashboard({
                     placeholder="নাম, ফোন বা আইডি দিয়ে খুঁজুন..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all"
                   />
                 </div>
 
@@ -710,28 +712,29 @@ export default function ManagementDashboard({
                 </button>
               </div>
 
-              {/* Project Filter Pills */}
-              <div className="flex items-center space-x-2 overflow-x-auto pb-1 text-2xs font-semibold">
+              {/* Project Filter Pills (with no-scrollbar) */}
+              <div className="flex items-center space-x-2 overflow-x-auto pb-1 text-2xs font-semibold no-scrollbar">
                 <button
                   onClick={() => setProjectFilter('all')}
-                  className={`px-3 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all cursor-pointer ${
                     projectFilter === 'all'
-                      ? 'bg-slate-900 text-white font-bold'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-slate-900 text-white font-bold shadow-xs'
+                      : 'bg-slate-100 hover:bg-slate-200/80 text-slate-600 border border-slate-200/60'
                   }`}
                 >
                   সব প্রজেক্ট ({data.clients.length})
                 </button>
                 {data.projects.map(p => {
                   const count = data.clients.filter(c => c.projectId === p.id).length;
+                  const isSelected = projectFilter === p.id;
                   return (
                     <button
                       key={p.id}
                       onClick={() => setProjectFilter(p.id)}
-                      className={`px-3 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
-                        projectFilter === p.id
-                          ? 'bg-[#006231] text-white font-bold'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      className={`px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#006231] text-white font-bold shadow-xs'
+                          : 'bg-slate-100 hover:bg-slate-200/80 text-slate-600 border border-slate-200/60'
                       }`}
                     >
                       {p.name} ({count})
@@ -741,47 +744,101 @@ export default function ManagementDashboard({
               </div>
             </div>
 
-            {/* Mobile-First Clients Cards View */}
-            <div className="block md:hidden space-y-3">
+            {/* Mobile-First Clients Cards View (Clean, Well-Organized ERP Style) */}
+            <div className="block md:hidden space-y-3.5">
               {filteredClients.map((cl) => {
                 const due = (cl.totalPrice || 0) - (cl.totalPaid || 0);
                 const percent = cl.totalPrice ? Math.round((cl.totalPaid / cl.totalPrice) * 100) : 0;
                 return (
-                  <div key={cl.id} className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-                    <div className="flex items-start justify-between border-b border-slate-100 pb-2.5">
-                      <div>
-                        <div className="font-black text-slate-900 text-sm">{cl.name}</div>
-                        <div className="text-2xs text-slate-500 font-medium">মোবাইল: {cl.phone} • আইডি: {cl.id}</div>
+                  <div key={cl.id} className="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all p-4 space-y-3.5">
+                    
+                    {/* Header: Customer Info + Compact Unit Tag */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center space-x-3 min-w-0">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
+                          {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-black text-slate-900 text-sm truncate">
+                            {cl.name}
+                          </h4>
+                          <div className="flex items-center space-x-1.5 text-2xs text-slate-500 font-medium truncate mt-0.5">
+                            <span>{cl.phone}</span>
+                            <span>•</span>
+                            <span className="font-mono text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded text-3xs font-semibold">
+                              {cl.id}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <span className="text-3xs font-bold text-[#006231] bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                        {cl.flatNo}
-                      </span>
+
+                      {/* Clean Unit Badge (Compact, not bloated) */}
+                      <div className="shrink-0 text-right">
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-200/70 text-2xs font-bold shadow-2xs">
+                          <Building2 className="w-3 h-3 text-[#006231]" />
+                          <span>{cl.flatNo}</span>
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="text-xs text-slate-600 font-medium">
-                      প্রকল্প: <strong className="text-slate-900">{cl.projectName}</strong>
+                    {/* Project Name Strip */}
+                    <div className="flex items-center space-x-1.5 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+                      <MapPin className="w-3.5 h-3.5 text-[#CE2028] shrink-0" />
+                      <span className="text-slate-500 font-medium">প্রকল্প:</span>
+                      <strong className="text-slate-900 font-bold">{cl.projectName}</strong>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-center">
-                      <div>
-                        <div className="text-3xs text-slate-400 font-bold uppercase">মোট মূল্য</div>
-                        <div className="text-xs font-black text-slate-800 truncate">{formatBDT(cl.totalPrice)}</div>
+                    {/* Financial Progress Bar & Metrics */}
+                    <div className="space-y-2 bg-slate-50/60 p-3 rounded-2xl border border-slate-100">
+                      <div className="flex items-center justify-between text-2xs font-bold">
+                        <span className="text-emerald-700 flex items-center space-x-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                          <span>পরিশোধিত: {percent}%</span>
+                        </span>
+                        <span className="text-amber-800">
+                          বাকি: {formatBDT(due)}
+                        </span>
                       </div>
-                      <div>
-                        <div className="text-3xs text-[#006231] font-bold uppercase">পরিশোধ ({percent}%)</div>
-                        <div className="text-xs font-black text-[#006231] truncate">{formatBDT(cl.totalPaid)}</div>
+
+                      <div className="w-full bg-slate-200/70 rounded-full h-2 overflow-hidden">
+                        <div 
+                          className="bg-gradient-to-r from-[#006231] to-[#8EBF40] h-full rounded-full transition-all duration-500" 
+                          style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+                        />
                       </div>
-                      <div>
-                        <div className="text-3xs text-amber-700 font-bold uppercase">বকেয়া বাকি</div>
-                        <div className="text-xs font-black text-amber-700 truncate">{formatBDT(due)}</div>
+
+                      {/* 3-Column Clean Financial Grid */}
+                      <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                        <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
+                          <div className="text-3xs text-slate-400 font-bold uppercase tracking-wider">মোট চুক্তি</div>
+                          <div className="text-xs font-black text-slate-800 truncate mt-0.5">{formatBDT(cl.totalPrice)}</div>
+                        </div>
+                        <div className="bg-white p-2 rounded-xl border border-emerald-100 shadow-2xs">
+                          <div className="text-3xs text-[#006231] font-bold uppercase tracking-wider">পরিশোধিত</div>
+                          <div className="text-xs font-black text-[#006231] truncate mt-0.5">{formatBDT(cl.totalPaid)}</div>
+                        </div>
+                        <div className="bg-white p-2 rounded-xl border border-amber-100 shadow-2xs">
+                          <div className="text-3xs text-amber-800 font-bold uppercase tracking-wider">বকেয়া</div>
+                          <div className="text-xs font-black text-amber-700 truncate mt-0.5">{formatBDT(due)}</div>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-1">
-                      <div className="text-2xs text-slate-500">
-                        পরবর্তী কিস্তি: <span className="font-bold text-slate-900">{cl.nextDueDate}</span>
-                        <div className="font-black text-[#CE2028]">{formatBDT(cl.nextDueAmount)}</div>
+                    {/* Bottom Row: Next Installment & Solid Action Button */}
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center space-x-1 text-3xs text-slate-400 font-bold uppercase">
+                          <Calendar className="w-3 h-3 text-slate-400" />
+                          <span>পরবর্তী কিস্তি</span>
+                        </div>
+                        <div className="text-xs font-bold text-slate-800">
+                          {cl.nextDueDate}
+                        </div>
+                        <div className="text-xs font-black text-[#CE2028]">
+                          {formatBDT(cl.nextDueAmount)}
+                        </div>
                       </div>
+
                       <button
                         onClick={() => {
                           setPaymentForm({
@@ -791,11 +848,13 @@ export default function ManagementDashboard({
                           });
                           setActiveTab('payments');
                         }}
-                        className="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#006231] text-[#006231] hover:text-white font-bold text-xs border border-emerald-200 transition-colors cursor-pointer active:scale-95"
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white hover:opacity-95 font-bold text-xs shadow-sm shadow-[#006231]/20 flex items-center space-x-1.5 transition-all cursor-pointer active:scale-95"
                       >
-                        + জমা নিন
+                        <DollarSign className="w-3.5 h-3.5" />
+                        <span>+ জমা নিন</span>
                       </button>
                     </div>
+
                   </div>
                 );
               })}
@@ -819,11 +878,19 @@ export default function ManagementDashboard({
                   <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
                     {filteredClients.map((cl) => {
                       const due = (cl.totalPrice || 0) - (cl.totalPaid || 0);
+                      const percent = cl.totalPrice ? Math.round((cl.totalPaid / cl.totalPrice) * 100) : 0;
                       return (
                         <tr key={cl.id} className="hover:bg-slate-50/80 transition-colors">
                           <td className="py-4 px-6">
-                            <div className="font-bold text-slate-900">{cl.name}</div>
-                            <div className="text-2xs text-slate-500">{cl.phone} • {cl.id}</div>
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0">
+                                {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
+                              </div>
+                              <div>
+                                <div className="font-bold text-slate-900">{cl.name}</div>
+                                <div className="text-2xs text-slate-500">{cl.phone} • {cl.id}</div>
+                              </div>
+                            </div>
                           </td>
                           <td className="py-4 px-6">
                             <div className="font-bold text-slate-800">{cl.projectName}</div>
@@ -833,7 +900,10 @@ export default function ManagementDashboard({
                             {formatBDT(cl.totalPrice)}
                           </td>
                           <td className="py-4 px-6 font-black text-[#006231]">
-                            {formatBDT(cl.totalPaid)}
+                            <div>{formatBDT(cl.totalPaid)}</div>
+                            <span className="text-3xs font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded">
+                              {percent}% আদায়
+                            </span>
                           </td>
                           <td className="py-4 px-6 font-bold text-amber-700">
                             {formatBDT(due)}
@@ -852,7 +922,7 @@ export default function ManagementDashboard({
                                 });
                                 setActiveTab('payments');
                               }}
-                              className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-[#006231] text-[#006231] hover:text-white font-bold text-xs border border-emerald-200 transition-colors cursor-pointer"
+                              className="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#006231] text-[#006231] hover:text-white font-bold text-xs border border-emerald-200 transition-all cursor-pointer active:scale-95"
                             >
                               + জমা এন্ট্রি
                             </button>

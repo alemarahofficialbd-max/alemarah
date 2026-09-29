@@ -9,19 +9,20 @@
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Subtle & Neutral */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ce2028;
-  border-radius: 4px;
+  background: #cbd5e1;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a9141b;
+  background: #94a3b8;
 }
 
 /* Brand Gradient Utilities */
