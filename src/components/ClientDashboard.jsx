@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Building2, 
   User, 
   LogOut, 
   CheckCircle2, 
   Clock, 
-  Calendar, 
   DollarSign, 
   FileText, 
   Phone, 
@@ -17,7 +16,17 @@ import {
   Home, 
   Check,
   CreditCard,
-  ChevronRight
+  ChevronRight,
+  Copy,
+  Download,
+  Printer,
+  Calendar,
+  Layers,
+  ArrowUpRight,
+  MessageCircle,
+  HelpCircle,
+  Lock,
+  X
 } from 'lucide-react';
 import { formatBDT, getManagementData } from '../data/managementStore';
 
@@ -28,16 +37,18 @@ export default function ClientDashboard({
   onLogout, 
   onNavigateHome 
 }) {
-  const [activeTab, setActiveTab] = useState('details'); // 'details', 'payments', 'progress', 'profile'
+  const [activeTab, setActiveTab] = useState('details'); // 'details', 'payments', 'progress', 'history', 'profile'
   
-  // Load management data to ensure we always have the latest client & project data
+  // Load management data to ensure sync with admin updates
   const mgtData = getManagementData();
   const client = propClient || mgtData.clients[0];
-  
-  // Find project details for this client
   const project = mgtData.projects.find(p => p.id === client?.projectId) || mgtData.projects[0];
 
-  // Profile Photo state stored in localStorage per client
+  // Selected receipt modal
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [copiedAccount, setCopiedAccount] = useState(false);
+
+  // Profile Photo state stored in localStorage
   const [avatarImage, setAvatarImage] = useState(() => {
     try {
       return localStorage.getItem(`alemarah_avatar_${client?.id}`) || null;
@@ -72,8 +83,14 @@ export default function ClientDashboard({
     reader.readAsDataURL(file);
   };
 
+  const copyBankInfo = () => {
+    navigator.clipboard?.writeText('1501204893001');
+    setCopiedAccount(true);
+    setTimeout(() => setCopiedAccount(false), 2000);
+  };
+
   return (
-    <div className="min-h-screen bg-[#F4F5F7] text-gray-900 flex flex-col font-sans animate-fadeIn pb-24">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans animate-fadeIn pb-28">
       {/* Hidden File Input for Profile Avatar */}
       <input 
         ref={avatarInputRef}
@@ -84,17 +101,16 @@ export default function ClientDashboard({
       />
 
       {/* ========================================================= */}
-      {/* 1. TOP HEADER (CLEAN & ELEGANT, NO TOP AVATAR)            */}
+      {/* 1. ULTRA-SLEEK MOBILE APP BAR (HEADER)                    */}
       {/* ========================================================= */}
-      <header className="bg-white border-b border-gray-200 py-3 px-4 sm:px-6 lg:px-8 shadow-2xs sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          
-          {/* Left: Brand Logo & Secured Portal Tag */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-2xs py-2.5 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          {/* Logo & Portal Status */}
+          <div className="flex items-center space-x-3">
             <button
               onClick={onNavigateHome}
-              className="flex items-center space-x-2 group cursor-pointer text-left"
-              title="ওয়েবসাইটে ফিরে যান"
+              className="flex items-center space-x-2 group cursor-pointer text-left transition-transform active:scale-95"
+              title="ওয়েবসাইটে ফিরে যান"
             >
               <img 
                 src="/alemarah_logo_header.svg" 
@@ -102,41 +118,53 @@ export default function ClientDashboard({
                 className="h-8 sm:h-9 w-auto object-contain"
               />
             </button>
-            <span className="text-gray-200 hidden sm:inline">|</span>
-            <div className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-[#006231] text-xs font-bold border border-emerald-100">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#8EBF40]" />
+            <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-[#006231] text-2xs sm:text-xs font-bold border border-emerald-200/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>গ্রাহক পোর্টাল</span>
             </div>
           </div>
 
-          {/* Right: Quick Action to Return to Website */}
-          <button
-            onClick={onNavigateHome}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition-colors cursor-pointer"
-          >
-            <Home className="w-3.5 h-3.5 text-[#CE2028]" />
-            <span className="hidden sm:inline">ওয়েবসাইটে ফিরে যান</span>
-            <span className="sm:hidden">ওয়েবসাইট</span>
-          </button>
+          {/* Quick Return to Website & Hotline */}
+          <div className="flex items-center space-x-2">
+            <a
+              href="tel:01918646575"
+              className="p-2 sm:px-3 sm:py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center space-x-1 transition-colors"
+              title="হটলাইনে কল করুন"
+            >
+              <Phone className="w-3.5 h-3.5 text-[#006231]" />
+              <span className="hidden sm:inline">সহযোগিতা</span>
+            </a>
+            <button
+              onClick={onNavigateHome}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
+            >
+              <Home className="w-3.5 h-3.5 text-[#8EBF40]" />
+              <span className="hidden sm:inline">ওয়েবসাইট</span>
+            </button>
+          </div>
         </div>
       </header>
 
       {/* ========================================================= */}
-      {/* 2. MAIN WORKSPACE: CONTROLLED BY FOOTER NAVBAR            */}
+      {/* 2. DYNAMIC WORKSPACE (CONTROLLED BY BOTTOM NAVBAR)        */}
       {/* ========================================================= */}
-      <main className="max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6 flex-1">
+      <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 pt-5 space-y-6 flex-1">
 
-        {/* ======================================================= */}
-        {/* SECTION 1: CUSTOMER & PROPERTY DETAILS                  */}
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
+        {/* TAB 1: কাস্টমার ও ফ্ল্যাট তথ্য (DETAILS)                  */}
+        {/* ------------------------------------------------------- */}
         {activeTab === 'details' && (
-          <div className="space-y-6 animate-fadeIn">
-            {/* Customer Welcome Card */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#1C1819] via-[#2A2223] to-[#1C1819] text-white shadow-xl relative overflow-hidden">
-              <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
-                {/* Profile Photo */}
+          <div className="space-y-5 animate-fadeIn">
+            {/* VIP Customer Profile Banner Card */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#111827] via-[#1F2937] to-[#0F172A] text-white p-6 sm:p-7 shadow-xl border border-slate-700/50">
+              {/* Background ambient glow circles */}
+              <div className="absolute top-0 right-0 -mr-16 -mt-16 w-60 h-60 rounded-full bg-[#006231]/30 blur-3xl pointer-events-none"></div>
+              <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-60 h-60 rounded-full bg-[#CE2028]/20 blur-3xl pointer-events-none"></div>
+
+              <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+                {/* Profile Avatar with quick tap to change */}
                 <div 
-                  className="relative cursor-pointer shrink-0" 
+                  className="relative cursor-pointer shrink-0 group"
                   onClick={() => avatarInputRef.current?.click()}
                   title="ছবি আপলোড করতে ক্লিক করুন"
                 >
@@ -144,291 +172,401 @@ export default function ClientDashboard({
                     <img 
                       src={avatarImage} 
                       alt={client?.name} 
-                      className="w-20 h-20 rounded-full object-cover ring-4 ring-emerald-500 shadow-lg"
+                      className="w-20 h-20 sm:w-22 sm:h-22 rounded-full object-cover ring-4 ring-emerald-500 shadow-2xl transition-transform group-hover:scale-105"
                     />
                   ) : (
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-2xl shadow-lg ring-4 ring-emerald-400">
+                    <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-2xl shadow-xl ring-4 ring-emerald-400">
                       {client?.name ? client.name.slice(0, 2) : 'গ্রা'}
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center text-white opacity-0 hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
                     <Camera className="w-6 h-6" />
                   </div>
+                  <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[#111827]"></span>
                 </div>
 
                 <div className="space-y-1.5 flex-1">
-                  <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-bold text-[#8EBF40]">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>আইডি: {client?.id}</span>
+                  <div className="inline-flex items-center space-x-1.5 px-3 py-0.5 rounded-full bg-white/10 text-2xs font-bold text-[#8EBF40] border border-white/10">
+                    <Sparkles className="w-3 h-3 text-[#8EBF40]" />
+                    <span>নিবন্ধিত প্রিমিয়াম ক্লায়েন্ট</span>
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+                  <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
                     {client?.name}
                   </h1>
-                  <p className="text-xs sm:text-sm text-gray-300">
-                    মোবাইল নম্বর: <strong className="text-white">{client?.phone}</strong>
+                  <p className="text-xs text-slate-300 font-medium">
+                    মোবাইল: <strong className="text-white font-mono">{client?.phone}</strong> • আইডি: <span className="font-mono text-emerald-400 font-bold">{client?.id}</span>
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Property Specification Details Card */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-5">
-              <div className="border-b border-gray-100 pb-3">
-                <h2 className="text-lg font-bold text-gray-900 flex items-center space-x-2">
-                  <Building2 className="w-5 h-5 text-[#CE2028]" />
-                  <span>ক্রয়কৃত প্রজেক্ট ও ফ্ল্যাটের বিবরণ</span>
-                </h2>
-                <p className="text-xs text-gray-500 mt-0.5">আপনার বরাদ্দকৃত অ্যাপার্টমেন্ট ও চুক্তিভিত্তিক সম্পত্তি</p>
+            {/* Flat & Property Details Card */}
+            <div className="bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 rounded-xl bg-red-50 text-[#CE2028] flex items-center justify-center">
+                    <Building2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-slate-900">বরাদ্দকৃত অ্যাপার্টমেন্ট বিবরণ</h2>
+                    <p className="text-2xs text-slate-500">আপনার ক্রয়কৃত সম্পত্তির মূল তথ্যাদি</p>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-[#006231] font-bold text-2xs border border-emerald-200">
+                  অনুমোদিত চুক্তি
+                </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
-                  <div className="text-2xs font-bold text-gray-400 uppercase">প্রকল্পের নাম</div>
-                  <div className="text-base font-black text-gray-900">{client?.projectName}</div>
-                  <div className="text-xs text-gray-500">{project?.location}</div>
+              {/* Specification Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                  <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider">প্রকল্পের নাম</div>
+                  <div className="text-base font-black text-slate-900">{client?.projectName}</div>
+                  <div className="text-xs text-slate-500 flex items-center space-x-1">
+                    <MapPin className="w-3 h-3 text-[#CE2028] shrink-0" />
+                    <span>{project?.location}</span>
+                  </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100 space-y-1">
-                  <div className="text-2xs font-bold text-[#006231] uppercase">ফ্ল্যাট নম্বর ও স্পেস</div>
+                <div className="p-4 rounded-2xl bg-emerald-50/40 border border-emerald-100 space-y-1">
+                  <div className="text-3xs font-bold text-[#006231] uppercase tracking-wider">ফ্ল্যাট নম্বর ও আয়তন</div>
                   <div className="text-base font-black text-[#006231]">{client?.flatNo}</div>
-                  <div className="text-xs text-emerald-700">অনুমোদিত আবাসিক ইউনিট</div>
+                  <div className="text-xs text-emerald-700 font-semibold">আবাসিক ইউনিট • ১ম শ্রেণি নির্মাণ</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
-                  <div className="text-2xs font-bold text-gray-400 uppercase">মোট চুক্তি মূল্য</div>
-                  <div className="text-base font-black text-gray-900">{formatBDT(client?.totalPrice)}</div>
-                  <div className="text-xs text-gray-500">শতভাগ নিষ্কণ্টক রেজিস্ট্রেশন চুক্তি</div>
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                  <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider">মোট চুক্তিভিত্তিক মূল্য</div>
+                  <div className="text-base font-black text-slate-900">{formatBDT(client?.totalPrice)}</div>
+                  <div className="text-xs text-slate-500">শতভাগ নিষ্কণ্টক রেজিস্ট্রেশন চুক্তি</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
-                  <div className="text-2xs font-bold text-gray-400 uppercase">হস্তান্তর সম্ভাব্য সময়</div>
-                  <div className="text-base font-black text-gray-900">জুন ২০২৭</div>
-                  <div className="text-xs text-[#006231] font-semibold">নির্ধারিত সময়ে চলমান</div>
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                  <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider">সম্ভাব্য ফ্ল্যাট হস্তান্তর</div>
+                  <div className="text-base font-black text-slate-900">জুন ২০২৭ ইং</div>
+                  <div className="text-xs text-emerald-600 font-semibold flex items-center space-x-1">
+                    <Clock className="w-3 h-3" />
+                    <span>নির্ধারিত সময়সূচি অনুযায়ী চলমান</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Apartment Features Chips */}
+              <div className="pt-2 border-t border-slate-100">
+                <div className="text-2xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">
+                  ফ্ল্যাটের অভ্যন্তরীণ সুযোগ-সুবিধা:
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-semibold">৩টি বেডরুম</span>
+                  <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-semibold">৩টি বাথরুম</span>
+                  <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-semibold">২টি প্রশস্ত বারান্দা</span>
+                  <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-semibold">দক্ষিণমুখী আলো-বাতাস</span>
+                  <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-semibold">১টি সংরক্ষিত কার পার্কিং</span>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* ======================================================= */}
-        {/* SECTION 2: FINANCIAL / INSTALLMENT LEDGER               */}
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
+        {/* TAB 2: কিস্তির হিসাব (PAYMENTS / FINANCIAL CARD)          */}
+        {/* ------------------------------------------------------- */}
         {activeTab === 'payments' && (
-          <div className="space-y-6 animate-fadeIn">
-            {/* 4 Financial Metric Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white p-5 rounded-3xl border border-gray-200 shadow-xs space-y-1">
-                <div className="text-xs font-bold text-gray-400 uppercase">মোট ফ্ল্যাটের মূল্য</div>
-                <div className="text-2xl font-black text-gray-900">{formatBDT(client?.totalPrice)}</div>
-                <div className="text-2xs text-gray-400 pt-1 font-semibold">চুক্তিভিত্তিক চূড়ান্ত মূল্য</div>
-              </div>
-
-              <div className="bg-white p-5 rounded-3xl border border-emerald-200/80 bg-gradient-to-b from-white to-emerald-50/20 shadow-xs space-y-1">
-                <div className="text-xs font-bold text-[#006231] uppercase">এ পর্যন্ত দিয়েছেন</div>
-                <div className="text-2xl font-black text-[#006231]">{formatBDT(client?.totalPaid)}</div>
-                <div className="text-2xs text-[#006231] font-bold pt-1">মোট মূল্যের {paidPercent}% পরিশোধিত</div>
-              </div>
-
-              <div className="bg-white p-5 rounded-3xl border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/20 shadow-xs space-y-1">
-                <div className="text-xs font-bold text-amber-800 uppercase">মোট বাকি / বকেয়া টাকা</div>
-                <div className="text-2xl font-black text-amber-700">{formatBDT(totalDue)}</div>
-                <div className="text-2xs text-amber-700 font-semibold pt-1">অবশিষ্ট কিস্তিসমূহে প্রদেয়</div>
-              </div>
-
-              <div className="bg-white p-5 rounded-3xl border border-red-200/80 bg-gradient-to-b from-white to-red-50/20 shadow-xs space-y-1">
-                <div className="text-xs font-bold text-[#CE2028] uppercase">পরবর্তী কিস্তির পরিমাণ</div>
-                <div className="text-2xl font-black text-[#CE2028]">{formatBDT(client?.nextDueAmount)}</div>
-                <div className="text-2xs text-red-600 font-bold pt-1">পরিশোধের তারিখ: {client?.nextDueDate}</div>
-              </div>
-            </div>
-
-            {/* Quick Summary Note */}
-            <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs flex items-center space-x-3 text-xs text-gray-600">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                <CreditCard className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="font-bold text-gray-900">কিস্তি পরিশোধের নিয়ম:</span> ব্যাংক ডিপোজিট, চেক বা কর্পোরেট অফিসে সরাসরি পে-অর্ডারের মাধ্যমে কিস্তি পরিশোধ করতে পারবেন। পরিশোধের পর অফিস রসিদ যোগ হবে।
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ======================================================= */}
-        {/* SECTION 3: CONSTRUCTION PROGRESS                        */}
-        {/* ======================================================= */}
-        {activeTab === 'progress' && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6 animate-fadeIn">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
-              <div>
-                <div className="text-xs font-bold text-[#CE2028] uppercase tracking-wider flex items-center space-x-1.5">
-                  <HardHat className="w-4 h-4" />
-                  <span>প্রকল্পের নির্মাণকাজের অগ্রগতি</span>
+          <div className="space-y-5 animate-fadeIn">
+            {/* Fintech Digital Wallet Card */}
+            <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0A4D27] text-white shadow-xl relative overflow-hidden space-y-5 border border-slate-700/60">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center text-emerald-400 backdrop-blur-md">
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-2xs font-bold uppercase tracking-wider text-slate-400">কিস্তির হিসাব লেজার</div>
+                    <div className="text-xs font-semibold text-slate-200">{client?.projectName}</div>
+                  </div>
                 </div>
-                <h2 className="text-xl font-black text-gray-900 mt-1">
-                  {project?.name || client?.projectName}
-                </h2>
+                <span className="text-2xs font-black px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  {paidPercent}% পরিশোধিত
+                </span>
               </div>
-              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-[#006231] font-bold text-xs border border-emerald-200 self-start sm:self-auto">
-                <span>সার্বিক অগ্রগতি:</span>
-                <strong className="text-sm">{project?.progress || 68}% সম্পন্ন</strong>
+
+              {/* Big Financial Numbers */}
+              <div className="space-y-1 pt-1">
+                <div className="text-xs font-bold text-slate-400 uppercase">এ পর্যন্ত পরিশোধিত মোট টাকা</div>
+                <div className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
+                  {formatBDT(client?.totalPaid)}
+                </div>
+                <div className="text-xs text-slate-300">
+                  মোট চুক্তি মূল্য: <strong className="text-white font-mono">{formatBDT(client?.totalPrice)}</strong>
+                </div>
+              </div>
+
+              {/* Dynamic Progress Bar */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-2xs font-bold text-slate-300">
+                  <span>পরিশোধ অগ্রগতি</span>
+                  <span>বকেয়া: {formatBDT(totalDue)}</span>
+                </div>
+                <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden p-0.5">
+                  <div 
+                    className="h-full bg-gradient-to-r from-emerald-500 via-[#8EBF40] to-emerald-400 rounded-full transition-all duration-1000 shadow-sm"
+                    style={{ width: `${paidPercent}%` }}
+                  ></div>
+                </div>
               </div>
             </div>
 
-            {/* Progress Bar & Stage */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-gray-700">
-                <span>বর্তমান চলমান কাজ: <strong className="text-gray-900">{project?.currentStage || 'ছাদ ঢালাই ও কাঠামো নির্মাণ'}</strong></span>
-                <span className="text-[#006231] font-black">{project?.progress || 68}%</span>
-              </div>
-              <div className="w-full bg-gray-100 h-4 rounded-full overflow-hidden p-0.5 border border-gray-200">
-                <div 
-                  className="h-full bg-gradient-to-r from-[#006231] via-[#8EBF40] to-[#006231] rounded-full transition-all duration-700 shadow-xs"
-                  style={{ width: `${project?.progress || 68}%` }}
-                ></div>
-              </div>
-            </div>
-
-            {/* Site Engineer Contact Box */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-              <div className="flex items-center space-x-3 text-gray-700">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
-                  <HardHat className="w-5 h-5" />
+            {/* Next Installment Due Alert Banner */}
+            <div className="p-5 rounded-3xl bg-gradient-to-r from-red-50 to-rose-50 border border-red-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-[#CE2028] text-white flex items-center justify-center shrink-0 shadow-sm">
+                  <Calendar className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="font-bold text-gray-900">সাইট ইনচার্জ: প্রকৌশলী মহিউদ্দিন আহমেদ</span>
-                  <div className="text-gray-500">সরাসরি সাইট হটলাইন: ০১৯১৮-৬৪৬৫৭৫ (সকাল ৯টা - সন্ধ্যা ৬টা)</div>
+                  <div className="text-2xs font-bold text-[#CE2028] uppercase tracking-wider">পরবর্তী কিস্তির সময়সীমা</div>
+                  <div className="text-base font-black text-slate-900">{client?.nextDueDate}</div>
+                  <div className="text-xs text-slate-600">নির্ধারিত তারিখে জমা দিয়ে রসিদ নিশ্চিত করুন</div>
                 </div>
               </div>
-              <a 
-                href="tel:01918646575"
-                className="px-4 py-2.5 rounded-xl bg-gray-900 hover:bg-black text-white font-bold text-xs transition-colors shrink-0"
-              >
-                সাইটে কল দিন
-              </a>
+              <div className="sm:text-right bg-white sm:bg-transparent p-3 sm:p-0 rounded-2xl border sm:border-0 border-red-100">
+                <div className="text-3xs text-slate-400 font-bold uppercase">প্রদেয় টাকার পরিমাণ</div>
+                <div className="text-xl font-black text-[#CE2028]">{formatBDT(client?.nextDueAmount)}</div>
+              </div>
+            </div>
+
+            {/* Bank Payment Details Box (With One-Click Copy) */}
+            <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                  <Building2 className="w-4 h-4 text-[#006231]" />
+                  <span>ব্যাংক ডিপোজিট ও কিস্তি জমাদানের বিবরণ</span>
+                </h3>
+                <p className="text-2xs text-slate-500 mt-0.5">নিচের ব্যাংক হিসাবে সরাসরি চেক, ক্যাশ বা ট্রান্সফার করতে পারেন</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                  <div className="text-3xs text-slate-400 font-bold uppercase">ব্যাংকের নাম</div>
+                  <div className="font-bold text-slate-900">সিটি ব্যাংক পিএলসি / ইসলামী ব্যাংক</div>
+                  <div className="text-2xs text-slate-500">প্রিন্সিপাল শাখা, মতিঝিল, ঢাকা</div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                  <div className="text-3xs text-slate-400 font-bold uppercase">একাউন্টের নাম</div>
+                  <div className="font-bold text-slate-900">Al-Emarah Properties Ltd.</div>
+                  <div className="text-2xs text-slate-500">কারেন্ট / কর্পোরেট অ্যাকাউন্ট</div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-emerald-50/40 border border-emerald-100 space-y-1 sm:col-span-2 flex items-center justify-between">
+                  <div>
+                    <div className="text-3xs text-[#006231] font-bold uppercase">হিসাব নম্বর (Account Number)</div>
+                    <div className="text-base font-black font-mono text-[#006231]">1501204893001</div>
+                    <div className="text-2xs text-emerald-700">রাউটিং নং: ২২৫২৭০৩৪০</div>
+                  </div>
+                  <button
+                    onClick={copyBankInfo}
+                    className="px-3.5 py-2 rounded-xl bg-white hover:bg-emerald-100 text-[#006231] font-bold text-xs border border-emerald-200 shadow-2xs flex items-center space-x-1.5 transition-all cursor-pointer active:scale-95"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>{copiedAccount ? 'কপি হয়েছে!' : 'কপি করুন'}</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* ======================================================= */}
-        {/* SECTION 4: PAYMENT HISTORY / STATEMENTS (NEW DEDICATED)  */}
-        {/* ======================================================= */}
-        {activeTab === 'history' && (
-          <div className="space-y-6 animate-fadeIn">
-            {/* Header Summary Card */}
-            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <div className="text-xs font-bold text-[#006231] uppercase tracking-wider flex items-center space-x-1.5">
-                  <FileText className="w-4 h-4" />
-                  <span>জমার হিস্ট্রি ও স্টেটমেন্ট</span>
+        {/* ------------------------------------------------------- */}
+        {/* TAB 3: কাজের অগ্রগতি (PROGRESS TRACKER)                  */}
+        {/* ------------------------------------------------------- */}
+        {activeTab === 'progress' && (
+          <div className="space-y-5 animate-fadeIn">
+            {/* Project Overall Status Header */}
+            <div className="bg-white p-5 sm:p-7 rounded-3xl border border-slate-200/80 shadow-xs space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="text-2xs font-bold text-[#CE2028] uppercase tracking-wider flex items-center space-x-1.5">
+                    <HardHat className="w-3.5 h-3.5" />
+                    <span>প্রকল্প নির্মাণকাজ ট্র্যাকার</span>
+                  </div>
+                  <h2 className="text-xl font-black text-slate-900 mt-1">
+                    {project?.name || client?.projectName}
+                  </h2>
+                  <p className="text-xs text-slate-500">{project?.location}</p>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-gray-900 mt-1">
-                  পূর্বে পরিশোধিত কিস্তিসমূহ
-                </h2>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  আল-ইমারাহ প্রোপার্টিজ অফিস কর্তৃক অনুমোদিত সকল জমার অফিসিয়াল রসিদ
-                </p>
+                <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-2xl bg-emerald-50 text-[#006231] font-bold text-xs border border-emerald-200 self-start sm:self-auto">
+                  <span>সার্বিক অগ্রগতি:</span>
+                  <strong className="text-base font-black">{project?.progress || 68}% সম্পন্ন</strong>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-3 self-start sm:self-auto">
-                <div className="px-3.5 py-2 rounded-2xl bg-emerald-50 border border-emerald-100 text-right">
-                  <div className="text-2xs text-[#006231] font-bold">মোট অনুমোদিত জমা</div>
-                  <div className="text-base font-black text-[#006231]">{formatBDT(client?.totalPaid)}</div>
+              {/* Stage description & Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                  <span>বর্তমান স্টেজ: <strong className="text-slate-900">{project?.currentStage}</strong></span>
+                  <span className="text-[#006231] font-black">{project?.progress || 68}%</span>
                 </div>
-                <div className="px-3.5 py-2 rounded-2xl bg-gray-50 border border-gray-100 text-right">
-                  <div className="text-2xs text-gray-400 font-bold">মোট রসিদ</div>
-                  <div className="text-base font-black text-gray-900">{client?.paymentHistory?.length || 0}টি</div>
+                <div className="w-full bg-slate-100 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#006231] via-[#8EBF40] to-[#006231] rounded-full transition-all duration-1000 shadow-xs"
+                    style={{ width: `${project?.progress || 68}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Construction Milestone Stepper */}
+              <div className="pt-2 space-y-3">
+                <div className="text-2xs font-bold text-slate-400 uppercase tracking-wider">
+                  নির্মাণ পর্যায়ভিত্তিক মাইলস্টোন:
+                </div>
+                <div className="space-y-2.5">
+                  <div className="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-100 flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-[#006231]" />
+                      <span className="font-bold text-slate-800">১. সয়েল টেস্ট, পাইলিং ও ডিপ বেসমেন্ট</span>
+                    </div>
+                    <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-[#006231]">সম্পন্ন</span>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-100 flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-[#006231]" />
+                      <span className="font-bold text-slate-800">২. ১ম থেকে ৫ম তলা আরসিসি ফ্রেম স্ট্রাকচার</span>
+                    </div>
+                    <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-[#006231]">সম্পন্ন</span>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-2.5">
+                      <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-3xs font-black animate-pulse">●</span>
+                      <span className="font-bold text-amber-900">৩. {project?.currentStage}</span>
+                    </div>
+                    <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-900">বর্তমানে চলমান</span>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs opacity-75">
+                    <div className="flex items-center space-x-2.5">
+                      <span className="w-4 h-4 rounded-full bg-slate-300 text-white flex items-center justify-center text-3xs">৪</span>
+                      <span className="font-medium text-slate-600">৪. অভ্যন্তরীণ প্লাস্টার, টাইলস ও পেইন্টিং</span>
+                    </div>
+                    <span className="text-3xs font-medium text-slate-400">পরবর্তী ধাপ</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Direct Site Engineer Connect */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+                    <HardHat className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-900">সাইট ইনচার্জ: প্রকৌশলী মহিউদ্দিন আহমেদ</div>
+                    <div className="text-slate-500">মোবাইল: ০১৯১৮-৬৪৬৫৭৫ (সকাল ৯টা - সন্ধ্যা ৬টা)</div>
+                  </div>
+                </div>
+                <a 
+                  href="tel:01918646575"
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs text-center transition-colors shadow-2xs cursor-pointer"
+                >
+                  সাইটে কল দিন
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ------------------------------------------------------- */}
+        {/* TAB 4: জমার হিস্ট্রি (RECEIPTS / FINANCIAL LEDGER)         */}
+        {/* ------------------------------------------------------- */}
+        {activeTab === 'history' && (
+          <div className="space-y-5 animate-fadeIn">
+            {/* Header Summary */}
+            <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="text-2xs font-bold text-[#006231] uppercase tracking-wider flex items-center space-x-1.5">
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>জমার অফিসিয়াল হিস্ট্রি</span>
+                </div>
+                <h2 className="text-lg sm:text-xl font-black text-slate-900 mt-1">
+                  পরিশোধিত কিস্তিসমূহের রসিদ
+                </h2>
+                <p className="text-xs text-slate-500">আল-ইমারাহ প্রোপার্টিজ কর্তৃক অনুমোদিত ও ভেরিফায়েড জমা</p>
+              </div>
+
+              <div className="flex items-center space-x-2.5 self-start sm:self-auto">
+                <div className="px-3.5 py-1.5 rounded-2xl bg-emerald-50 border border-emerald-100 text-right">
+                  <div className="text-3xs text-[#006231] font-bold">মোট অনুমোদিত জমা</div>
+                  <div className="text-sm sm:text-base font-black text-[#006231]">{formatBDT(client?.totalPaid)}</div>
+                </div>
+                <div className="px-3 py-1.5 rounded-2xl bg-slate-50 border border-slate-200 text-right">
+                  <div className="text-3xs text-slate-400 font-bold">রসিদ সংখ্যা</div>
+                  <div className="text-sm sm:text-base font-black text-slate-800">{client?.paymentHistory?.length || 0}টি</div>
                 </div>
               </div>
             </div>
 
-            {/* Mobile Cards View (Visible on phones) */}
-            <div className="block sm:hidden space-y-3">
+            {/* List of Receipts (Mobile-First Cards) */}
+            <div className="space-y-3">
               {client?.paymentHistory && client.paymentHistory.length > 0 ? (
                 client.paymentHistory.map((item, idx) => (
-                  <div key={idx} className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-2.5">
-                    <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-                      <div className="font-bold text-gray-900 text-xs">
-                        রসিদ নং: <span className="font-mono text-[#CE2028]">{item.id}</span>
+                  <div 
+                    key={idx} 
+                    className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3 transition-all hover:border-emerald-300"
+                  >
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-7 h-7 rounded-lg bg-emerald-50 text-[#006231] flex items-center justify-center font-bold text-xs">
+                          ✓
+                        </div>
+                        <div>
+                          <span className="font-bold text-xs text-slate-900">মানি রিসিট নং:</span>{' '}
+                          <span className="font-mono text-xs font-black text-[#CE2028]">{item.id}</span>
+                        </div>
                       </div>
-                      <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-bold border border-emerald-100">
-                        <Check className="w-2.5 h-2.5 text-[#8EBF40]" />
-                        <span>অনুমোদিত</span>
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-bold border border-emerald-200">
+                        <span>অনুমোদিত জমা</span>
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
                       <div>
-                        <div className="text-gray-500 text-2xs">জমার তারিখ ও মাধ্যম</div>
-                        <div className="font-semibold text-gray-800">{item.date} • {item.method}</div>
+                        <div className="text-slate-400 text-3xs font-bold uppercase">জমার তারিখ ও মাধ্যম</div>
+                        <div className="font-semibold text-slate-800 mt-0.5">{item.date} • {item.method}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-gray-500 text-2xs">পরিশোধিত টাকা</div>
-                        <div className="font-black text-sm text-[#006231]">{formatBDT(item.amount)}</div>
+                        <div className="text-slate-400 text-3xs font-bold uppercase">পরিশোধিত টাকা</div>
+                        <div className="font-black text-base text-[#006231]">{formatBDT(item.amount)}</div>
                       </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-end">
+                      <button
+                        onClick={() => setSelectedReceipt(item)}
+                        className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-2xs font-bold flex items-center space-x-1 transition-colors cursor-pointer"
+                      >
+                        <FileText className="w-3 h-3 text-[#CE2028]" />
+                        <span>রসিদ প্রিভিউ দেখুন</span>
+                      </button>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="bg-white p-8 rounded-2xl border border-gray-200 text-center text-gray-500 text-xs">
+                <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-400 text-xs">
                   এখনো কোনো পরিশোধিত কিস্তির রেকর্ড নেই।
                 </div>
               )}
             </div>
-
-            {/* Desktop Table View (Hidden on phones, visible on sm+) */}
-            <div className="hidden sm:block bg-white rounded-3xl border border-gray-200 shadow-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs sm:text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase font-bold text-xs">
-                    <tr>
-                      <th className="py-3.5 px-6">রসিদ নম্বর</th>
-                      <th className="py-3.5 px-6">তারিখ</th>
-                      <th className="py-3.5 px-6">জমার মাধ্যম</th>
-                      <th className="py-3.5 px-6 text-right">পরিশোধিত টাকা</th>
-                      <th className="py-3.5 px-6 text-center">স্ট্যাটাস</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 text-gray-700 font-medium">
-                    {client?.paymentHistory && client.paymentHistory.length > 0 ? (
-                      client.paymentHistory.map((item, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50/80 transition-colors">
-                          <td className="py-4 px-6 font-bold text-gray-900">{item.id}</td>
-                          <td className="py-4 px-6 text-gray-600">{item.date}</td>
-                          <td className="py-4 px-6">{item.method}</td>
-                          <td className="py-4 px-6 text-right font-black text-[#006231]">
-                            {formatBDT(item.amount)}
-                          </td>
-                          <td className="py-4 px-6 text-center">
-                            <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-emerald-50 text-[#006231] text-xs font-bold border border-emerald-100">
-                              <Check className="w-3 h-3 text-[#8EBF40]" />
-                              <span>অনুমোদিত</span>
-                            </span>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="py-8 text-center text-gray-500 text-xs">
-                          এখনো কোনো পরিশোধিত কিস্তির রেকর্ড নেই।
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
           </div>
         )}
 
-        {/* ======================================================= */}
-        {/* SECTION 5: PROFILE VIEW & ACCOUNT CONTROLS             */}
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
+        {/* TAB 5: প্রোফাইল ও সেটিংস (PROFILE & CONTROLS)            */}
+        {/* ------------------------------------------------------- */}
         {activeTab === 'profile' && (
-          <div className="space-y-6 animate-fadeIn">
+          <div className="space-y-5 animate-fadeIn">
             {/* Profile Overview Card */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6 text-center">
-              {/* Circular Avatar with Camera Icon */}
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6 text-center">
+              {/* Circular Avatar with Camera overlay */}
               <div 
                 className="relative inline-block cursor-pointer mx-auto group" 
                 onClick={() => avatarInputRef.current?.click()}
@@ -451,25 +589,25 @@ export default function ClientDashboard({
               </div>
 
               <div>
-                <h2 className="text-xl sm:text-2xl font-black text-gray-900">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">
                   {client?.name}
                 </h2>
                 <div className="inline-block mt-1 px-3 py-1 rounded-full bg-emerald-100 text-[#006231] font-bold text-xs">
-                  আইডি: {client?.id}
+                  কাস্টমার আইডি: {client?.id}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  মোবাইল নম্বর: <strong>{client?.phone}</strong>
+                <p className="text-xs text-slate-500 mt-1.5 font-medium">
+                  মোবাইল নম্বর: <strong className="text-slate-800">{client?.phone}</strong>
                 </p>
-                <div className="text-2xs text-gray-400 mt-1">
-                  বরাদ্দকৃত ফ্ল্যাট: <span className="text-gray-700 font-semibold">{client?.projectName} ({client?.flatNo})</span>
-                </div>
+                <p className="text-2xs text-slate-400 mt-0.5">
+                  বরাদ্দকৃত সম্পত্তি: <span className="text-slate-700 font-semibold">{client?.projectName} ({client?.flatNo})</span>
+                </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="max-w-md mx-auto space-y-2.5 pt-2">
+              <div className="max-w-sm mx-auto space-y-2.5 pt-2">
                 <button
                   onClick={() => avatarInputRef.current?.click()}
-                  className="w-full py-3 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs sm:text-sm font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                  className="w-full py-3 px-4 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95"
                 >
                   <Camera className="w-4 h-4 text-[#006231]" />
                   <span>প্রোফাইল ছবি পরিবর্তন করুন</span>
@@ -477,7 +615,7 @@ export default function ClientDashboard({
 
                 <button
                   onClick={onNavigateHome}
-                  className="w-full py-3 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs sm:text-sm font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                  className="w-full py-3 px-4 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95"
                 >
                   <Home className="w-4 h-4 text-[#CE2028]" />
                   <span>ওয়েবসাইটে ফিরে যান</span>
@@ -485,7 +623,7 @@ export default function ClientDashboard({
 
                 <button
                   onClick={onLogout}
-                  className="w-full py-3 px-4 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white border border-red-200 text-xs sm:text-sm font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-2xs"
+                  className="w-full py-3 px-4 rounded-2xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white border border-red-200 text-xs font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-2xs active:scale-95"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>লগআউট করুন</span>
@@ -493,17 +631,19 @@ export default function ClientDashboard({
               </div>
             </div>
 
-            {/* Customer Care Contact Help Box */}
-            <div className="p-5 rounded-3xl bg-white border border-gray-200 shadow-xs flex items-center justify-between text-xs">
+            {/* Helpline Card */}
+            <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between text-xs">
               <div className="space-y-0.5">
-                <div className="font-bold text-gray-900">যেকোনো সহযোগিতায় কাস্টমার কেয়ার</div>
-                <div className="text-gray-500">হটলাইন: ০১৯১৮-৬৪৬৫৭৫ (সকাল ৯টা - রাত ৮টা)</div>
+                <div className="font-bold text-slate-900">জরুরি কাস্টমার কেয়ার সাপোর্ট</div>
+                <div className="text-slate-500">হটলাইন: ০১৯১৮-৬৪৬৫৭৫ (সকাল ৯টা - রাত ৮টা)</div>
               </div>
               <a
-                href="tel:01918646575"
-                className="px-3.5 py-2 rounded-xl bg-emerald-50 text-[#006231] font-bold text-xs border border-emerald-200 hover:bg-[#006231] hover:text-white transition-colors"
+                href="https://wa.me/8801918646575"
+                target="_blank"
+                rel="noreferrer"
+                className="px-3.5 py-2 rounded-xl bg-emerald-500 text-white font-bold text-xs hover:bg-emerald-600 transition-colors shadow-2xs"
               >
-                কল দিন
+                হোয়াটসঅ্যাপ
               </a>
             </div>
           </div>
@@ -512,98 +652,106 @@ export default function ClientDashboard({
       </main>
 
       {/* ========================================================= */}
-      {/* 3. STICKY FOOTER NAVBAR (EXACTLY 5 ICONS - NO TEXT LABELS)*/}
+      {/* 3. FLOATING PILL FOOTER NAVBAR (5 ICONS ONLY)             */}
       {/* ========================================================= */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl py-2 px-3">
-        <div className="flex items-center justify-around max-w-md mx-auto">
-          {/* Tab 1: কাস্টমার তথ্য */}
+      <nav className="fixed bottom-3 left-4 right-4 z-50 max-w-sm sm:max-w-md mx-auto">
+        <div className="bg-white/95 backdrop-blur-2xl border border-slate-200 shadow-2xl rounded-full py-1.5 px-3 flex items-center justify-around ring-1 ring-black/5">
+          {/* 1. কাস্টমার তথ্য */}
           <button
             onClick={() => setActiveTab('details')}
             aria-label="কাস্টমার তথ্য"
             title="কাস্টমার তথ্য"
-            className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
-              activeTab === 'details' ? 'text-[#CE2028] bg-red-50/80 scale-105' : 'text-gray-400 hover:text-gray-700'
+            className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
+              activeTab === 'details' 
+                ? 'bg-red-50 text-[#CE2028] scale-110 shadow-xs' 
+                : 'text-slate-400 hover:text-slate-600'
             }`}
           >
             {activeTab === 'details' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
             )}
-            <User className={`w-6 h-6 ${activeTab === 'details' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
+            <User className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
-          {/* Tab 2: কিস্তির হিসাব */}
+          {/* 2. কিস্তির হিসাব */}
           <button
             onClick={() => setActiveTab('payments')}
             aria-label="কিস্তির হিসাব"
             title="কিস্তির হিসাব"
-            className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
-              activeTab === 'payments' ? 'text-[#CE2028] bg-red-50/80 scale-105' : 'text-gray-400 hover:text-gray-700'
+            className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
+              activeTab === 'payments' 
+                ? 'bg-red-50 text-[#CE2028] scale-110 shadow-xs' 
+                : 'text-slate-400 hover:text-slate-600'
             }`}
           >
             {activeTab === 'payments' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
             )}
-            <CreditCard className={`w-6 h-6 ${activeTab === 'payments' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
+            <CreditCard className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
-          {/* Tab 3: কাজের অগ্রগতি */}
+          {/* 3. কাজের অগ্রগতি */}
           <button
             onClick={() => setActiveTab('progress')}
             aria-label="কাজের অগ্রগতি"
             title="কাজের অগ্রগতি"
-            className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
-              activeTab === 'progress' ? 'text-[#CE2028] bg-red-50/80 scale-105' : 'text-gray-400 hover:text-gray-700'
+            className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
+              activeTab === 'progress' 
+                ? 'bg-red-50 text-[#CE2028] scale-110 shadow-xs' 
+                : 'text-slate-400 hover:text-slate-600'
             }`}
           >
             {activeTab === 'progress' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
             )}
-            <HardHat className={`w-6 h-6 ${activeTab === 'progress' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
+            <HardHat className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
-          {/* Tab 4: জমার হিস্ট্রি */}
+          {/* 4. জমার হিস্ট্রি */}
           <button
             onClick={() => setActiveTab('history')}
             aria-label="জমার হিস্ট্রি"
             title="জমার হিস্ট্রি"
-            className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
-              activeTab === 'history' ? 'text-[#CE2028] bg-red-50/80 scale-105' : 'text-gray-400 hover:text-gray-700'
+            className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
+              activeTab === 'history' 
+                ? 'bg-red-50 text-[#CE2028] scale-110 shadow-xs' 
+                : 'text-slate-400 hover:text-slate-600'
             }`}
           >
             {activeTab === 'history' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
             )}
-            <FileText className={`w-6 h-6 ${activeTab === 'history' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
+            <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
-          {/* Tab 5: প্রোফাইল (CIRCULAR AVATAR - ICON ONLY) */}
+          {/* 5. প্রোফাইল (CIRCULAR AVATAR PHOTO) */}
           <button
             onClick={() => setActiveTab('profile')}
             aria-label="প্রোফাইল"
             title="প্রোফাইল"
-            className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
-              activeTab === 'profile' ? 'bg-red-50/80 scale-105' : 'hover:opacity-80'
+            className={`p-1.5 rounded-full transition-all cursor-pointer relative ${
+              activeTab === 'profile' ? 'scale-110' : 'hover:opacity-80'
             }`}
           >
             {activeTab === 'profile' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
             )}
             <div className="relative">
               {avatarImage ? (
                 <img 
                   src={avatarImage} 
                   alt="Profile" 
-                  className={`w-7 h-7 rounded-full object-cover transition-all ${
+                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover transition-all ${
                     activeTab === 'profile' 
                       ? 'ring-2 ring-[#CE2028] shadow-xs' 
-                      : 'ring-1 ring-gray-300'
+                      : 'ring-1 ring-slate-300'
                   }`} 
                 />
               ) : (
-                <div className={`w-7 h-7 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs transition-all ${
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs transition-all ${
                   activeTab === 'profile' 
                     ? 'ring-2 ring-[#CE2028] shadow-xs' 
-                    : 'ring-1 ring-gray-300'
+                    : 'ring-1 ring-slate-300'
                 }`}>
                   {client?.name ? client.name.slice(0, 1) : 'প্রো'}
                 </div>
@@ -612,6 +760,72 @@ export default function ClientDashboard({
           </button>
         </div>
       </nav>
+
+      {/* ========================================================= */}
+      {/* 4. OFFICIAL MONEY RECEIPT MODAL                           */}
+      {/* ========================================================= */}
+      {selectedReceipt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 relative space-y-4">
+            <button
+              onClick={() => setSelectedReceipt(null)}
+              className="absolute top-4 right-4 p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="text-center space-y-1">
+              <img src="/alemarah_logo_header.svg" alt="Al-Emarah" className="h-7 mx-auto mb-2" />
+              <div className="text-3xs uppercase tracking-widest text-[#006231] font-black">অফিসিয়াল মানি রিসিট</div>
+              <h3 className="text-sm font-bold text-slate-800">আল-ইমারাহ প্রোপার্টিজ লিমিটেড</h3>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-slate-400 text-2xs">রসিদ নম্বর:</span>
+                <span className="font-mono font-bold text-[#CE2028]">{selectedReceipt.id}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400 text-2xs">তারিখ:</span>
+                <span className="font-semibold text-slate-800">{selectedReceipt.date}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400 text-2xs">গ্রাহকের নাম:</span>
+                <span className="font-bold text-slate-800">{client?.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400 text-2xs">প্রকল্প ও ফ্ল্যাট:</span>
+                <span className="text-slate-700">{client?.projectName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400 text-2xs">পেমেন্ট মাধ্যম:</span>
+                <span className="text-slate-700">{selectedReceipt.method}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-slate-200 text-sm font-black">
+                <span className="text-slate-800">পরিশোধিত টাকা:</span>
+                <span className="text-[#006231]">{formatBDT(selectedReceipt.amount)}</span>
+              </div>
+            </div>
+
+            <div className="text-center text-3xs text-emerald-700 font-bold bg-emerald-50 py-1.5 rounded-xl border border-emerald-100 flex items-center justify-center space-x-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>ডিজিটাল অডিট ও অফিস কর্তৃক ভেরিফায়েড</span>
+            </div>
+
+            <button
+              onClick={() => {
+                alert('মানি রিসিট প্রিন্ট প্রক্রিয়া শুরু হচ্ছে...');
+                setSelectedReceipt(null);
+              }}
+              className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>রসিদ প্রিন্ট বা ডাউনলোড করুন</span>
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -116,9 +116,28 @@ export const getManagementData = () => {
 export const saveManagementData = (data) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: data }));
   } catch (e) {
     console.error('Error saving management data to localStorage:', e);
   }
+};
+
+// Subscription listener for real-time sync across components
+export const subscribeToManagementData = (callback) => {
+  const handler = (e) => {
+    callback(e.detail || getManagementData());
+  };
+  const storageHandler = (e) => {
+    if (e.key === STORAGE_KEY) {
+      callback(getManagementData());
+    }
+  };
+  window.addEventListener('alemarah_store_updated', handler);
+  window.addEventListener('storage', storageHandler);
+  return () => {
+    window.removeEventListener('alemarah_store_updated', handler);
+    window.removeEventListener('storage', storageHandler);
+  };
 };
 
 // Currency formatter utility

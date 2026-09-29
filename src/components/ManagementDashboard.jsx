@@ -3,51 +3,66 @@ import {
   Building2, 
   Users, 
   DollarSign, 
+  Wallet, 
   HardHat, 
-  Plus, 
-  Check, 
   Search, 
-  LogOut, 
-  Home, 
-  Calendar, 
+  Plus, 
   CheckCircle2, 
   Clock, 
+  Calendar, 
+  ArrowUpRight, 
+  Filter, 
+  Phone, 
+  Home, 
+  LogOut, 
   ShieldCheck, 
-  Wallet,
-  Coins,
-  ChevronRight
+  X, 
+  ChevronRight, 
+  Check, 
+  Sparkles,
+  TrendingUp,
+  FileSpreadsheet
 } from 'lucide-react';
 import { 
+  formatBDT, 
   getManagementData, 
   saveManagementData, 
-  formatBDT 
+  subscribeToManagementData 
 } from '../data/managementStore';
 
 export default function ManagementDashboard({ 
   admin, 
+  lang = 'bn', 
+  t, 
   onLogout, 
-  onNavigateHome,
-  lang = 'bn'
+  onNavigateHome 
 }) {
-  const [data, setData] = useState(() => getManagementData());
+  const [data, setData] = useState(getManagementData);
   const [activeTab, setActiveTab] = useState('clients'); // 'clients', 'payments', 'projects', 'expenses', 'team'
   const [searchQuery, setSearchQuery] = useState('');
+  const [projectFilter, setProjectFilter] = useState('all');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [successAlert, setSuccessAlert] = useState('');
 
   const profileRef = useRef(null);
 
-  const triggerAlert = (msg) => {
-    setSuccessAlert(msg);
-    setTimeout(() => setSuccessAlert(''), 3000);
-  };
+  // Subscribe to central store updates
+  useEffect(() => {
+    const unsubscribe = subscribeToManagementData((newData) => {
+      setData(newData);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const updateStore = (updater) => {
-    setData((prev) => {
-      const updated = updater(prev);
-      saveManagementData(updated);
-      return updated;
-    });
+    const updated = typeof updater === 'function' ? updater(data) : updater;
+    setData(updated);
+    saveManagementData(updated);
+  };
+
+  const triggerAlert = (msg) => {
+    setSuccessAlert(msg);
+    setTimeout(() => setSuccessAlert(''), 3500);
   };
 
   // Close profile dropdown on outside click (supports mouse and mobile touch)
@@ -142,11 +157,11 @@ export default function ManagementDashboard({
       flatNo: clientForm.flatNo || 'বরাদ্দকৃত ইউনিট',
       totalPrice: Number(clientForm.totalPrice) || 0,
       totalPaid: initialPaidNum,
-      nextDueDate: clientForm.nextDueDate,
+      nextDueDate: clientForm.nextDueDate || '১৫ নভেম্বর, ২০২৬',
       nextDueAmount: Number(clientForm.nextDueAmount) || 0,
       paymentHistory: initialPaidNum > 0 ? [
         {
-          id: `TRX-${Date.now().toString().slice(-4)}`,
+          id: `TRX-${Math.floor(100 + Math.random() * 900)}`,
           date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
           amount: initialPaidNum,
           method: 'বুকিং মানি / প্রাথমিক জমা'
@@ -171,62 +186,65 @@ export default function ManagementDashboard({
       nextDueDate: '১৫ নভেম্বর, ২০২৬',
       nextDueAmount: '৫০০০০০'
     });
-    triggerAlert(`নতুন কাস্টমার ${newClient.name} (আইডি: ${newId}) সফলভাবে যোগ হয়েছে!`);
+    triggerAlert(`নতুন ক্লায়েন্ট "${newClient.name}" সফলভাবে যুক্ত হয়েছেন!`);
   };
 
   const handleReceivePayment = (e) => {
     e.preventDefault();
     const payAmount = Number(paymentForm.amount);
-    if (!paymentForm.clientId || !payAmount || payAmount <= 0) {
-      alert('সঠিক কাস্টমার ও জমার পরিমাণ লিখুন।');
+    if (!payAmount || payAmount <= 0) {
+      alert('অনুগ্রহ করে জমার সঠিক টাকার পরিমাণ লিখুন।');
       return;
     }
 
     const targetClient = data.clients.find(c => c.id === paymentForm.clientId);
-    if (!targetClient) return;
+    if (!targetClient) {
+      alert('ক্লায়েন্ট খুঁজে পাওয়া যায়নি।');
+      return;
+    }
 
-    const newPaymentRecord = {
-      id: `TRX-${Date.now().toString().slice(-4)}`,
-      date: paymentForm.date,
+    const newTrx = {
+      id: `TRX-${Math.floor(100 + Math.random() * 900)}`,
+      date: paymentForm.date || new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       amount: payAmount,
-      method: paymentForm.method + (paymentForm.note ? ` (${paymentForm.note})` : '')
+      method: paymentForm.method || 'ব্যাংক ডিপোজিট'
     };
 
     updateStore((prev) => ({
       ...prev,
       clients: prev.clients.map(c => {
-        if (c.id === paymentForm.clientId) {
+        if (c.id === targetClient.id) {
           return {
             ...c,
             totalPaid: (c.totalPaid || 0) + payAmount,
-            paymentHistory: [newPaymentRecord, ...(c.paymentHistory || [])]
+            paymentHistory: [newTrx, ...(c.paymentHistory || [])]
           };
         }
         return c;
       })
     }));
 
-    triggerAlert(`${targetClient.name}-এর একাউন্টে ${formatBDT(payAmount)} টাকা জমার এন্ট্রি সফল হয়েছে!`);
     setPaymentForm({
       ...paymentForm,
       amount: '',
       note: ''
     });
+    triggerAlert(`৳ ${payAmount.toLocaleString('bn-BD')} টাকা জমা এন্ট্রি সফল হয়েছে!`);
   };
 
   const handleAddProject = (e) => {
     e.preventDefault();
     if (!projectForm.name || !projectForm.budget) {
-      alert('প্রজেক্টের নাম ও মোট বাজেট লিখুন।');
+      alert('প্রজেক্টের নাম ও আনুমানিক বাজেট পূরণ করুন।');
       return;
     }
 
     const newProj = {
-      id: `proj-${Date.now()}`,
+      id: `proj-${Date.now().toString().slice(-4)}`,
       name: projectForm.name,
       location: projectForm.location || 'ঢাকা',
       progress: Number(projectForm.progress) || 10,
-      currentStage: projectForm.currentStage || 'সাইট কাজ শুরু',
+      currentStage: projectForm.currentStage || 'পাইলিং ও সাইট প্রিপারেশন',
       budget: Number(projectForm.budget) || 0,
       expenses: []
     };
@@ -330,31 +348,38 @@ export default function ManagementDashboard({
     triggerAlert(`কর্মকর্তা ${newMember.name} সফলভাবে যুক্ত হয়েছেন!`);
   };
 
-  // Calculations for Overview Cards
+  // Calculations for Stats
   const totalClientsCount = data.clients.length;
   const totalCollections = data.clients.reduce((acc, c) => acc + (c.totalPaid || 0), 0);
-  const totalDues = data.clients.reduce((acc, c) => acc + Math.max(0, (c.totalPrice || 0) - (c.totalPaid || 0)), 0);
+  const totalContractVal = data.clients.reduce((acc, c) => acc + (c.totalPrice || 0), 0);
+  const totalDues = totalContractVal - totalCollections;
   const totalConstructionSpent = data.projects.reduce((acc, p) => {
-    const pSpent = (p.expenses || []).reduce((expAcc, e) => expAcc + (e.amount || 0), 0);
-    return acc + pSpent;
+    const pExp = (p.expenses || []).reduce((eAcc, e) => eAcc + (e.amount || 0), 0);
+    return acc + pExp;
   }, 0);
 
-  // Filtered clients for table search
+  // Filter clients
   const filteredClients = data.clients.filter(c => {
     const q = searchQuery.toLowerCase();
-    return (
+    const matchesSearch = (
       c.name.toLowerCase().includes(q) ||
       c.phone.toLowerCase().includes(q) ||
       c.id.toLowerCase().includes(q) ||
       c.projectName.toLowerCase().includes(q)
     );
+    const matchesProject = projectFilter === 'all' || c.projectId === projectFilter;
+    return matchesSearch && matchesProject;
   });
 
   const selectedProjForExpense = data.projects.find(p => p.id === selectedExpenseProject) || data.projects[0];
   const projectTotalExpense = (selectedProjForExpense?.expenses || []).reduce((acc, e) => acc + (e.amount || 0), 0);
   const projectRemainingBudget = (selectedProjForExpense?.budget || 0) - projectTotalExpense;
 
-  // Management Footer Navbar items
+  // Selected client for quick payment calculation
+  const targetClientForCalc = data.clients.find(c => c.id === paymentForm.clientId);
+  const targetClientDue = (targetClientForCalc?.totalPrice || 0) - (targetClientForCalc?.totalPaid || 0);
+
+  // Management Footer Navbar items (Exactly 5 icons)
   const managementNavItems = [
     { id: 'clients', label: '১. ক্লায়েন্ট', icon: Users },
     { id: 'payments', label: '২. জমা এন্ট্রি', icon: DollarSign },
@@ -364,19 +389,19 @@ export default function ManagementDashboard({
   ];
 
   return (
-    <div className="min-h-screen bg-[#F4F5F7] text-gray-900 flex flex-col font-sans animate-fadeIn pb-24">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans animate-fadeIn pb-28">
       
       {/* ========================================================= */}
-      {/* 1. TOP HEADER (JUST LOGO & PURE CIRCULAR AVATAR - NO BOX) */}
+      {/* 1. TOP APP BAR (HEADER)                                   */}
       {/* ========================================================= */}
-      <header className="bg-white border-b border-gray-200 py-3 px-4 sm:px-6 lg:px-8 shadow-2xs sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-2xs py-2.5 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           
-          {/* Logo & Portal Badge */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Logo & Portal Status */}
+          <div className="flex items-center space-x-3">
             <button
               onClick={onNavigateHome}
-              className="flex items-center space-x-2 group cursor-pointer"
+              className="flex items-center space-x-2 group cursor-pointer active:scale-95 transition-transform"
               title="ওয়েবসাইটে ফিরে যান"
             >
               <img 
@@ -385,14 +410,13 @@ export default function ManagementDashboard({
                 className="h-8 sm:h-9 w-auto object-contain"
               />
             </button>
-            <span className="text-gray-300 hidden sm:inline">|</span>
-            <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#CE2028] text-xs font-bold border border-red-100">
+            <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#CE2028] text-2xs sm:text-xs font-bold border border-red-200/60">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>ম্যানেজমেন্ট প্যানেল</span>
             </div>
           </div>
 
-          {/* Right: PURE CIRCULAR AVATAR (NO BOX / NO BUTTON BORDER BOX) */}
+          {/* Right: Circular Manager Avatar & Menu */}
           <div className="relative" ref={profileRef}>
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -400,48 +424,53 @@ export default function ManagementDashboard({
               aria-expanded={isProfileOpen}
               title="ম্যানেজমেন্ট মেনু"
             >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-[#CE2028] to-[#A9141B] text-white flex items-center justify-center font-black text-sm ring-2 ring-[#CE2028] shadow-sm hover:ring-[#006231] transition-all">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white flex items-center justify-center font-black text-sm ring-2 ring-[#CE2028]/30 shadow-md">
                 {admin?.name ? admin.name.slice(0, 2) : 'ম্যা'}
               </div>
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
             </button>
 
-            {/* Backdrop overlay for mobile */}
+            {/* Mobile Backdrop Overlay */}
             {isProfileOpen && (
               <div 
-                className="fixed inset-0 z-40 bg-black/40 backdrop-blur-2xs sm:hidden"
+                className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs sm:hidden"
                 onClick={() => setIsProfileOpen(false)}
               />
             )}
 
-            {/* Profile Dropdown Popup Menu - Phone Responsive */}
+            {/* Manager Profile Popup Drawer / Dropdown */}
             {isProfileOpen && (
-              <div className="fixed inset-x-4 top-18 sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2.5 w-auto sm:w-72 max-w-sm mx-auto sm:mx-0 bg-white rounded-3xl shadow-2xl border border-gray-100 py-3 z-50 animate-fadeIn divide-y divide-gray-100">
+              <div className="fixed inset-x-4 top-16 sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2.5 w-auto sm:w-72 max-w-sm mx-auto sm:mx-0 bg-white rounded-3xl shadow-2xl border border-slate-100 py-3 z-50 animate-fadeIn divide-y divide-slate-100">
                 <div className="px-5 py-3">
-                  <div className="text-sm font-black text-gray-900 truncate">
+                  <div className="text-sm font-black text-slate-900 truncate">
                     {admin?.name || 'অ্যাডমিন কর্মকর্তা'}
                   </div>
                   <div className="text-xs text-[#006231] font-semibold mt-0.5">
                     {admin?.role || 'ম্যানেজমেন্ট টিম'}
                   </div>
-                  <div className="text-2xs text-gray-400 mt-0.5">
+                  <div className="text-2xs text-slate-400 mt-0.5">
                     মোবাইল: {admin?.phone || '০১৯১৮-৬৪৬৫৭৫'}
                   </div>
                 </div>
 
-                <div className="p-2 space-y-1 text-xs font-bold text-gray-700">
+                <div className="p-2 space-y-1 text-xs font-bold text-slate-700">
                   <button
                     onClick={() => {
                       setIsProfileOpen(false);
                       onNavigateHome();
                     }}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-gray-100 hover:text-gray-900 transition-colors text-left cursor-pointer"
+                    className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left cursor-pointer"
                   >
-                    <div className="w-7 h-7 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center">
-                      <Home className="w-3.5 h-3.5" />
-                    </div>
+                    <Home className="w-4 h-4 text-[#CE2028]" />
                     <span>ওয়েবসাইটে ফিরে যান</span>
                   </button>
+                  <a
+                    href="tel:01918646575"
+                    className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left"
+                  >
+                    <Phone className="w-4 h-4 text-[#006231]" />
+                    <span>সাইট হটলাইনে কল করুন</span>
+                  </a>
                 </div>
 
                 <div className="p-2">
@@ -450,7 +479,7 @@ export default function ManagementDashboard({
                       setIsProfileOpen(false);
                       onLogout();
                     }}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white transition-all text-xs font-bold text-left cursor-pointer"
+                    className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white transition-all text-xs font-bold text-left cursor-pointer active:scale-95"
                   >
                     <LogOut className="w-4 h-4" />
                     <span>লগআউট</span>
@@ -464,59 +493,59 @@ export default function ManagementDashboard({
 
       {/* Floating Success Toast Alert */}
       {successAlert && (
-        <div className="fixed top-18 right-4 z-50 bg-[#006231] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-2 text-xs sm:text-sm font-bold animate-fadeIn">
+        <div className="fixed top-16 right-4 z-50 bg-[#006231] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-2 text-xs sm:text-sm font-bold animate-fadeIn">
           <CheckCircle2 className="w-5 h-5 text-[#8EBF40]" />
           <span>{successAlert}</span>
         </div>
       )}
 
       {/* ========================================================= */}
-      {/* 2. STATS OVERVIEW CARDS (PHONE RESPONSIVE)               */}
+      {/* 2. STATS OVERVIEW CARDS (PHONE OPTIMIZED)                 */}
       {/* ========================================================= */}
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-5">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="flex items-center justify-between text-gray-500 text-2xs sm:text-xs font-bold">
+      <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 pt-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-slate-500 text-3xs sm:text-2xs font-bold uppercase">
               <span>মোট ক্লায়েন্ট</span>
               <Users className="w-4 h-4 text-blue-600 shrink-0" />
             </div>
-            <div className="text-base sm:text-2xl font-black text-gray-900 mt-1 truncate">
+            <div className="text-base sm:text-2xl font-black text-slate-900 truncate">
               {totalClientsCount} জন
             </div>
-            <div className="text-3xs sm:text-2xs text-gray-400 truncate">নিবন্ধিত ফ্ল্যাট ক্রেতা</div>
+            <div className="text-3xs text-slate-400 truncate">নিবন্ধিত ফ্ল্যাট ক্রেতা</div>
           </div>
 
-          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-emerald-200/80 bg-gradient-to-b from-white to-emerald-50/20 shadow-xs">
-            <div className="flex items-center justify-between text-[#006231] text-2xs sm:text-xs font-bold">
-              <span className="truncate">মোট সংগৃহীত টাকা</span>
+          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-emerald-200/80 bg-gradient-to-b from-white to-emerald-50/20 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-[#006231] text-3xs sm:text-2xs font-bold uppercase">
+              <span className="truncate">সংগৃহীত টাকা</span>
               <DollarSign className="w-4 h-4 text-[#006231] shrink-0" />
             </div>
-            <div className="text-base sm:text-2xl font-black text-[#006231] mt-1 truncate">
+            <div className="text-base sm:text-2xl font-black text-[#006231] truncate">
               {formatBDT(totalCollections)}
             </div>
-            <div className="text-3xs sm:text-2xs text-[#006231] font-semibold truncate">মোট পরিশোধ জমা</div>
+            <div className="text-3xs text-[#006231] font-semibold truncate">মোট পরিশোধিত জমা</div>
           </div>
 
-          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/20 shadow-xs">
-            <div className="flex items-center justify-between text-amber-800 text-2xs sm:text-xs font-bold">
-              <span className="truncate">মোট বকেয়া কিস্তি</span>
+          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/20 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-amber-800 text-3xs sm:text-2xs font-bold uppercase">
+              <span className="truncate">মোট বাকি / বকেয়া</span>
               <Clock className="w-4 h-4 text-amber-600 shrink-0" />
             </div>
-            <div className="text-base sm:text-2xl font-black text-amber-700 mt-1 truncate">
+            <div className="text-base sm:text-2xl font-black text-amber-700 truncate">
               {formatBDT(totalDues)}
             </div>
-            <div className="text-3xs sm:text-2xs text-amber-700 font-semibold truncate">ভবিষ্যত প্রাপ্য কিস্তি</div>
+            <div className="text-3xs text-amber-700 font-semibold truncate">ভবিষ্যত প্রাপ্য কিস্তি</div>
           </div>
 
-          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="flex items-center justify-between text-gray-500 text-2xs sm:text-xs font-bold">
+          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-slate-500 text-3xs sm:text-2xs font-bold uppercase">
               <span className="truncate">প্রজেক্টে মোট ব্যয়</span>
               <HardHat className="w-4 h-4 text-[#CE2028] shrink-0" />
             </div>
-            <div className="text-base sm:text-2xl font-black text-[#CE2028] mt-1 truncate">
+            <div className="text-base sm:text-2xl font-black text-[#CE2028] truncate">
               {formatBDT(totalConstructionSpent)}
             </div>
-            <div className="text-3xs sm:text-2xs text-gray-400 truncate">{data.projects.length}টি প্রজেক্টে এ পর্যন্ত ব্যয়</div>
+            <div className="text-3xs text-slate-400 truncate">{data.projects.length}টি প্রকল্পে মোট ব্যয়</div>
           </div>
         </div>
       </div>
@@ -524,74 +553,107 @@ export default function ManagementDashboard({
       {/* ========================================================= */}
       {/* 3. MAIN WORKSPACE (SWITCHED VIA FOOTER NAVBAR)            */}
       {/* ========================================================= */}
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-6 flex-1">
+      <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 space-y-5 flex-1">
         
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
         {/* TAB 1: CLIENT MANAGEMENT                                */}
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
         {activeTab === 'clients' && (
           <div className="space-y-4 animate-fadeIn">
-            {/* Action Bar */}
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="relative w-full sm:w-80">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
-                <input
-                  type="text"
-                  placeholder="নাম, ফোন বা আইডি দিয়ে খুঁজুন..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none"
-                />
+            {/* Search & Project Filter Bar */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="relative w-full sm:w-80">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <input
+                    type="text"
+                    placeholder="নাম, ফোন বা আইডি দিয়ে খুঁজুন..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none"
+                  />
+                </div>
+
+                <button
+                  onClick={() => setIsClientModalOpen(true)}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>+ নতুন ক্লায়েন্ট যোগ করুন</span>
+                </button>
               </div>
 
-              <button
-                onClick={() => setIsClientModalOpen(true)}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>+ নতুন ক্লায়েন্ট যুক্ত করুন</span>
-              </button>
+              {/* Project Filter Pills */}
+              <div className="flex items-center space-x-2 overflow-x-auto pb-1 text-2xs font-semibold">
+                <button
+                  onClick={() => setProjectFilter('all')}
+                  className={`px-3 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
+                    projectFilter === 'all'
+                      ? 'bg-slate-900 text-white font-bold'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  সব প্রজেক্ট ({data.clients.length})
+                </button>
+                {data.projects.map(p => {
+                  const count = data.clients.filter(c => c.projectId === p.id).length;
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => setProjectFilter(p.id)}
+                      className={`px-3 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
+                        projectFilter === p.id
+                          ? 'bg-[#006231] text-white font-bold'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {p.name} ({count})
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Mobile Card View for Clients (Phones) */}
+            {/* Mobile-First Clients Cards View */}
             <div className="block md:hidden space-y-3">
               {filteredClients.map((cl) => {
                 const due = (cl.totalPrice || 0) - (cl.totalPaid || 0);
+                const percent = cl.totalPrice ? Math.round((cl.totalPaid / cl.totalPrice) * 100) : 0;
                 return (
-                  <div key={cl.id} className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-3">
-                    <div className="flex items-start justify-between border-b border-gray-100 pb-2.5">
+                  <div key={cl.id} className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                    <div className="flex items-start justify-between border-b border-slate-100 pb-2.5">
                       <div>
-                        <div className="font-bold text-gray-900 text-sm">{cl.name}</div>
-                        <div className="text-2xs text-gray-500 font-medium">{cl.phone} • {cl.id}</div>
+                        <div className="font-black text-slate-900 text-sm">{cl.name}</div>
+                        <div className="text-2xs text-slate-500 font-medium">মোবাইল: {cl.phone} • আইডি: {cl.id}</div>
                       </div>
-                      <span className="text-2xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                      <span className="text-3xs font-bold text-[#006231] bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                         {cl.flatNo}
                       </span>
                     </div>
 
-                    <div className="text-xs text-gray-600 font-medium">
-                      প্রকল্প: <strong className="text-gray-900">{cl.projectName}</strong>
+                    <div className="text-xs text-slate-600 font-medium">
+                      প্রকল্প: <strong className="text-slate-900">{cl.projectName}</strong>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-center">
+                    <div className="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-center">
                       <div>
-                        <div className="text-3xs text-gray-400 font-bold uppercase">মোট মূল্য</div>
-                        <div className="text-xs font-black text-gray-800 truncate">{formatBDT(cl.totalPrice)}</div>
+                        <div className="text-3xs text-slate-400 font-bold uppercase">মোট মূল্য</div>
+                        <div className="text-xs font-black text-slate-800 truncate">{formatBDT(cl.totalPrice)}</div>
                       </div>
                       <div>
-                        <div className="text-3xs text-[#006231] font-bold uppercase">পরিশোধিত</div>
+                        <div className="text-3xs text-[#006231] font-bold uppercase">পরিশোধ ({percent}%)</div>
                         <div className="text-xs font-black text-[#006231] truncate">{formatBDT(cl.totalPaid)}</div>
                       </div>
                       <div>
-                        <div className="text-3xs text-amber-700 font-bold uppercase">বকেয়া</div>
+                        <div className="text-3xs text-amber-700 font-bold uppercase">বকেয়া বাকি</div>
                         <div className="text-xs font-black text-amber-700 truncate">{formatBDT(due)}</div>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between pt-1">
-                      <div className="text-2xs text-gray-500">
-                        পরবর্তী কিস্তি: <span className="font-bold text-gray-900">{cl.nextDueDate}</span>
-                        <div className="font-bold text-[#CE2028]">{formatBDT(cl.nextDueAmount)}</div>
+                      <div className="text-2xs text-slate-500">
+                        পরবর্তী কিস্তি: <span className="font-bold text-slate-900">{cl.nextDueDate}</span>
+                        <div className="font-black text-[#CE2028]">{formatBDT(cl.nextDueAmount)}</div>
                       </div>
                       <button
                         onClick={() => {
@@ -602,9 +664,9 @@ export default function ManagementDashboard({
                           });
                           setActiveTab('payments');
                         }}
-                        className="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#006231] text-[#006231] hover:text-white font-bold text-xs border border-emerald-200 transition-colors cursor-pointer"
+                        className="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#006231] text-[#006231] hover:text-white font-bold text-xs border border-emerald-200 transition-colors cursor-pointer active:scale-95"
                       >
-                        + জমা এন্ট্রি
+                        + জমা নিন
                       </button>
                     </div>
                   </div>
@@ -612,11 +674,11 @@ export default function ManagementDashboard({
               })}
             </div>
 
-            {/* Desktop Clients Table (Tablets and Desktops) */}
-            <div className="hidden md:block bg-white rounded-3xl border border-gray-200 shadow-xs overflow-hidden">
+            {/* Desktop Clients Table View (Hidden on mobile) */}
+            <div className="hidden md:block bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs sm:text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase font-bold text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 uppercase font-bold text-xs">
                     <tr>
                       <th className="py-3.5 px-6">কাস্টমার তথ্য</th>
                       <th className="py-3.5 px-6">প্রজেক্ট ও ফ্ল্যাট</th>
@@ -627,20 +689,20 @@ export default function ManagementDashboard({
                       <th className="py-3.5 px-6 text-right">অ্যাকশন</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 text-gray-700 font-medium">
+                  <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
                     {filteredClients.map((cl) => {
                       const due = (cl.totalPrice || 0) - (cl.totalPaid || 0);
                       return (
-                        <tr key={cl.id} className="hover:bg-gray-50/80 transition-colors">
+                        <tr key={cl.id} className="hover:bg-slate-50/80 transition-colors">
                           <td className="py-4 px-6">
-                            <div className="font-bold text-gray-900">{cl.name}</div>
-                            <div className="text-2xs text-gray-500">{cl.phone} • {cl.id}</div>
+                            <div className="font-bold text-slate-900">{cl.name}</div>
+                            <div className="text-2xs text-slate-500">{cl.phone} • {cl.id}</div>
                           </td>
                           <td className="py-4 px-6">
-                            <div className="font-bold text-gray-800">{cl.projectName}</div>
+                            <div className="font-bold text-slate-800">{cl.projectName}</div>
                             <div className="text-2xs text-emerald-700 font-semibold">{cl.flatNo}</div>
                           </td>
-                          <td className="py-4 px-6 font-bold text-gray-900">
+                          <td className="py-4 px-6 font-bold text-slate-900">
                             {formatBDT(cl.totalPrice)}
                           </td>
                           <td className="py-4 px-6 font-black text-[#006231]">
@@ -650,7 +712,7 @@ export default function ManagementDashboard({
                             {formatBDT(due)}
                           </td>
                           <td className="py-4 px-6">
-                            <div className="text-xs text-gray-900 font-bold">{cl.nextDueDate}</div>
+                            <div className="text-xs text-slate-900 font-bold">{cl.nextDueDate}</div>
                             <div className="text-2xs text-[#CE2028] font-bold">{formatBDT(cl.nextDueAmount)}</div>
                           </td>
                           <td className="py-4 px-6 text-right">
@@ -678,32 +740,32 @@ export default function ManagementDashboard({
           </div>
         )}
 
-        {/* ======================================================= */}
-        {/* TAB 2: PAYMENT COLLECTION ENTRY                         */}
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
+        {/* TAB 2: কিস্তি ও জমা এন্ট্রি (PAYMENTS COLLECTION)        */}
+        {/* ------------------------------------------------------- */}
         {activeTab === 'payments' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fadeIn">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 animate-fadeIn">
             {/* Payment Entry Form (5 cols) */}
-            <div className="lg:col-span-5 bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs space-y-4">
-              <div className="border-b border-gray-100 pb-3">
-                <h3 className="text-lg font-bold text-gray-900 flex items-center space-x-2">
+            <div className="lg:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2">
                   <DollarSign className="w-5 h-5 text-[#006231]" />
                   <span>কিস্তি বা টাকা জমার নতুন এন্ট্রি</span>
                 </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  কাস্টমার টাকা পরিশোধ করলে এখানে এন্ট্রি দিলে স্বয়ংক্রিয়ভাবে তার একাউন্টে আপডেট হবে।
+                <p className="text-2xs text-slate-500 mt-0.5">
+                  কাস্টমার থেকে টাকা জমা পেলে এখানে এন্ট্রি দিন। সাথে সাথে কাস্টমার পোর্টালে যুক্ত হবে।
                 </p>
               </div>
 
               <form onSubmit={handleReceivePayment} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     কাস্টমার নির্বাচন করুন *
                   </label>
                   <select
                     value={paymentForm.clientId}
                     onChange={(e) => setPaymentForm({ ...paymentForm, clientId: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
                   >
                     {data.clients.map(c => {
                       const due = (c.totalPrice || 0) - (c.totalPaid || 0);
@@ -714,43 +776,54 @@ export default function ManagementDashboard({
                       );
                     })}
                   </select>
+                  {targetClientForCalc && (
+                    <div className="mt-1 text-2xs text-slate-500 flex justify-between">
+                      <span>মোট মূল্য: {formatBDT(targetClientForCalc.totalPrice)}</span>
+                      <span className="font-bold text-amber-700">বর্তমান বকেয়া: {formatBDT(targetClientDue)}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                    টাকা জমার পরিমাণ (BDT) *
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    জমার টাকার পরিমাণ (BDT) *
                   </label>
                   <input
                     type="number"
                     placeholder="যেমন: 600000"
                     value={paymentForm.amount}
                     onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-bold text-gray-800 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-black text-slate-900 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
                     required
                   />
+                  {paymentForm.amount && targetClientDue > 0 && (
+                    <div className="mt-1 text-2xs text-[#006231] font-semibold">
+                      জমা প্রদানের পর অবশিষ্ট বকেয়া থাকবে: {formatBDT(Math.max(0, targetClientDue - Number(paymentForm.amount)))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                    <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                       জমার তারিখ
                     </label>
                     <input
                       type="text"
                       value={paymentForm.date}
                       onChange={(e) => setPaymentForm({ ...paymentForm, date: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-medium text-gray-800 outline-none focus:border-[#CE2028]"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-[#CE2028]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                    <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                       পেমেন্ট মাধ্যম
                     </label>
                     <select
                       value={paymentForm.method}
                       onChange={(e) => setPaymentForm({ ...paymentForm, method: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                     >
                       <option value="ব্যাংক ডিপোজিট">ব্যাংক ডিপোজিট</option>
                       <option value="ব্যাংক চেক">ব্যাংক চেক</option>
@@ -762,21 +835,21 @@ export default function ManagementDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     রসিদ নম্বর বা নোট (ঐচ্ছিক)
                   </label>
                   <input
                     type="text"
-                    placeholder="যেমন: মানি রিসিট #৪২০১"
+                    placeholder="যেমন: ব্যাংক চালান #৮২০১"
                     value={paymentForm.note}
                     onChange={(e) => setPaymentForm({ ...paymentForm, note: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-medium text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 outline-none focus:border-[#CE2028]"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-900/20 hover:opacity-95 transition-all cursor-pointer flex items-center justify-center space-x-1.5"
+                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-900/20 hover:opacity-95 transition-all cursor-pointer flex items-center justify-center space-x-1.5 active:scale-95"
                 >
                   <Check className="w-4 h-4" />
                   <span>জমা নিশ্চিত করুন ও এন্ট্রি দিন</span>
@@ -784,30 +857,30 @@ export default function ManagementDashboard({
               </form>
             </div>
 
-            {/* Recent Collections Table (7 cols) */}
-            <div className="lg:col-span-7 bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs space-y-4">
-              <div className="border-b border-gray-100 pb-3 flex items-center justify-between">
+            {/* Recent Collections Feed (7 cols) */}
+            <div className="lg:col-span-7 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+              <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">সাম্প্রতিক সংগৃহীত কিস্তির তালিকা</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">সকল কাস্টমার থেকে সংগৃহীত এন্ট্রিসমূহ</p>
+                  <h3 className="text-base font-bold text-slate-900">সাম্প্রতিক সংগৃহীত কিস্তির তালিকা</h3>
+                  <p className="text-2xs text-slate-500 mt-0.5">সকল কাস্টমার থেকে সংগৃহীত এন্ট্রিসমূহ</p>
                 </div>
-                <span className="text-xs font-bold text-[#006231] bg-emerald-50 px-2.5 py-1 rounded-md">
+                <span className="text-xs font-bold text-[#006231] bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
                   সর্বমোট: {formatBDT(totalCollections)}
                 </span>
               </div>
 
-              <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
+              <div className="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
                 {data.clients.flatMap(c => (c.paymentHistory || []).map(p => ({ ...p, clientName: c.name, projectName: c.projectName, clientId: c.id })))
                   .sort((a, b) => (b.id > a.id ? 1 : -1))
                   .map((trx, idx) => (
-                    <div key={idx} className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between text-xs">
+                    <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
                       <div className="space-y-0.5">
-                        <div className="font-bold text-gray-900 flex items-center space-x-1.5">
+                        <div className="font-bold text-slate-900 flex items-center space-x-1.5">
                           <span>{trx.clientName}</span>
-                          <span className="text-2xs text-gray-400 font-normal">({trx.projectName})</span>
+                          <span className="text-3xs text-slate-400 font-normal">({trx.projectName})</span>
                         </div>
-                        <div className="text-2xs text-gray-500">
-                          {trx.date} • {trx.method} • আইডি: {trx.id}
+                        <div className="text-2xs text-slate-500">
+                          {trx.date} • {trx.method} • রসিদ: {trx.id}
                         </div>
                       </div>
                       <div className="text-right">
@@ -825,45 +898,48 @@ export default function ManagementDashboard({
           </div>
         )}
 
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
         {/* TAB 3: PROJECT MANAGEMENT & PROGRESS UPDATE             */}
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
         {activeTab === 'projects' && (
           <div className="space-y-4 animate-fadeIn">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
               <div>
-                <h3 className="text-base font-bold text-gray-900">চলমান ও আসন্ন প্রজেক্টসমূহ</h3>
-                <p className="text-xs text-gray-500">প্রজেক্টের কাজের শতাংশ ও চলমান তলার কাজ আপডেট করুন</p>
+                <h3 className="text-base font-bold text-slate-900">চলমান ও আসন্ন প্রজেক্টসমূহ</h3>
+                <p className="text-xs text-slate-500">প্রজেক্টের কাজের শতাংশ ও চলমান তলার কাজ আপডেট করুন</p>
               </div>
               <button
                 onClick={() => setIsProjectModalOpen(true)}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>+ নতুন প্রজেক্ট অ্যাড করুন</span>
+                <span>+ নতুন প্রজেক্ট যোগ করুন</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {data.projects.map((proj) => {
                 const projClients = data.clients.filter(c => c.projectId === proj.id);
                 return (
-                  <div key={proj.id} className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-200 shadow-xs space-y-4">
-                    <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                  <div key={proj.id} className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <div>
-                        <h4 className="text-lg font-black text-gray-900">{proj.name}</h4>
-                        <p className="text-xs text-gray-500">{proj.location}</p>
+                        <h4 className="text-base sm:text-lg font-black text-slate-900">{proj.name}</h4>
+                        <p className="text-xs text-slate-500 flex items-center space-x-1">
+                          <MapPin className="w-3 h-3 text-[#CE2028]" />
+                          <span>{proj.location}</span>
+                        </p>
                       </div>
                       <div className="text-right">
                         <span className="text-xl font-black text-[#006231]">{proj.progress}%</span>
-                        <div className="text-2xs text-gray-400 font-bold">সম্পন্ন</div>
+                        <div className="text-3xs text-slate-400 font-bold">সম্পন্ন</div>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs font-bold text-gray-700">
-                        <span>কাজের অগ্রগতি পরিবর্তন করুন:</span>
-                        <span className="text-[#CE2028]">{proj.progress}%</span>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                        <span>কাজের অগ্রগতি স্লাইডার:</span>
+                        <span className="text-[#CE2028] font-black">{proj.progress}%</span>
                       </div>
                       <input
                         type="range"
@@ -876,24 +952,24 @@ export default function ManagementDashboard({
                     </div>
 
                     <div>
-                      <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+                      <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
                         বর্তমান চলমান কাজের বিবরণ (ফ্লোর/ফেজ)
                       </label>
                       <input
                         type="text"
                         defaultValue={proj.currentStage}
                         onBlur={(e) => handleUpdateProjectProgress(proj.id, proj.progress, e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 pt-2 text-xs">
-                      <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
-                        <div className="text-2xs text-gray-400 font-bold">মোট বাজেট</div>
-                        <div className="font-bold text-gray-900 mt-0.5 truncate">{formatBDT(proj.budget)}</div>
+                    <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
+                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                        <div className="text-3xs text-slate-400 font-bold">মোট বাজেট</div>
+                        <div className="font-bold text-slate-900 mt-0.5 truncate">{formatBDT(proj.budget)}</div>
                       </div>
-                      <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
-                        <div className="text-2xs text-gray-400 font-bold">নিবন্ধিত ক্রেতা</div>
+                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                        <div className="text-3xs text-slate-400 font-bold">নিবন্ধিত ক্রেতা</div>
                         <div className="font-bold text-[#006231] mt-0.5">{projClients.length} জন</div>
                       </div>
                     </div>
@@ -904,22 +980,22 @@ export default function ManagementDashboard({
           </div>
         )}
 
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
         {/* TAB 4: PROJECT EXPENSE & SHORT BUDGET BREAKDOWN         */}
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
         {activeTab === 'expenses' && (
-          <div className="space-y-6 animate-fadeIn">
+          <div className="space-y-5 animate-fadeIn">
             {/* Top Project Selector & Budget Summary */}
-            <div className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-200 shadow-xs space-y-4">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+            <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div className="w-full lg:w-auto">
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-400 uppercase tracking-wider mb-1">
                     প্রজেক্ট নির্বাচন করুন
                   </label>
                   <select
                     value={selectedExpenseProject}
                     onChange={(e) => setSelectedExpenseProject(e.target.value)}
-                    className="w-full lg:w-auto bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm sm:text-base font-black text-gray-900 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
+                    className="w-full lg:w-auto bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm sm:text-base font-black text-slate-900 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
                   >
                     {data.projects.map(p => (
                       <option key={p.id} value={p.id}>{p.name}</option>
@@ -927,21 +1003,21 @@ export default function ManagementDashboard({
                   </select>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 w-full lg:w-auto divide-x divide-gray-100 lg:divide-x-0">
+                <div className="grid grid-cols-3 gap-2 w-full lg:w-auto divide-x divide-slate-100 lg:divide-x-0">
                   <div className="text-center sm:text-right px-1">
-                    <div className="text-3xs sm:text-xs text-gray-400 font-bold">প্রজেক্ট বাজেট</div>
-                    <div className="text-xs sm:text-base font-black text-gray-900 truncate">
+                    <div className="text-3xs text-slate-400 font-bold uppercase">প্রজেক্ট বাজেট</div>
+                    <div className="text-xs sm:text-base font-black text-slate-900 truncate">
                       {formatBDT(selectedProjForExpense?.budget)}
                     </div>
                   </div>
-                  <div className="text-center sm:text-right px-1 lg:border-l lg:pl-4 lg:border-gray-200">
-                    <div className="text-3xs sm:text-xs text-[#CE2028] font-bold">মোট ব্যয়</div>
+                  <div className="text-center sm:text-right px-1 lg:border-l lg:pl-4 lg:border-slate-200">
+                    <div className="text-3xs text-[#CE2028] font-bold uppercase">মোট ব্যয়</div>
                     <div className="text-xs sm:text-base font-black text-[#CE2028] truncate">
                       {formatBDT(projectTotalExpense)}
                     </div>
                   </div>
-                  <div className="text-center sm:text-right px-1 lg:border-l lg:pl-4 lg:border-gray-200">
-                    <div className="text-3xs sm:text-xs text-[#006231] font-bold">অবশিষ্ট ফান্ড</div>
+                  <div className="text-center sm:text-right px-1 lg:border-l lg:pl-4 lg:border-slate-200">
+                    <div className="text-3xs text-[#006231] font-bold uppercase">অবশিষ্ট ফান্ড</div>
                     <div className="text-xs sm:text-base font-black text-[#006231] truncate">
                       {formatBDT(projectRemainingBudget)}
                     </div>
@@ -952,21 +1028,21 @@ export default function ManagementDashboard({
               {/* Add New Short Expense Form */}
               <form onSubmit={handleAddExpense} className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-1 items-end">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                    খরচের পর্যায় / বিবরণ (যেমন: পাইলিং, ১ম-৫ম তলা ঢালাই) *
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    খরচের পর্যায় / বিবরণ (যেমন: ১ম-৫ম তলা ঢালাই) *
                   </label>
                   <input
                     type="text"
                     placeholder="যেমন: ১ম থেকে ৫ম তলা আরসিসি ঢালাই"
                     value={expenseForm.title}
                     onChange={(e) => setExpenseForm({ ...expenseForm, title: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     খরচের পরিমাণ (BDT) *
                   </label>
                   <input
@@ -974,7 +1050,7 @@ export default function ManagementDashboard({
                     placeholder="যেমন: 31000000"
                     value={expenseForm.amount}
                     onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-bold text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
                     required
                   />
                 </div>
@@ -982,7 +1058,7 @@ export default function ManagementDashboard({
                 <div>
                   <button
                     type="submit"
-                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all cursor-pointer h-[42px]"
+                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all cursor-pointer h-[38px] active:scale-95"
                   >
                     + খরচ এন্ট্রি দিন
                   </button>
@@ -991,15 +1067,15 @@ export default function ManagementDashboard({
             </div>
 
             {/* Expenses Breakdown Mobile Cards & Table */}
-            <div className="bg-white rounded-3xl border border-gray-200 shadow-xs overflow-hidden">
-              <div className="p-5 sm:p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                  <h3 className="text-base font-bold text-slate-900">
                     {selectedProjForExpense?.name} - পর্যায়ভিত্তিক খরচের সংক্ষিপ্ত বিবরণ
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">ফ্লোর ও কনস্ট্রাকশন ধাপ অনুযায়ী খরচের হিসাব</p>
+                  <p className="text-2xs text-slate-500">ফ্লোর ও কনস্ট্রাকশন ধাপ অনুযায়ী খরচের হিসাব</p>
                 </div>
-                <span className="text-xs font-bold text-[#CE2028] bg-red-50 px-2.5 py-1 rounded-md self-start sm:self-auto">
+                <span className="text-xs font-bold text-[#CE2028] bg-red-50 px-2.5 py-1 rounded-full self-start sm:self-auto border border-red-100">
                   মোট ব্যয়: {formatBDT(projectTotalExpense)}
                 </span>
               </div>
@@ -1008,10 +1084,10 @@ export default function ManagementDashboard({
               <div className="block md:hidden p-4 space-y-2.5">
                 {selectedProjForExpense?.expenses && selectedProjForExpense.expenses.length > 0 ? (
                   selectedProjForExpense.expenses.map((exp, idx) => (
-                    <div key={idx} className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between text-xs">
+                    <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
                       <div>
-                        <div className="font-bold text-gray-900 text-xs sm:text-sm">{exp.title}</div>
-                        <div className="text-2xs text-gray-500 mt-0.5">{exp.date}</div>
+                        <div className="font-bold text-slate-900 text-xs sm:text-sm">{exp.title}</div>
+                        <div className="text-2xs text-slate-500 mt-0.5">{exp.date}</div>
                       </div>
                       <div className="text-right">
                         <div className="font-black text-sm text-[#CE2028]">{formatBDT(exp.amount)}</div>
@@ -1022,7 +1098,7 @@ export default function ManagementDashboard({
                     </div>
                   ))
                 ) : (
-                  <div className="py-6 text-center text-gray-400 text-xs">
+                  <div className="py-6 text-center text-slate-400 text-xs">
                     এই প্রজেক্টে এখনো কোনো খরচের এন্ট্রি যুক্ত করা হয়নি।
                   </div>
                 )}
@@ -1031,7 +1107,7 @@ export default function ManagementDashboard({
               {/* Desktop Table View (Tablets & Desktops) */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs sm:text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase font-bold text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 uppercase font-bold text-xs">
                     <tr>
                       <th className="py-3.5 px-6">খরচের পর্যায় / বিবরণ</th>
                       <th className="py-3.5 px-6">তারিখ</th>
@@ -1039,12 +1115,12 @@ export default function ManagementDashboard({
                       <th className="py-3.5 px-6 text-center">স্ট্যাটাস</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 text-gray-700 font-medium">
+                  <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
                     {selectedProjForExpense?.expenses && selectedProjForExpense.expenses.length > 0 ? (
                       selectedProjForExpense.expenses.map((exp, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50/80 transition-colors">
-                          <td className="py-4 px-6 font-bold text-gray-900">{exp.title}</td>
-                          <td className="py-4 px-6 text-gray-500">{exp.date}</td>
+                        <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="py-4 px-6 font-bold text-slate-900">{exp.title}</td>
+                          <td className="py-4 px-6 text-slate-500">{exp.date}</td>
                           <td className="py-4 px-6 text-right font-black text-[#CE2028]">
                             {formatBDT(exp.amount)}
                           </td>
@@ -1058,7 +1134,7 @@ export default function ManagementDashboard({
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} className="py-8 text-center text-gray-400 text-xs">
+                        <td colSpan={4} className="py-8 text-center text-slate-400 text-xs">
                           এই প্রজেক্টে এখনো কোনো খরচের এন্ট্রি যুক্ত করা হয়নি।
                         </td>
                       </tr>
@@ -1070,42 +1146,50 @@ export default function ManagementDashboard({
           </div>
         )}
 
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
         {/* TAB 5: MANAGEMENT TEAM                                  */}
-        {/* ======================================================= */}
+        {/* ------------------------------------------------------- */}
         {activeTab === 'team' && (
           <div className="space-y-4 animate-fadeIn">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
               <div>
-                <h3 className="text-base font-bold text-gray-900">ম্যানেজমেন্ট টিম ও দায়িত্বপ্রাপ্ত কর্মকর্তাগণ</h3>
-                <p className="text-xs text-gray-500">অ্যাডমিন, অ্যাকাউন্টস ও সাইট ইঞ্জিনিয়ারদের তালিকা</p>
+                <h3 className="text-base font-bold text-slate-900">ম্যানেজমেন্ট টিম ও দায়িত্বপ্রাপ্ত কর্মকর্তাগণ</h3>
+                <p className="text-xs text-slate-500">অ্যাডমিন, অ্যাকাউন্টস ও সাইট ইঞ্জিনিয়ারদের তালিকা</p>
               </div>
               <button
                 onClick={() => setIsTeamModalOpen(true)}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>+ নতুন কর্মকর্তা যুক্ত করুন</span>
+                <span>+ নতুন কর্মকর্তা যোগ করুন</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {data.managementTeam.map((mem) => (
-                <div key={mem.id} className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs space-y-3">
+                <div key={mem.id} className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 rounded-full bg-red-50 text-[#CE2028] flex items-center justify-center font-black text-lg">
-                      <HardHat className="w-6 h-6" />
+                    <div className="w-11 h-11 rounded-2xl bg-red-50 text-[#CE2028] flex items-center justify-center font-black text-base">
+                      <HardHat className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-black text-gray-900">{mem.name}</h4>
-                      <p className="text-xs text-gray-500">{mem.role}</p>
+                      <h4 className="text-sm font-black text-slate-900">{mem.name}</h4>
+                      <p className="text-xs text-[#006231] font-semibold">{mem.role}</p>
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 text-xs space-y-1">
-                    <div>মোবাইল: <strong className="text-gray-900">{mem.phone}</strong></div>
-                    <div>অ্যাক্সেস কী: <span className="font-mono text-gray-600">{mem.accessKey}</span></div>
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1">
+                    <div>মোবাইল: <strong className="text-slate-900 font-mono">{mem.phone}</strong></div>
+                    <div>অ্যাক্সেস কী: <span className="font-mono text-slate-600 font-semibold">{mem.accessKey}</span></div>
                   </div>
+
+                  <a
+                    href={`tel:${mem.phone}`}
+                    className="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center space-x-1 transition-colors"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-[#006231]" />
+                    <span>কল দিন</span>
+                  </a>
                 </div>
               ))}
             </div>
@@ -1115,10 +1199,10 @@ export default function ManagementDashboard({
       </main>
 
       {/* ========================================================= */}
-      {/* 4. STICKY FOOTER NAVBAR (ICONS ONLY - NO TEXT LABELS)     */}
+      {/* 4. FLOATING PILL FOOTER NAVBAR (EXACTLY 5 ICONS)          */}
       {/* ========================================================= */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl py-2 px-3">
-        <div className="flex items-center justify-around max-w-md mx-auto">
+      <nav className="fixed bottom-3 left-4 right-4 z-50 max-w-sm sm:max-w-md mx-auto">
+        <div className="bg-white/95 backdrop-blur-2xl border border-slate-200 shadow-2xl rounded-full py-1.5 px-3 flex items-center justify-around ring-1 ring-black/5">
           {managementNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -1128,17 +1212,16 @@ export default function ManagementDashboard({
                 onClick={() => setActiveTab(item.id)}
                 aria-label={item.label}
                 title={item.label}
-                className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
+                className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
                   isActive 
-                    ? 'text-[#CE2028] bg-red-50/80 scale-105' 
-                    : 'text-gray-400 hover:text-gray-700'
+                    ? 'bg-red-50 text-[#CE2028] scale-110 shadow-xs' 
+                    : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
-                {/* Active indicator dot */}
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
                 )}
-                <Icon className={`w-6 h-6 ${isActive ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             );
           })}
@@ -1150,15 +1233,23 @@ export default function ManagementDashboard({
       {/* ========================================================= */}
       {isClientModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-gray-100 relative max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">
-              নতুন ক্লায়েন্ট / ফ্ল্যাট ক্রেতা নিবন্ধন
-            </h3>
+          <div className="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                নতুন ক্লায়েন্ট / ফ্ল্যাট ক্রেতা নিবন্ধন
+              </h3>
+              <button 
+                onClick={() => setIsClientModalOpen(false)}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-            <form onSubmit={handleAddClient} className="space-y-4 pt-3">
+            <form onSubmit={handleAddClient} className="space-y-3.5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     কাস্টমারের নাম *
                   </label>
                   <input
@@ -1166,13 +1257,13 @@ export default function ManagementDashboard({
                     placeholder="যেমন: মোহাম্মদ আরিফুল ইসলাম"
                     value={clientForm.name}
                     onChange={(e) => setClientForm({ ...clientForm, name: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     মোবাইল নম্বর *
                   </label>
                   <input
@@ -1180,7 +1271,7 @@ export default function ManagementDashboard({
                     placeholder="যেমন: 01711223344"
                     value={clientForm.phone}
                     onChange={(e) => setClientForm({ ...clientForm, phone: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                     required
                   />
                 </div>
@@ -1188,13 +1279,13 @@ export default function ManagementDashboard({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     প্রজেক্ট নির্বাচন *
                   </label>
                   <select
                     value={clientForm.projectId}
                     onChange={(e) => setClientForm({ ...clientForm, projectId: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                   >
                     {data.projects.map(p => (
                       <option key={p.id} value={p.id}>{p.name}</option>
@@ -1203,7 +1294,7 @@ export default function ManagementDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     ফ্ল্যাট ও সাইজ বিবরণ *
                   </label>
                   <input
@@ -1211,7 +1302,7 @@ export default function ManagementDashboard({
                     placeholder="যেমন: ৭ম তলা, ফ্ল্যাট ৭-বি (১২৬৫ বর্গফুট)"
                     value={clientForm.flatNo}
                     onChange={(e) => setClientForm({ ...clientForm, flatNo: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                     required
                   />
                 </div>
@@ -1219,7 +1310,7 @@ export default function ManagementDashboard({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     মোট চুক্তি মূল্য (BDT) *
                   </label>
                   <input
@@ -1227,13 +1318,13 @@ export default function ManagementDashboard({
                     placeholder="যেমন: 12000000"
                     value={clientForm.totalPrice}
                     onChange={(e) => setClientForm({ ...clientForm, totalPrice: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     বুকিং মানি / প্রাথমিক জমা (BDT)
                   </label>
                   <input
@@ -1241,26 +1332,26 @@ export default function ManagementDashboard({
                     placeholder="যেমন: 2400000"
                     value={clientForm.initialPaid}
                     onChange={(e) => setClientForm({ ...clientForm, initialPaid: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     পরবর্তী কিস্তির তারিখ
                   </label>
                   <input
                     type="text"
                     value={clientForm.nextDueDate}
                     onChange={(e) => setClientForm({ ...clientForm, nextDueDate: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-medium text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-[#CE2028]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     পরবর্তী কিস্তির পরিমাণ (BDT)
                   </label>
                   <input
@@ -1268,22 +1359,22 @@ export default function ManagementDashboard({
                     placeholder="যেমন: 600000"
                     value={clientForm.nextDueAmount}
                     onChange={(e) => setClientForm({ ...clientForm, nextDueAmount: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-bold text-gray-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:border-[#CE2028]"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-gray-100">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsClientModalOpen(false)}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors cursor-pointer text-center"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer text-center"
                 >
                   বাতিল
                 </button>
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center active:scale-95"
                 >
                   নিশ্চিত করুন ও ক্লায়েন্ট তৈরি করুন
                 </button>
@@ -1298,14 +1389,22 @@ export default function ManagementDashboard({
       {/* ========================================================= */}
       {isProjectModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-gray-100 relative">
-            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">
-              নতুন প্রজেক্ট যোগ করুন
-            </h3>
+          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                নতুন প্রজেক্ট যোগ করুন
+              </h3>
+              <button 
+                onClick={() => setIsProjectModalOpen(false)}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-            <form onSubmit={handleAddProject} className="space-y-4 pt-3">
+            <form onSubmit={handleAddProject} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   প্রজেক্টের নাম *
                 </label>
                 <input
@@ -1313,13 +1412,13 @@ export default function ManagementDashboard({
                   placeholder="যেমন: আল-ইমারাহ হাইটস"
                   value={projectForm.name}
                   onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   লোকেশন / ঠিকানা
                 </label>
                 <input
@@ -1327,12 +1426,12 @@ export default function ManagementDashboard({
                   placeholder="যেমন: পুরানা পল্টন, ঢাকা"
                   value={projectForm.location}
                   onChange={(e) => setProjectForm({ ...projectForm, location: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   মোট আনুমানিক বাজেট (BDT) *
                 </label>
                 <input
@@ -1340,22 +1439,22 @@ export default function ManagementDashboard({
                   placeholder="যেমন: 85000000"
                   value={projectForm.budget}
                   onChange={(e) => setProjectForm({ ...projectForm, budget: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold text-gray-800 outline-none focus:border-[#CE2028]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
                   required
                 />
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-gray-100">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsProjectModalOpen(false)}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors cursor-pointer text-center"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer text-center"
                 >
                   বাতিল
                 </button>
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center active:scale-95"
                 >
                   প্রজেক্ট যুক্ত করুন
                 </button>
@@ -1370,14 +1469,22 @@ export default function ManagementDashboard({
       {/* ========================================================= */}
       {isTeamModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-gray-100 relative max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">
-              নতুন কর্মকর্তা / অ্যাডমিন যুক্ত করুন
-            </h3>
+          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                নতুন কর্মকর্তা / অ্যাডমিন যুক্ত করুন
+              </h3>
+              <button 
+                onClick={() => setIsTeamModalOpen(false)}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-            <form onSubmit={handleAddTeam} className="space-y-4 pt-3">
+            <form onSubmit={handleAddTeam} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   কর্মকর্তার নাম *
                 </label>
                 <input
@@ -1385,13 +1492,13 @@ export default function ManagementDashboard({
                   placeholder="যেমন: প্রকৌশলী মাহমুদুর রহমান"
                   value={teamForm.name}
                   onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   মোবাইল নম্বর *
                 </label>
                 <input
@@ -1399,19 +1506,19 @@ export default function ManagementDashboard({
                   placeholder="যেমন: 01918646575"
                   value={teamForm.phone}
                   onChange={(e) => setTeamForm({ ...teamForm, phone: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   পদবী / রোল
                 </label>
                 <select
                   value={teamForm.role}
                   onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                 >
                   <option value="সাইট ইঞ্জিনিয়ার">সাইট ইঞ্জিনিয়ার</option>
                   <option value="প্রজেক্ট ডিরেক্টর">প্রজেক্ট ডিরেক্টর</option>
@@ -1421,28 +1528,28 @@ export default function ManagementDashboard({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   লগইন অ্যাক্সেস কী / পাসওয়ার্ড
                 </label>
                 <input
                   type="text"
                   value={teamForm.accessKey}
                   onChange={(e) => setTeamForm({ ...teamForm, accessKey: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-[#CE2028]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                 />
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-gray-100">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsTeamModalOpen(false)}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors cursor-pointer text-center"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer text-center"
                 >
                   বাতিল
                 </button>
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center active:scale-95"
                 >
                   যুক্ত করুন
                 </button>
