@@ -106,11 +106,8 @@ export default function ContactSection({ lang, t, preselectedProject }) {
                     <a href="tel:01743926926" className="hover:text-[#CE2028] transition-colors">
                       {lang === 'en' ? '01743-926926' : '০১৭৪৩-৯২৬৯২৬'}
                     </a>
-                    <a href="tel:01914425073" className="hover:text-[#CE2028] transition-colors">
-                      {lang === 'en' ? '01914-425073' : '০১৯১৪-৪২৫০৭৩'}
-                    </a>
-                    <a href="tel:01833544548" className="hover:text-[#CE2028] transition-colors">
-                      {lang === 'en' ? '01833-544548' : '০১৮৩৩-৫৪৪৫৪৮'}
+                    <a href="tel:01816233013" className="hover:text-[#CE2028] transition-colors">
+                      {lang === 'en' ? '01816-233013' : '০১৮১৬-২৩৩০১৩'}
                     </a>
                   </div>
                 </div>
