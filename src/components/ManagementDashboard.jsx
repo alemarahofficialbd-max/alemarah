@@ -1019,10 +1019,10 @@ export default function ManagementDashboard({
       </main>
 
       {/* ========================================================= */}
-      {/* 4. STICKY FOOTER NAVBAR (ALL 5 MANAGEMENT OPTIONS AT BOTTOM) */}
+      {/* 4. STICKY FOOTER NAVBAR (ICONS ONLY - NO TEXT LABELS)     */}
       {/* ========================================================= */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl py-1.5 px-2">
-        <div className="grid grid-cols-5 max-w-lg mx-auto gap-1">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl py-2 px-3">
+        <div className="flex items-center justify-around max-w-md mx-auto">
           {managementNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -1030,20 +1030,19 @@ export default function ManagementDashboard({
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all cursor-pointer relative ${
+                aria-label={item.label}
+                title={item.label}
+                className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
                   isActive 
-                    ? 'text-[#CE2028] font-black' 
-                    : 'text-gray-500 hover:text-gray-800 font-semibold'
+                    ? 'text-[#CE2028] bg-red-50/80 scale-105' 
+                    : 'text-gray-400 hover:text-gray-700'
                 }`}
               >
                 {/* Active indicator dot */}
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
                 )}
-                <Icon className={`w-5 h-5 ${isActive ? 'scale-110 text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
-                <span className="text-3xs mt-1 tracking-tight text-center truncate max-w-full">
-                  {item.label}
-                </span>
+                <Icon className={`w-6 h-6 ${isActive ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
               </button>
             );
           })}

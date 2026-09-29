@@ -437,93 +437,88 @@ export default function ClientDashboard({
       </main>
 
       {/* ========================================================= */}
-      {/* 3. STICKY FOOTER NAVBAR (WITH CIRCULAR AVATAR AS LAST TAB) */}
+      {/* 3. STICKY FOOTER NAVBAR (ICONS ONLY - NO TEXT LABELS)     */}
       {/* ========================================================= */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl py-1.5 px-2">
-        <div className="grid grid-cols-4 max-w-md mx-auto gap-1">
-          {/* Tab 1: প্রোপার্টি ও তথ্য */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl py-2 px-4">
+        <div className="flex items-center justify-around max-w-sm mx-auto">
+          {/* Tab 1: প্রোপার্টি */}
           <button
             onClick={() => setActiveTab('details')}
-            className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all cursor-pointer relative ${
-              activeTab === 'details' ? 'text-[#CE2028] font-black' : 'text-gray-500 hover:text-gray-800 font-semibold'
+            aria-label="প্রোপার্টি বিবরণ"
+            title="প্রোপার্টি বিবরণ"
+            className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
+              activeTab === 'details' ? 'text-[#CE2028] bg-red-50/80 scale-105' : 'text-gray-400 hover:text-gray-700'
             }`}
           >
             {activeTab === 'details' && (
               <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
             )}
-            <Building2 className={`w-5 h-5 ${activeTab === 'details' ? 'scale-110 text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
-            <span className="text-3xs mt-1 tracking-tight text-center truncate max-w-full">
-              প্রোপার্টি
-            </span>
+            <Building2 className={`w-6 h-6 ${activeTab === 'details' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
           </button>
 
           {/* Tab 2: কিস্তির হিসাব */}
           <button
             onClick={() => setActiveTab('payments')}
-            className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all cursor-pointer relative ${
-              activeTab === 'payments' ? 'text-[#CE2028] font-black' : 'text-gray-500 hover:text-gray-800 font-semibold'
+            aria-label="কিস্তির হিসাব"
+            title="কিস্তির হিসাব"
+            className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
+              activeTab === 'payments' ? 'text-[#CE2028] bg-red-50/80 scale-105' : 'text-gray-400 hover:text-gray-700'
             }`}
           >
             {activeTab === 'payments' && (
               <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
             )}
-            <DollarSign className={`w-5 h-5 ${activeTab === 'payments' ? 'scale-110 text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
-            <span className="text-3xs mt-1 tracking-tight text-center truncate max-w-full">
-              কিস্তির হিসাব
-            </span>
+            <DollarSign className={`w-6 h-6 ${activeTab === 'payments' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
           </button>
 
           {/* Tab 3: কাজের অগ্রগতি */}
           <button
             onClick={() => setActiveTab('progress')}
-            className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all cursor-pointer relative ${
-              activeTab === 'progress' ? 'text-[#CE2028] font-black' : 'text-gray-500 hover:text-gray-800 font-semibold'
+            aria-label="কাজের অগ্রগতি"
+            title="কাজের অগ্রগতি"
+            className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
+              activeTab === 'progress' ? 'text-[#CE2028] bg-red-50/80 scale-105' : 'text-gray-400 hover:text-gray-700'
             }`}
           >
             {activeTab === 'progress' && (
               <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
             )}
-            <HardHat className={`w-5 h-5 ${activeTab === 'progress' ? 'scale-110 text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
-            <span className="text-3xs mt-1 tracking-tight text-center truncate max-w-full">
-              কাজের অগ্রগতি
-            </span>
+            <HardHat className={`w-6 h-6 ${activeTab === 'progress' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
           </button>
 
-          {/* Tab 4: প্রোফাইল (CIRCULAR AVATAR DIRECTLY IN THE FOOTER NAVBAR) */}
+          {/* Tab 4: প্রোফাইল (CIRCULAR AVATAR - ICON ONLY) */}
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all cursor-pointer relative ${
-              activeTab === 'profile' ? 'text-[#CE2028] font-black' : 'text-gray-500 hover:text-gray-800 font-semibold'
+            aria-label="প্রোফাইল"
+            title="প্রোফাইল"
+            className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
+              activeTab === 'profile' ? 'bg-red-50/80 scale-105' : 'hover:opacity-80'
             }`}
           >
             {activeTab === 'profile' && (
               <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
             )}
-            {/* Render actual circular photo in the footer navbar */}
             <div className="relative">
               {avatarImage ? (
                 <img 
                   src={avatarImage} 
                   alt="Profile" 
-                  className={`w-6 h-6 rounded-full object-cover transition-all ${
+                  className={`w-7 h-7 rounded-full object-cover transition-all ${
                     activeTab === 'profile' 
-                      ? 'ring-2 ring-[#CE2028] scale-110 shadow-xs' 
+                      ? 'ring-2 ring-[#CE2028] shadow-xs' 
                       : 'ring-1 ring-gray-300'
                   }`} 
                 />
               ) : (
-                <div className={`w-6 h-6 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-3xs transition-all ${
+                <div className={`w-7 h-7 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs transition-all ${
                   activeTab === 'profile' 
-                    ? 'ring-2 ring-[#CE2028] scale-110 shadow-xs' 
+                    ? 'ring-2 ring-[#CE2028] shadow-xs' 
                     : 'ring-1 ring-gray-300'
                 }`}>
                   {client?.name ? client.name.slice(0, 1) : 'প্রো'}
                 </div>
               )}
             </div>
-            <span className="text-3xs mt-1 tracking-tight text-center truncate max-w-full">
-              প্রোফাইল
-            </span>
           </button>
         </div>
       </nav>
