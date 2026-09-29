@@ -311,86 +311,73 @@ export default function ClientDashboard({
         )}
 
         {/* ======================================================= */}
-        {/* SECTION 4: PROFILE VIEW & ACCOUNT CONTROLS             */}
+        {/* SECTION 4: PAYMENT HISTORY / STATEMENTS (NEW DEDICATED)  */}
         {/* ======================================================= */}
-        {activeTab === 'profile' && (
+        {activeTab === 'history' && (
           <div className="space-y-6 animate-fadeIn">
-            {/* Profile Overview Card */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6 text-center">
-              {/* Circular Avatar with Camera Icon */}
-              <div 
-                className="relative inline-block cursor-pointer mx-auto group" 
-                onClick={() => avatarInputRef.current?.click()}
-                title="ছবি পরিবর্তন করতে ক্লিক করুন"
-              >
-                {avatarImage ? (
-                  <img 
-                    src={avatarImage} 
-                    alt={client?.name} 
-                    className="w-24 h-24 rounded-full object-cover ring-4 ring-emerald-500 shadow-xl"
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-3xl shadow-xl ring-4 ring-emerald-400">
-                    {client?.name ? client.name.slice(0, 2) : 'গ্রা'}
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-7 h-7" />
-                </div>
-              </div>
-
+            {/* Header Summary Card */}
+            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl sm:text-2xl font-black text-gray-900">
-                  {client?.name}
-                </h2>
-                <div className="inline-block mt-1 px-3 py-1 rounded-full bg-emerald-100 text-[#006231] font-bold text-xs">
-                  আইডি: {client?.id}
+                <div className="text-xs font-bold text-[#006231] uppercase tracking-wider flex items-center space-x-1.5">
+                  <FileText className="w-4 h-4" />
+                  <span>জমার হিস্ট্রি ও স্টেটমেন্ট</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  মোবাইল নম্বর: <strong>{client?.phone}</strong>
+                <h2 className="text-xl sm:text-2xl font-black text-gray-900 mt-1">
+                  পূর্বে পরিশোধিত কিস্তিসমূহ
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  আল-ইমারাহ প্রোপার্টিজ অফিস কর্তৃক অনুমোদিত সকল জমার অফিসিয়াল রসিদ
                 </p>
               </div>
 
-              {/* Action Buttons */}
-              <div className="max-w-md mx-auto space-y-2 pt-2">
-                <button
-                  onClick={() => avatarInputRef.current?.click()}
-                  className="w-full py-3 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs sm:text-sm font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer"
-                >
-                  <Camera className="w-4 h-4 text-[#006231]" />
-                  <span>প্রোফাইল ছবি পরিবর্তন করুন</span>
-                </button>
-
-                <button
-                  onClick={onNavigateHome}
-                  className="w-full py-3 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs sm:text-sm font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer"
-                >
-                  <Home className="w-4 h-4 text-[#CE2028]" />
-                  <span>ওয়েবসাইটে ফিরে যান</span>
-                </button>
-
-                <button
-                  onClick={onLogout}
-                  className="w-full py-3 px-4 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white border border-red-200 text-xs sm:text-sm font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-2xs"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>লগআউট করুন</span>
-                </button>
+              <div className="flex items-center space-x-3 self-start sm:self-auto">
+                <div className="px-3.5 py-2 rounded-2xl bg-emerald-50 border border-emerald-100 text-right">
+                  <div className="text-2xs text-[#006231] font-bold">মোট অনুমোদিত জমা</div>
+                  <div className="text-base font-black text-[#006231]">{formatBDT(client?.totalPaid)}</div>
+                </div>
+                <div className="px-3.5 py-2 rounded-2xl bg-gray-50 border border-gray-100 text-right">
+                  <div className="text-2xs text-gray-400 font-bold">মোট রসিদ</div>
+                  <div className="text-base font-black text-gray-900">{client?.paymentHistory?.length || 0}টি</div>
+                </div>
               </div>
             </div>
 
-            {/* Payment History Statement Table */}
-            <div className="bg-white rounded-3xl border border-gray-200 shadow-xs overflow-hidden">
-              <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">পরিশোধিত কিস্তিসমূহের রেকর্ড</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">অফিস কর্তৃক অনুমোদিত সকল জমার স্টেটমেন্ট</p>
-                </div>
-                <span className="text-xs font-bold text-[#006231] bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
-                  {client?.paymentHistory?.length || 0}টি জমা রেকর্ড
-                </span>
-              </div>
+            {/* Mobile Cards View (Visible on phones) */}
+            <div className="block sm:hidden space-y-3">
+              {client?.paymentHistory && client.paymentHistory.length > 0 ? (
+                client.paymentHistory.map((item, idx) => (
+                  <div key={idx} className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-2.5">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                      <div className="font-bold text-gray-900 text-xs">
+                        রসিদ নং: <span className="font-mono text-[#CE2028]">{item.id}</span>
+                      </div>
+                      <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-bold border border-emerald-100">
+                        <Check className="w-2.5 h-2.5 text-[#8EBF40]" />
+                        <span>অনুমোদিত</span>
+                      </span>
+                    </div>
 
+                    <div className="flex items-center justify-between text-xs">
+                      <div>
+                        <div className="text-gray-500 text-2xs">জমার তারিখ ও মাধ্যম</div>
+                        <div className="font-semibold text-gray-800">{item.date} • {item.method}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-gray-500 text-2xs">পরিশোধিত টাকা</div>
+                        <div className="font-black text-sm text-[#006231]">{formatBDT(item.amount)}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="bg-white p-8 rounded-2xl border border-gray-200 text-center text-gray-500 text-xs">
+                  এখনো কোনো পরিশোধিত কিস্তির রেকর্ড নেই।
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table View (Hidden on phones, visible on sm+) */}
+            <div className="hidden sm:block bg-white rounded-3xl border border-gray-200 shadow-xs overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs sm:text-sm">
                   <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase font-bold text-xs">
@@ -434,18 +421,106 @@ export default function ClientDashboard({
           </div>
         )}
 
+        {/* ======================================================= */}
+        {/* SECTION 5: PROFILE VIEW & ACCOUNT CONTROLS             */}
+        {/* ======================================================= */}
+        {activeTab === 'profile' && (
+          <div className="space-y-6 animate-fadeIn">
+            {/* Profile Overview Card */}
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6 text-center">
+              {/* Circular Avatar with Camera Icon */}
+              <div 
+                className="relative inline-block cursor-pointer mx-auto group" 
+                onClick={() => avatarInputRef.current?.click()}
+                title="ছবি পরিবর্তন করতে ক্লিক করুন"
+              >
+                {avatarImage ? (
+                  <img 
+                    src={avatarImage} 
+                    alt={client?.name} 
+                    className="w-24 h-24 rounded-full object-cover ring-4 ring-emerald-500 shadow-xl"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-3xl shadow-xl ring-4 ring-emerald-400">
+                    {client?.name ? client.name.slice(0, 2) : 'গ্রা'}
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-7 h-7" />
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-gray-900">
+                  {client?.name}
+                </h2>
+                <div className="inline-block mt-1 px-3 py-1 rounded-full bg-emerald-100 text-[#006231] font-bold text-xs">
+                  আইডি: {client?.id}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  মোবাইল নম্বর: <strong>{client?.phone}</strong>
+                </p>
+                <div className="text-2xs text-gray-400 mt-1">
+                  বরাদ্দকৃত ফ্ল্যাট: <span className="text-gray-700 font-semibold">{client?.projectName} ({client?.flatNo})</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="max-w-md mx-auto space-y-2.5 pt-2">
+                <button
+                  onClick={() => avatarInputRef.current?.click()}
+                  className="w-full py-3 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs sm:text-sm font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                >
+                  <Camera className="w-4 h-4 text-[#006231]" />
+                  <span>প্রোফাইল ছবি পরিবর্তন করুন</span>
+                </button>
+
+                <button
+                  onClick={onNavigateHome}
+                  className="w-full py-3 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs sm:text-sm font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                >
+                  <Home className="w-4 h-4 text-[#CE2028]" />
+                  <span>ওয়েবসাইটে ফিরে যান</span>
+                </button>
+
+                <button
+                  onClick={onLogout}
+                  className="w-full py-3 px-4 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white border border-red-200 text-xs sm:text-sm font-bold transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-2xs"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>লগআউট করুন</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Customer Care Contact Help Box */}
+            <div className="p-5 rounded-3xl bg-white border border-gray-200 shadow-xs flex items-center justify-between text-xs">
+              <div className="space-y-0.5">
+                <div className="font-bold text-gray-900">যেকোনো সহযোগিতায় কাস্টমার কেয়ার</div>
+                <div className="text-gray-500">হটলাইন: ০১৯১৮-৬৪৬৫৭৫ (সকাল ৯টা - রাত ৮টা)</div>
+              </div>
+              <a
+                href="tel:01918646575"
+                className="px-3.5 py-2 rounded-xl bg-emerald-50 text-[#006231] font-bold text-xs border border-emerald-200 hover:bg-[#006231] hover:text-white transition-colors"
+              >
+                কল দিন
+              </a>
+            </div>
+          </div>
+        )}
+
       </main>
 
       {/* ========================================================= */}
-      {/* 3. STICKY FOOTER NAVBAR (ICONS ONLY - NO TEXT LABELS)     */}
+      {/* 3. STICKY FOOTER NAVBAR (EXACTLY 5 ICONS - NO TEXT LABELS)*/}
       {/* ========================================================= */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl py-2 px-4">
-        <div className="flex items-center justify-around max-w-sm mx-auto">
-          {/* Tab 1: প্রোপার্টি */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl py-2 px-3">
+        <div className="flex items-center justify-around max-w-md mx-auto">
+          {/* Tab 1: কাস্টমার তথ্য */}
           <button
             onClick={() => setActiveTab('details')}
-            aria-label="প্রোপার্টি বিবরণ"
-            title="প্রোপার্টি বিবরণ"
+            aria-label="কাস্টমার তথ্য"
+            title="কাস্টমার তথ্য"
             className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
               activeTab === 'details' ? 'text-[#CE2028] bg-red-50/80 scale-105' : 'text-gray-400 hover:text-gray-700'
             }`}
@@ -453,7 +528,7 @@ export default function ClientDashboard({
             {activeTab === 'details' && (
               <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
             )}
-            <Building2 className={`w-6 h-6 ${activeTab === 'details' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
+            <User className={`w-6 h-6 ${activeTab === 'details' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
           </button>
 
           {/* Tab 2: কিস্তির হিসাব */}
@@ -468,7 +543,7 @@ export default function ClientDashboard({
             {activeTab === 'payments' && (
               <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
             )}
-            <DollarSign className={`w-6 h-6 ${activeTab === 'payments' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
+            <CreditCard className={`w-6 h-6 ${activeTab === 'payments' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
           </button>
 
           {/* Tab 3: কাজের অগ্রগতি */}
@@ -486,7 +561,22 @@ export default function ClientDashboard({
             <HardHat className={`w-6 h-6 ${activeTab === 'progress' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
           </button>
 
-          {/* Tab 4: প্রোফাইল (CIRCULAR AVATAR - ICON ONLY) */}
+          {/* Tab 4: জমার হিস্ট্রি */}
+          <button
+            onClick={() => setActiveTab('history')}
+            aria-label="জমার হিস্ট্রি"
+            title="জমার হিস্ট্রি"
+            className={`flex flex-col items-center justify-center p-2.5 rounded-2xl transition-all cursor-pointer relative ${
+              activeTab === 'history' ? 'text-[#CE2028] bg-red-50/80 scale-105' : 'text-gray-400 hover:text-gray-700'
+            }`}
+          >
+            {activeTab === 'history' && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] mb-1 animate-pulse"></span>
+            )}
+            <FileText className={`w-6 h-6 ${activeTab === 'history' ? 'text-[#CE2028]' : 'text-gray-400'} transition-transform`} />
+          </button>
+
+          {/* Tab 5: প্রোফাইল (CIRCULAR AVATAR - ICON ONLY) */}
           <button
             onClick={() => setActiveTab('profile')}
             aria-label="প্রোফাইল"

@@ -50,7 +50,7 @@ export default function ManagementDashboard({
     });
   };
 
-  // Close profile dropdown on outside click
+  // Close profile dropdown on outside click (supports mouse and mobile touch)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -58,7 +58,11 @@ export default function ManagementDashboard({
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, []);
 
   // -------------------------------------------------------------
@@ -402,10 +406,18 @@ export default function ManagementDashboard({
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
             </button>
 
-            {/* Profile Dropdown Popup Menu */}
+            {/* Backdrop overlay for mobile */}
             {isProfileOpen && (
-              <div className="absolute right-0 mt-2.5 w-72 bg-white rounded-3xl shadow-2xl border border-gray-100 py-3 z-50 animate-fadeIn divide-y divide-gray-100">
-                <div className="px-4 py-3">
+              <div 
+                className="fixed inset-0 z-40 bg-black/40 backdrop-blur-2xs sm:hidden"
+                onClick={() => setIsProfileOpen(false)}
+              />
+            )}
+
+            {/* Profile Dropdown Popup Menu - Phone Responsive */}
+            {isProfileOpen && (
+              <div className="fixed inset-x-4 top-18 sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2.5 w-auto sm:w-72 max-w-sm mx-auto sm:mx-0 bg-white rounded-3xl shadow-2xl border border-gray-100 py-3 z-50 animate-fadeIn divide-y divide-gray-100">
+                <div className="px-5 py-3">
                   <div className="text-sm font-black text-gray-900 truncate">
                     {admin?.name || 'অ্যাডমিন কর্মকর্তা'}
                   </div>
@@ -459,52 +471,52 @@ export default function ManagementDashboard({
       )}
 
       {/* ========================================================= */}
-      {/* 2. STATS OVERVIEW CARDS                                   */}
+      {/* 2. STATS OVERVIEW CARDS (PHONE RESPONSIVE)               */}
       {/* ========================================================= */}
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-5">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="flex items-center justify-between text-gray-500 text-xs font-bold">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-200 shadow-xs">
+            <div className="flex items-center justify-between text-gray-500 text-2xs sm:text-xs font-bold">
               <span>মোট ক্লায়েন্ট</span>
-              <Users className="w-4 h-4 text-blue-600" />
+              <Users className="w-4 h-4 text-blue-600 shrink-0" />
             </div>
-            <div className="text-lg sm:text-2xl font-black text-gray-900 mt-1">
+            <div className="text-base sm:text-2xl font-black text-gray-900 mt-1 truncate">
               {totalClientsCount} জন
             </div>
-            <div className="text-2xs text-gray-400">নিবন্ধিত ফ্ল্যাট ক্রেতা</div>
+            <div className="text-3xs sm:text-2xs text-gray-400 truncate">নিবন্ধিত ফ্ল্যাট ক্রেতা</div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-emerald-200/80 bg-gradient-to-b from-white to-emerald-50/20 shadow-xs">
-            <div className="flex items-center justify-between text-[#006231] text-xs font-bold">
-              <span>মোট সংগৃহীত টাকা</span>
-              <DollarSign className="w-4 h-4 text-[#006231]" />
+          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-emerald-200/80 bg-gradient-to-b from-white to-emerald-50/20 shadow-xs">
+            <div className="flex items-center justify-between text-[#006231] text-2xs sm:text-xs font-bold">
+              <span className="truncate">মোট সংগৃহীত টাকা</span>
+              <DollarSign className="w-4 h-4 text-[#006231] shrink-0" />
             </div>
-            <div className="text-lg sm:text-2xl font-black text-[#006231] mt-1">
+            <div className="text-base sm:text-2xl font-black text-[#006231] mt-1 truncate">
               {formatBDT(totalCollections)}
             </div>
-            <div className="text-2xs text-[#006231] font-semibold">মোট পরিশোধ জমা</div>
+            <div className="text-3xs sm:text-2xs text-[#006231] font-semibold truncate">মোট পরিশোধ জমা</div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/20 shadow-xs">
-            <div className="flex items-center justify-between text-amber-800 text-xs font-bold">
-              <span>মোট বকেয়া কিস্তি</span>
-              <Clock className="w-4 h-4 text-amber-600" />
+          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/20 shadow-xs">
+            <div className="flex items-center justify-between text-amber-800 text-2xs sm:text-xs font-bold">
+              <span className="truncate">মোট বকেয়া কিস্তি</span>
+              <Clock className="w-4 h-4 text-amber-600 shrink-0" />
             </div>
-            <div className="text-lg sm:text-2xl font-black text-amber-700 mt-1">
+            <div className="text-base sm:text-2xl font-black text-amber-700 mt-1 truncate">
               {formatBDT(totalDues)}
             </div>
-            <div className="text-2xs text-amber-700 font-semibold">ভবিষ্যত প্রাপ্য কিস্তি</div>
+            <div className="text-3xs sm:text-2xs text-amber-700 font-semibold truncate">ভবিষ্যত প্রাপ্য কিস্তি</div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="flex items-center justify-between text-gray-500 text-xs font-bold">
-              <span>প্রজেক্টে মোট ব্যয়</span>
-              <HardHat className="w-4 h-4 text-[#CE2028]" />
+          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-200 shadow-xs">
+            <div className="flex items-center justify-between text-gray-500 text-2xs sm:text-xs font-bold">
+              <span className="truncate">প্রজেক্টে মোট ব্যয়</span>
+              <HardHat className="w-4 h-4 text-[#CE2028] shrink-0" />
             </div>
-            <div className="text-lg sm:text-2xl font-black text-[#CE2028] mt-1">
+            <div className="text-base sm:text-2xl font-black text-[#CE2028] mt-1 truncate">
               {formatBDT(totalConstructionSpent)}
             </div>
-            <div className="text-2xs text-gray-400">{data.projects.length}টি প্রজেক্টে এ পর্যন্ত ব্যয়</div>
+            <div className="text-3xs sm:text-2xs text-gray-400 truncate">{data.projects.length}টি প্রজেক্টে এ পর্যন্ত ব্যয়</div>
           </div>
         </div>
       </div>
@@ -541,8 +553,67 @@ export default function ManagementDashboard({
               </button>
             </div>
 
-            {/* Clients Table */}
-            <div className="bg-white rounded-3xl border border-gray-200 shadow-xs overflow-hidden">
+            {/* Mobile Card View for Clients (Phones) */}
+            <div className="block md:hidden space-y-3">
+              {filteredClients.map((cl) => {
+                const due = (cl.totalPrice || 0) - (cl.totalPaid || 0);
+                return (
+                  <div key={cl.id} className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-3">
+                    <div className="flex items-start justify-between border-b border-gray-100 pb-2.5">
+                      <div>
+                        <div className="font-bold text-gray-900 text-sm">{cl.name}</div>
+                        <div className="text-2xs text-gray-500 font-medium">{cl.phone} • {cl.id}</div>
+                      </div>
+                      <span className="text-2xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                        {cl.flatNo}
+                      </span>
+                    </div>
+
+                    <div className="text-xs text-gray-600 font-medium">
+                      প্রকল্প: <strong className="text-gray-900">{cl.projectName}</strong>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-center">
+                      <div>
+                        <div className="text-3xs text-gray-400 font-bold uppercase">মোট মূল্য</div>
+                        <div className="text-xs font-black text-gray-800 truncate">{formatBDT(cl.totalPrice)}</div>
+                      </div>
+                      <div>
+                        <div className="text-3xs text-[#006231] font-bold uppercase">পরিশোধিত</div>
+                        <div className="text-xs font-black text-[#006231] truncate">{formatBDT(cl.totalPaid)}</div>
+                      </div>
+                      <div>
+                        <div className="text-3xs text-amber-700 font-bold uppercase">বকেয়া</div>
+                        <div className="text-xs font-black text-amber-700 truncate">{formatBDT(due)}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="text-2xs text-gray-500">
+                        পরবর্তী কিস্তি: <span className="font-bold text-gray-900">{cl.nextDueDate}</span>
+                        <div className="font-bold text-[#CE2028]">{formatBDT(cl.nextDueAmount)}</div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setPaymentForm({
+                            ...paymentForm,
+                            clientId: cl.id,
+                            amount: cl.nextDueAmount || ''
+                          });
+                          setActiveTab('payments');
+                        }}
+                        className="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#006231] text-[#006231] hover:text-white font-bold text-xs border border-emerald-200 transition-colors cursor-pointer"
+                      >
+                        + জমা এন্ট্রি
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Clients Table (Tablets and Desktops) */}
+            <div className="hidden md:block bg-white rounded-3xl border border-gray-200 shadow-xs overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs sm:text-sm">
                   <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase font-bold text-xs">
@@ -759,14 +830,14 @@ export default function ManagementDashboard({
         {/* ======================================================= */}
         {activeTab === 'projects' && (
           <div className="space-y-4 animate-fadeIn">
-            <div className="flex items-center justify-between bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
               <div>
                 <h3 className="text-base font-bold text-gray-900">চলমান ও আসন্ন প্রজেক্টসমূহ</h3>
                 <p className="text-xs text-gray-500">প্রজেক্টের কাজের শতাংশ ও চলমান তলার কাজ আপডেট করুন</p>
               </div>
               <button
                 onClick={() => setIsProjectModalOpen(true)}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center space-x-1 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>+ নতুন প্রজেক্ট অ্যাড করুন</span>
@@ -777,7 +848,7 @@ export default function ManagementDashboard({
               {data.projects.map((proj) => {
                 const projClients = data.clients.filter(c => c.projectId === proj.id);
                 return (
-                  <div key={proj.id} className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xs space-y-4">
+                  <div key={proj.id} className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-200 shadow-xs space-y-4">
                     <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                       <div>
                         <h4 className="text-lg font-black text-gray-900">{proj.name}</h4>
@@ -819,7 +890,7 @@ export default function ManagementDashboard({
                     <div className="grid grid-cols-2 gap-2 pt-2 text-xs">
                       <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
                         <div className="text-2xs text-gray-400 font-bold">মোট বাজেট</div>
-                        <div className="font-bold text-gray-900 mt-0.5">{formatBDT(proj.budget)}</div>
+                        <div className="font-bold text-gray-900 mt-0.5 truncate">{formatBDT(proj.budget)}</div>
                       </div>
                       <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
                         <div className="text-2xs text-gray-400 font-bold">নিবন্ধিত ক্রেতা</div>
@@ -839,16 +910,16 @@ export default function ManagementDashboard({
         {activeTab === 'expenses' && (
           <div className="space-y-6 animate-fadeIn">
             {/* Top Project Selector & Budget Summary */}
-            <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
-                <div>
+            <div className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-200 shadow-xs space-y-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+                <div className="w-full lg:w-auto">
                   <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
                     প্রজেক্ট নির্বাচন করুন
                   </label>
                   <select
                     value={selectedExpenseProject}
                     onChange={(e) => setSelectedExpenseProject(e.target.value)}
-                    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm sm:text-base font-black text-gray-900 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
+                    className="w-full lg:w-auto bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm sm:text-base font-black text-gray-900 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
                   >
                     {data.projects.map(p => (
                       <option key={p.id} value={p.id}>{p.name}</option>
@@ -856,22 +927,22 @@ export default function ManagementDashboard({
                   </select>
                 </div>
 
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <div className="text-xs text-gray-400 font-bold">প্রজেক্ট বাজেট</div>
-                    <div className="text-base sm:text-lg font-black text-gray-900">
+                <div className="grid grid-cols-3 gap-2 w-full lg:w-auto divide-x divide-gray-100 lg:divide-x-0">
+                  <div className="text-center sm:text-right px-1">
+                    <div className="text-3xs sm:text-xs text-gray-400 font-bold">প্রজেক্ট বাজেট</div>
+                    <div className="text-xs sm:text-base font-black text-gray-900 truncate">
                       {formatBDT(selectedProjForExpense?.budget)}
                     </div>
                   </div>
-                  <div className="text-right border-l pl-4 border-gray-200">
-                    <div className="text-xs text-[#CE2028] font-bold">এ পর্যন্ত মোট ব্যয়</div>
-                    <div className="text-base sm:text-lg font-black text-[#CE2028]">
+                  <div className="text-center sm:text-right px-1 lg:border-l lg:pl-4 lg:border-gray-200">
+                    <div className="text-3xs sm:text-xs text-[#CE2028] font-bold">মোট ব্যয়</div>
+                    <div className="text-xs sm:text-base font-black text-[#CE2028] truncate">
                       {formatBDT(projectTotalExpense)}
                     </div>
                   </div>
-                  <div className="text-right border-l pl-4 border-gray-200">
-                    <div className="text-xs text-[#006231] font-bold">অবশিষ্ট ফান্ড</div>
-                    <div className="text-base sm:text-lg font-black text-[#006231]">
+                  <div className="text-center sm:text-right px-1 lg:border-l lg:pl-4 lg:border-gray-200">
+                    <div className="text-3xs sm:text-xs text-[#006231] font-bold">অবশিষ্ট ফান্ড</div>
+                    <div className="text-xs sm:text-base font-black text-[#006231] truncate">
                       {formatBDT(projectRemainingBudget)}
                     </div>
                   </div>
@@ -919,21 +990,46 @@ export default function ManagementDashboard({
               </form>
             </div>
 
-            {/* Expenses Breakdown Table */}
+            {/* Expenses Breakdown Mobile Cards & Table */}
             <div className="bg-white rounded-3xl border border-gray-200 shadow-xs overflow-hidden">
-              <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div className="p-5 sm:p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900">
                     {selectedProjForExpense?.name} - পর্যায়ভিত্তিক খরচের সংক্ষিপ্ত বিবরণ
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5">ফ্লোর ও কনস্ট্রাকশন ধাপ অনুযায়ী খরচের হিসাব</p>
                 </div>
-                <span className="text-xs font-bold text-[#CE2028] bg-red-50 px-2.5 py-1 rounded-md">
+                <span className="text-xs font-bold text-[#CE2028] bg-red-50 px-2.5 py-1 rounded-md self-start sm:self-auto">
                   মোট ব্যয়: {formatBDT(projectTotalExpense)}
                 </span>
               </div>
 
-              <div className="overflow-x-auto">
+              {/* Mobile Cards View (Phones) */}
+              <div className="block md:hidden p-4 space-y-2.5">
+                {selectedProjForExpense?.expenses && selectedProjForExpense.expenses.length > 0 ? (
+                  selectedProjForExpense.expenses.map((exp, idx) => (
+                    <div key={idx} className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between text-xs">
+                      <div>
+                        <div className="font-bold text-gray-900 text-xs sm:text-sm">{exp.title}</div>
+                        <div className="text-2xs text-gray-500 mt-0.5">{exp.date}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-black text-sm text-[#CE2028]">{formatBDT(exp.amount)}</div>
+                        <span className="text-3xs px-2 py-0.5 rounded-full bg-emerald-50 text-[#006231] font-bold border border-emerald-100">
+                          বিল পরিশোধিত
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-6 text-center text-gray-400 text-xs">
+                    এই প্রজেক্টে এখনো কোনো খরচের এন্ট্রি যুক্ত করা হয়নি।
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop Table View (Tablets & Desktops) */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs sm:text-sm">
                   <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase font-bold text-xs">
                     <tr>
@@ -979,14 +1075,14 @@ export default function ManagementDashboard({
         {/* ======================================================= */}
         {activeTab === 'team' && (
           <div className="space-y-4 animate-fadeIn">
-            <div className="flex items-center justify-between bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
               <div>
                 <h3 className="text-base font-bold text-gray-900">ম্যানেজমেন্ট টিম ও দায়িত্বপ্রাপ্ত কর্মকর্তাগণ</h3>
                 <p className="text-xs text-gray-500">অ্যাডমিন, অ্যাকাউন্টস ও সাইট ইঞ্জিনিয়ারদের তালিকা</p>
               </div>
               <button
                 onClick={() => setIsTeamModalOpen(true)}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center space-x-1 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>+ নতুন কর্মকর্তা যুক্ত করুন</span>
@@ -1177,17 +1273,17 @@ export default function ManagementDashboard({
                 </div>
               </div>
 
-              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setIsClientModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors cursor-pointer text-center"
                 >
                   বাতিল
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center"
                 >
                   নিশ্চিত করুন ও ক্লায়েন্ট তৈরি করুন
                 </button>
@@ -1249,17 +1345,17 @@ export default function ManagementDashboard({
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setIsProjectModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors cursor-pointer text-center"
                 >
                   বাতিল
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center"
                 >
                   প্রজেক্ট যুক্ত করুন
                 </button>
@@ -1274,7 +1370,7 @@ export default function ManagementDashboard({
       {/* ========================================================= */}
       {isTeamModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-gray-100 relative">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-gray-100 relative max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">
               নতুন কর্মকর্তা / অ্যাডমিন যুক্ত করুন
             </h3>
@@ -1336,17 +1432,17 @@ export default function ManagementDashboard({
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setIsTeamModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors cursor-pointer text-center"
                 >
                   বাতিল
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center"
                 >
                   যুক্ত করুন
                 </button>
