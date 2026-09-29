@@ -44,7 +44,12 @@ import {
   Sprout,
   Fish,
   Wheat,
-  Briefcase
+  Briefcase,
+  GraduationCap,
+  School,
+  BookOpen,
+  Gift,
+  Info
 } from 'lucide-react';
 import { projectsData } from '../data/projectsData';
 
@@ -527,6 +532,207 @@ export default function ProjectDetailsPage({
                 </div>
               </div>
             </div>
+
+            {/* Project Detailed Description / Overview (if available) */}
+            {(project.descriptionBn || project.descriptionEn) && (
+              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-4">
+                <div className="flex items-center space-x-2 text-[#006231] text-xs font-bold uppercase tracking-wider">
+                  <Info className="w-4 h-4 text-[#8EBF40]" />
+                  <span>{isEn ? 'Project Concept & Overview' : 'প্রকল্পের ধারণা ও সার্বিক পরিচিতি'}</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-gray-900">
+                  {isEn ? 'Strategic Land Ownership & Living' : 'জমির স্বতন্ত্র মালিকানা ও পরিকল্পিত আবাসন'}
+                </h3>
+                <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-normal">
+                  {isEn ? project.descriptionEn : project.descriptionBn}
+                </p>
+
+                {/* Financial Plan & Special Offer Banner */}
+                {(project.financialPlanBn || project.specialOfferBn) && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-3">
+                    {project.financialPlanBn && (
+                      <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 space-y-1">
+                        <div className="flex items-center space-x-2 text-amber-800 text-xs font-bold uppercase tracking-wider">
+                          <Coins className="w-4 h-4 text-amber-600" />
+                          <span>{isEn ? 'Financial Plan' : 'আর্থিক পরিকল্পনা ও কিস্তি'}</span>
+                        </div>
+                        <p className="text-xs sm:text-sm font-semibold text-gray-900 leading-snug">
+                          {isEn ? project.financialPlanEn : project.financialPlanBn}
+                        </p>
+                      </div>
+                    )}
+
+                    {project.specialOfferBn && (
+                      <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/60 space-y-1">
+                        <div className="flex items-center space-x-2 text-[#006231] text-xs font-bold uppercase tracking-wider">
+                          <Gift className="w-4 h-4 text-[#8EBF40]" />
+                          <span>{isEn ? 'Special Launch Offer' : 'সিরাতুন্নবী বিশেষ অফার'}</span>
+                        </div>
+                        <p className="text-xs sm:text-sm font-bold text-gray-900 leading-snug">
+                          {isEn ? project.specialOfferEn : project.specialOfferBn}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Nearby Amenities / Religious & Educational Institutions */}
+            {project.nearbyInstitutions && (
+              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                  <div className="space-y-1">
+                    <div className="text-xs font-bold text-[#CE2028] uppercase tracking-wider flex items-center space-x-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#CE2028]" />
+                      <span>{isEn ? 'Surrounding Facilities' : 'আশেপাশের নাগরিক ও দ্বীনি সুবিধাসমূহ'}</span>
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-black text-gray-900">
+                      {isEn ? 'Nearby Mosques, Madrasas & Educational Hubs' : 'নিকটবর্তী মসজিদ, মাদ্রাসা ও খ্যাতনামা শিক্ষাপ্রতিষ্ঠান'}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-500">
+                      {isEn 
+                        ? 'Prominent spiritual, educational, and civic landmarks within walking distance & 500m radius of West Sanarpar, Madinabaag (Ward-66, Demra).'
+                        : 'পশ্চিম সানারপাড়, মদিনাবাগ (কোদালধোয়া), ৬৬ নং ওয়ার্ড, ডেমরা এলাকার ৫০০ মিটার পরিমণ্ডলে অবস্থিত গুরুত্বপূর্ণ প্রতিষ্ঠানসমূহ:'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* 1. Mosques */}
+                  {project.nearbyInstitutions.mosques && (
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-emerald-50/60 to-white border border-emerald-100/80 shadow-2xs space-y-3">
+                      <div className="flex items-center space-x-2 pb-2 border-b border-emerald-100">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <Moon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">
+                            {isEn ? 'Nearby Mosques' : 'নিকটবর্তী মসজিদসমূহ'}
+                          </h4>
+                          <span className="text-3xs text-emerald-700 font-semibold">
+                            {isEn ? 'Within 300-500m' : '৩০০-৫০০ মিটারের মধ্যে'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {project.nearbyInstitutions.mosques.map((item, idx) => (
+                          <div key={idx} className="p-2.5 rounded-xl bg-white border border-emerald-50 shadow-2xs space-y-1 hover:border-emerald-200 transition-colors">
+                            <div className="text-xs font-bold text-gray-900 leading-snug">
+                              {isEn ? item.nameEn : item.nameBn}
+                            </div>
+                            <div className="flex items-center justify-between text-3xs font-medium text-emerald-700 pt-0.5">
+                              <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100/60 font-semibold">
+                                {isEn ? item.distanceEn : item.distanceBn}
+                              </span>
+                              <a
+                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.nameBn + ' পশ্চিম সানারপাড় ঢাকা')}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-gray-400 hover:text-emerald-700 flex items-center space-x-0.5 transition-colors"
+                                title={isEn ? 'View on Map' : 'ম্যাপে দেখুন'}
+                              >
+                                <span>{isEn ? 'Map' : 'ম্যাপ'}</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. Madrasas */}
+                  {project.nearbyInstitutions.madrasas && (
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-teal-50/60 to-white border border-teal-100/80 shadow-2xs space-y-3">
+                      <div className="flex items-center space-x-2 pb-2 border-b border-teal-100">
+                        <div className="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <BookOpen className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">
+                            {isEn ? 'Islamic Madrasas' : 'মাদ্রাসা ও দ্বীনি শিক্ষা'}
+                          </h4>
+                          <span className="text-3xs text-teal-700 font-semibold">
+                            {isEn ? 'Renowned Institutions' : 'ঐতিহ্যবাহী শীর্ষ প্রতিষ্ঠান'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {project.nearbyInstitutions.madrasas.map((item, idx) => (
+                          <div key={idx} className="p-2.5 rounded-xl bg-white border border-teal-50 shadow-2xs space-y-1 hover:border-teal-200 transition-colors">
+                            <div className="text-xs font-bold text-gray-900 leading-snug">
+                              {isEn ? item.nameEn : item.nameBn}
+                            </div>
+                            <div className="flex items-center justify-between text-3xs font-medium text-teal-700 pt-0.5">
+                              <span className="px-2 py-0.5 rounded-full bg-teal-50 border border-teal-100/60 font-semibold">
+                                {isEn ? item.distanceEn : item.distanceBn}
+                              </span>
+                              <a
+                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.nameBn)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-gray-400 hover:text-teal-700 flex items-center space-x-0.5 transition-colors"
+                                title={isEn ? 'View on Map' : 'ম্যাপে দেখুন'}
+                              >
+                                <span>{isEn ? 'Map' : 'ম্যাপ'}</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 3. Schools & Colleges */}
+                  {project.nearbyInstitutions.education && (
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-indigo-50/60 to-white border border-indigo-100/80 shadow-2xs space-y-3">
+                      <div className="flex items-center space-x-2 pb-2 border-b border-indigo-100">
+                        <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <GraduationCap className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">
+                            {isEn ? 'Schools & Colleges' : 'স্কুল ও খ্যাতনামা কলেজ'}
+                          </h4>
+                          <span className="text-3xs text-indigo-700 font-semibold">
+                            {isEn ? 'Top Academic Centers' : 'উচ্চমানের শিক্ষা প্রতিষ্ঠান'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {project.nearbyInstitutions.education.map((item, idx) => (
+                          <div key={idx} className="p-2.5 rounded-xl bg-white border border-indigo-50 shadow-2xs space-y-1 hover:border-indigo-200 transition-colors">
+                            <div className="text-xs font-bold text-gray-900 leading-snug">
+                              {isEn ? item.nameEn : item.nameBn}
+                            </div>
+                            <div className="flex items-center justify-between text-3xs font-medium text-indigo-700 pt-0.5">
+                              <span className="px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-100/60 font-semibold">
+                                {isEn ? item.distanceEn : item.distanceBn}
+                              </span>
+                              <a
+                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.nameBn)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-gray-400 hover:text-indigo-700 flex items-center space-x-0.5 transition-colors"
+                                title={isEn ? 'View on Map' : 'ম্যাপে দেখুন'}
+                              >
+                                <span>{isEn ? 'Map' : 'ম্যাপ'}</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
           </div>
 

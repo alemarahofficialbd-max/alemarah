@@ -58,8 +58,8 @@ export const projectsData = [
     ],
     featuresEn: [
       "Land Area: 17.40 Decimals (100% Clear Title)",
-      "Flat Size: 1,265 Sq. Ft. (Jofri measurement)",
-      "3 Bedrooms, 2 Bathrooms, 2 Balconies",
+      "Flat Size: 1,265 Sq. Ft. (Land measurement)",
+      "3 Bedrooms, 3 Bathrooms, 2 Balconies",
       "Tidy, well-planned kitchen space",
       "Well-arranged drawing room & separate dining space",
       "2 High-speed Passenger Lifts & 1 Dedicated Staircase",
@@ -80,7 +80,29 @@ export const projectsData = [
       "ঢাকা-চট্টগ্রাম মহাসড়ক থেকে মাত্র ৮০০ মিটার, পরিকল্পিত MRT লাইন-৪ এর নিকটে"
     ],
     rajukApprovalEn: "Approved Structural Design & Clear Land Title",
-    rajukApprovalBn: "অনুমোদিত স্ট্রাকচারাল ডিজাইন ও শতভাগ নিষ্কণ্টক জমি"
+    rajukApprovalBn: "অনুমোদিত স্ট্রাকচারাল ডিজাইন ও শতভাগ নিষ্কণ্টক জমি",
+    nearbyInstitutions: {
+      mosques: [
+        { nameBn: "পশ্চিম সানারপাড় দারুস সালাম জামে মসজিদ ও ঈদগাহ", nameEn: "West Sanarpar Darus Salam Jame Masjid & Eidgah", distanceBn: "৩০০ মিটার (হাঁটা দূরত্ব)", distanceEn: "300m (Walking Distance)" },
+        { nameBn: "নূরে মদিনা জামে মসজিদ (মসজিদ রোড)", nameEn: "Nure Madina Jame Masjid (Masjid Road)", distanceBn: "৩৫০ মিটার (হাঁটা দূরত্ব)", distanceEn: "350m (Walking Distance)" },
+        { nameBn: "মদিনাবাগ কেন্দ্রীয় জামে মসজিদ / বায়তুল ফালাহ", nameEn: "Madinabaag Central Jame Masjid / Baitul Falah", distanceBn: "৪০০ মিটার (হাঁটা দূরত্ব)", distanceEn: "400m (Walking Distance)" },
+        { nameBn: "কোদালধোয়া বায়তুল আমান জামে মসজিদ", nameEn: "Kodaldhoya Baitul Aman Jame Masjid", distanceBn: "৪৫০ মিটার (হাঁটা দূরত্ব)", distanceEn: "450m (Walking Distance)" },
+        { nameBn: "ডৌলেশ্বর জামে মসজিদ (লন্ডন মার্কেট সংলগ্ন)", nameEn: "Douleshwar Jame Masjid (near London Market)", distanceBn: "৫০০ মিটার", distanceEn: "500m" }
+      ],
+      madrasas: [
+        { nameBn: "দারুন নাজাত সিদ্দীকিয়া কামিল মাদ্রাসা (সারুলিয়া, ডেমরা)", nameEn: "Darun Najat Siddikia Kamil Madrasah (Sarulia, Demra)", distanceBn: "কয়েক মিনিটের দূরত্ব", distanceEn: "Few mins drive" },
+        { nameBn: "দোগাইর দারুচ্ছুন্নাত আলিম মাদ্রাসা (৬৬ নং ওয়ার্ড)", nameEn: "Dogair Darussunnat Alim Madrasah (Ward-66)", distanceBn: "নিকটবর্তী", distanceEn: "Nearby" },
+        { nameBn: "পশ্চিম সানারপাড় নূরানী ও হাফেজিয়া মাদ্রাসা", nameEn: "West Sanarpar Noorani & Hafezia Madrasah", distanceBn: "হাঁটার দূরত্ব", distanceEn: "Walking Distance" },
+        { nameBn: "তামীরুল মিল্লাত মহিলা কামিল মাদ্রাসা শাখা", nameEn: "Tameerul Millat Mohila Kamil Madrasah Branch", distanceBn: "নিকটবর্তী", distanceEn: "Nearby" }
+      ],
+      education: [
+        { nameBn: "সানারপাড় শেখ মোরতোজা আলী উচ্চ বিদ্যালয় (EIIN: 112404)", nameEn: "Sanarpar Sheikh Mortoza Ali High School", distanceBn: "ঘরের কাছে (হাঁটা দূরত্ব)", distanceEn: "Walking Distance" },
+        { nameBn: "সানারপাড় রওশন আরা ডিগ্রি কলেজ", nameEn: "Sanarpar Rowshan Ara Degree College", distanceBn: "ঘরের কাছে (হাঁটা দূরত্ব)", distanceEn: "Walking Distance" },
+        { nameBn: "শামসুল হক খান স্কুল অ্যান্ড কলেজ (কোনাপাড়া, ডেমরা)", nameEn: "Shamsul Haque Khan School & College (Konapara)", distanceBn: "স্বল্প দূরত্বের মধ্যে", distanceEn: "Short Distance" },
+        { nameBn: "ড. মাহবুবুর রহমান মোল্লা কলেজ - DMRC (মাতুয়াইল/ডেমরা)", nameEn: "Dr. Mahbubur Rahman Molla College - DMRC", distanceBn: "স্বল্প দূরত্বের মধ্যে", distanceEn: "Short Distance" },
+        { nameBn: "মদিনাবাগ রেজিঃ প্রাথমিক বিদ্যালয় ও কিন্ডারগার্টেন", nameEn: "Madinabaag Reg. Primary School", distanceBn: "হাঁটার দূরত্ব", distanceEn: "Walking Distance" }
+      ]
+    }
   },
   {
     id: "barakah-tower-01",
