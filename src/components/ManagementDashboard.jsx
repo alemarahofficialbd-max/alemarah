@@ -49,13 +49,9 @@ export default function ManagementDashboard({
   const [activeTab, setActiveTab] = useState('clients'); // 'clients', 'payments', 'projects', 'expenses', 'team'
   const [searchQuery, setSearchQuery] = useState('');
   const [projectFilter, setProjectFilter] = useState('all');
-  const [expandedClientId, setExpandedClientId] = useState(null);
+  const [selectedClientForProfile, setSelectedClientForProfile] = useState(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [successAlert, setSuccessAlert] = useState('');
-
-  const toggleClientExpand = (id) => {
-    setExpandedClientId(prev => prev === id ? null : id);
-  };
 
   const profileRef = useRef(null);
 
@@ -755,269 +751,56 @@ export default function ManagementDashboard({
               </div>
             </div>
 
-            {/* Mobile-First Clients Cards View: Compact Accordion List with Expandable Deep Details */}
+            {/* Mobile-First Clients Cards View: Clean & Compact List */}
             <div className="block md:hidden space-y-2.5">
               {filteredClients.map((cl) => {
                 const due = (cl.totalPrice || 0) - (cl.totalPaid || 0);
-                const percent = cl.totalPrice ? Math.round((cl.totalPaid / cl.totalPrice) * 100) : 0;
-                const isExpanded = expandedClientId === cl.id;
-                const project = data.projects.find(p => p.id === cl.projectId);
 
                 return (
                   <div 
                     key={cl.id} 
-                    className={`bg-white rounded-2xl border transition-all duration-200 overflow-hidden ${
-                      isExpanded 
-                        ? 'border-[#006231]/40 shadow-md ring-2 ring-[#006231]/10' 
-                        : 'border-slate-200/80 shadow-2xs hover:shadow-xs hover:border-slate-300'
-                    }`}
+                    onClick={() => setSelectedClientForProfile(cl)}
+                    className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs hover:border-[#006231]/40 hover:shadow-xs transition-all p-3.5 flex items-center justify-between gap-3 cursor-pointer group active:scale-[0.99]"
+                    title="সম্পূর্ণ প্রোফাইল দেখতে ক্লিক করুন"
                   >
-                    {/* Collapsed Summary Header (Always visible, tap anywhere to expand/collapse) */}
-                    <div 
-                      onClick={() => toggleClientExpand(cl.id)}
-                      className="p-3.5 flex items-center justify-between gap-2.5 cursor-pointer select-none group"
-                      title={isExpanded ? 'সংক্ষেপ করতে ক্লিক করুন' : 'বিস্তারিত দেখতে ক্লিক করুন'}
-                    >
-                      <div className="flex items-center space-x-3 min-w-0">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
-                          {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center space-x-1.5">
-                            <h4 className="font-black text-slate-900 text-sm truncate group-hover:text-[#006231] transition-colors">
-                              {cl.name}
-                            </h4>
-                            <span className="font-mono text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded text-3xs font-semibold shrink-0">
-                              {cl.id}
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-1.5 text-2xs text-slate-500 font-medium truncate mt-0.5">
-                            <span>{cl.phone}</span>
-                            <span>•</span>
-                            <span className="text-slate-700 font-semibold truncate">{cl.projectName}</span>
-                          </div>
-                        </div>
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
+                        {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
                       </div>
-
-                      {/* Right summary indicator + Chevron button */}
-                      <div className="flex items-center space-x-2 shrink-0">
-                        <div className="text-right">
-                          <span className="inline-block px-2 py-0.5 rounded-lg bg-emerald-50 text-[#006231] border border-emerald-200/70 text-3xs font-bold">
-                            {cl.flatNo.split(' ')[0] || cl.flatNo}
+                      <div className="min-w-0">
+                        <div className="flex items-center space-x-1.5">
+                          <h4 className="font-black text-slate-900 text-sm truncate group-hover:text-[#006231] transition-colors">
+                            {cl.name}
+                          </h4>
+                          <span className="font-mono text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded text-3xs font-semibold shrink-0">
+                            {cl.id}
                           </span>
-                          <div className="text-3xs text-amber-700 font-bold mt-0.5">
-                            বাকি: {formatBDT(due)}
-                          </div>
                         </div>
-
-                        <div className={`p-1.5 rounded-full text-slate-400 group-hover:text-slate-700 group-hover:bg-slate-100 transition-all ${
-                          isExpanded ? 'rotate-180 text-[#006231] bg-emerald-50' : ''
-                        }`}>
-                          <ChevronDown className="w-4 h-4 transition-transform duration-200" />
+                        <div className="text-2xs text-slate-500 font-medium truncate mt-0.5 flex items-center space-x-1.5">
+                          <span>{cl.phone}</span>
+                          <span>•</span>
+                          <span className="text-slate-700 font-semibold truncate">{cl.projectName}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* EXPANDED DEEP DETAILS VIEW (Revealed upon click) */}
-                    {isExpanded && (
-                      <div className="px-4 pb-4 pt-2 space-y-4 border-t border-slate-100 animate-fadeIn">
-                        
-                        {/* 1. Property & Construction Specs */}
-                        <div className="bg-slate-50/90 rounded-2xl p-3.5 border border-slate-200/70 space-y-2.5">
-                          <div className="flex items-center justify-between">
-                            <span className="text-3xs font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
-                              <Building2 className="w-3.5 h-3.5 text-[#006231]" />
-                              <span>প্রকল্প ও সাইট অগ্রগতি</span>
-                            </span>
-                            {project && (
-                              <span className="text-2xs font-bold text-[#006231] bg-emerald-100/60 px-2 py-0.5 rounded-full border border-emerald-200">
-                                সাইট কাজ {project.progress}% সম্পন্ন
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="space-y-1.5 text-xs">
-                            <div>
-                              <span className="text-slate-400 text-3xs font-medium block">প্রকল্পের নাম ও অবস্থান</span>
-                              <strong className="text-slate-800 font-bold">{cl.projectName}</strong>
-                              {project?.location && (
-                                <p className="text-2xs text-slate-500 flex items-center space-x-1 mt-0.5">
-                                  <MapPin className="w-3 h-3 text-[#CE2028] shrink-0" />
-                                  <span>{project.location}</span>
-                                </p>
-                              )}
-                            </div>
-                            <div>
-                              <span className="text-slate-400 text-3xs font-medium block">বরাদ্দকৃত ফ্ল্যাট ও বিবরণ</span>
-                              <strong className="text-slate-800 font-bold">{cl.flatNo}</strong>
-                              {project?.currentStage && (
-                                <p className="text-2xs text-emerald-800 font-medium mt-0.5">
-                                  সাইট স্টেজ: {project.currentStage}
-                                </p>
-                              )}
-                            </div>
-                          </div>
+                    <div className="flex items-center space-x-2 shrink-0">
+                      <div className="text-right">
+                        <span className="inline-block px-2 py-0.5 rounded-lg bg-emerald-50 text-[#006231] border border-emerald-200/70 text-3xs font-bold">
+                          {cl.flatNo.split(' ')[0] || cl.flatNo}
+                        </span>
+                        <div className="text-3xs text-amber-700 font-bold mt-0.5">
+                          বাকি: {formatBDT(due)}
                         </div>
-
-                        {/* 2. Financial Overview & Progress Bar */}
-                        <div className="bg-slate-50/90 rounded-2xl p-3.5 border border-slate-200/70 space-y-3">
-                          <div className="flex items-center justify-between text-2xs font-bold">
-                            <span className="text-emerald-700 flex items-center space-x-1">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>পরিশোধিত: {percent}%</span>
-                            </span>
-                            <span className="text-amber-800">
-                              বকেয়া বাকি: {formatBDT(due)}
-                            </span>
-                          </div>
-
-                          <div className="w-full bg-slate-200/80 rounded-full h-2.5 overflow-hidden">
-                            <div 
-                              className="bg-gradient-to-r from-[#006231] to-[#8EBF40] h-full rounded-full transition-all duration-500" 
-                              style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
-                            />
-                          </div>
-
-                          <div className="grid grid-cols-3 gap-2 text-center pt-1">
-                            <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
-                              <div className="text-3xs text-slate-400 font-bold uppercase tracking-wider">মোট চুক্তি</div>
-                              <div className="text-xs font-black text-slate-900 truncate mt-0.5">{formatBDT(cl.totalPrice)}</div>
-                            </div>
-                            <div className="bg-white p-2 rounded-xl border border-emerald-100 shadow-2xs">
-                              <div className="text-3xs text-[#006231] font-bold uppercase tracking-wider">পরিশোধিত</div>
-                              <div className="text-xs font-black text-[#006231] truncate mt-0.5">{formatBDT(cl.totalPaid)}</div>
-                            </div>
-                            <div className="bg-white p-2 rounded-xl border border-amber-100 shadow-2xs">
-                              <div className="text-3xs text-amber-800 font-bold uppercase tracking-wider">বর্তমান বাকি</div>
-                              <div className="text-xs font-black text-amber-700 truncate mt-0.5">{formatBDT(due)}</div>
-                            </div>
-                          </div>
-
-                          {/* Next Due Box */}
-                          <div className="p-2.5 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                              <Calendar className="w-4 h-4 text-slate-400" />
-                              <div>
-                                <div className="text-3xs text-slate-400 font-bold uppercase">পরবর্তী কিস্তির তারিখ</div>
-                                <div className="text-xs font-bold text-slate-800">{cl.nextDueDate}</div>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-3xs text-slate-400 font-bold uppercase">প্রদেয় টাকা</div>
-                              <div className="text-xs font-black text-[#CE2028]">{formatBDT(cl.nextDueAmount)}</div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 3. Customer Portal Login Credentials (For Manager Reference) */}
-                        <div className="p-3 rounded-2xl bg-amber-50/60 border border-amber-200/60 text-xs space-y-1.5">
-                          <div className="flex items-center justify-between">
-                            <span className="text-3xs font-bold text-amber-800 uppercase tracking-wider flex items-center space-x-1">
-                              <Key className="w-3.5 h-3.5 text-amber-700" />
-                              <span>গ্রাহক পোর্টাল লগইন অ্যাক্সেস</span>
-                            </span>
-                            <span className="text-3xs text-amber-700 font-medium">কাস্টমারকে জানাতে পারবেন</span>
-                          </div>
-                          <div className="grid grid-cols-3 gap-2 bg-white/80 p-2 rounded-xl border border-amber-100 text-center sm:text-left">
-                            <div>
-                              <span className="text-3xs text-slate-400 block font-bold">লগইন ফোন</span>
-                              <span className="font-bold text-slate-800 font-mono text-2xs truncate block">{cl.phone}</span>
-                            </div>
-                            <div>
-                              <span className="text-3xs text-slate-400 block font-bold">আইডি</span>
-                              <span className="font-bold text-slate-800 font-mono text-2xs truncate block">{cl.id}</span>
-                            </div>
-                            <div>
-                              <span className="text-3xs text-slate-400 block font-bold">পাসওয়ার্ড</span>
-                              <span className="font-bold text-[#CE2028] font-mono text-2xs truncate block">{cl.password || 'password123'}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 4. Payment History (পূর্বে পরিশোধিত কিস্তির রেকর্ড) */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-2xs font-bold text-slate-700 px-1">
-                            <span className="flex items-center space-x-1.5">
-                              <FileText className="w-3.5 h-3.5 text-[#006231]" />
-                              <span>পূর্বের কিস্তি জমার স্টেটমেন্ট ({cl.paymentHistory?.length || 0}টি)</span>
-                            </span>
-                            <span className="text-3xs text-slate-400">অনুমোদিত রেকর্ড</span>
-                          </div>
-
-                          {cl.paymentHistory && cl.paymentHistory.length > 0 ? (
-                            <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
-                              {cl.paymentHistory.map((trx, tIdx) => (
-                                <div key={tIdx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-2xs">
-                                  <div className="space-y-0.5">
-                                    <div className="font-bold text-slate-800 flex items-center space-x-1.5">
-                                      <span>{trx.method}</span>
-                                      <span className="font-mono text-3xs text-slate-400">({trx.id})</span>
-                                    </div>
-                                    <div className="text-3xs text-slate-500 font-medium">
-                                      {trx.date}
-                                    </div>
-                                  </div>
-                                  <div className="text-right">
-                                    <span className="font-black text-xs text-[#006231]">
-                                      +{formatBDT(trx.amount)}
-                                    </span>
-                                    <div className="text-3xs text-emerald-600 font-bold">অনুমোদিত</div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="p-3 text-center text-3xs text-slate-400 bg-slate-50 rounded-xl border border-slate-100">
-                              এখনো কোনো পূর্ববর্তী জমার রেকর্ড নেই।
-                            </div>
-                          )}
-                        </div>
-
-                        {/* 5. Quick Actions Row */}
-                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
-                          <div className="flex items-center space-x-2">
-                            <a
-                              href={`tel:${cl.phone}`}
-                              className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center space-x-1.5 transition-colors cursor-pointer"
-                            >
-                              <Phone className="w-3.5 h-3.5 text-[#006231]" />
-                              <span>কল দিন</span>
-                            </a>
-                            <button
-                              type="button"
-                              onClick={() => toggleClientExpand(cl.id)}
-                              className="px-3 py-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-medium text-xs transition-colors cursor-pointer"
-                            >
-                              সংক্ষেপ করুন
-                            </button>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setPaymentForm({
-                                ...paymentForm,
-                                clientId: cl.id,
-                                amount: cl.nextDueAmount || ''
-                              });
-                              setActiveTab('payments');
-                            }}
-                            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white hover:opacity-95 font-bold text-xs shadow-sm shadow-[#006231]/20 flex items-center space-x-1.5 transition-all cursor-pointer active:scale-95"
-                          >
-                            <DollarSign className="w-3.5 h-3.5" />
-                            <span>+ কিস্তি জমা নিন</span>
-                          </button>
-                        </div>
-
                       </div>
-                    )}
-
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#006231] group-hover:translate-x-0.5 transition-all" />
+                    </div>
                   </div>
                 );
               })}
             </div>
 
-            {/* Desktop Clients Table View (with Expandable Rows) */}
+            {/* Desktop Clients Table View */}
             <div className="hidden md:block bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs sm:text-sm">
@@ -1036,150 +819,80 @@ export default function ManagementDashboard({
                     {filteredClients.map((cl) => {
                       const due = (cl.totalPrice || 0) - (cl.totalPaid || 0);
                       const percent = cl.totalPrice ? Math.round((cl.totalPaid / cl.totalPrice) * 100) : 0;
-                      const isExpanded = expandedClientId === cl.id;
-                      const project = data.projects.find(p => p.id === cl.projectId);
 
                       return (
-                        <React.Fragment key={cl.id}>
-                          <tr 
-                            onClick={() => toggleClientExpand(cl.id)}
-                            className={`cursor-pointer transition-colors ${
-                              isExpanded ? 'bg-emerald-50/40' : 'hover:bg-slate-50/80'
-                            }`}
-                          >
-                            <td className="py-4 px-6">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0">
-                                  {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
-                                </div>
-                                <div>
-                                  <div className="font-bold text-slate-900 flex items-center space-x-1.5">
-                                    <span>{cl.name}</span>
-                                    <span className="font-mono text-3xs text-slate-400 bg-slate-100 px-1 py-0.2 rounded font-normal">
-                                      {cl.id}
-                                    </span>
-                                  </div>
-                                  <div className="text-2xs text-slate-500">{cl.phone}</div>
-                                </div>
+                        <tr 
+                          key={cl.id} 
+                          onClick={() => setSelectedClientForProfile(cl)}
+                          className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                          title="প্রোফাইল দেখতে ক্লিক করুন"
+                        >
+                          <td className="py-4 px-6">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                                {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
                               </div>
-                            </td>
-                            <td className="py-4 px-6">
-                              <div className="font-bold text-slate-800">{cl.projectName}</div>
-                              <div className="text-2xs text-emerald-700 font-semibold">{cl.flatNo}</div>
-                            </td>
-                            <td className="py-4 px-6 font-bold text-slate-900">
-                              {formatBDT(cl.totalPrice)}
-                            </td>
-                            <td className="py-4 px-6 font-black text-[#006231]">
-                              <div>{formatBDT(cl.totalPaid)}</div>
-                              <span className="text-3xs font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded">
-                                {percent}% আদায়
-                              </span>
-                            </td>
-                            <td className="py-4 px-6 font-bold text-amber-700">
-                              {formatBDT(due)}
-                            </td>
-                            <td className="py-4 px-6">
-                              <div className="text-xs text-slate-900 font-bold">{cl.nextDueDate}</div>
-                              <div className="text-2xs text-[#CE2028] font-bold">{formatBDT(cl.nextDueAmount)}</div>
-                            </td>
-                            <td className="py-4 px-6 text-right">
-                              <div className="flex items-center justify-end space-x-2">
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setPaymentForm({
-                                      ...paymentForm,
-                                      clientId: cl.id,
-                                      amount: cl.nextDueAmount || ''
-                                    });
-                                    setActiveTab('payments');
-                                  }}
-                                  className="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#006231] text-[#006231] hover:text-white font-bold text-xs border border-emerald-200 transition-all cursor-pointer active:scale-95"
-                                >
-                                  + জমা এন্ট্রি
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleClientExpand(cl.id);
-                                  }}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
-                                  title={isExpanded ? 'সংক্ষেপ করুন' : 'বিস্তারিত দেখুন'}
-                                >
-                                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-[#006231]' : ''}`} />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-
-                          {/* Desktop Expanded Sub-Row */}
-                          {isExpanded && (
-                            <tr className="bg-slate-50/70">
-                              <td colSpan={7} className="p-5 border-b border-slate-200/80 animate-fadeIn">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                  {/* Deep Project & Property Specs */}
-                                  <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2">
-                                    <div className="text-2xs font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
-                                      <Building2 className="w-3.5 h-3.5 text-[#006231]" />
-                                      <span>প্রকল্প ও প্রপার্টি বিবরণ</span>
-                                    </div>
-                                    <div className="text-xs space-y-1">
-                                      <div><span className="text-slate-400">প্রকল্প: </span><strong className="text-slate-800">{cl.projectName}</strong></div>
-                                      {project?.location && <div><span className="text-slate-400">লোকেশন: </span><span className="text-slate-700">{project.location}</span></div>}
-                                      <div><span className="text-slate-400">ইউনিট: </span><span className="text-[#006231] font-bold">{cl.flatNo}</span></div>
-                                      {project?.currentStage && <div><span className="text-slate-400">স্টেজ: </span><span className="text-emerald-700 font-semibold">{project.currentStage} ({project.progress}%)</span></div>}
-                                    </div>
-                                  </div>
-
-                                  {/* Access Credentials & Call */}
-                                  <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2">
-                                    <div className="text-2xs font-bold text-amber-800 uppercase tracking-wider flex items-center space-x-1.5">
-                                      <Key className="w-3.5 h-3.5 text-amber-700" />
-                                      <span>কাস্টমার পোর্টাল অ্যাক্সেস</span>
-                                    </div>
-                                    <div className="text-xs space-y-1">
-                                      <div><span className="text-slate-400">লগইন আইডি: </span><strong className="text-slate-800 font-mono">{cl.id}</strong></div>
-                                      <div><span className="text-slate-400">মোবাইল: </span><span className="text-slate-700 font-mono">{cl.phone}</span></div>
-                                      <div><span className="text-slate-400">পাসওয়ার্ড: </span><strong className="text-[#CE2028] font-mono">{cl.password || 'password123'}</strong></div>
-                                    </div>
-                                    <div className="pt-2">
-                                      <a
-                                        href={`tel:${cl.phone}`}
-                                        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-2xs font-bold transition-colors"
-                                      >
-                                        <Phone className="w-3 h-3 text-[#006231]" />
-                                        <span>গ্রাহককে কল দিন</span>
-                                      </a>
-                                    </div>
-                                  </div>
-
-                                  {/* Mini Statement History */}
-                                  <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2">
-                                    <div className="text-2xs font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
-                                      <FileText className="w-3.5 h-3.5 text-[#006231]" />
-                                      <span>জমা স্টেটমেন্ট রেকর্ড</span>
-                                    </div>
-                                    {cl.paymentHistory && cl.paymentHistory.length > 0 ? (
-                                      <div className="space-y-1 max-h-28 overflow-y-auto pr-1">
-                                        {cl.paymentHistory.map((trx, tIdx) => (
-                                          <div key={tIdx} className="flex items-center justify-between text-2xs py-1 border-b border-slate-50 last:border-0">
-                                            <span className="text-slate-600 truncate">{trx.date} • {trx.method}</span>
-                                            <span className="font-bold text-[#006231] shrink-0 ml-2">+{formatBDT(trx.amount)}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <div className="text-3xs text-slate-400">কোনো পূর্ববর্তী জমা রেকর্ড নেই।</div>
-                                    )}
-                                  </div>
+                              <div>
+                                <div className="font-bold text-slate-900 group-hover:text-[#006231] transition-colors flex items-center space-x-1.5">
+                                  <span>{cl.name}</span>
+                                  <span className="font-mono text-3xs text-slate-400 bg-slate-100 px-1 py-0.2 rounded font-normal">
+                                    {cl.id}
+                                  </span>
                                 </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
+                                <div className="text-2xs text-slate-500">{cl.phone}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="font-bold text-slate-800">{cl.projectName}</div>
+                            <div className="text-2xs text-emerald-700 font-semibold">{cl.flatNo}</div>
+                          </td>
+                          <td className="py-4 px-6 font-bold text-slate-900">
+                            {formatBDT(cl.totalPrice)}
+                          </td>
+                          <td className="py-4 px-6 font-black text-[#006231]">
+                            <div>{formatBDT(cl.totalPaid)}</div>
+                            <span className="text-3xs font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded">
+                              {percent}% আদায়
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 font-bold text-amber-700">
+                            {formatBDT(due)}
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="text-xs text-slate-900 font-bold">{cl.nextDueDate}</div>
+                            <div className="text-2xs text-[#CE2028] font-bold">{formatBDT(cl.nextDueAmount)}</div>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedClientForProfile(cl);
+                                }}
+                                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all cursor-pointer"
+                              >
+                                প্রোফাইল
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPaymentForm({
+                                    ...paymentForm,
+                                    clientId: cl.id,
+                                    amount: cl.nextDueAmount || ''
+                                  });
+                                  setActiveTab('payments');
+                                }}
+                                className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#006231] text-[#006231] hover:text-white font-bold text-xs border border-emerald-200 transition-all cursor-pointer active:scale-95"
+                              >
+                                + জমা
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
                       );
                     })}
                   </tbody>
@@ -2008,6 +1721,237 @@ export default function ManagementDashboard({
           </div>
         </div>
       )}
+
+      {/* ========================================================= */}
+      {/* MODAL 4: FULL CLIENT PROFILE DETAILS                      */}
+      {/* ========================================================= */}
+      {selectedClientForProfile && (() => {
+        const cl = selectedClientForProfile;
+        const project = data.projects.find(p => p.id === cl.projectId);
+        const due = (cl.totalPrice || 0) - (cl.totalPaid || 0);
+        const percent = cl.totalPrice ? Math.round((cl.totalPaid / cl.totalPrice) * 100) : 0;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+            <div className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 relative divide-y divide-slate-100">
+              
+              {/* Profile Header Banner */}
+              <div className="p-5 sm:p-6 flex items-start justify-between bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-t-3xl relative">
+                <div className="flex items-center space-x-3.5 min-w-0">
+                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-lg ring-4 ring-white/10 shadow-md shrink-0">
+                    {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center space-x-2">
+                      <h3 className="text-base sm:text-lg font-black text-white truncate">{cl.name}</h3>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-[#8EBF40] border border-emerald-400/30 text-3xs font-bold shrink-0">
+                        অনুমোদিত ক্লায়েন্ট
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 font-medium mt-0.5 truncate">
+                      মোবাইল: <strong className="text-white font-mono">{cl.phone}</strong> • আইডি: <span className="font-mono text-emerald-400 font-bold">{cl.id}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedClientForProfile(null)}
+                  className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
+                  title="বন্ধ করুন"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Profile Body */}
+              <div className="p-5 sm:p-6 space-y-4 text-slate-800">
+                
+                {/* 1. Property Specs */}
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/70 space-y-2">
+                  <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-[#006231]" />
+                    <span>বরাদ্দকৃত ফ্ল্যাট ও প্রজেক্ট তথ্য</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-slate-400 text-3xs block">প্রকল্প ও লোকেশন</span>
+                      <strong className="text-slate-800 font-bold">{cl.projectName}</strong>
+                      {project?.location && (
+                        <p className="text-2xs text-slate-500 flex items-center space-x-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-[#CE2028] shrink-0" />
+                          <span>{project.location}</span>
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <span className="text-slate-400 text-3xs block">ফ্ল্যাট নম্বর ও সাইজ</span>
+                      <strong className="text-[#006231] font-bold">{cl.flatNo}</strong>
+                      {project?.currentStage && (
+                        <p className="text-2xs text-slate-600 mt-0.5">
+                          চলমান কাজ: {project.currentStage} ({project.progress}%)
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Financial Overview */}
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/70 space-y-3">
+                  <div className="flex items-center justify-between text-2xs font-bold">
+                    <span className="text-emerald-700 flex items-center space-x-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>পরিশোধিত: {percent}%</span>
+                    </span>
+                    <span className="text-amber-800">বকেয়া বাকি: {formatBDT(due)}</span>
+                  </div>
+
+                  <div className="w-full bg-slate-200/80 rounded-full h-2.5 overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-[#006231] to-[#8EBF40] h-full rounded-full transition-all duration-500" 
+                      style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-center pt-1">
+                    <div className="bg-white p-2.5 rounded-xl border border-slate-100 shadow-2xs">
+                      <div className="text-3xs text-slate-400 font-bold uppercase">মোট চুক্তি</div>
+                      <div className="text-xs sm:text-sm font-black text-slate-900 mt-0.5">{formatBDT(cl.totalPrice)}</div>
+                    </div>
+                    <div className="bg-white p-2.5 rounded-xl border border-emerald-100 shadow-2xs">
+                      <div className="text-3xs text-[#006231] font-bold uppercase">পরিশোধিত</div>
+                      <div className="text-xs sm:text-sm font-black text-[#006231] mt-0.5">{formatBDT(cl.totalPaid)}</div>
+                    </div>
+                    <div className="bg-white p-2.5 rounded-xl border border-amber-100 shadow-2xs">
+                      <div className="text-3xs text-amber-800 font-bold uppercase">বাকি টাকা</div>
+                      <div className="text-xs sm:text-sm font-black text-amber-700 mt-0.5">{formatBDT(due)}</div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="w-4 h-4 text-slate-400" />
+                      <div>
+                        <div className="text-3xs text-slate-400 font-bold uppercase">পরবর্তী কিস্তির তারিখ</div>
+                        <div className="text-xs font-bold text-slate-800">{cl.nextDueDate}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xs text-slate-400 font-bold uppercase">প্রদেয় টাকা</div>
+                      <div className="text-xs sm:text-sm font-black text-[#CE2028]">{formatBDT(cl.nextDueAmount)}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Login Credentials for Manager Support */}
+                <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/70 text-xs space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xs font-bold text-amber-800 uppercase tracking-wider flex items-center space-x-1">
+                      <Key className="w-3.5 h-3.5 text-amber-700" />
+                      <span>গ্রাহক পোর্টাল লগইন তথ্য</span>
+                    </span>
+                    <span className="text-3xs text-amber-700">কাস্টমারকে সহায়তা দিন</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 bg-white/90 p-2.5 rounded-xl border border-amber-100 text-center">
+                    <div>
+                      <span className="text-3xs text-slate-400 block font-bold">লগইন ফোন</span>
+                      <span className="font-bold text-slate-800 font-mono text-2xs truncate block">{cl.phone}</span>
+                    </div>
+                    <div>
+                      <span className="text-3xs text-slate-400 block font-bold">আইডি</span>
+                      <span className="font-bold text-slate-800 font-mono text-2xs truncate block">{cl.id}</span>
+                    </div>
+                    <div>
+                      <span className="text-3xs text-slate-400 block font-bold">পাসওয়ার্ড</span>
+                      <span className="font-bold text-[#CE2028] font-mono text-2xs truncate block">{cl.password || 'password123'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Payment History Statement */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-2xs font-bold text-slate-700 px-1">
+                    <span className="flex items-center space-x-1.5">
+                      <FileText className="w-3.5 h-3.5 text-[#006231]" />
+                      <span>পরিশোধিত কিস্তির রেকর্ড ({cl.paymentHistory?.length || 0}টি)</span>
+                    </span>
+                    <span className="text-3xs text-slate-400">অনুমোদিত রসিদসমূহ</span>
+                  </div>
+
+                  {cl.paymentHistory && cl.paymentHistory.length > 0 ? (
+                    <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+                      {cl.paymentHistory.map((trx, tIdx) => (
+                        <div key={tIdx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-2xs">
+                          <div className="space-y-0.5">
+                            <div className="font-bold text-slate-800 flex items-center space-x-1.5">
+                              <span>{trx.method}</span>
+                              <span className="font-mono text-3xs text-slate-400">({trx.id})</span>
+                            </div>
+                            <div className="text-3xs text-slate-500 font-medium">
+                              {trx.date}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className="font-black text-xs text-[#006231]">
+                              +{formatBDT(trx.amount)}
+                            </span>
+                            <div className="text-3xs text-emerald-600 font-bold">অনুমোদিত</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-3 text-center text-3xs text-slate-400 bg-slate-50 rounded-xl border border-slate-100">
+                      এখনো কোনো পূর্ববর্তী জমার রেকর্ড যুক্ত করা হয়নি।
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div className="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-2.5 bg-slate-50 rounded-b-3xl">
+                <div className="flex items-center space-x-2">
+                  <a
+                    href={`tel:${cl.phone}`}
+                    className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 shadow-2xs flex items-center space-x-1.5 transition-colors cursor-pointer"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-[#006231]" />
+                    <span>কল দিন</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedClientForProfile(null)}
+                    className="px-4 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 font-bold text-xs transition-colors cursor-pointer"
+                  >
+                    বন্ধ করুন
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const targetId = cl.id;
+                    const nextAmt = cl.nextDueAmount || '';
+                    setSelectedClientForProfile(null);
+                    setPaymentForm({
+                      ...paymentForm,
+                      clientId: targetId,
+                      amount: nextAmt
+                    });
+                    setActiveTab('payments');
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white hover:opacity-95 font-bold text-xs shadow-md shadow-[#006231]/20 flex items-center space-x-1.5 transition-all cursor-pointer active:scale-95"
+                >
+                  <DollarSign className="w-3.5 h-3.5" />
+                  <span>+ কিস্তি জমা এন্ট্রি</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        );
+      })()}
 
     </div>
   );
