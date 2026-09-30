@@ -30,7 +30,13 @@ import {
   MapPin,
   Coins,
   Scale,
-  Award
+  Award,
+  FileText,
+  Clock,
+  TrendingUp,
+  MessageSquare,
+  Check,
+  Layers
 } from 'lucide-react';
 
 export default function App() {
@@ -256,59 +262,231 @@ export default function App() {
               </div>
             </section>
 
-            {/* Halal Investment Teaser Card */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <div className="rounded-3xl bg-gradient-to-r from-emerald-950 via-[#004724] to-emerald-900 text-white p-8 sm:p-12 shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-80 h-80 bg-[#8EBF40]/15 rounded-full blur-3xl pointer-events-none"></div>
+            {/* ==================================================== */}
+            {/* SECTION: পরিকল্পিত বিনিয়োগ, আস্থার সাথে সম্পদ সৃষ্টি */}
+            {/* ==================================================== */}
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+              <div className="relative rounded-3xl bg-gradient-to-br from-[#002715] via-[#004724] to-[#011C0F] text-white p-6 sm:p-10 md:p-14 shadow-2xl border border-emerald-500/25 overflow-hidden">
+                {/* Glow & Atmosphere Background Effects */}
+                <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#8EBF40]/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#CE2028]/15 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(#8EBF40_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none"></div>
 
-                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                  <div className="lg:col-span-8 space-y-4">
-                    <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold text-[#8EBF40] border border-white/10">
-                      <Coins className="w-3.5 h-3.5" />
-                      <span>{lang === 'en' ? 'Participatory Halal Wealth Creation' : 'পরিকল্পিত বিনিয়োগ, আস্থার সাথে সম্পদ সৃষ্টি'}</span>
+                <div className="relative z-10 space-y-8 sm:space-y-10">
+                  {/* Top Header & Intro */}
+                  <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-white/10">
+                    <div className="space-y-3 max-w-3xl">
+                      <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#8EBF40]/15 text-[#8EBF40] border border-[#8EBF40]/30 text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                        <Sparkles className="w-3.5 h-3.5 text-[#8EBF40]" />
+                        <span>{lang === 'en' ? '100% Shariah-Compliant Partnership' : '১০০% হালাল ও শরীয়াহসম্মত বিনিয়োগ'}</span>
+                      </div>
+
+                      <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.2]">
+                        <span className="block">{lang === 'en' ? 'Planned Investment,' : 'পরিকল্পিত বিনিয়োগ,'}</span>
+                        <span className="bg-gradient-to-r from-[#8EBF40] via-emerald-300 to-[#8EBF40] bg-clip-text text-transparent">
+                          {lang === 'en' ? 'Creating Wealth with Trust' : 'আস্থার সাথে সম্পদ সৃষ্টি'}
+                        </span>
+                      </h2>
+
+                      <p className="text-xs sm:text-sm md:text-base text-gray-200 leading-relaxed font-normal">
+                        {lang === 'en'
+                          ? 'Al-Emarah Properties & Agro offers secure, asset-backed, interest-free joint-venture partnership schemes. Designed for expatriates and families seeking verified halal returns backed by registered land shares and livestock assets.'
+                          : 'আল-ইমারাহ প্রোপার্টিজ ও এগ্রো প্রকল্পে বাস্তব সম্পদের ওপর ভিত্তি করে নিরাপদ ও লাভজনক যৌথ অংশীদারিত্ব। মধ্যবিত্ত পরিবার ও প্রবাসীদের জন্য সরকারি স্ট্যাম্পে রেজিস্ট্রিকৃত চুক্তি ও সুদমুক্ত আয়ের নিশ্চিত প্ল্যাটফর্ম।'}
+                      </p>
                     </div>
 
-                    <h3 className="text-2xl sm:text-4xl font-black text-white">
-                      {lang === 'en' ? 'Grow Your Wealth with Halal Agro & Real Estate Shares' : 'ন্যূনতম ১ লক্ষ টাকা থেকে হালাল যৌথ ব্যবসায় অংশীদার হোন'}
-                    </h3>
+                    {/* Quick Stats Pill Column */}
+                    <div className="flex flex-wrap sm:flex-nowrap lg:flex-col gap-2.5 shrink-0">
+                      <div className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md text-xs font-bold text-white">
+                        <Check className="w-4 h-4 text-[#8EBF40] shrink-0" />
+                        <span>{lang === 'en' ? 'Tangible Real Estate & Livestock' : 'বাস্তব জমি ও ডেইরি প্রকল্প'}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md text-xs font-bold text-white">
+                        <Check className="w-4 h-4 text-[#8EBF40] shrink-0" />
+                        <span>{lang === 'en' ? 'Zero Hidden Charges or Penalty' : 'সুদমুক্ত মুদারাবা নীতি'}</span>
+                      </div>
+                    </div>
+                  </div>
 
-                    <p className="text-xs sm:text-sm text-gray-200 leading-relaxed max-w-2xl">
-                      {lang === 'en' 
-                        ? 'Invest in tangible dairy cattle farming and prime apartment developments with guaranteed legal agreements, quarterly accounting audits, and a 90-day capital refund policy.'
-                        : 'আল-ইমারাহ প্রোপার্টিজ ও এগ্রো প্রকল্পে রয়েছে সীমিত আয়ের মানুষ ও প্রবাসীদের জন্য হালাল মুনাফা উপার্জনের সুযোগ। সরকারি স্ট্যাম্পে চুক্তি এবং ৯০ দিনের নোটিশে মূলধন ফেরতের সুদৃঢ় নিশ্চয়তা।'}
-                    </p>
+                  {/* 4 Core Pillars Grid (Cards with modern frosted glass look) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                    {/* Pillar 1 */}
+                    <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-[#8EBF40]/50 hover:bg-white/10 transition-all duration-300 backdrop-blur-md space-y-3 group">
+                      <div className="flex items-center justify-between">
+                        <div className="w-10 h-10 rounded-xl bg-[#8EBF40]/20 text-[#8EBF40] border border-[#8EBF40]/30 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+                          <Coins className="w-5 h-5" />
+                        </div>
+                        <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-[#8EBF40] border border-emerald-500/30">
+                          {lang === 'en' ? 'Accessible' : 'সবার সাধ্যে'}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="text-2xs font-bold uppercase tracking-wider text-gray-300">
+                          {lang === 'en' ? 'Minimum Capital' : 'ন্যূনতম বিনিয়োগ'}
+                        </div>
+                        <div className="text-xl sm:text-2xl font-black text-white mt-0.5">
+                          {lang === 'en' ? 'BDT 1,00,000' : '৳ ১,০০,০০০'}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        {lang === 'en' 
+                          ? 'Starting from only 1 Lakh Taka, open for expatriates and service holders.' 
+                          : 'স্বল্প পুঁজিতেও হালাল প্রফিট শেয়ারিংয়ের সুযোগ; সকল স্তরের মানুষের প্রবেশযোগ্য।'}
+                      </p>
+                    </div>
 
-                    <div className="pt-2 flex flex-wrap gap-3">
+                    {/* Pillar 2 */}
+                    <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-[#8EBF40]/50 hover:bg-white/10 transition-all duration-300 backdrop-blur-md space-y-3 group">
+                      <div className="flex items-center justify-between">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+                          <FileText className="w-5 h-5" />
+                        </div>
+                        <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                          {lang === 'en' ? '100% Legal' : 'আইনি সুরক্ষা'}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="text-2xs font-bold uppercase tracking-wider text-gray-300">
+                          {lang === 'en' ? 'Legal Deed' : 'আইনি নিশ্চয়তা'}
+                        </div>
+                        <div className="text-xl sm:text-2xl font-black text-white mt-0.5">
+                          {lang === 'en' ? 'Judicial Stamp' : 'সরকারি স্ট্যাম্প'}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        {lang === 'en' 
+                          ? 'Every investment is executed on government judicial stamp with money receipt.' 
+                          : 'প্রতিটি লেনদেনের জন্য সরকারি স্ট্যাম্পে রেজিস্ট্রিকৃত চুক্তি ও মানি রিসিট প্রদান।'}
+                      </p>
+                    </div>
+
+                    {/* Pillar 3 */}
+                    <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-[#8EBF40]/50 hover:bg-white/10 transition-all duration-300 backdrop-blur-md space-y-3 group">
+                      <div className="flex items-center justify-between">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+                          <Clock className="w-5 h-5" />
+                        </div>
+                        <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          {lang === 'en' ? 'Zero Penalty' : 'নিরাপদ এক্সিট'}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="text-2xs font-bold uppercase tracking-wider text-gray-300">
+                          {lang === 'en' ? 'Capital Refund' : 'মূলধন ফেরত সুবিধা'}
+                        </div>
+                        <div className="text-xl sm:text-2xl font-black text-white mt-0.5">
+                          {lang === 'en' ? '90 Days Notice' : '৯০ দিনের নোটিশে'}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        {lang === 'en' 
+                          ? 'Request full capital withdrawal anytime with 90-day written notice.' 
+                          : 'প্রয়োজনে কোনো প্রকার কর্তন ছাড়াই সম্পূর্ণ মূলধন ফেরত নেওয়ার শতভাগ গ্যারান্টি।'}
+                      </p>
+                    </div>
+
+                    {/* Pillar 4 */}
+                    <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-[#8EBF40]/50 hover:bg-white/10 transition-all duration-300 backdrop-blur-md space-y-3 group">
+                      <div className="flex items-center justify-between">
+                        <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+                          <TrendingUp className="w-5 h-5" />
+                        </div>
+                        <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                          {lang === 'en' ? 'Direct Bank' : 'স্বচ্ছ অডিট'}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="text-2xs font-bold uppercase tracking-wider text-gray-300">
+                          {lang === 'en' ? 'Profit Distribution' : 'লভ্যাংশ বণ্টন'}
+                        </div>
+                        <div className="text-xl sm:text-2xl font-black text-white mt-0.5">
+                          {lang === 'en' ? 'Quarterly Payout' : 'ত্রৈমাসিক বণ্টন'}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        {lang === 'en' 
+                          ? 'Quarterly profit transferred directly to your bank account after audit.' 
+                          : 'প্রতি ৩ মাস পর পর নিট অর্জিত মুনাফা সরাসরি বিনিয়োগকারীর ব্যাংক অ্যাকাউন্টে জমা।'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Dual Investment Sectors Showcase Bar */}
+                  <div className="p-5 sm:p-6 rounded-2xl bg-black/25 border border-white/10 backdrop-blur-md">
+                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
+                      <div className="flex items-center space-x-2 text-xs font-bold text-gray-200 uppercase tracking-wider">
+                        <Layers className="w-4 h-4 text-[#8EBF40]" />
+                        <span>{lang === 'en' ? 'Where Your Money Is Invested' : 'যেখানে আপনার অর্থ নিয়োজিত থাকবে (বাস্তব সম্পদ)'}</span>
+                      </div>
+                      <span className="text-3xs text-[#8EBF40] font-semibold hidden sm:inline-block">
+                        {lang === 'en' ? 'Tangible Asset Backed' : 'দৃশ্যমান সম্পদের নিরাপত্তা'}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                      <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-start space-x-3 hover:bg-white/10 transition-colors">
+                        <div className="w-9 h-9 rounded-lg bg-emerald-500/20 text-[#8EBF40] flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                          <Building2 className="w-4 h-4" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="font-bold text-white text-sm">
+                            {lang === 'en' ? '1. Real Estate Land Share Scheme' : '১. বাণিজ্যিক ও আবাসিক জমির শেয়ার প্রকল্প'}
+                          </div>
+                          <p className="text-gray-300 leading-snug">
+                            {lang === 'en'
+                              ? 'Al Quds Tower & Barakah Tower apartment developments with independent registered land share ownership.'
+                              : 'আল কুদস টাওয়ার ও বারাকাহ টাওয়ারের মতো বহুতল ভবনে নির্মাণ শুরুর আগেই স্বতন্ত্র রেজিস্ট্রিতে জমির মালিকানা।'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-start space-x-3 hover:bg-white/10 transition-colors">
+                        <div className="w-9 h-9 rounded-lg bg-[#8EBF40]/20 text-[#8EBF40] flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                          <Sprout className="w-4 h-4" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="font-bold text-white text-sm">
+                            {lang === 'en' ? '2. Emarah Dairy & Cattle Agro Farming' : '২. ইমারাহ ডেইরি ও পশু খামার প্রকল্প'}
+                          </div>
+                          <p className="text-gray-300 leading-snug">
+                            {lang === 'en'
+                              ? 'Sustainable dairy milk production, high-yield breeding, and cattle rearing with steady agricultural cash flow.'
+                              : 'উন্নত জাতের গাভী পালন, দুধ উৎপাদন ও পশু মোটাতাজাকরণ প্রকল্প—যেখানে সম্পদ দৃশ্যমান ও খামার উন্মুক্ত।'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions & Hotline Strip */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
+                    <div className="flex flex-wrap items-center gap-3">
                       <button
                         onClick={() => navigateTo('investment')}
-                        className="px-6 py-3 rounded-xl bg-[#8EBF40] hover:bg-[#7ca935] text-gray-950 font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95 inline-flex items-center space-x-2"
+                        className="px-6 py-3.5 rounded-xl bg-[#8EBF40] hover:bg-[#7ca935] text-gray-950 font-bold text-xs sm:text-sm shadow-lg shadow-[#8EBF40]/25 transition-all cursor-pointer active:scale-95 inline-flex items-center justify-center space-x-2"
                       >
-                        <span>{lang === 'en' ? 'Read Full Investment Policy' : 'বিনিয়োগের সম্পূর্ণ নীতিমালা পড়ুন'}</span>
+                        <span>{lang === 'en' ? 'Investment Policy & Calculator' : 'বিনিয়োগ নীতিমালা ও লাভ ক্যালকুলেটর'}</span>
                         <ArrowRight className="w-4 h-4" />
                       </button>
 
                       <a
-                        href="tel:+8801918646575"
-                        className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all flex items-center space-x-2 cursor-pointer"
+                        href="tel:01918646575"
+                        className="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all flex items-center justify-center space-x-2 cursor-pointer"
                       >
                         <Phone className="w-4 h-4 text-[#8EBF40]" />
-                        <span>{lang === 'en' ? 'Call: 01918-646575' : 'হটলাইন: ০১৯১৮-৬৪৬৫৭৫'}</span>
+                        <span>{lang === 'en' ? 'Call Desk: 01918-646575' : 'বিনিয়োগ ডেস্ক: ০১৯১৮-৬৪৬৫৭৫'}</span>
                       </a>
                     </div>
-                  </div>
 
-                  <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
-                    <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/10 space-y-1">
-                      <div className="text-[11px] font-bold text-[#8EBF40] uppercase">সর্বনিম্ন বিনিয়োগ</div>
-                      <div className="text-2xl font-black text-white">৳ ১,০০,০০০</div>
-                      <div className="text-[11px] text-gray-300">সকল আয়ের মানুষের সুযোগ</div>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/10 space-y-1">
-                      <div className="text-[11px] font-bold text-red-300 uppercase">মূলধন প্রত্যাহার</div>
-                      <div className="text-2xl font-black text-white">৯০ দিনের নোটিশ</div>
-                      <div className="text-[11px] text-gray-300">নিরাপদ এক্সিট গ্যারান্টি</div>
-                    </div>
+                    <a
+                      href="https://wa.me/8801918646575?text=%E0%A6%86%E0%A6%B8%E0%A6%B8%E0%A6%BE%E0%A6%B2%E0%A6%BE%E0%A6%AE%E0%A7%81%20%E0%A6%86%E0%A6%B2%E0%A6%BE%E0%A6%87%E0%A6%95%E0%A7%81%E0%A6%AE%E0%A7%A4%20%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%AC%E0%A6%BF%E0%A6%A8%E0%A6%BF%E0%A7%9F%E0%A7%8B%E0%A6%97%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87%E0%A7%A4"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-5 py-3.5 rounded-xl bg-[#006231] hover:bg-[#004723] text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 border border-emerald-400/30 shadow-md cursor-pointer"
+                    >
+                      <MessageSquare className="w-4 h-4 text-[#8EBF40]" />
+                      <span>{lang === 'en' ? 'WhatsApp Inquiry' : 'হোয়াটসঅ্যাপে পরামর্শ নিন'}</span>
+                    </a>
                   </div>
                 </div>
               </div>
