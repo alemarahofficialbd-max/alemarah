@@ -51,16 +51,19 @@ export default function Hero({
 
         {/* Floating Content over the skyline */}
         <div className="relative z-10 text-center space-y-4 max-w-lg mx-auto">
-          {/* Master Headline */}
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#231F20] tracking-tight leading-[1.2]">
-            <span>{t.hero.headlinePrefix} </span>
-            <span className="relative inline-block text-[#CE2028]">
-              {t.hero.headlineHighlight}
-              <svg className="absolute -bottom-1.5 left-0 w-full h-2.5 text-[#8EBF40]/70" viewBox="0 0 100 20" preserveAspectRatio="none">
-                <path d="M0,15 Q50,0 100,15" stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" />
-              </svg>
-            </span>{' '}
-            <span className="text-gray-900">{t.hero.headlineSuffix}</span>
+          {/* Master Headline (Two distinct lines) */}
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#231F20] tracking-tight leading-[1.25]">
+            <span className="block text-gray-900">
+              {t.hero.headlineLine1 || t.hero.headlinePrefix}
+            </span>
+            <span className="block mt-1">
+              <span className="relative inline-block text-[#CE2028]">
+                {t.hero.headlineLine2 || t.hero.headlineHighlight}
+                <svg className="absolute -bottom-1.5 left-0 w-full h-2.5 text-[#8EBF40]/70" viewBox="0 0 100 20" preserveAspectRatio="none">
+                  <path d="M0,15 Q50,0 100,15" stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" />
+                </svg>
+              </span>
+            </span>
           </h1>
 
           {/* Description */}
@@ -85,16 +88,19 @@ export default function Hero({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Desktop Main Hero Header (Hidden on mobile) */}
         <div className="hidden md:block text-center max-w-4xl mx-auto space-y-6">
-          {/* Master Headline */}
-          <h1 className="text-4xl lg:text-6xl font-extrabold text-[#231F20] tracking-tight leading-[1.15]">
-            <span>{t.hero.headlinePrefix} </span>
-            <span className="relative inline-block text-[#CE2028]">
-              {t.hero.headlineHighlight}
-              <svg className="absolute -bottom-2 left-0 w-full h-3 text-[#8EBF40]/70" viewBox="0 0 100 20" preserveAspectRatio="none">
-                <path d="M0,15 Q50,0 100,15" stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" />
-              </svg>
-            </span>{' '}
-            <span className="text-gray-900">{t.hero.headlineSuffix}</span>
+          {/* Master Headline (Two distinct lines) */}
+          <h1 className="text-4xl lg:text-6xl font-extrabold text-[#231F20] tracking-tight leading-[1.2]">
+            <span className="block text-gray-900">
+              {t.hero.headlineLine1 || t.hero.headlinePrefix}
+            </span>
+            <span className="block mt-2">
+              <span className="relative inline-block text-[#CE2028]">
+                {t.hero.headlineLine2 || t.hero.headlineHighlight}
+                <svg className="absolute -bottom-2.5 left-0 w-full h-3 text-[#8EBF40]/70" viewBox="0 0 100 20" preserveAspectRatio="none">
+                  <path d="M0,15 Q50,0 100,15" stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" />
+                </svg>
+              </span>
+            </span>
           </h1>
 
           {/* Description */}

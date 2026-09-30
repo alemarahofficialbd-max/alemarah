@@ -31,9 +31,11 @@ export const translations = {
     // Hero Section
     hero: {
       badge: "Planned Development, Creating Wealth with Trust",
-      headlinePrefix: "Own Your Dream Address —",
-      headlineHighlight: "From Land Share to Flat",
-      headlineSuffix: "Ownership",
+      headlineLine1: "Own Your Dream Address",
+      headlineLine2: "From Land Share to Flat Ownership",
+      headlinePrefix: "Own Your Dream Address",
+      headlineHighlight: "From Land Share to Flat Ownership",
+      headlineSuffix: "",
       description: "Al-Emarah Properties Limited works toward planned land, housing development, commercial assets, aesthetic architecture, and safe construction keeping people's affordability, needs, and future in mind — where an address is not just a dwelling, but a lasting asset for the future.",
       exploreBtn: "Explore Projects",
       consultationBtn: "Get Free Consultation",
@@ -676,9 +678,11 @@ export const translations = {
     // Hero Section
     hero: {
       badge: "পরিকল্পিত উন্নয়ন, আস্থার সঙ্গে সম্পদ সৃষ্টি",
-      headlinePrefix: "স্বপ্নের ঠিকানা হোক",
-      headlineHighlight: "নিজের",
-      headlineSuffix: "— জমি থেকে ফ্ল্যাটের মালিকানা",
+      headlineLine1: "স্বপ্নের ঠিকানা হোক নিজের",
+      headlineLine2: "জমি থেকে ফ্ল্যাটের মালিকানা",
+      headlinePrefix: "স্বপ্নের ঠিকানা হোক নিজের",
+      headlineHighlight: "জমি থেকে ফ্ল্যাটের মালিকানা",
+      headlineSuffix: "",
       description: "আল-ইমারাহ প্রোপার্টিজ লিমিটেড মানুষের সাধ্য, প্রয়োজন ও ভবিষ্যৎকে বিবেচনায় রেখে পরিকল্পিত জমি, আবাসন উন্নয়ন, বাণিজ্যিক সম্পদ, নান্দনিক স্থাপত্য এবং নিরাপদ নির্মাণ ও পরিকল্পিত উন্নয়নে কাজ করে—যেখানে একটি ঠিকানা শুধু বসবাসের স্থান নয়, বরং ভবিষ্যতের একটি স্থায়ী সম্পদ।",
       exploreBtn: "প্রকল্পসমূহ দেখুন",
       consultationBtn: "বিনামূল্যে পরামর্শ নিন",
