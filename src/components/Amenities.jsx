@@ -11,14 +11,9 @@ import {
   Volume2,
   Zap,
   Cctv,
-  Phone,
-  Calendar,
-  MessageSquare,
   Building2,
-  ArrowRight,
   Sun,
-  Shield,
-  Gem
+  Shield
 } from 'lucide-react';
 
 export default function Amenities({ 
@@ -259,52 +254,6 @@ export default function Amenities({
                 {isEn ? "Architecturally engineered cross ventilation for refreshing, healthy living." : "প্রতিটি ইউনিটে সর্বোচ্চ দিনের আলো ও উন্মুক্ত বাতাস প্রবাহ নিশ্চিত।"}
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* Bottom Booking & Consultation Action Strip */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#004724] to-[#002715] border border-emerald-500/30 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
-          <div className="space-y-2 text-center lg:text-left relative z-10">
-            <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-emerald-200 uppercase tracking-wider">
-              <Sparkles className="w-4 h-4 text-emerald-300" />
-              <span>{isEn ? "Experience the Amenities in Person" : "সরাসরি প্রজেক্ট ঘুরে বিশেষত্ব অনুভব করুন"}</span>
-            </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white">
-              {isEn ? "Schedule a Guided Project Walkthrough" : "আমাদের ইঞ্জিনিয়ারের সাথে সরাসরি সাইট ভিজিট করুন"}
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-200 max-w-xl">
-              {isEn 
-                ? "Visit Al Quds Tower (Sanarpar) or Barakah Tower (Paltan) with our senior engineers."
-                : "আল কুদস টাওয়ার (পশ্চিম সানারপাড়) অথবা বারাকাহ টাওয়ারের (পল্টন) নির্মাণ কাজ ও সুযোগ-সুবিধা সশরীরে পরিদর্শন করুন।"}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 shrink-0 relative z-10">
-            <button
-              onClick={onOpenBookVisit}
-              className="px-6 py-3.5 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white font-bold text-xs sm:text-sm shadow-lg shadow-[#CE2028]/30 transition-all cursor-pointer inline-flex items-center space-x-2 active:scale-95"
-            >
-              <Calendar className="w-4 h-4" />
-              <span>{isEn ? "Book Free Site Visit" : "ফ্রি সাইট ভিজিট শিডিউল করুন"}</span>
-            </button>
-
-            <a
-              href="tel:01918646575"
-              className="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all flex items-center space-x-2 cursor-pointer"
-            >
-              <Phone className="w-4 h-4 text-emerald-300" />
-              <span>{isEn ? "Call: 01918-646575" : "কল: ০১৯১৮-৬৪৬৫৭৫"}</span>
-            </a>
-
-            <a
-              href="https://wa.me/8801918646575?text=%E0%A6%86%E0%A6%B8%E0%A6%B8%E0%A6%BE%E0%A6%AE%E0%A7%81%20%E0%A6%86%E0%A6%B2%E0%A6%BE%E0%A6%87%E0%A6%95%E0%A7%81%E0%A6%AE%E0%A7%A4%20%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%86%E0%A6%B2-%E0%A6%87%E0%A6%AE%E0%A6%BE%E0%A6%B0%E0%A6%BE%E0%A6%B9%E0%A6%B0%20%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%9C%E0%A7%87%E0%A6%95%E0%A7%8D%E0%A6%9F%20%E0%A6%AD%E0%A6%bf%E0%A6%9C%E0%A6%bf%E0%A6%9f%20%E0%A6%95%E0%A6%B0%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87%E0%A7%A4"
-              target="_blank"
-              rel="noreferrer"
-              className="p-3.5 rounded-xl bg-white/10 hover:bg-[#25D366] text-white transition-all border border-white/20 flex items-center justify-center cursor-pointer shadow-md"
-              title={isEn ? "WhatsApp Consultation" : "হোয়াটসঅ্যাপে যোগাযোগ"}
-            >
-              <MessageSquare className="w-4 h-4" />
-            </a>
           </div>
         </div>
       </div>
