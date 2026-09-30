@@ -493,7 +493,12 @@ export default function App() {
             </section>
 
             {/* Signature Amenities Preview */}
-            <Amenities lang={lang} t={t} />
+            <Amenities 
+              lang={lang} 
+              t={t} 
+              onOpenBookVisit={() => handleOpenBookVisit()}
+              onExploreProjects={() => navigateTo('projects')}
+            />
 
             {/* Quick Contact & Site Visit Invitation Strip */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
@@ -595,7 +600,12 @@ export default function App() {
             <WhyChooseUs lang={lang} t={t} />
 
             {/* Amenities Section on Quality Page */}
-            <Amenities lang={lang} t={t} />
+            <Amenities 
+              lang={lang} 
+              t={t} 
+              onOpenBookVisit={() => handleOpenBookVisit()}
+              onExploreProjects={() => navigateTo('projects')}
+            />
 
             {/* Bottom CTA */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
@@ -633,7 +643,12 @@ export default function App() {
             <AboutUs lang={lang} t={t} />
 
             {/* Signature Amenities */}
-            <Amenities lang={lang} t={t} />
+            <Amenities 
+              lang={lang} 
+              t={t} 
+              onOpenBookVisit={() => handleOpenBookVisit()}
+              onExploreProjects={() => navigateTo('projects')}
+            />
 
             {/* Corporate Location Details Card */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
