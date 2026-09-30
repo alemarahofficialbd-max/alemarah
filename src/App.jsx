@@ -571,20 +571,19 @@ export default function App() {
             </section>
 
             {/* ==================================================== */}
-            {/* SECTION 2: ১০০% হালাল ও শরীয়াহসম্মত বিনিয়োগ (High-Impact Split Showcase) */}
+            {/* SECTION 2: ১০০% হালাল ও শরীয়াহসম্মত বিনিয়োগ (Refined & Elegant Corporate Showcase) */}
             {/* ==================================================== */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-              <div className="rounded-3xl bg-gradient-to-br from-[#F4FAF6] via-white to-[#EEF8F2] border-2 border-emerald-300/80 p-6 sm:p-10 md:p-12 shadow-2xl shadow-emerald-950/10 relative overflow-hidden">
-                {/* Soft ambient background radial bursts */}
-                <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-emerald-200/50 rounded-full blur-[130px] pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-amber-100/40 rounded-full blur-[130px] pointer-events-none"></div>
+              <div className="rounded-3xl bg-white border border-gray-200/90 p-6 sm:p-10 md:p-12 shadow-xl shadow-gray-200/50 relative overflow-hidden">
+                {/* Subtle, soft ambient background glow */}
+                <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-50/60 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                   
                   {/* LEFT COLUMN (7 Cols): Compelling Value Proposition & 3 Guarantees */}
                   <div className="lg:col-span-7 space-y-6">
                     {/* Badge */}
-                    <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-emerald-100 text-[#006231] border border-emerald-300/80 text-xs font-extrabold uppercase tracking-wider shadow-2xs">
+                    <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-[#006231] border border-emerald-200 text-xs font-bold uppercase tracking-wider">
                       <Sparkles className="w-3.5 h-3.5 text-[#006231]" />
                       <span>{lang === 'en' ? '100% Shariah-Compliant Partnership' : '১০০% হালাল ও শরীয়াহসম্মত যৌথ বিনিয়োগ'}</span>
                     </div>
@@ -604,15 +603,15 @@ export default function App() {
                       </p>
                     </div>
 
-                    {/* 3 Large Eye-Catching Guarantees with Luxury Emblems */}
+                    {/* 3 Large Clean Guarantees - Harmonized with Deep Green Palette */}
                     <div className="space-y-3 pt-1">
-                      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-2xs hover:shadow-md hover:border-emerald-400 transition-all flex items-start space-x-3.5 group">
-                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/80 text-[#006231] border border-emerald-300 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-gray-50/70 border border-gray-200/90 hover:bg-emerald-50/30 hover:border-emerald-300 transition-all flex items-start space-x-3.5 group">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-100/80 text-[#006231] border border-emerald-200 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                           <ScrollText className="w-5 h-5 text-[#006231]" />
                         </div>
                         <div>
-                          <div className="font-bold text-gray-900 text-sm sm:text-base flex items-center space-x-2">
-                            <span>{lang === 'en' ? '1. Government Judicial Stamp Agreement' : '১. সরকারি স্ট্যাম্পে ৩শ টাকার আইনি চুক্তিপত্র'}</span>
+                          <div className="font-bold text-gray-900 text-sm sm:text-base">
+                            {lang === 'en' ? '1. Government Judicial Stamp Agreement' : '১. সরকারি স্ট্যাম্পে ৩শ টাকার আইনি চুক্তিপত্র'}
                           </div>
                           <p className="text-xs text-gray-600 leading-snug pt-0.5">
                             {lang === 'en' ? 'Every investment is executed with registered legal deed and official money receipt.' : 'প্রতিটি লেনদেনের বিপরীতে সরকারি স্ট্যাম্পে রেজিস্ট্রিকৃত চুক্তি ও মানি রিসিট প্রদান।'}
@@ -620,9 +619,9 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-2xs hover:shadow-md hover:border-amber-400 transition-all flex items-start space-x-3.5 group">
-                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/80 text-amber-700 border border-amber-300 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                          <RotateCcw className="w-5 h-5 text-amber-700" />
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-gray-50/70 border border-gray-200/90 hover:bg-emerald-50/30 hover:border-emerald-300 transition-all flex items-start space-x-3.5 group">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-100/80 text-[#006231] border border-emerald-200 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                          <RotateCcw className="w-5 h-5 text-[#006231]" />
                         </div>
                         <div>
                           <div className="font-bold text-gray-900 text-sm sm:text-base">
@@ -634,9 +633,9 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-2xs hover:shadow-md hover:border-purple-400 transition-all flex items-start space-x-3.5 group">
-                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100/80 text-purple-700 border border-purple-300 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                          <BadgePercent className="w-5 h-5 text-purple-700" />
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-gray-50/70 border border-gray-200/90 hover:bg-emerald-50/30 hover:border-emerald-300 transition-all flex items-start space-x-3.5 group">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-100/80 text-[#006231] border border-emerald-200 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                          <BadgePercent className="w-5 h-5 text-[#006231]" />
                         </div>
                         <div>
                           <div className="font-bold text-gray-900 text-sm sm:text-base">
@@ -653,7 +652,7 @@ export default function App() {
                     <div className="flex flex-wrap items-center gap-3 pt-2">
                       <button
                         onClick={() => navigateTo('investment')}
-                        className="px-6 py-3.5 rounded-xl bg-[#006231] hover:bg-[#004724] text-white font-bold text-xs sm:text-sm shadow-lg shadow-[#006231]/25 transition-all cursor-pointer active:scale-95 inline-flex items-center space-x-2"
+                        className="px-6 py-3.5 rounded-xl bg-[#006231] hover:bg-[#004724] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#006231]/20 transition-all cursor-pointer active:scale-95 inline-flex items-center space-x-2"
                       >
                         <span>{lang === 'en' ? 'View Profit Calculator & Policy' : 'বিনিয়োগ নীতিমালা ও লাভ ক্যালকুলেটর'}</span>
                         <ArrowRight className="w-4 h-4" />
@@ -661,14 +660,14 @@ export default function App() {
 
                       <a
                         href="tel:01918646575"
-                        className="px-5 py-3.5 rounded-xl bg-white hover:bg-gray-50 text-gray-900 font-bold text-xs sm:text-sm border border-gray-300 transition-all flex items-center space-x-2 shadow-2xs cursor-pointer"
+                        className="px-5 py-3.5 rounded-xl bg-white hover:bg-gray-50 text-gray-800 font-bold text-xs sm:text-sm border border-gray-300 transition-all flex items-center space-x-2 shadow-2xs cursor-pointer"
                       >
                         <Phone className="w-4 h-4 text-[#006231]" />
                         <span>{lang === 'en' ? 'Hotline: 01918-646575' : 'হটলাইন: ০১৯১৮-৬৪৬৫৭৫'}</span>
                       </a>
 
                       <a
-                        href="https://wa.me/8801918646575?text=%E0%A6%86%E0%A6%B8%E0%A6%B8%E0%A6%BE%E0%A6%B2%E0%A6%BE%E0%A6%AE%E0%A7%81%20%E0%A6%86%E0%A6%B2%E0%A6%BE%E0%A6%87%E0%A6%95%E0%A7%81%E0%A6%AE%E0%A7%A4%20%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%AC%E0%A6%BF%E0%A6%A8%E0%A6%BF%E0%A7%9F%E0%A7%8B%E0%A6%97%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87%E0%A7%A4"
+                        href="https://wa.me/8801918646575?text=%E0%A6%86%E0%A6%B8%E0%A6%B8%E0%A6%BE%E0%A6%AE%E0%A7%81%20%E0%A6%86%E0%A6%B2%E0%A6%BE%E0%A6%87%E0%A6%95%E0%A7%81%E0%A6%AE%E0%A7%A4%20%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%AC%E0%A6%BF%E0%A6%A8%E0%A6%BF%E0%A7%9F%E0%A7%8B%E0%A6%97%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87%E0%A7%A4"
                         target="_blank"
                         rel="noreferrer"
                         className="p-3.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white transition-all flex items-center justify-center shadow-md shadow-emerald-500/20 cursor-pointer"
@@ -679,87 +678,90 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* RIGHT COLUMN (5 Cols): The "Shariah Investment Pass" Showcase Card */}
+                  {/* RIGHT COLUMN (5 Cols): The "Shariah Investment Pass" Clean & Elegant White Card */}
                   <div className="lg:col-span-5">
-                    <div className="relative rounded-3xl bg-gradient-to-br from-[#00381C] via-[#004724] to-[#002B16] text-white p-7 sm:p-8 shadow-2xl border-2 border-emerald-400/30 overflow-hidden space-y-6">
+                    <div className="rounded-3xl bg-white border-2 border-emerald-200/90 p-7 sm:p-8 shadow-xl shadow-emerald-950/5 space-y-6">
                       {/* Top Ribbon & Seal */}
-                      <div className="flex items-center justify-between pb-4 border-b border-white/15">
-                        <div className="flex items-center space-x-2.5">
-                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8EBF40] to-[#6d962d] text-gray-950 flex items-center justify-center font-black text-xs shadow-md border border-lime-200/40">
-                            <Crown className="w-4 h-4 text-gray-950" />
+                      <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#006231] text-white flex items-center justify-center font-black text-xs shadow-xs">
+                            AE
                           </div>
                           <div>
-                            <div className="text-2xs font-extrabold uppercase tracking-wider text-[#8EBF40] flex items-center space-x-1">
-                              <span>AL-EMARAH SHARIAH ASSETS</span>
+                            <div className="text-xs font-black tracking-wider text-gray-900">
+                              AL-EMARAH SHARIAH ASSETS
                             </div>
-                            <div className="text-3xs text-gray-300">
+                            <div className="text-3xs text-gray-500 font-medium">
                               {lang === 'en' ? 'Verified Halal Partnership' : 'অনুমোদিত হালাল অংশীদারিত্ব'}
                             </div>
                           </div>
                         </div>
 
-                        <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-3xs font-extrabold uppercase tracking-wider shadow-inner">
-                          <Gem className="w-3 h-3 text-[#8EBF40]" />
+                        <div className="inline-flex items-center space-x-1 px-3 py-1 rounded-full bg-emerald-50 text-[#006231] border border-emerald-200 text-3xs font-extrabold uppercase tracking-wider">
+                          <Gem className="w-3 h-3 text-[#006231]" />
                           <span>{lang === 'en' ? 'Shariah Verified' : '১০০% সুদমুক্ত'}</span>
                         </div>
                       </div>
 
                       {/* Prominent Capital Entry Amount */}
-                      <div className="p-4 sm:p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-1 relative overflow-hidden">
-                        <div className="inline-flex items-center space-x-1.5 text-2xs font-extrabold text-[#8EBF40] uppercase tracking-wider">
-                          <Wallet className="w-3.5 h-3.5" />
+                      <div className="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-center space-y-1.5">
+                        <div className="inline-flex items-center space-x-1.5 text-2xs font-extrabold text-[#006231] uppercase tracking-wider">
+                          <Wallet className="w-3.5 h-3.5 text-[#006231]" />
                           <span>{lang === 'en' ? 'Minimum Capital Threshold' : 'সর্বনিম্ন বিনিয়োগের অংশীদারিত্ব'}</span>
                         </div>
-                        <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                        <div className="text-3xl sm:text-4xl font-black text-[#006231] tracking-tight">
                           {lang === 'en' ? 'BDT 1,00,000' : '৳ ১,০০,০০০'}
                         </div>
-                        <p className="text-3xs text-gray-200">
+                        <p className="text-xs text-gray-600 font-medium">
                           {lang === 'en' ? 'Low entry barrier for families and expatriates' : 'সীমিত আয়ের পরিবার ও প্রবাসীদের জন্য সহজ কিস্তি ও শেয়ার সুবিধা'}
                         </p>
                       </div>
 
                       {/* 2 Visible Tangible Sectors */}
                       <div className="space-y-2.5 text-xs">
-                        <div className="text-3xs font-extrabold uppercase tracking-wider text-gray-300">
+                        <div className="text-3xs font-extrabold uppercase tracking-wider text-gray-500">
                           {lang === 'en' ? 'Two Tangible Active Sectors:' : 'যেখানে আপনার অর্থ নিয়োজিত থাকবে (বাস্তব সম্পদ):'}
                         </div>
 
-                        <div className="p-3 rounded-xl bg-white/10 border border-white/10 flex items-center space-x-3">
-                          <Building2 className="w-5 h-5 text-[#8EBF40] shrink-0" />
+                        <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 flex items-center space-x-3.5 hover:border-emerald-300 transition-colors">
+                          <div className="w-9 h-9 rounded-lg bg-emerald-100 text-[#006231] flex items-center justify-center shrink-0">
+                            <Building2 className="w-5 h-5 text-[#006231]" />
+                          </div>
                           <div className="leading-snug">
-                            <div className="font-bold text-white text-xs">
+                            <div className="font-bold text-gray-900 text-xs sm:text-sm">
                               {lang === 'en' ? '1. Real Estate Land Share Scheme' : '১. বাণিজ্যিক ও আবাসিক জমির শেয়ার'}
                             </div>
-                            <div className="text-3xs text-gray-300">
+                            <div className="text-3xs text-gray-500">
                               {lang === 'en' ? 'Al Quds Tower & Barakah Tower units' : 'আল কুদস টাওয়ার ও বারাকাহ টাওয়ার'}
                             </div>
                           </div>
                         </div>
 
-                        <div className="p-3 rounded-xl bg-white/10 border border-white/10 flex items-center space-x-3">
-                          <Sprout className="w-5 h-5 text-[#8EBF40] shrink-0" />
+                        <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 flex items-center space-x-3.5 hover:border-emerald-300 transition-colors">
+                          <div className="w-9 h-9 rounded-lg bg-emerald-100 text-[#006231] flex items-center justify-center shrink-0">
+                            <Sprout className="w-5 h-5 text-[#006231]" />
+                          </div>
                           <div className="leading-snug">
-                            <div className="font-bold text-white text-xs">
+                            <div className="font-bold text-gray-900 text-xs sm:text-sm">
                               {lang === 'en' ? '2. Emarah Agro & Cattle Farm' : '২. ইমারাহ ডেইরি ও পশু খামার প্রকল্প'}
                             </div>
-                            <div className="text-3xs text-gray-300">
+                            <div className="text-3xs text-gray-500">
                               {lang === 'en' ? 'Dairy milk & cattle rearing cash flow' : 'দুধ উৎপাদন, প্রজনন ও পশু মোটাতাজাকরণ'}
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Bottom Fast Action Button */}
+                      {/* Bottom Fast Action Button - Elegant Brand Green */}
                       <button
                         onClick={() => navigateTo('investment')}
-                        className="w-full py-3 rounded-xl bg-[#8EBF40] hover:bg-[#7ca935] text-gray-950 font-bold text-xs sm:text-sm shadow-lg transition-all cursor-pointer flex items-center justify-center space-x-2 active:scale-98"
+                        className="w-full py-3.5 rounded-xl bg-[#006231] hover:bg-[#004724] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#006231]/20 transition-all cursor-pointer flex items-center justify-center space-x-2 active:scale-98"
                       >
                         <span>{lang === 'en' ? 'Calculate Your Returns' : 'আপনার লাভের হিসাব করুন'}</span>
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="w-4 h-4 text-white" />
                       </button>
                     </div>
                   </div>
-
                 </div>
               </div>
             </section>
