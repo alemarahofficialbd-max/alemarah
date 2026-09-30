@@ -227,7 +227,8 @@ export const translations = {
       mdTitle: "Message from the Managing Director",
       mdQuote: "As the Managing Director, my primary duty is advancing our organization into a powerful, multifaceted, and publicly trusted enterprise through sound planning, skilled management, and pragmatic execution. Alongside residential and commercial towers like Al Quds Tower and Barakah Tower 01, our Emarah Agro initiative is opening new frontiers in sustainable agriculture and participatory returns. Because behind a person's savings lie their hard work, their family's future, and their aspiration to build something lasting. From that accountability, our journey continues from planning to execution, from a single initiative toward multi-asset development.",
       mdName: "Talukdar Tariq Masud",
-      mdDesignation: "Managing Director, Al-Emarah Properties"
+      mdDesignation: "Managing Director",
+      mdEducation: "BSS Political Science, Govt Titumir College"
     },
 
     // Special Project Amenities (From Corporate Profile)
@@ -876,7 +877,7 @@ export const translations = {
       mdQuote: "আল ইমারাহ প্রোপার্টিজের ব্যবস্থাপনা পরিচালক হিসেবে আমার প্রধান দায়িত্ব হলো—সুষ্ঠু পরিকল্পনা, দক্ষ ব্যবস্থাপনা ও কার্যকর বাস্তবায়নের মাধ্যমে প্রতিষ্ঠানকে একটি শক্তিশালী, বহুমুখী ও জনআস্থাসম্পন্ন প্রতিষ্ঠানে এগিয়ে নেওয়া। আবাসিক ও বাণিজ্যিক কার্যক্রমের পাশাপাশি রিয়েল এস্টেট ডেভেলপমেন্ট অ্যান্ড হাউজিং, পরিকল্পিত আবাসন, ভূমি উন্নয়ন এবং কৃষিভিত্তিক সম্পদ উন্নয়ন খাতেও আমাদের কার্যক্রম সম্প্রসারিত হচ্ছে। বিশেষ করে আল ইমারাহ এগ্রো উদ্যোগের মাধ্যমে কৃষি, উৎপাদন ও অংশীদারিত্বের নতুন সম্ভাবনা তৈরি হচ্ছে। কারণ মানুষের সঞ্চয়ের সঙ্গে জড়িয়ে থাকে তার পরিশ্রম, পরিবারের ভবিষ্যৎ এবং নিজের জন্য কিছু গড়ে তোলার আকাঙ্ক্ষা। সেই দায়বদ্ধতা থেকেই আমরা এমন একটি প্রতিষ্ঠান গড়ে তুলতে চাই, যেখানে মানুষের অংশগ্রহণ ভবিষ্যতের একটি সম্পদ ও সম্ভাবনার সঙ্গে যুক্ত হবে। পরিকল্পনা থেকে বাস্তবায়নে, একটি উদ্যোগ থেকে বহুমুখী সম্পদ উন্নয়নের দিকে আমাদের পথচলা চলমান।",
       mdName: "তালুকদার তারিক মাসউদ",
       mdDesignation: "ব্যবস্থাপনা পরিচালক",
-      mdEducation: "আল ইমারাহ প্রোপার্টিজ লিমিটেড"
+      mdEducation: "BSS রাষ্ট্রবিজ্ঞান, সরকারি তিতুমীর কলেজ"
     },
 
     // Special Project Amenities (From Corporate Profile)
