@@ -189,74 +189,316 @@ export default function App() {
               onViewAllProjects={() => navigateTo('projects')}
             />
 
-            {/* Why Choose Us Highlights Strip (4 Pillars) */}
-            <section className="py-12 bg-white border-y border-gray-100">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-[#CE2028] uppercase tracking-wider">
-                      {lang === 'en' ? 'Pillars of Excellence' : 'আমাদের মূল ভিত্তি ও অঙ্গীকার'}
-                    </span>
-                    <h2 className="text-2xl sm:text-3xl font-black text-gray-900">
-                      {lang === 'en' ? 'Why Al-Emarah Properties?' : 'কেন আল-ইমারাহ প্রোপার্টিজ?'}
+            {/* ==================================================== */}
+            {/* SECTION: আল-ইমারাহ এর বিশেষত্ব (Why Al-Emarah 6 Pillars) */}
+            {/* ==================================================== */}
+            <section id="why-al-emarah" className="py-14 sm:py-20 bg-gradient-to-b from-white via-gray-50/60 to-white border-y border-gray-200/80 relative overflow-hidden">
+              {/* Subtle architectural background accents */}
+              <div className="absolute top-0 right-1/4 w-96 h-96 bg-red-100/30 rounded-full blur-3xl pointer-events-none -z-10"></div>
+              <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-emerald-100/30 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
+                {/* Section Header */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+                  <div className="space-y-3 max-w-3xl">
+                    <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-red-50 text-[#CE2028] text-xs font-bold uppercase tracking-wider border border-red-200/80 shadow-2xs">
+                      <Sparkles className="w-3.5 h-3.5 text-[#CE2028]" />
+                      <span>{lang === 'en' ? 'Core Specialties of Al-Emarah' : 'আল-ইমারাহ এর বিশেষত্ব'}</span>
+                    </div>
+
+                    <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight">
+                      <span>{lang === 'en' ? 'Planned Housing & Trusted Construction:' : 'পরিকল্পিত আবাসন ও বিশ্বস্ত নির্মাণে'} </span>
+                      <span className="text-[#CE2028]">
+                        {lang === 'en' ? 'Our 6 Signature Specialties' : 'আমাদের অনন্য ৬টি প্রাতিষ্ঠানিক বিশেষত্ব'}
+                      </span>
                     </h2>
+
+                    <p className="text-xs sm:text-sm md:text-base text-gray-600 leading-relaxed font-normal">
+                      {lang === 'en' 
+                        ? 'Al-Emarah Properties is not just another real estate developer. We take full responsibility for securing your hard-earned investment with early land registration, 100% Shariah ethics, and BUET-tested structural engineering.'
+                        : 'আল-ইমারাহ প্রোপার্টিজ কেবল একটি আবাসন নির্মাণ প্রতিষ্ঠান নয়—আমরা ক্রেতার কষ্টার্জিত সঞ্চয়ের নিরাপত্তা, শুরুতেই জমির স্বতন্ত্র রেজিস্ট্রেশন এবং বুয়েট পরীক্ষিত সর্বোচ্চ কাঠামোগত নিরাপত্তার শতভাগ নিশ্চয়তা প্রদান করি।'}
+                    </p>
                   </div>
+
                   <button
                     onClick={() => navigateTo('why-us')}
-                    className="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-bold text-[#006231] hover:text-[#CE2028] transition-colors cursor-pointer"
+                    className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-[#006231] text-white text-xs sm:text-sm font-bold shadow-md transition-all shrink-0 cursor-pointer self-start md:self-end"
                   >
-                    <span>{lang === 'en' ? 'Read full engineering standards' : 'আমাদের মান ও বিশেষত্ব বিস্তারিত দেখুন'}</span>
+                    <span>{lang === 'en' ? 'Full Standards & Policy' : 'আমাদের সম্পূর্ণ নীতিমালা দেখুন'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                  <div className="p-6 rounded-2xl bg-[#FBFBFB] border border-gray-200/80 hover:border-[#006231] hover:bg-white hover:shadow-lg transition-all group">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center font-bold mb-4 group-hover:scale-110 transition-transform">
-                      <Scale className="w-6 h-6" />
+                {/* 6 Signature Specialty Cards Grid (3 cols x 2 rows) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                  {/* Specialty 1: Land Share Independent Registry */}
+                  <div className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/90 shadow-xs hover:shadow-xl hover:border-[#CE2028]/50 transition-all duration-300 group flex flex-col justify-between relative overflow-hidden">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#CE2028] border border-red-100 flex items-center justify-center font-bold group-hover:scale-110 transition-transform shadow-xs">
+                          <FileText className="w-6 h-6" />
+                        </div>
+                        <span className="text-3xs font-extrabold px-2.5 py-1 rounded-full bg-red-50 text-[#CE2028] border border-red-200 uppercase tracking-wider">
+                          {lang === 'en' ? 'Specialty 01' : 'বিশেষত্ব ০১'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-[#CE2028] transition-colors leading-snug">
+                          {lang === 'en' ? 'Independent Land Registry Upfront' : 'শুরুতেই জমির স্বতন্ত্র রেজিস্ট্রেশন'}
+                        </h3>
+                        <p className="text-xs font-semibold text-gray-400 mt-1">
+                          {lang === 'en' ? 'Land Share-Based Flat Scheme' : 'জমির শেয়ার ভিত্তিক ফ্ল্যাট প্রকল্প'}
+                        </p>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+                        {lang === 'en'
+                          ? 'Buyers receive legal land share registration under their own name at the sub-registry office before construction begins, guaranteeing 100% legal title safety.'
+                          : 'ভবন নির্মাণের আগেই সাব-রেজিস্ট্রি অফিসে প্রতিটি ক্রেতার নামে শেয়ার অনুযায়ী জমির স্বতন্ত্র রেজিস্ট্রেশন সম্পন্ন করা হয়—যাতে শুরু থেকেই আপনার জমির মালিকানা নিশ্চিত থাকে।'}
+                      </p>
+
+                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? 'Land deed registered before construction' : 'নির্মাণ শুরুর আগেই জমি রেজিস্ট্রি হস্তান্তর'}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? '100% permanent legal title ownership' : 'শেয়ার অনুযায়ী শতভাগ বৈধ স্থায়ী মালিকানা'}</span>
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#006231] transition-colors">
-                      {lang === 'en' ? '100% Shariah Foundation' : '১০০% হালাল ও নৈতিক ভিত্তি'}
-                    </h3>
-                    <p className="text-xs text-gray-600 leading-relaxed">
-                      {lang === 'en' ? 'Strictly interest-free, Halal Mudarabah partnership principles.' : 'সুদমুক্ত যৌথ লাভ-ক্ষতির অংশীদারিত্ব ও ইসলামী অর্থনৈতিক মূল্যবোধ।'}
-                    </p>
+
+                    <div className="mt-5 pt-3.5 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-[#CE2028]">
+                      <span>{lang === 'en' ? '100% Legal Ownership' : 'আইনি মালিকানার শতভাগ নিশ্চয়তা'}</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
 
-                  <div className="p-6 rounded-2xl bg-[#FBFBFB] border border-gray-200/80 hover:border-[#006231] hover:bg-white hover:shadow-lg transition-all group">
-                    <div className="w-12 h-12 rounded-xl bg-red-50 text-[#CE2028] flex items-center justify-center font-bold mb-4 group-hover:scale-110 transition-transform">
-                      <ShieldCheck className="w-6 h-6" />
+                  {/* Specialty 2: 100% Shariah Compliant */}
+                  <div className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/90 shadow-xs hover:shadow-xl hover:border-[#006231]/50 transition-all duration-300 group flex flex-col justify-between relative overflow-hidden">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-[#006231] border border-emerald-100 flex items-center justify-center font-bold group-hover:scale-110 transition-transform shadow-xs">
+                          <Scale className="w-6 h-6" />
+                        </div>
+                        <span className="text-3xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-50 text-[#006231] border border-emerald-200 uppercase tracking-wider">
+                          {lang === 'en' ? 'Specialty 02' : 'বিশেষত্ব ০২'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-[#006231] transition-colors leading-snug">
+                          {lang === 'en' ? '100% Shariah & Ethical Foundation' : '১০০% সুদমুক্ত ও শরীয়াহসম্মত নীতি'}
+                        </h3>
+                        <p className="text-xs font-semibold text-gray-400 mt-1">
+                          {lang === 'en' ? 'Interest-Free Halal Principles' : 'সম্পূর্ণ হালাল ও নৈতিক অংশীদারিত্ব'}
+                        </p>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+                        {lang === 'en'
+                          ? 'Strictly interest-free, fair and ethical joint-venture real estate and agro investment model. No hidden penalties, interest charges, or un-Islamic contracts.'
+                          : 'সম্পূর্ণ সুদমুক্ত, নৈতিক ও যৌথ অংশীদারিত্বমূলক হালাল অর্থনৈতিক কাঠামো। কিস্তিতে কোনো প্রকার লুকানো সুদ, পেনাল্টি চার্জ বা অনৈতিক শর্তের কোনো সুযোগ নেই।'}
+                      </p>
+
+                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? 'Strictly interest-free Mudarabah/Musharakah' : 'সম্পূর্ণ সুদমুক্ত ও হালাল নীতিতে পরিচালিত'}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? 'No hidden fees or compounding interest' : 'কোনো প্রকার গোপন চার্জ বা সুদ নেই'}</span>
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#CE2028] transition-colors">
-                      {lang === 'en' ? 'BUET Tested Safety' : 'বুয়েট টেস্ট ও সর্বোচ্চ নিরাপত্তা'}
-                    </h3>
-                    <p className="text-xs text-gray-600 leading-relaxed">
-                      {lang === 'en' ? 'Rigorous soil testing, 7.5+ earthquake resistance, and 60-grade steel.' : '৭.৫+ মাত্রার ভূমিকম্প সহনশীল স্ট্রাকচার ও সর্বোচ্চ গ্রেডের রড-পাথর।'}
-                    </p>
+
+                    <div className="mt-5 pt-3.5 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-[#006231]">
+                      <span>{lang === 'en' ? 'Shariah Ethical Assurance' : 'সুদমুক্ত হালাল নিশ্চয়তা'}</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
 
-                  <div className="p-6 rounded-2xl bg-[#FBFBFB] border border-gray-200/80 hover:border-[#006231] hover:bg-white hover:shadow-lg transition-all group">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center font-bold mb-4 group-hover:scale-110 transition-transform">
-                      <Building2 className="w-6 h-6" />
+                  {/* Specialty 3: 100% Clear Land Title */}
+                  <div className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/90 shadow-xs hover:shadow-xl hover:border-blue-500/50 transition-all duration-300 group flex flex-col justify-between relative overflow-hidden">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-bold group-hover:scale-110 transition-transform shadow-xs">
+                          <ShieldCheck className="w-6 h-6" />
+                        </div>
+                        <span className="text-3xs font-extrabold px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200 uppercase tracking-wider">
+                          {lang === 'en' ? 'Specialty 03' : 'বিশেষত্ব ০৩'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug">
+                          {lang === 'en' ? '100% Clear Title & Verified Land' : 'শতভাগ নিষ্কণ্টক নিজস্ব জমি'}
+                        </h3>
+                        <p className="text-xs font-semibold text-gray-400 mt-1">
+                          {lang === 'en' ? 'Zero Legal Disputes Guarantee' : 'আইনি জটিলতামুক্ত পরিষ্কার সম্পত্তি'}
+                        </p>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+                        {lang === 'en'
+                          ? 'Zero litigation, flawless mutation deeds, clear CS, SA, RS, and City records with complete municipal and building compliance verification.'
+                          : 'মামলা-মোকদ্দমামুক্ত, নিখুঁত সিএস/এসএ/আরএস/সিটি খতিয়ান ও নিজ নামে নামজারি সম্পন্ন শতভাগ নিষ্কণ্টক জমিতেই কেবল আল-ইমারাহ প্রকল্প গ্রহণ করে।'}
+                      </p>
+
+                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? 'Up-to-date Mutation & Khatian deeds' : 'আপ-টু-ডেট মিউটেশন ও খতিয়ান সম্পন্ন'}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? 'Zero court disputes or title complications' : 'আইন বিশেষজ্ঞদের দ্বারা যাচাইকৃত নির্ভেজাল জমি'}</span>
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#006231] transition-colors">
-                      {lang === 'en' ? '100% Clear Land Title' : 'নিষ্কণ্টক নিজস্ব জমি'}
-                    </h3>
-                    <p className="text-xs text-gray-600 leading-relaxed">
-                      {lang === 'en' ? 'Verified municipal approvals, clear mutation deeds, and zero legal disputes.' : 'শতভাগ নির্ভেজাল জমি, রাজউক কমপ্লায়েন্স ও আইনি স্বচ্ছতা।'}
-                    </p>
+
+                    <div className="mt-5 pt-3.5 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-blue-600">
+                      <span>{lang === 'en' ? 'Verified Title Deed' : 'নিষ্কণ্টক নিজস্ব সম্পত্তি'}</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
 
-                  <div className="p-6 rounded-2xl bg-[#FBFBFB] border border-gray-200/80 hover:border-[#006231] hover:bg-white hover:shadow-lg transition-all group">
-                    <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold mb-4 group-hover:scale-110 transition-transform">
-                      <Award className="w-6 h-6" />
+                  {/* Specialty 4: BUET Tested Safety */}
+                  <div className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/90 shadow-xs hover:shadow-xl hover:border-red-500/50 transition-all duration-300 group flex flex-col justify-between relative overflow-hidden">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#CE2028] border border-red-100 flex items-center justify-center font-bold group-hover:scale-110 transition-transform shadow-xs">
+                          <Building2 className="w-6 h-6" />
+                        </div>
+                        <span className="text-3xs font-extrabold px-2.5 py-1 rounded-full bg-red-50 text-[#CE2028] border border-red-200 uppercase tracking-wider">
+                          {lang === 'en' ? 'Specialty 04' : 'বিশেষত্ব ০৪'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-[#CE2028] transition-colors leading-snug">
+                          {lang === 'en' ? 'BUET Tested Structural Safety' : 'বুয়েট টেস্ট ও সর্বোচ্চ নিরাপত্তা'}
+                        </h3>
+                        <p className="text-xs font-semibold text-gray-400 mt-1">
+                          {lang === 'en' ? '7.5+ Earthquake Resistant Design' : '৭.৫+ রিখটার ভূমিকম্প সহনশীল'}
+                        </p>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+                        {lang === 'en'
+                          ? 'Soil test and structural design verified by BUET engineers. Built with 60/72.5 grade high-tensile TMT steel, casted with stone chips and deep pile foundations.'
+                          : 'বুয়েট সার্টিফাইড বিশেষজ্ঞ প্রকৌশলী দ্বারা সয়েল টেস্ট ও স্ট্রাকচারাল ডিজাইন। ৬০/৭২.৫ গ্রেড উন্নতমানের রিবার স্টিল ও গভীর পাইল ফাউন্ডেশনের সর্বোচ্চ নিরাপত্তা।'}
+                      </p>
+
+                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? 'Certified by senior BUET engineers' : 'বুয়েট টেস্ট ও অনুমোদিত স্ট্রাকচারাল নকশা'}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? '60/72.5 Grade high-yield rebar steel' : '৬০/৭২.৫ গ্রেড রিবার স্টিল ও পাথরের ঢালাই'}</span>
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-1 group-hover:text-amber-700 transition-colors">
-                      {lang === 'en' ? 'On-Time Handover' : 'সময়মতো হস্তান্তর অঙ্গীকার'}
-                    </h3>
-                    <p className="text-xs text-gray-600 leading-relaxed">
-                      {lang === 'en' ? 'Time-bound project milestones and dedicated post-handover facility care.' : 'নির্দিষ্ট সময়ভিত্তিক নির্মাণ এবং হস্তান্তর-পরবর্তী দীর্ঘমেয়াদি যত্ন।'}
-                    </p>
+
+                    <div className="mt-5 pt-3.5 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-[#CE2028]">
+                      <span>{lang === 'en' ? 'Highest Engineering Rigor' : 'সর্বোচ্চ স্ট্রাকচারাল স্থায়িত্ব'}</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+
+                  {/* Specialty 5: Transparent Management & Direct Monitoring */}
+                  <div className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/90 shadow-xs hover:shadow-xl hover:border-purple-500/50 transition-all duration-300 group flex flex-col justify-between relative overflow-hidden">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center font-bold group-hover:scale-110 transition-transform shadow-xs">
+                          <CheckCircle2 className="w-6 h-6" />
+                        </div>
+                        <span className="text-3xs font-extrabold px-2.5 py-1 rounded-full bg-purple-50 text-purple-600 border border-purple-200 uppercase tracking-wider">
+                          {lang === 'en' ? 'Specialty 05' : 'বিশেষত্ব ০৫'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors leading-snug">
+                          {lang === 'en' ? 'Open Governance & Live Monitoring' : 'স্বচ্ছ ব্যবস্থাপনা ও সরাসরি তদারকি'}
+                        </h3>
+                        <p className="text-xs font-semibold text-gray-400 mt-1">
+                          {lang === 'en' ? 'Real-Time Progress & Accounts Access' : 'হিসাব ও কাজের অগ্রগতি সবসময় উন্মুক্ত'}
+                        </p>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+                        {lang === 'en'
+                          ? 'Shareholders and buyers can inspect construction progress and budget statements at any time. Direct site visits and regular milestone updates guaranteed.'
+                          : 'প্রতিটি নির্মাণ কাজের অগ্রগতি, রড-সিমেন্টের মান ও ব্যয়ের হিসাব ফ্ল্যাট ক্রেতা ও অংশীদারদের জন্য উন্মুক্ত। ক্রেতারা সরাসরি সাইটে গিয়ে কাজের মান তদারকি করতে পারেন।'}
+                      </p>
+
+                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? 'Full access to milestone progress and budget' : 'নির্মাণ অগ্রগতি ও ব্যয়ের হিসাব সবসময় উন্মুক্ত'}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? 'Direct site inspection rights for every buyer' : 'সরাসরি সাইট পরিদর্শন ও তদারকির অবাধ সুযোগ'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 pt-3.5 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-purple-600">
+                      <span>{lang === 'en' ? '100% Institutional Transparency' : '১০০% স্বচ্ছতা ও নিয়মিত রিপোর্ট'}</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+
+                  {/* Specialty 6: Time-Bound Handover */}
+                  <div className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/90 shadow-xs hover:shadow-xl hover:border-amber-500/50 transition-all duration-300 group flex flex-col justify-between relative overflow-hidden">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center font-bold group-hover:scale-110 transition-transform shadow-xs">
+                          <Award className="w-6 h-6" />
+                        </div>
+                        <span className="text-3xs font-extrabold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider">
+                          {lang === 'en' ? 'Specialty 06' : 'বিশেষত্ব ০৬'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-amber-700 transition-colors leading-snug">
+                          {lang === 'en' ? 'On-Time Handover Commitment' : 'সময়মতো হস্তান্তর ও দীর্ঘমেয়াদি কেয়ার'}
+                        </h3>
+                        <p className="text-xs font-semibold text-gray-400 mt-1">
+                          {lang === 'en' ? 'Time-Bound Milestone Execution' : 'নির্দিষ্ট সময়ভিত্তিক নির্মাণ অঙ্গীকার'}
+                        </p>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+                        {lang === 'en'
+                          ? 'Strict adherence to project timelines and handover dates. Comprehensive post-handover facility maintenance and homeowner support structure.'
+                          : 'পূর্বনির্ধারিত সময়ভিত্তিক মাইলস্টোন অনুযায়ী নির্মাণ কাজ সম্পন্নকরণ এবং ফ্ল্যাট বুঝিয়ে দেওয়ার পরও ভবনের দীর্ঘমেয়াদি রক্ষণাবেক্ষণ ও কেয়ার সার্ভিসের স্থায়ী প্রতিশ্রুতি।'}
+                      </p>
+
+                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? 'Strict adherence to committed handover dates' : 'প্রতিশ্রুতিবদ্ধ সময়সীমার মধ্যে প্রকল্প হস্তান্তর'}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
+                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                          <span>{lang === 'en' ? 'Dedicated post-handover facility care' : 'হস্তান্তর-পরবর্তী দায়িত্বশীল রক্ষণাবেক্ষণ সেবা'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 pt-3.5 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-amber-700">
+                      <span>{lang === 'en' ? 'Guaranteed Timely Delivery' : 'অন-টাইম ডেলিভারি প্রতিশ্রুতি'}</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
                 </div>
               </div>

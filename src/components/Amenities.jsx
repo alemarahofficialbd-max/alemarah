@@ -126,7 +126,7 @@ export default function Amenities({
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-[#8EBF40]/15 text-[#8EBF40] text-xs font-bold uppercase tracking-wider border border-[#8EBF40]/30 shadow-sm backdrop-blur-md">
             <Sparkles className="w-3.5 h-3.5 text-[#8EBF40] animate-pulse" />
-            <span>{t.amenities.badge || (isEn ? "Signature Excellence" : "আল-ইমারাহ এর বিশেষত্ব")}</span>
+            <span>{isEn ? "Building Amenities & Living Facilities" : "বিল্ডিং ও প্রকল্পের আধুনিক সুযোগ-সুবিধা"}</span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
