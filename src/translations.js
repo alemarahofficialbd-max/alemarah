@@ -31,10 +31,10 @@ export const translations = {
     // Hero Section
     hero: {
       badge: "Planned Development, Creating Wealth with Trust",
-      headlinePrefix: "Crafting Architectural",
-      headlineHighlight: "Landmarks",
-      headlineSuffix: "for Luxury Living & Investment",
-      description: "Al-Emarah Properties Limited blends timeless aesthetic grandeur with cutting-edge engineering safety. Explore prestigious residential apartments and commercial spaces crafted with passion in prime Dhaka locations.",
+      headlinePrefix: "Own Your Dream Address —",
+      headlineHighlight: "From Land Share to Flat",
+      headlineSuffix: "Ownership",
+      description: "Al-Emarah Properties Limited works toward planned land, housing development, commercial assets, aesthetic architecture, and safe construction keeping people's affordability, needs, and future in mind — where an address is not just a dwelling, but a lasting asset for the future.",
       exploreBtn: "Explore Projects",
       consultationBtn: "Get Free Consultation",
       stats: {
@@ -676,10 +676,10 @@ export const translations = {
     // Hero Section
     hero: {
       badge: "পরিকল্পিত উন্নয়ন, আস্থার সঙ্গে সম্পদ সৃষ্টি",
-      headlinePrefix: "নিরাপদ বসবাস ও দীর্ঘমেয়াদী বিনিয়োগে",
-      headlineHighlight: "স্থাপত্যের শ্রেষ্ঠত্ব",
-      headlineSuffix: "নিয়ে আল-ইমারাহ",
-      description: "আল-ইমারাহ প্রোপার্টিজ লিমিটেড নান্দনিক স্থাপত্যশৈলী এবং বুয়েট পরীক্ষিত সর্বোচ্চ কাঠামোগত নিরাপত্তার বিশ্বস্ত প্রতীক। রাজধানীর অভিজাত এলাকায় আপনার স্বপ্নের আবাসন ও আধুনিক বাণিজ্যিক স্পেসের বিশ্বস্ত ঠিকানা।",
+      headlinePrefix: "স্বপ্নের ঠিকানা হোক",
+      headlineHighlight: "নিজের",
+      headlineSuffix: "— জমি থেকে ফ্ল্যাটের মালিকানা",
+      description: "আল-ইমারাহ প্রোপার্টিজ লিমিটেড মানুষের সাধ্য, প্রয়োজন ও ভবিষ্যৎকে বিবেচনায় রেখে পরিকল্পিত জমি, আবাসন উন্নয়ন, বাণিজ্যিক সম্পদ, নান্দনিক স্থাপত্য এবং নিরাপদ নির্মাণ ও পরিকল্পিত উন্নয়নে কাজ করে—যেখানে একটি ঠিকানা শুধু বসবাসের স্থান নয়, বরং ভবিষ্যতের একটি স্থায়ী সম্পদ।",
       exploreBtn: "প্রকল্পসমূহ দেখুন",
       consultationBtn: "বিনামূল্যে পরামর্শ নিন",
       stats: {
