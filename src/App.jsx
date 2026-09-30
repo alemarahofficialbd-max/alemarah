@@ -680,25 +680,25 @@ export default function App() {
 
                   {/* RIGHT COLUMN (5 Cols): The "Shariah Investment Pass" Clean & Elegant White Card */}
                   <div className="lg:col-span-5">
-                    <div className="rounded-3xl bg-white border-2 border-emerald-200/90 p-7 sm:p-8 shadow-xl shadow-emerald-950/5 space-y-6">
+                    <div className="rounded-3xl bg-white border-2 border-emerald-200/90 p-5 sm:p-7 shadow-xl shadow-emerald-950/5 space-y-5 sm:space-y-6">
                       {/* Top Ribbon & Seal */}
-                      <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 rounded-xl bg-[#006231] text-white flex items-center justify-center font-black text-xs shadow-xs">
+                      <div className="flex items-center justify-between gap-2 pb-4 border-b border-gray-100">
+                        <div className="flex items-center space-x-2 min-w-0">
+                          <div className="w-8 h-8 rounded-lg bg-[#006231] text-white flex items-center justify-center font-black text-2xs shadow-xs shrink-0">
                             AE
                           </div>
-                          <div>
-                            <div className="text-xs font-black tracking-wider text-gray-900">
+                          <div className="min-w-0">
+                            <div className="text-3xs sm:text-2xs font-black tracking-wide text-gray-900 whitespace-nowrap">
                               AL-EMARAH SHARIAH ASSETS
                             </div>
-                            <div className="text-3xs text-gray-500 font-medium">
+                            <div className="text-3xs text-gray-500 font-medium whitespace-nowrap">
                               {lang === 'en' ? 'Verified Halal Partnership' : 'অনুমোদিত হালাল অংশীদারিত্ব'}
                             </div>
                           </div>
                         </div>
 
-                        <div className="inline-flex items-center space-x-1 px-3 py-1 rounded-full bg-emerald-50 text-[#006231] border border-emerald-200 text-3xs font-extrabold uppercase tracking-wider">
-                          <Gem className="w-3 h-3 text-[#006231]" />
+                        <div className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-emerald-50 text-[#006231] border border-emerald-200 text-3xs font-extrabold uppercase tracking-wider shrink-0 whitespace-nowrap">
+                          <Gem className="w-3 h-3 text-[#006231] shrink-0" />
                           <span>{lang === 'en' ? 'Shariah Verified' : '১০০% সুদমুক্ত'}</span>
                         </div>
                       </div>
