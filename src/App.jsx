@@ -704,12 +704,12 @@ export default function App() {
                       </div>
 
                       {/* Prominent Capital Entry Amount */}
-                      <div className="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-center space-y-1.5">
-                        <div className="inline-flex items-center space-x-1.5 text-2xs font-extrabold text-[#006231] uppercase tracking-wider">
-                          <Wallet className="w-3.5 h-3.5 text-[#006231]" />
+                      <div className="p-5 rounded-2xl bg-red-50/60 border border-red-200/90 text-center space-y-1.5">
+                        <div className="inline-flex items-center space-x-1.5 text-2xs font-extrabold text-[#CE2028] uppercase tracking-wider">
+                          <Wallet className="w-3.5 h-3.5 text-[#CE2028]" />
                           <span>{lang === 'en' ? 'Minimum Capital Threshold' : 'সর্বনিম্ন বিনিয়োগের অংশীদারিত্ব'}</span>
                         </div>
-                        <div className="text-3xl sm:text-4xl font-black text-[#006231] tracking-tight">
+                        <div className="text-3xl sm:text-4xl font-black text-[#CE2028] tracking-tight">
                           {lang === 'en' ? 'BDT 1,00,000' : '৳ ১,০০,০০০'}
                         </div>
                         <p className="text-xs text-gray-600 font-medium">
