@@ -22,7 +22,6 @@ import {
   Compass, 
   Phone, 
   ArrowRight, 
-  CheckCircle2, 
   Sprout, 
   Sparkles,
   Calendar,
@@ -35,13 +34,24 @@ import {
   Clock,
   TrendingUp,
   MessageSquare,
-  Check,
   Layers,
   BadgeCheck,
   FileCheck2,
   Landmark,
   Shield,
-  KeyRound
+  KeyRound,
+  Crown,
+  Gem,
+  BadgePercent,
+  Wallet,
+  RotateCcw,
+  GraduationCap,
+  Eye,
+  BarChart3,
+  CalendarCheck2,
+  HeartHandshake,
+  ScrollText,
+  Banknote
 } from 'lucide-react';
 
 export default function App() {
@@ -243,12 +253,13 @@ export default function App() {
 
                     <div className="space-y-5 relative z-10">
                       <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-[#CE2028] text-white text-2xs font-extrabold uppercase tracking-wider shadow-xs">
-                          <BadgeCheck className="w-3.5 h-3.5 text-white" />
+                        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#CE2028] to-[#991319] text-white text-2xs font-extrabold uppercase tracking-wider shadow-sm border border-red-300/40">
+                          <Crown className="w-3.5 h-3.5 text-amber-300" />
                           <span>{lang === 'en' ? 'Flagship Specialty 01' : 'প্রধান স্বাতন্ত্র্য • বিশেষত্ব ০১'}</span>
                         </div>
-                        <span className="text-xs font-bold text-[#CE2028] bg-red-50 px-3 py-1 rounded-full border border-red-200">
-                          {lang === 'en' ? '100% Legal Title Ownership' : 'আইনি মালিকানার শতভাগ নিশ্চয়তা'}
+                        <span className="inline-flex items-center space-x-1.5 text-xs font-bold text-[#CE2028] bg-red-50 px-3 py-1 rounded-full border border-red-200 shadow-2xs">
+                          <Gem className="w-3.5 h-3.5 text-[#CE2028]" />
+                          <span>{lang === 'en' ? '100% Legal Title Ownership' : 'আইনি মালিকানার শতভাগ নিশ্চয়তা'}</span>
                         </span>
                       </div>
 
@@ -263,34 +274,40 @@ export default function App() {
                         </p>
                       </div>
 
-                      {/* 3 Key Guarantees Pill Grid */}
+                      {/* 3 Key Guarantees Pill Grid with Premium Icons */}
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                        <div className="p-3.5 rounded-2xl bg-white border border-red-100 shadow-2xs space-y-1">
+                        <div className="p-3.5 rounded-2xl bg-white border border-red-100 shadow-2xs hover:border-red-300 transition-colors space-y-1.5">
                           <div className="flex items-center space-x-2 text-xs font-bold text-gray-900">
-                            <Check className="w-4 h-4 text-[#006231] shrink-0" />
+                            <div className="w-6 h-6 rounded-lg bg-red-50 text-[#CE2028] flex items-center justify-center shrink-0 border border-red-200">
+                              <FileCheck2 className="w-3.5 h-3.5" />
+                            </div>
                             <span>{lang === 'en' ? 'Registered Land Deed' : 'স্বতন্ত্র রেজিস্ট্রি দলিল'}</span>
                           </div>
-                          <p className="text-3xs text-gray-500">
+                          <p className="text-3xs text-gray-500 pl-8">
                             {lang === 'en' ? 'Direct title in buyer name' : 'সাব-রেজিস্ট্রি অফিসে নিজ নামে দলিল'}
                           </p>
                         </div>
 
-                        <div className="p-3.5 rounded-2xl bg-white border border-red-100 shadow-2xs space-y-1">
+                        <div className="p-3.5 rounded-2xl bg-white border border-red-100 shadow-2xs hover:border-red-300 transition-colors space-y-1.5">
                           <div className="flex items-center space-x-2 text-xs font-bold text-gray-900">
-                            <Check className="w-4 h-4 text-[#006231] shrink-0" />
+                            <div className="w-6 h-6 rounded-lg bg-emerald-50 text-[#006231] flex items-center justify-center shrink-0 border border-emerald-200">
+                              <ShieldCheck className="w-3.5 h-3.5" />
+                            </div>
                             <span>{lang === 'en' ? 'Safe from Day 1' : 'শুরু থেকেই নিরাপদ'}</span>
                           </div>
-                          <p className="text-3xs text-gray-500">
+                          <p className="text-3xs text-gray-500 pl-8">
                             {lang === 'en' ? 'Building on your own land' : 'নিজের জমির ওপর ভবন নির্মাণ'}
                           </p>
                         </div>
 
-                        <div className="p-3.5 rounded-2xl bg-white border border-red-100 shadow-2xs space-y-1">
+                        <div className="p-3.5 rounded-2xl bg-white border border-red-100 shadow-2xs hover:border-red-300 transition-colors space-y-1.5">
                           <div className="flex items-center space-x-2 text-xs font-bold text-gray-900">
-                            <Check className="w-4 h-4 text-[#006231] shrink-0" />
+                            <div className="w-6 h-6 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200">
+                              <Landmark className="w-3.5 h-3.5" />
+                            </div>
                             <span>{lang === 'en' ? 'Zero Title Risk' : 'শতভাগ আইনি সুরক্ষা'}</span>
                           </div>
-                          <p className="text-3xs text-gray-500">
+                          <p className="text-3xs text-gray-500 pl-8">
                             {lang === 'en' ? 'Verified land ownership' : 'আইনি জটিলতামুক্ত স্থায়ী সম্পদ'}
                           </p>
                         </div>
@@ -332,13 +349,17 @@ export default function App() {
                           : 'সম্পূর্ণ সুদমুক্ত, নৈতিক ও যৌথ অংশীদারিত্বমূলক হালাল অর্থনৈতিক কাঠামো। কিস্তিতে কোনো প্রকার লুকানো সুদ, পেনাল্টি চার্জ বা অনৈতিক শর্তের কোনো সুযোগ নেই।'}
                       </p>
 
-                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
-                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
-                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                      <div className="pt-2.5 space-y-2 border-t border-gray-100">
+                        <div className="flex items-center space-x-2.5 text-3xs sm:text-xs text-gray-800">
+                          <div className="w-5 h-5 rounded-md bg-emerald-100 text-[#006231] flex items-center justify-center shrink-0 border border-emerald-200">
+                            <Gem className="w-3 h-3" />
+                          </div>
                           <span>{lang === 'en' ? 'Interest-free Mudarabah/Musharakah' : 'সম্পূর্ণ সুদমুক্ত ও হালাল নীতিতে পরিচালিত'}</span>
                         </div>
-                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
-                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                        <div className="flex items-center space-x-2.5 text-3xs sm:text-xs text-gray-800">
+                          <div className="w-5 h-5 rounded-md bg-emerald-100 text-[#006231] flex items-center justify-center shrink-0 border border-emerald-200">
+                            <Coins className="w-3 h-3" />
+                          </div>
                           <span>{lang === 'en' ? 'Zero hidden compounding interest' : 'কোনো প্রকার গোপন চার্জ বা সুদ নেই'}</span>
                         </div>
                       </div>
@@ -377,13 +398,17 @@ export default function App() {
                           : 'মামলা-মোকদ্দমামুক্ত, নিখুঁত সিএস/এসএ/আরএস/সিটি খতিয়ান ও নিজ নামে নামজারি সম্পন্ন শতভাগ নিষ্কণ্টক জমিতেই কেবল আল-ইমারাহ প্রকল্প গ্রহণ করে।'}
                       </p>
 
-                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
-                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
-                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                      <div className="pt-2.5 space-y-2 border-t border-gray-100">
+                        <div className="flex items-center space-x-2.5 text-3xs sm:text-xs text-gray-800">
+                          <div className="w-5 h-5 rounded-md bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200">
+                            <FileText className="w-3 h-3" />
+                          </div>
                           <span>{lang === 'en' ? 'Up-to-date Mutation & Khatian deeds' : 'আপ-টু-ডেট মিউটেশন ও খতিয়ান সম্পন্ন'}</span>
                         </div>
-                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
-                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                        <div className="flex items-center space-x-2.5 text-3xs sm:text-xs text-gray-800">
+                          <div className="w-5 h-5 rounded-md bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200">
+                            <ShieldCheck className="w-3 h-3" />
+                          </div>
                           <span>{lang === 'en' ? 'Zero court disputes or complications' : 'আইন বিশেষজ্ঞদের দ্বারা যাচাইকৃত নির্ভেজাল জমি'}</span>
                         </div>
                       </div>
@@ -422,13 +447,17 @@ export default function App() {
                           : 'বুয়েট সার্টিফাইড বিশেষজ্ঞ প্রকৌশলী দ্বারা সয়েল টেস্ট ও স্ট্রাকচারাল ডিজাইন। ৬০/৭২.৫ গ্রেড উন্নতমানের রিবার স্টিল ও গভীর পাইল ফাউন্ডেশনের সর্বোচ্চ নিরাপত্তা।'}
                       </p>
 
-                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
-                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
-                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                      <div className="pt-2.5 space-y-2 border-t border-gray-100">
+                        <div className="flex items-center space-x-2.5 text-3xs sm:text-xs text-gray-800">
+                          <div className="w-5 h-5 rounded-md bg-red-100 text-[#CE2028] flex items-center justify-center shrink-0 border border-red-200">
+                            <GraduationCap className="w-3 h-3" />
+                          </div>
                           <span>{lang === 'en' ? 'Certified by senior BUET engineers' : 'বুয়েট টেস্ট ও অনুমোদিত স্ট্রাকচারাল নকশা'}</span>
                         </div>
-                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
-                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                        <div className="flex items-center space-x-2.5 text-3xs sm:text-xs text-gray-800">
+                          <div className="w-5 h-5 rounded-md bg-red-100 text-[#CE2028] flex items-center justify-center shrink-0 border border-red-200">
+                            <Layers className="w-3 h-3" />
+                          </div>
                           <span>{lang === 'en' ? '60/72.5 Grade high-yield rebar steel' : '৬০/৭২.৫ গ্রেড রিবার স্টিল ও পাথরের ঢালাই'}</span>
                         </div>
                       </div>
@@ -445,7 +474,7 @@ export default function App() {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 border border-purple-200 flex items-center justify-center font-bold group-hover:scale-110 transition-transform shadow-xs">
-                          <CheckCircle2 className="w-6 h-6" />
+                          <Eye className="w-6 h-6" />
                         </div>
                         <span className="text-3xs font-extrabold px-2.5 py-1 rounded-full bg-purple-50 text-purple-600 border border-purple-200 uppercase tracking-wider">
                           {lang === 'en' ? 'Specialty 05' : 'বিশেষত্ব ০৫'}
@@ -467,13 +496,17 @@ export default function App() {
                           : 'প্রতিটি নির্মাণ কাজের অগ্রগতি, রড-সিমেন্টের মান ও ব্যয়ের হিসাব ফ্ল্যাট ক্রেতা ও অংশীদারদের জন্য উন্মুক্ত। ক্রেতারা সরাসরি সাইটে গিয়ে কাজের মান তদারকি করতে পারেন।'}
                       </p>
 
-                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
-                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
-                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                      <div className="pt-2.5 space-y-2 border-t border-gray-100">
+                        <div className="flex items-center space-x-2.5 text-3xs sm:text-xs text-gray-800">
+                          <div className="w-5 h-5 rounded-md bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 border border-purple-200">
+                            <BarChart3 className="w-3 h-3" />
+                          </div>
                           <span>{lang === 'en' ? 'Full access to milestone progress and budget' : 'নির্মাণ অগ্রগতি ও ব্যয়ের হিসাব সবসময় উন্মুক্ত'}</span>
                         </div>
-                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
-                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                        <div className="flex items-center space-x-2.5 text-3xs sm:text-xs text-gray-800">
+                          <div className="w-5 h-5 rounded-md bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 border border-purple-200">
+                            <Eye className="w-3 h-3" />
+                          </div>
                           <span>{lang === 'en' ? 'Direct site inspection rights for every buyer' : 'সরাসরি সাইট পরিদর্শন ও তদারকির অবাধ সুযোগ'}</span>
                         </div>
                       </div>
@@ -490,7 +523,7 @@ export default function App() {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center font-bold group-hover:scale-110 transition-transform shadow-xs">
-                          <Award className="w-6 h-6" />
+                          <KeyRound className="w-6 h-6" />
                         </div>
                         <span className="text-3xs font-extrabold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider">
                           {lang === 'en' ? 'Specialty 06' : 'বিশেষত্ব ০৬'}
@@ -512,13 +545,17 @@ export default function App() {
                           : 'পূর্বনির্ধারিত সময়ভিত্তিক মাইলস্টোন অনুযায়ী নির্মাণ কাজ সম্পন্নকরণ এবং ফ্ল্যাট বুঝিয়ে দেওয়ার পরও ভবনের দীর্ঘমেয়াদি রক্ষণাবেক্ষণ ও কেয়ার সার্ভিসের স্থায়ী প্রতিশ্রুতি।'}
                       </p>
 
-                      <div className="pt-2 space-y-1.5 border-t border-gray-100">
-                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
-                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                      <div className="pt-2.5 space-y-2 border-t border-gray-100">
+                        <div className="flex items-center space-x-2.5 text-3xs sm:text-xs text-gray-800">
+                          <div className="w-5 h-5 rounded-md bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200">
+                            <CalendarCheck2 className="w-3 h-3" />
+                          </div>
                           <span>{lang === 'en' ? 'Strict adherence to committed handover dates' : 'প্রতিশ্রুতিবদ্ধ সময়সীমার মধ্যে প্রকল্প হস্তান্তর'}</span>
                         </div>
-                        <div className="flex items-center space-x-2 text-3xs sm:text-xs text-gray-700">
-                          <Check className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                        <div className="flex items-center space-x-2.5 text-3xs sm:text-xs text-gray-800">
+                          <div className="w-5 h-5 rounded-md bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200">
+                            <HeartHandshake className="w-3 h-3" />
+                          </div>
                           <span>{lang === 'en' ? 'Dedicated post-handover facility care' : 'হস্তান্তর-পরবর্তী দায়িত্বশীল রক্ষণাবেক্ষণ সেবা'}</span>
                         </div>
                       </div>
@@ -567,45 +604,45 @@ export default function App() {
                       </p>
                     </div>
 
-                    {/* 3 Large Eye-Catching Guarantees */}
+                    {/* 3 Large Eye-Catching Guarantees with Luxury Emblems */}
                     <div className="space-y-3 pt-1">
-                      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-2xs hover:shadow-md transition-all flex items-start space-x-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-200 flex items-center justify-center shrink-0 font-bold">
-                          <FileText className="w-5 h-5" />
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-2xs hover:shadow-md hover:border-emerald-400 transition-all flex items-start space-x-3.5 group">
+                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/80 text-[#006231] border border-emerald-300 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                          <ScrollText className="w-5 h-5 text-[#006231]" />
                         </div>
                         <div>
-                          <div className="font-bold text-gray-900 text-sm sm:text-base">
-                            {lang === 'en' ? '1. Government Judicial Stamp Agreement' : '১. সরকারি স্ট্যাম্পে ৩শ টাকার আইনি চুক্তিপত্র'}
+                          <div className="font-bold text-gray-900 text-sm sm:text-base flex items-center space-x-2">
+                            <span>{lang === 'en' ? '1. Government Judicial Stamp Agreement' : '১. সরকারি স্ট্যাম্পে ৩শ টাকার আইনি চুক্তিপত্র'}</span>
                           </div>
-                          <p className="text-xs text-gray-600 leading-snug">
+                          <p className="text-xs text-gray-600 leading-snug pt-0.5">
                             {lang === 'en' ? 'Every investment is executed with registered legal deed and official money receipt.' : 'প্রতিটি লেনদেনের বিপরীতে সরকারি স্ট্যাম্পে রেজিস্ট্রিকৃত চুক্তি ও মানি রিসিট প্রদান।'}
                           </p>
                         </div>
                       </div>
 
-                      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-2xs hover:shadow-md transition-all flex items-start space-x-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0 font-bold">
-                          <Clock className="w-5 h-5" />
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-2xs hover:shadow-md hover:border-amber-400 transition-all flex items-start space-x-3.5 group">
+                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/80 text-amber-700 border border-amber-300 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                          <RotateCcw className="w-5 h-5 text-amber-700" />
                         </div>
                         <div>
                           <div className="font-bold text-gray-900 text-sm sm:text-base">
                             {lang === 'en' ? '2. 90-Day Full Capital Refund Policy' : '২. ৯০ দিনের নোটিশে ১০০% মূলধন ফেরত সুবিধা'}
                           </div>
-                          <p className="text-xs text-gray-600 leading-snug">
+                          <p className="text-xs text-gray-600 leading-snug pt-0.5">
                             {lang === 'en' ? 'Need funds back? Submit 90 days notice for 100% capital settlement with zero penalties.' : 'প্রয়োজনে কোনো প্রকার কর্তন বা পেনাল্টি ছাড়াই সম্পূর্ণ মূলধন ফেরত নেওয়ার নিরাপদ নিশ্চয়তা।'}
                           </p>
                         </div>
                       </div>
 
-                      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-2xs hover:shadow-md transition-all flex items-start space-x-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 font-bold">
-                          <TrendingUp className="w-5 h-5" />
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-2xs hover:shadow-md hover:border-purple-400 transition-all flex items-start space-x-3.5 group">
+                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100/80 text-purple-700 border border-purple-300 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                          <BadgePercent className="w-5 h-5 text-purple-700" />
                         </div>
                         <div>
                           <div className="font-bold text-gray-900 text-sm sm:text-base">
                             {lang === 'en' ? '3. Quarterly Dividend Direct to Bank Account' : '৩. ত্রৈমাসিক লভ্যাংশ সরাসরি ব্যাংক অ্যাকাউন্টে'}
                           </div>
-                          <p className="text-xs text-gray-600 leading-snug">
+                          <p className="text-xs text-gray-600 leading-snug pt-0.5">
                             {lang === 'en' ? 'Transparent quarterly audit and net profit transferred directly to your bank account.' : 'প্রতি ৩ মাস পর পর স্বচ্ছ অডিট রিপোর্টের মাধ্যমে অর্জিত নিট মুনাফা ব্যাংক অ্যাকাউন্টে জমা।'}
                           </p>
                         </div>
@@ -647,13 +684,13 @@ export default function App() {
                     <div className="relative rounded-3xl bg-gradient-to-br from-[#00381C] via-[#004724] to-[#002B16] text-white p-7 sm:p-8 shadow-2xl border-2 border-emerald-400/30 overflow-hidden space-y-6">
                       {/* Top Ribbon & Seal */}
                       <div className="flex items-center justify-between pb-4 border-b border-white/15">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-8 h-8 rounded-lg bg-[#8EBF40] text-gray-950 flex items-center justify-center font-black text-xs shadow-md">
-                            AE
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8EBF40] to-[#6d962d] text-gray-950 flex items-center justify-center font-black text-xs shadow-md border border-lime-200/40">
+                            <Crown className="w-4 h-4 text-gray-950" />
                           </div>
                           <div>
-                            <div className="text-2xs font-extrabold uppercase tracking-wider text-[#8EBF40]">
-                              AL-EMARAH SHARIAH ASSETS
+                            <div className="text-2xs font-extrabold uppercase tracking-wider text-[#8EBF40] flex items-center space-x-1">
+                              <span>AL-EMARAH SHARIAH ASSETS</span>
                             </div>
                             <div className="text-3xs text-gray-300">
                               {lang === 'en' ? 'Verified Halal Partnership' : 'অনুমোদিত হালাল অংশীদারিত্ব'}
@@ -661,15 +698,17 @@ export default function App() {
                           </div>
                         </div>
 
-                        <div className="px-2.5 py-1 rounded-full bg-white/10 text-emerald-300 border border-white/20 text-3xs font-bold uppercase tracking-wider">
-                          {lang === 'en' ? 'Shariah Verified' : '১০০% সুদমুক্ত'}
+                        <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-3xs font-extrabold uppercase tracking-wider shadow-inner">
+                          <Gem className="w-3 h-3 text-[#8EBF40]" />
+                          <span>{lang === 'en' ? 'Shariah Verified' : '১০০% সুদমুক্ত'}</span>
                         </div>
                       </div>
 
                       {/* Prominent Capital Entry Amount */}
-                      <div className="p-4 sm:p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-1">
-                        <div className="text-2xs font-extrabold text-[#8EBF40] uppercase tracking-wider">
-                          {lang === 'en' ? 'Minimum Capital Threshold' : 'সর্বনিম্ন বিনিয়োগের অংশীদারিত্ব'}
+                      <div className="p-4 sm:p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-1 relative overflow-hidden">
+                        <div className="inline-flex items-center space-x-1.5 text-2xs font-extrabold text-[#8EBF40] uppercase tracking-wider">
+                          <Wallet className="w-3.5 h-3.5" />
+                          <span>{lang === 'en' ? 'Minimum Capital Threshold' : 'সর্বনিম্ন বিনিয়োগের অংশীদারিত্ব'}</span>
                         </div>
                         <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
                           {lang === 'en' ? 'BDT 1,00,000' : '৳ ১,০০,০০০'}
