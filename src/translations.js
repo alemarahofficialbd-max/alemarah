@@ -220,7 +220,8 @@ export const translations = {
       chairmanTitle: "Message from the Honorable Chairman",
       chairmanQuote: "The core philosophy of Al-Emarah Properties is planned development, responsible management, and sustainable wealth creation. We believe real estate is not merely land and brick structures; it is deeply intertwined with human lives, urbanization, and shaping the future. In every venture, we uphold transparency, accountability, professionalism, and ethical governance to build a dependable, multi-faceted institution for generations.",
       chairmanName: "Sheikh Fazlul Karim Maroof",
-      chairmanDesignation: "Chairman, Al-Emarah Properties (Public Administration, University of Dhaka)",
+      chairmanDesignation: "Chairman",
+      chairmanEducation: "Graduate, Public Administration, University of Dhaka",
       
       // Managing Director's Message
       mdTitle: "Message from the Managing Director",
@@ -867,13 +868,15 @@ export const translations = {
       chairmanTitle: "চেয়ারম্যানের বক্তব্য",
       chairmanQuote: "আল ইমারাহ প্রোপার্টিজের পথচলার মূল দর্শন পরিকল্পিত উন্নয়ন, দায়িত্বশীল ব্যবস্থাপনা এবং দীর্ঘমেয়াদি সম্পদ সৃষ্টি। আমরা বিশ্বাস করি, রিয়েল এস্টেট শুধু জমি ও ভবনের বিষয় নয়; এটি মানুষের জীবন, নগরায়ণ এবং ভবিষ্যৎ নির্মাণের সঙ্গে গভীরভাবে সম্পৃক্ত। তাই আমাদের প্রতিটি উদ্যোগে স্বচ্ছতা, জবাবদিহিতা, পেশাদারিত্ব ও সুশাসনকে সর্বোচ্চ গুরুত্ব দেওয়া হয়। আমাদের উদ্দেশ্য শুধু প্রকল্পকেন্দ্রিক একটি ব্যবসা পরিচালনা করা নয়; বরং সময়ের সঙ্গে একটি বিশ্বস্ত, সুসংগঠিত ও স্থায়ী প্রতিষ্ঠান হিসেবে নিজেদের প্রতিষ্ঠিত করা এবং মানুষের জন্য সহজ শর্তে আবাসন নির্মাণ করা।",
       chairmanName: "শেখ ফজলুল করিম মারুফ",
-      chairmanDesignation: "চেয়ারম্যান, আল ইমারাহ প্রোপার্টিজ (লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়)",
+      chairmanDesignation: "চেয়ারম্যান",
+      chairmanEducation: "স্নাতক, লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়",
       
       // Managing Director's Message
       mdTitle: "ব্যবস্থাপনা পরিচালকের বক্তব্য",
       mdQuote: "আল ইমারাহ প্রোপার্টিজের ব্যবস্থাপনা পরিচালক হিসেবে আমার প্রধান দায়িত্ব হলো—সুষ্ঠু পরিকল্পনা, দক্ষ ব্যবস্থাপনা ও কার্যকর বাস্তবায়নের মাধ্যমে প্রতিষ্ঠানকে একটি শক্তিশালী, বহুমুখী ও জনআস্থাসম্পন্ন প্রতিষ্ঠানে এগিয়ে নেওয়া। আবাসিক ও বাণিজ্যিক কার্যক্রমের পাশাপাশি রিয়েল এস্টেট ডেভেলপমেন্ট অ্যান্ড হাউজিং, পরিকল্পিত আবাসন, ভূমি উন্নয়ন এবং কৃষিভিত্তিক সম্পদ উন্নয়ন খাতেও আমাদের কার্যক্রম সম্প্রসারিত হচ্ছে। বিশেষ করে আল ইমারাহ এগ্রো উদ্যোগের মাধ্যমে কৃষি, উৎপাদন ও অংশীদারিত্বের নতুন সম্ভাবনা তৈরি হচ্ছে। কারণ মানুষের সঞ্চয়ের সঙ্গে জড়িয়ে থাকে তার পরিশ্রম, পরিবারের ভবিষ্যৎ এবং নিজের জন্য কিছু গড়ে তোলার আকাঙ্ক্ষা। সেই দায়বদ্ধতা থেকেই আমরা এমন একটি প্রতিষ্ঠান গড়ে তুলতে চাই, যেখানে মানুষের অংশগ্রহণ ভবিষ্যতের একটি সম্পদ ও সম্ভাবনার সঙ্গে যুক্ত হবে। পরিকল্পনা থেকে বাস্তবায়নে, একটি উদ্যোগ থেকে বহুমুখী সম্পদ উন্নয়নের দিকে আমাদের পথচলা চলমান।",
       mdName: "তালুকদার তারিক মাসউদ",
-      mdDesignation: "ব্যবস্থাপনা পরিচালক, আল ইমারাহ প্রোপার্টিজ"
+      mdDesignation: "ব্যবস্থাপনা পরিচালক",
+      mdEducation: "আল ইমারাহ প্রোপার্টিজ লিমিটেড"
     },
 
     // Special Project Amenities (From Corporate Profile)
@@ -1170,7 +1173,7 @@ export const translations = {
       intro: "আল ইমারাহ প্রোপার্টিজের ব্যবস্থাপনা কাঠামোতে Board of Directors, Executive Committee, Chairman এবং Managing Director-এর নির্ধারিত ভূমিকা ও দায়িত্বের মাধ্যমে একটি ভারসাম্যপূর্ণ প্রশাসনিক কাঠামো গড়ে তোলা হয়েছে।",
       chairmanRole: {
         title: "কৌশলগত নেতৃত্ব ও দিকনির্দেশনা",
-        desc: "প্রতিষ্ঠানের সামগ্রিক নেতৃত্ব ও কৌশলগত দিকনির্দেশনায় রয়েছেন সম্মানিত চেয়ারম্যান শেখ ফজলুল করিম মারুফ (লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়)। তাঁর সুদীর্ঘ সাংগঠনিক অভিজ্ঞতা, দূরদর্শিতা, সাংগঠনিক সক্ষমতা এবং বিস্তৃত সামাজিক ও প্রাতিষ্ঠানিক সম্পৃক্ততা প্রতিষ্ঠানের নীতিগত পথচলাকে সুসংগঠিত করছে।"
+        desc: "প্রতিষ্ঠানের সামগ্রিক নেতৃত্ব ও কৌশলগত দিকনির্দেশনায় রয়েছেন সম্মানিত চেয়ারম্যান শেখ ফজলুল করিম মারুফ (স্নাতক, লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়)। তাঁর সুদীর্ঘ সাংগঠনিক অভিজ্ঞতা, দূরদর্শিতা, সাংগঠনিক সক্ষমতা এবং বিস্তৃত সামাজিক ও প্রাতিষ্ঠানিক সম্পৃক্ততা প্রতিষ্ঠানের নীতিগত পথচলাকে সুসংগঠিত করছে।"
       },
       execRole: {
         title: "এক্সিকিউটিভ কমিটি ও বাস্তবায়ন",

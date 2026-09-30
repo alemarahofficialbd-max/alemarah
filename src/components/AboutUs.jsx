@@ -202,9 +202,12 @@ export default function AboutUs({ lang, t }) {
               </div>
             </div>
 
-            <div className="pt-4 mt-6 border-t border-gray-100 text-center sm:text-left">
+            <div className="pt-4 mt-6 border-t border-gray-100 text-center sm:text-left space-y-0.5">
               <div className="text-base font-extrabold text-gray-900">{t.about.chairmanName}</div>
-              <div className="text-xs text-gray-500 font-medium mt-0.5">{t.about.chairmanDesignation}</div>
+              <div className="text-xs font-bold text-[#CE2028]">{t.about.chairmanDesignation}</div>
+              {t.about.chairmanEducation && (
+                <div className="text-xs text-gray-500 font-medium">{t.about.chairmanEducation}</div>
+              )}
             </div>
           </div>
 
@@ -239,9 +242,12 @@ export default function AboutUs({ lang, t }) {
               </div>
             </div>
 
-            <div className="pt-4 mt-6 border-t border-gray-100 text-center sm:text-left">
+            <div className="pt-4 mt-6 border-t border-gray-100 text-center sm:text-left space-y-0.5">
               <div className="text-base font-extrabold text-gray-900">{t.about.mdName}</div>
-              <div className="text-xs text-gray-500 font-medium mt-0.5">{t.about.mdDesignation}</div>
+              <div className="text-xs font-bold text-[#006231]">{t.about.mdDesignation}</div>
+              {t.about.mdEducation && (
+                <div className="text-xs text-gray-500 font-medium">{t.about.mdEducation}</div>
+              )}
             </div>
           </div>
         </div>
