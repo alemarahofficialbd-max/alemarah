@@ -622,20 +622,10 @@ export default function ProjectDetailsPage({
                             <div className="text-xs font-bold text-gray-900 leading-snug">
                               {isEn ? item.nameEn : item.nameBn}
                             </div>
-                            <div className="flex items-center justify-between text-3xs font-medium text-emerald-700 pt-0.5">
+                            <div className="flex items-center text-3xs font-medium text-emerald-700 pt-0.5">
                               <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100/60 font-semibold">
                                 {isEn ? item.distanceEn : item.distanceBn}
                               </span>
-                              <a
-                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.nameBn + ' পশ্চিম সানারপাড় ঢাকা')}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-gray-400 hover:text-emerald-700 flex items-center space-x-0.5 transition-colors"
-                                title={isEn ? 'View on Map' : 'ম্যাপে দেখুন'}
-                              >
-                                <span>{isEn ? 'Map' : 'ম্যাপ'}</span>
-                                <ExternalLink className="w-2.5 h-2.5" />
-                              </a>
                             </div>
                           </div>
                         ))}
@@ -666,20 +656,10 @@ export default function ProjectDetailsPage({
                             <div className="text-xs font-bold text-gray-900 leading-snug">
                               {isEn ? item.nameEn : item.nameBn}
                             </div>
-                            <div className="flex items-center justify-between text-3xs font-medium text-teal-700 pt-0.5">
+                            <div className="flex items-center text-3xs font-medium text-teal-700 pt-0.5">
                               <span className="px-2 py-0.5 rounded-full bg-teal-50 border border-teal-100/60 font-semibold">
                                 {isEn ? item.distanceEn : item.distanceBn}
                               </span>
-                              <a
-                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.nameBn)}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-gray-400 hover:text-teal-700 flex items-center space-x-0.5 transition-colors"
-                                title={isEn ? 'View on Map' : 'ম্যাপে দেখুন'}
-                              >
-                                <span>{isEn ? 'Map' : 'ম্যাপ'}</span>
-                                <ExternalLink className="w-2.5 h-2.5" />
-                              </a>
                             </div>
                           </div>
                         ))}
@@ -710,20 +690,10 @@ export default function ProjectDetailsPage({
                             <div className="text-xs font-bold text-gray-900 leading-snug">
                               {isEn ? item.nameEn : item.nameBn}
                             </div>
-                            <div className="flex items-center justify-between text-3xs font-medium text-indigo-700 pt-0.5">
+                            <div className="flex items-center text-3xs font-medium text-indigo-700 pt-0.5">
                               <span className="px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-100/60 font-semibold">
                                 {isEn ? item.distanceEn : item.distanceBn}
                               </span>
-                              <a
-                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.nameBn)}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-gray-400 hover:text-indigo-700 flex items-center space-x-0.5 transition-colors"
-                                title={isEn ? 'View on Map' : 'ম্যাপে দেখুন'}
-                              >
-                                <span>{isEn ? 'Map' : 'ম্যাপ'}</span>
-                                <ExternalLink className="w-2.5 h-2.5" />
-                              </a>
                             </div>
                           </div>
                         ))}
