@@ -182,16 +182,14 @@ export default function AboutUs({ lang, t }) {
                 <Quote className="w-7 h-7 text-[#CE2028]/30" />
               </div>
 
-              {/* Portrait with seamless bottom gradient fade */}
+              {/* Executive Portrait */}
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
-                <div className="relative w-40 sm:w-44 h-52 sm:h-60 shrink-0 rounded-2xl overflow-hidden bg-gradient-to-b from-red-50/40 via-red-50/20 to-white">
+                <div className="relative w-40 sm:w-44 h-52 sm:h-60 shrink-0 rounded-2xl overflow-hidden shadow-sm border border-red-100 bg-gray-50">
                   <img
                     src="/images/chairman.webp"
                     alt={t.about.chairmanName}
                     className="w-full h-full object-cover object-top"
                   />
-                  {/* Seamless fade overlay to eliminate cut at the bottom */}
-                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none"></div>
                 </div>
 
                 <div className="flex-1 space-y-2 text-center sm:text-left">
@@ -222,16 +220,14 @@ export default function AboutUs({ lang, t }) {
                 <Quote className="w-7 h-7 text-[#006231]/30" />
               </div>
 
-              {/* Portrait with seamless bottom gradient fade */}
+              {/* Executive Portrait */}
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
-                <div className="relative w-40 sm:w-44 h-52 sm:h-60 shrink-0 rounded-2xl overflow-hidden bg-gradient-to-b from-emerald-50/40 via-emerald-50/20 to-white">
+                <div className="relative w-40 sm:w-44 h-52 sm:h-60 shrink-0 rounded-2xl overflow-hidden shadow-sm border border-emerald-100 bg-gray-50">
                   <img
                     src="/images/managing_director.webp"
                     alt={t.about.mdName}
                     className="w-full h-full object-cover object-top"
                   />
-                  {/* Seamless fade overlay to eliminate cut at the bottom */}
-                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none"></div>
                 </div>
 
                 <div className="flex-1 space-y-2 text-center sm:text-left">
