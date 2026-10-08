@@ -1,4 +1,4 @@
-// Central Store for Al-Emarah Management & Client Data with LocalStorage Persistence
+import { supabase } from '../lib/supabaseClient';
 
 const STORAGE_KEY = 'alemarah_management_store_v1';
 
@@ -262,11 +262,207 @@ export const getManagementData = () => {
   return initialManagementData;
 };
 
-// Save data to localStorage
+// Background async sync to Supabase
+export const syncToSupabase = async (data) => {
+  try {
+    if (!data) return;
+
+    // 1. Sync Directors
+    if (data.directors && data.directors.length > 0) {
+      const dirRows = data.directors.map(d => ({
+        id: d.id,
+        name: d.name,
+        name_en: d.nameEn || '',
+        role: d.role,
+        role_en: d.roleEn || '',
+        folio_no: d.folioNo,
+        image: d.image || null,
+        investment: Number(d.investment) || 0,
+        share_percentage: Number(d.sharePercentage) || 0,
+        dividend_earned: Number(d.dividendEarned) || 0,
+        phone: d.phone || '',
+        email: d.email || '',
+        joining_date: d.joiningDate || '',
+        status: d.status || 'সক্রিয় (Active)',
+        nominee_name: d.nomineeName || '',
+        nominee_relation: d.nomineeRelation || '',
+        nominee_phone: d.nomineePhone || '',
+        theme: d.theme || 'emerald'
+      }));
+      await supabase.from('directors').upsert(dirRows, { onConflict: 'id' });
+    }
+
+    // 2. Sync Admins & Team
+    if (data.managementTeam && data.managementTeam.length > 0) {
+      const adminRows = data.managementTeam.map(a => ({
+        id: a.id,
+        name: a.name,
+        name_en: a.nameEn || '',
+        email: a.email || '',
+        phone: a.phone || '',
+        role: a.role || '',
+        role_type: a.roleType || 'officer',
+        access_key: a.accessKey || 'admin123',
+        is_super_admin: Boolean(a.isSuperAdmin),
+        permissions: a.permissions || ['all'],
+        status: a.status || 'সক্রিয় (Active)'
+      }));
+      await supabase.from('admins').upsert(adminRows, { onConflict: 'id' });
+    }
+
+    // 3. Sync Projects
+    if (data.projects && data.projects.length > 0) {
+      const projRows = data.projects.map(p => ({
+        id: p.id,
+        name: p.name,
+        name_en: p.nameEn || '',
+        location: p.location || '',
+        progress: Number(p.progress) || 0,
+        current_stage: p.currentStage || '',
+        budget: Number(p.budget) || 0
+      }));
+      await supabase.from('projects').upsert(projRows, { onConflict: 'id' });
+    }
+  } catch (err) {
+    console.log('Supabase sync notice (offline or pending tables):', err?.message || err);
+  }
+};
+
+// Background sync from Supabase
+export const syncFromSupabase = async () => {
+  try {
+    const [adminsRes, directorsRes, projectsRes, clientsRes] = await Promise.all([
+      supabase.from('admins').select('*'),
+      supabase.from('directors').select('*'),
+      supabase.from('projects').select('*, expenses:project_expenses(*)'),
+      supabase.from('clients').select('*, paymentHistory:client_payments(*)')
+    ]);
+
+    // If tables do not exist yet, return gracefully
+    if (adminsRes.error && directorsRes.error) {
+      return;
+    }
+
+    const current = getManagementData();
+    const updated = { ...current };
+
+    if (adminsRes.data && adminsRes.data.length > 0) {
+      const superAdminRow = adminsRes.data.find(a => a.is_super_admin || a.email === 'alemarah.officialbd@gmail.com');
+      if (superAdminRow) {
+        updated.superAdmin = {
+          id: superAdminRow.id,
+          name: superAdminRow.name,
+          nameEn: superAdminRow.name_en,
+          email: superAdminRow.email,
+          phone: superAdminRow.phone,
+          role: superAdminRow.role,
+          roleType: superAdminRow.role_type,
+          accessKey: superAdminRow.access_key,
+          isSuperAdmin: true,
+          permissions: superAdminRow.permissions || ['all'],
+          status: superAdminRow.status
+        };
+      }
+      updated.managementTeam = adminsRes.data.map(a => ({
+        id: a.id,
+        name: a.name,
+        nameEn: a.name_en,
+        email: a.email,
+        phone: a.phone,
+        role: a.role,
+        roleType: a.role_type,
+        accessKey: a.access_key,
+        isSuperAdmin: Boolean(a.is_super_admin),
+        permissions: a.permissions || ['projects', 'expenses'],
+        status: a.status
+      }));
+    }
+
+    if (directorsRes.data && directorsRes.data.length > 0) {
+      updated.directors = directorsRes.data.map(d => ({
+        id: d.id,
+        name: d.name,
+        nameEn: d.name_en,
+        role: d.role,
+        roleEn: d.role_en,
+        folioNo: d.folio_no,
+        image: d.image,
+        investment: Number(d.investment) || 0,
+        sharePercentage: Number(d.share_percentage) || 0,
+        dividendEarned: Number(d.dividend_earned) || 0,
+        phone: d.phone,
+        email: d.email,
+        joiningDate: d.joining_date,
+        status: d.status,
+        nomineeName: d.nominee_name,
+        nomineeRelation: d.nominee_relation,
+        nomineePhone: d.nominee_phone,
+        theme: d.theme
+      }));
+    }
+
+    if (projectsRes.data && projectsRes.data.length > 0) {
+      updated.projects = projectsRes.data.map(p => ({
+        id: p.id,
+        name: p.name,
+        nameEn: p.name_en,
+        location: p.location,
+        progress: p.progress,
+        currentStage: p.current_stage,
+        budget: Number(p.budget) || 0,
+        expenses: (p.expenses || []).map(e => ({
+          id: e.id,
+          title: e.title,
+          amount: Number(e.amount) || 0,
+          date: e.date
+        }))
+      }));
+    }
+
+    if (clientsRes.data && clientsRes.data.length > 0) {
+      updated.clients = clientsRes.data.map(c => ({
+        id: c.id,
+        name: c.name,
+        phone: c.phone,
+        password: c.password,
+        projectId: c.project_id,
+        projectName: c.project_name,
+        flatNo: c.flat_no,
+        totalPrice: Number(c.total_price) || 0,
+        totalPaid: Number(c.total_paid) || 0,
+        nextDueDate: c.next_due_date,
+        nextDueAmount: Number(c.next_due_amount) || 0,
+        paymentHistory: (c.paymentHistory || []).map(pay => ({
+          id: pay.id,
+          date: pay.date,
+          amount: Number(pay.amount) || 0,
+          method: pay.method
+        }))
+      }));
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: updated }));
+  } catch (err) {
+    console.log('Supabase sync notice:', err);
+  }
+};
+
+// Auto sync on app load
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    syncFromSupabase();
+  }, 1200);
+}
+
+// Save data to localStorage and sync to Supabase
 export const saveManagementData = (data) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: data }));
+    
+    // Background cloud sync
+    syncToSupabase(data);
   } catch (e) {
     console.error('Error saving management data to localStorage:', e);
   }
