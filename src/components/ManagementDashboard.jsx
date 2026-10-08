@@ -4,6 +4,9 @@ import {
   PieChart,
   GraduationCap,
   Briefcase,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ChevronLeft,
   Building2, 
   Users, 
   DollarSign, 
@@ -56,6 +59,7 @@ export default function ManagementDashboard({
   const [selectedClientForProfile, setSelectedClientForProfile] = useState(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [successAlert, setSuccessAlert] = useState('');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const profileRef = useRef(null);
 
@@ -489,57 +493,92 @@ export default function ManagementDashboard({
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row font-sans animate-fadeIn">
       
       {/* ========================================================= */}
-      {/* 1. WEB VIEW: LEFT SIDEBAR NAVIGATION (SOFTWARE / ERP STYLE)*/}
+      {/* 1. WEB VIEW: COLLAPSIBLE LEFT SIDEBAR NAVIGATION          */}
       {/* ========================================================= */}
-      <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-white border-r border-slate-200/80 h-screen sticky top-0 shrink-0 z-30 justify-between p-5 select-none">
-        
-        {/* Top: Logo & Manager Mini Card */}
-        <div className="space-y-6">
-          {/* Logo & Software Tag */}
-          <div>
+      <aside 
+        className={`hidden md:flex flex-col bg-white border-r border-slate-200/80 h-screen sticky top-0 shrink-0 z-30 justify-between select-none transition-all duration-300 ease-in-out ${
+          isSidebarCollapsed ? 'w-20 p-3' : 'w-64 lg:w-72 p-5'
+        }`}
+      >
+        {/* Top: Logo, Collapse Button & Manager Profile */}
+        <div className="space-y-5">
+          {/* Top Header Row with Logo & Collapse Toggle */}
+          <div className={`flex items-center ${isSidebarCollapsed ? 'flex-col space-y-2 justify-center' : 'justify-between'}`}>
             <button
               onClick={onNavigateHome}
-              className="flex items-center space-x-2 group cursor-pointer text-left"
+              className="flex items-center space-x-2 group cursor-pointer text-left overflow-hidden"
               title="ওয়েবসাইটে ফিরে যান"
             >
-              <img 
-                src="/alemarah_logo_header.svg" 
-                alt="Al-Emarah Properties" 
-                className="h-9 w-auto object-contain"
-              />
+              {isSidebarCollapsed ? (
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white flex items-center justify-center font-black text-base shadow-sm">
+                  AE
+                </div>
+              ) : (
+                <img 
+                  src="/alemarah_logo_header.svg" 
+                  alt="Al-Emarah Properties" 
+                  className="h-9 w-auto object-contain"
+                />
+              )}
             </button>
-            <div className="mt-2.5 inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#CE2028] text-3xs font-bold border border-red-200/60">
+
+            {/* Collapse/Expand Toggle Button */}
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className={`p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer ${
+                isSidebarCollapsed ? 'w-9 h-9 flex items-center justify-center bg-slate-50' : ''
+              }`}
+              title={isSidebarCollapsed ? "প্যানেল বড় করুন (Expand)" : "প্যানেল ছোট করুন (Collapse)"}
+            >
+              {isSidebarCollapsed ? (
+                <PanelLeftOpen className="w-5 h-5 text-[#CE2028]" />
+              ) : (
+                <PanelLeftClose className="w-5 h-5 text-slate-500" />
+              )}
+            </button>
+          </div>
+
+          {/* Software Tag (expanded mode only) */}
+          {!isSidebarCollapsed && (
+            <div className="-mt-2 inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#CE2028] text-3xs font-bold border border-red-200/60">
               <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] animate-pulse"></span>
               <span>ম্যানেজমেন্ট সফটওয়্যার v2.0</span>
             </div>
-          </div>
+          )}
 
           {/* Manager Mini Profile Card in Sidebar */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center space-x-3">
-            <div className="relative shrink-0">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white flex items-center justify-center font-black text-sm shadow-2xs">
+          <div className={`rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center transition-all ${
+            isSidebarCollapsed ? 'p-2 justify-center' : 'p-3.5 space-x-3'
+          }`}>
+            <div className="relative shrink-0" title={admin?.name || 'অ্যাডমিন'}>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white flex items-center justify-center font-black text-sm shadow-2xs">
                 {admin?.name ? admin.name.slice(0, 2) : 'ম্যা'}
               </div>
               <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-xs font-black text-slate-900 truncate">
-                {admin?.name || 'অ্যাডমিন কর্মকর্তা'}
+            {!isSidebarCollapsed && (
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-black text-slate-900 truncate">
+                  {admin?.name || 'অ্যাডমিন কর্মকর্তা'}
+                </div>
+                <div className="text-3xs text-[#006231] font-bold truncate">
+                  {admin?.role || 'ম্যানেজমেন্ট টিম'}
+                </div>
+                <div className="text-3xs text-slate-400 font-semibold truncate">
+                  {admin?.phone || '০১৯১৮-৬৪৬৫৭৫'}
+                </div>
               </div>
-              <div className="text-3xs text-[#006231] font-bold truncate">
-                {admin?.role || 'ম্যানেজমেন্ট টিম'}
-              </div>
-              <div className="text-3xs text-slate-400 font-semibold truncate">
-                {admin?.phone || '০১৯১৮-৬৪৬৫৭৫'}
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Sidebar Navigation Menu (All 5 Options on the Left) */}
+          {/* Sidebar Navigation Menu */}
           <nav className="space-y-1.5 pt-1">
-            <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">
-              নেভিগেশন মেনু
-            </div>
+            {!isSidebarCollapsed && (
+              <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 flex items-center justify-between">
+                <span>নেভিগেশন মেনু</span>
+                <span className="text-[10px] text-slate-400">৬টি মডিউল</span>
+              </div>
+            )}
             {managementNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -547,18 +586,31 @@ export default function ManagementDashboard({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl transition-all text-xs font-bold cursor-pointer ${
+                  title={item.label}
+                  className={`w-full flex items-center rounded-2xl transition-all font-bold cursor-pointer relative group ${
+                    isSidebarCollapsed 
+                      ? 'justify-center p-3 text-sm' 
+                      : 'justify-between px-3.5 py-3 text-xs'
+                  } ${
                     isActive
                       ? 'bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white shadow-md shadow-[#CE2028]/25 scale-[1.02]'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                    <span>{item.label}</span>
+                  <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'space-x-3'}`}>
+                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-700'}`} />
+                    {!isSidebarCollapsed && (
+                      <span className="truncate">{item.label}</span>
+                    )}
                   </div>
-                  {isActive && (
+                  {isActive && !isSidebarCollapsed && (
                     <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                  )}
+                  {/* Tooltip on Hover in Collapsed Mode */}
+                  {isSidebarCollapsed && (
+                    <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 text-white text-xs font-bold rounded-xl whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-xl">
+                      {item.label}
+                    </div>
                   )}
                 </button>
               );
@@ -567,29 +619,44 @@ export default function ManagementDashboard({
         </div>
 
         {/* Bottom Sidebar Actions */}
-        <div className="space-y-2 pt-4 border-t border-slate-100">
+        <div className={`pt-4 border-t border-slate-100 space-y-2 ${isSidebarCollapsed ? 'flex flex-col items-center' : ''}`}>
           <a
             href="tel:01918646575"
-            className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-2xs font-semibold transition-colors"
+            title="হটলাইন: ০১৯১৮-৬৪৬৫৭৫"
+            className={`flex items-center rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors ${
+              isSidebarCollapsed 
+                ? 'w-11 h-11 justify-center' 
+                : 'w-full space-x-2.5 px-3 py-2 text-2xs font-semibold'
+            }`}
           >
             <Phone className="w-3.5 h-3.5 text-[#006231]" />
-            <span>হটলাইন: ০১৯১৮-৬৪৬৫৭৫</span>
+            {!isSidebarCollapsed && <span>হটলাইন: ০১৯১৮-৬৪৬৫৭৫</span>}
           </a>
 
           <button
             onClick={onNavigateHome}
-            className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+            title="ওয়েবসাইটে ফিরে যান"
+            className={`flex items-center rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold transition-colors cursor-pointer ${
+              isSidebarCollapsed 
+                ? 'w-11 h-11 justify-center' 
+                : 'w-full space-x-2.5 px-3 py-2.5 text-xs'
+            }`}
           >
             <Home className="w-4 h-4 text-[#CE2028]" />
-            <span>ওয়েবসাইটে ফিরে যান</span>
+            {!isSidebarCollapsed && <span>ওয়েবসাইটে ফিরে যান</span>}
           </button>
 
           <button
             onClick={onLogout}
-            className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white text-xs font-bold transition-all cursor-pointer"
+            title="লগআউট"
+            className={`flex items-center rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white font-bold transition-all cursor-pointer ${
+              isSidebarCollapsed 
+                ? 'w-11 h-11 justify-center' 
+                : 'w-full space-x-2.5 px-3 py-2.5 text-xs'
+            }`}
           >
             <LogOut className="w-4 h-4" />
-            <span>লগআউট</span>
+            {!isSidebarCollapsed && <span>লগআউট</span>}
           </button>
         </div>
       </aside>
