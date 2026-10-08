@@ -662,33 +662,7 @@ export default function ManagementDashboard({
         </div>
 
         {/* Bottom Sidebar Actions */}
-        <div className={`pt-4 border-t border-slate-100 space-y-2 ${isSidebarCollapsed ? 'flex flex-col items-center' : ''}`}>
-          <a
-            href="tel:01918646575"
-            title="হটলাইন: ০১৯১৮-৬৪৬৫৭৫"
-            className={`flex items-center rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors ${
-              isSidebarCollapsed 
-                ? 'w-11 h-11 justify-center' 
-                : 'w-full space-x-2.5 px-3 py-2 text-2xs font-semibold'
-            }`}
-          >
-            <Phone className="w-3.5 h-3.5 text-[#006231]" />
-            {!isSidebarCollapsed && <span>হটলাইন: ০১৯১৮-৬৪৬৫৭৫</span>}
-          </a>
-
-          <button
-            onClick={onNavigateHome}
-            title="ওয়েবসাইটে ফিরে যান"
-            className={`flex items-center rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold transition-colors cursor-pointer ${
-              isSidebarCollapsed 
-                ? 'w-11 h-11 justify-center' 
-                : 'w-full space-x-2.5 px-3 py-2.5 text-xs'
-            }`}
-          >
-            <Home className="w-4 h-4 text-[#CE2028]" />
-            {!isSidebarCollapsed && <span>ওয়েবসাইটে ফিরে যান</span>}
-          </button>
-
+        <div className={`pt-4 border-t border-slate-100 ${isSidebarCollapsed ? 'flex flex-col items-center' : ''}`}>
           <button
             onClick={onLogout}
             title="লগআউট"
