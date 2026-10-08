@@ -1923,9 +1923,8 @@ export default function ManagementDashboard({
                           <div className="text-3xs text-emerald-600 font-bold">পরিশোধিত বিনিয়োগ</div>
                         </td>
                         <td className="py-3 px-4">
-                          <div className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-red-50 text-[#CE2028] font-black text-xs border border-red-200 shadow-2xs">
+                          <div className="inline-flex items-center px-2.5 py-1 rounded-xl bg-red-50 text-[#CE2028] font-bold text-xs border border-red-200 shadow-2xs font-mono">
                             <span>{dir.sharePercentage}%</span>
-                            <span className="text-[10px] font-normal text-slate-500">(১০০% এর মধ্যে)</span>
                           </div>
                         </td>
                         <td className="py-3 px-4">
@@ -2234,13 +2233,13 @@ export default function ManagementDashboard({
 
                   <div className="p-3.5 rounded-2xl bg-red-50/70 border border-red-100">
                     <div className="text-3xs font-bold text-red-800 uppercase">শেয়ার অংশীদারিত্ব</div>
-                    <div className="text-base font-black text-[#CE2028] mt-0.5">{d.sharePercentage}%</div>
-                    <div className="text-3xs text-red-700 font-bold">মোট ১০০% এর মধ্যে</div>
+                    <div className="text-base font-bold text-[#CE2028] mt-0.5">{d.sharePercentage}%</div>
+                    <div className="text-3xs text-red-700 font-medium">অংশীদারিত্ব ইকুইটি</div>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-100 col-span-2 sm:col-span-1">
                     <div className="text-3xs font-bold text-purple-800 uppercase">অর্জিত মোট ডিভিডেন্ড</div>
-                    <div className="text-base font-black text-purple-800 mt-0.5">{formatBDT(d.dividendEarned)}</div>
+                    <div className="text-base font-bold text-purple-800 mt-0.5">{formatBDT(d.dividendEarned)}</div>
                     <div className="text-3xs text-purple-600 font-medium">পরিশোধিত হিসাব</div>
                   </div>
                 </div>
@@ -2249,7 +2248,7 @@ export default function ManagementDashboard({
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5 text-xs">
                   <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
                     <span className="text-slate-500">কোম্পানির মোট ইকুইটি শেয়ার:</span>
-                    <span className="font-bold text-slate-800">১০০% এর মধ্যে {d.sharePercentage}% অংশীদারিত্ব</span>
+                    <span className="font-bold text-slate-800">{d.sharePercentage}%</span>
                   </div>
                   <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
                     <span className="text-slate-500">বোর্ড সদস্য হিসেবে অন্তর্ভুক্তি:</span>
