@@ -137,14 +137,21 @@ export default function ManagementDashboard({
     note: ''
   });
 
-  // 3. New Project Form
+  // State for Money Receipt Preview & Print modal
+  const [selectedReceiptForPrint, setSelectedReceiptForPrint] = useState(null);
+
+  // 3. New Project Form (with Smart Unit & Floor Generator)
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [projectForm, setProjectForm] = useState({
     name: '',
     location: '',
     progress: 10,
     currentStage: 'পাইলিং ও সাইট প্রিপারেশন',
-    budget: ''
+    budget: '',
+    projectType: 'residential', // 'residential' | 'share' | 'commercial'
+    totalFloors: 10,
+    unitsPerFloor: 2,
+    customUnitsText: ''
   });
 
   // 4. Project Expense Form
@@ -315,6 +322,37 @@ export default function ManagementDashboard({
       return;
     }
 
+    // Auto-generate units based on project type
+    let generatedUnits = [];
+    if (projectForm.projectType === 'residential') {
+      const floorsCount = Math.max(1, Number(projectForm.totalFloors) || 10);
+      const unitsPerFloorCount = Math.max(1, Number(projectForm.unitsPerFloor) || 2);
+      const unitLetters = ['এ (A)', 'বি (B)', 'সি (C)', 'ডি (D)', 'ই (E)', 'এফ (F)'];
+      const bnFloorNames = ['', '১ম তলা', '২য় তলা', '৩য় তলা', '৪র্থ তলা', '৫ম তলা', '৬ষ্ঠ তলা', '৭ম তলা', '৮ম তলা', '৯ম তলা', '১০ম তলা', '১১তম তলা', '১২তম তলা', '১৩তম তলা', '১৪তম তলা', '১৫তম তলা'];
+
+      for (let fl = 2; fl <= floorsCount; fl++) {
+        const floorName = bnFloorNames[fl] || `${fl}তম তলা`;
+        for (let u = 0; u < unitsPerFloorCount; u++) {
+          const letter = unitLetters[u] || `ইউনিট ${u + 1}`;
+          generatedUnits.push(`${floorName}, ফ্ল্যাট ${fl}-${letter}`);
+        }
+      }
+    } else if (projectForm.projectType === 'share') {
+      const shareCount = Math.max(1, Number(projectForm.totalFloors) || 50);
+      for (let s = 1; s <= shareCount; s++) {
+        generatedUnits.push(`পার্টনারশিপ ইনভেস্টমেন্ট শেয়ার স্লট #${String(s).padStart(2, '0')}`);
+      }
+    } else if (projectForm.customUnitsText) {
+      generatedUnits = projectForm.customUnitsText.split('\n').map(u => u.trim()).filter(Boolean);
+    } else {
+      generatedUnits = [
+        'গ্রাউন্ড ফ্লোর, বাণিজ্যিক স্পেস ০১',
+        '১ম তলা, ইউনিট ১০১',
+        '১ম তলা, ইউনিট ১০২',
+        '২য় তলা, ইউনিট ২০১'
+      ];
+    }
+
     const newProj = {
       id: `proj-${Date.now().toString().slice(-4)}`,
       name: projectForm.name,
@@ -322,6 +360,10 @@ export default function ManagementDashboard({
       progress: Number(projectForm.progress) || 10,
       currentStage: projectForm.currentStage || 'পাইলিং ও সাইট প্রিপারেশন',
       budget: Number(projectForm.budget) || 0,
+      type: projectForm.projectType || 'residential',
+      totalFloors: Number(projectForm.totalFloors) || 10,
+      unitsPerFloor: Number(projectForm.unitsPerFloor) || 2,
+      units: generatedUnits,
       expenses: []
     };
 
@@ -336,9 +378,13 @@ export default function ManagementDashboard({
       location: '',
       progress: 10,
       currentStage: 'পাইলিং ও সাইট প্রিপারেশন',
-      budget: ''
+      budget: '',
+      projectType: 'residential',
+      totalFloors: 10,
+      unitsPerFloor: 2,
+      customUnitsText: ''
     });
-    triggerAlert(`নতুন প্রজেক্ট "${newProj.name}" সফলভাবে যুক্ত হয়েছে!`);
+    triggerAlert(`নতুন প্রজেক্ট "${newProj.name}" (${generatedUnits.length}টি ইউনিট সহ) সফলভাবে যুক্ত হয়েছে!`);
   };
 
   const handleUpdateProjectProgress = (projId, newProgress, newStage) => {
@@ -1377,13 +1423,29 @@ export default function ManagementDashboard({
                           {trx.date} • {trx.method} • রসিদ: {trx.id}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-black text-sm text-[#006231]">
-                          +{formatBDT(trx.amount)}
+                      <div className="text-right flex items-center space-x-2 shrink-0">
+                        <div>
+                          <div className="font-black text-sm text-[#006231]">
+                            +{formatBDT(trx.amount)}
+                          </div>
+                          <span className="text-3xs px-2 py-0.5 rounded-full bg-emerald-100 text-[#006231] font-bold">
+                            অনুমোদিত
+                          </span>
                         </div>
-                        <span className="text-3xs px-2 py-0.5 rounded-full bg-emerald-100 text-[#006231] font-bold">
-                          অনুমোদিত
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cl = data.clients.find(c => c.id === trx.clientId);
+                            setSelectedReceiptForPrint({
+                              trx,
+                              client: cl || { name: trx.clientName, phone: '', projectName: trx.projectName, flatNo: '' }
+                            });
+                          }}
+                          title="মানি রিসিট দেখুন ও প্রিন্ট করুন"
+                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Printer className="w-4 h-4 text-[#006231]" />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -3173,17 +3235,50 @@ export default function ManagementDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    ফ্ল্যাট ও সাইজ বিবরণ *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="যেমন: ৭ম তলা, ফ্ল্যাট ৭-বি (১২৬৫ বর্গফুট)"
-                    value={clientForm.flatNo}
-                    onChange={(e) => setClientForm({ ...clientForm, flatNo: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-                    required
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider">
+                      বরাদ্দকৃত ফ্ল্যাট / ইউনিট *
+                    </label>
+                    <span className="text-[10px] text-slate-400">ড্রপডাউন থেকে নির্বাচন করুন</span>
+                  </div>
+                  {(() => {
+                    const selProj = data.projects.find(p => p.id === clientForm.projectId) || data.projects[0];
+                    const projectUnits = selProj?.units || [];
+                    const soldUnits = data.clients.filter(c => c.projectId === selProj?.id).map(c => c.flatNo);
+
+                    return (
+                      <div className="space-y-1.5">
+                        <select
+                          value={clientForm.flatNo}
+                          onChange={(e) => setClientForm({ ...clientForm, flatNo: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                          required
+                        >
+                          <option value="">-- ফ্ল্যাট / ইউনিট নির্বাচন করুন --</option>
+                          {projectUnits.map((u, uIdx) => {
+                            const isSold = soldUnits.includes(u);
+                            return (
+                              <option key={uIdx} value={u} disabled={isSold}>
+                                {u} {isSold ? '(বিক্রিত / বুকড)' : '✓ খালি'}
+                              </option>
+                            );
+                          })}
+                          <option value="custom_manual">➕ তালিকায় নেই (ম্যানুয়ালি লিখুন)</option>
+                        </select>
+
+                        {clientForm.flatNo === 'custom_manual' && (
+                          <input
+                            type="text"
+                            placeholder="যেমন: ৯ম তলা, ফ্ল্যাট ৯-এ (১৪৫০ বর্গফুট)"
+                            onChange={(e) => setClientForm({ ...clientForm, flatNo: e.target.value })}
+                            className="w-full bg-white border border-[#CE2028] rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none animate-fadeIn"
+                            autoFocus
+                            required
+                          />
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -3309,19 +3404,100 @@ export default function ManagementDashboard({
                 />
               </div>
 
-              <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  মোট আনুমানিক বাজেট (BDT) *
-                </label>
-                <input
-                  type="number"
-                  placeholder="যেমন: 85000000"
-                  value={projectForm.budget}
-                  onChange={(e) => setProjectForm({ ...projectForm, budget: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
-                  required
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    মোট আনুমানিক বাজেট (BDT) *
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="যেমন: 85000000"
+                    value={projectForm.budget}
+                    onChange={(e) => setProjectForm({ ...projectForm, budget: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    প্রজেক্টের ধরন / টাইপ *
+                  </label>
+                  <select
+                    value={projectForm.projectType}
+                    onChange={(e) => setProjectForm({ ...projectForm, projectType: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  >
+                    <option value="residential">আবাসিক ফ্ল্যাট (Residential Flats)</option>
+                    <option value="share">বিনিয়োগ শেয়ার (Investment Shares)</option>
+                    <option value="commercial">বাণিজ্যিক স্পেস / শপ (Commercial)</option>
+                  </select>
+                </div>
               </div>
+
+              {projectForm.projectType === 'residential' && (
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2.5">
+                  <span className="text-3xs font-bold text-slate-500 uppercase tracking-wider flex items-center space-x-1">
+                    <span>🏢 অটো ফ্ল্যাট ইনভেন্টরি কনফিগারেশন</span>
+                  </span>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-3xs font-bold text-slate-600 uppercase mb-1">মোট তলা / ফ্লোর</label>
+                      <input
+                        type="number"
+                        min="2"
+                        max="30"
+                        value={projectForm.totalFloors}
+                        onChange={(e) => setProjectForm({ ...projectForm, totalFloors: e.target.value })}
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-3xs font-bold text-slate-600 uppercase mb-1">প্রতি তলায় ফ্ল্যাট</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="6"
+                        value={projectForm.unitsPerFloor}
+                        onChange={(e) => setProjectForm({ ...projectForm, unitsPerFloor: e.target.value })}
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 outline-none"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-emerald-700 font-medium">
+                    স্বয়ংক্রিয়ভাবে {Math.max(0, ((Number(projectForm.totalFloors) || 10) - 1) * (Number(projectForm.unitsPerFloor) || 2))}টি ফ্ল্যাট তৈরি হবে (২য় থেকে {projectForm.totalFloors || 10}ম তলা পর্যন্ত)।
+                  </p>
+                </div>
+              )}
+
+              {projectForm.projectType === 'share' && (
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2">
+                  <label className="block text-3xs font-bold text-slate-600 uppercase mb-1">মোট শেয়ার সংখ্যা</label>
+                  <input
+                    type="number"
+                    placeholder="যেমন: 50 বা 100"
+                    value={projectForm.totalFloors}
+                    onChange={(e) => setProjectForm({ ...projectForm, totalFloors: e.target.value })}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 outline-none"
+                  />
+                  <p className="text-[11px] text-emerald-700 font-medium">
+                    স্বয়ংক্রিয়ভাবে {projectForm.totalFloors || 50}টি শেয়ার স্লট তৈরি হবে।
+                  </p>
+                </div>
+              )}
+
+              {projectForm.projectType === 'commercial' && (
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2">
+                  <label className="block text-3xs font-bold text-slate-600 uppercase mb-1">দোকান / ইউনিটের তালিকা (প্রতি লাইনে একটি)</label>
+                  <textarea
+                    rows="3"
+                    placeholder="গ্রাউন্ড ফ্লোর, দোকান নং ০১&#10;১ম তলা, দোকান নং ১০১&#10;২য় তলা, স্পেস ২০১"
+                    value={projectForm.customUnitsText}
+                    onChange={(e) => setProjectForm({ ...projectForm, customUnitsText: e.target.value })}
+                    className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-medium text-slate-800 outline-none"
+                  />
+                </div>
+              )}
 
               <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
@@ -3725,6 +3901,153 @@ export default function ManagementDashboard({
                 >
                   <DollarSign className="w-3.5 h-3.5" />
                   <span>+ কিস্তি জমা এন্ট্রি</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ========================================================= */}
+      {/* MODAL: OFFICIAL MONEY RECEIPT PREVIEW & PRINT             */}
+      {/* ========================================================= */}
+      {selectedReceiptForPrint && (() => {
+        const { trx, client } = selectedReceiptForPrint;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs animate-fadeIn select-none">
+            <div className="bg-white rounded-3xl max-w-xl w-full max-h-[95vh] overflow-y-auto shadow-2xl border border-slate-100 relative">
+              
+              {/* Top Controls */}
+              <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 rounded-t-3xl">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-5 h-5 text-[#006231]" />
+                  <span className="font-bold text-sm text-slate-800">অফিশিয়াল মানি রিসিট ভাউচার</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs flex items-center space-x-1.5 cursor-pointer shadow-sm active:scale-95 transition-all"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>প্রিন্ট করুন</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedReceiptForPrint(null)}
+                    className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Printable Money Receipt Document */}
+              <div className="p-6 sm:p-8 bg-slate-50/50">
+                <div className="p-6 sm:p-8 bg-white rounded-2xl border border-slate-200/90 shadow-sm space-y-6">
+                  
+                  {/* Header with Logo */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                    <div>
+                      <img 
+                        src="/alemarah_logo_header.svg" 
+                        alt="Al-Emarah Properties" 
+                        className="h-10 w-auto object-contain"
+                      />
+                      <p className="text-[10px] text-slate-500 font-medium mt-1">
+                        ২২ ফুট প্রশস্ত রাস্তা সংলগ্ন • পুরানা পল্টন, ঢাকা
+                      </p>
+                    </div>
+                    <div className="text-left sm:text-right">
+                      <span className="inline-block px-3 py-1 rounded-full bg-emerald-50 text-[#006231] font-bold text-xs border border-emerald-200">
+                        মানি রিসিট (Money Receipt)
+                      </span>
+                      <div className="text-2xs font-mono font-bold text-slate-600 mt-1">
+                        রসিদ নং: <strong className="text-slate-900">{trx.id}</strong>
+                      </div>
+                      <div className="text-[11px] text-slate-400">
+                        তারিখ: {trx.date}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Customer & Unit Details Grid */}
+                  <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 text-xs">
+                    <div>
+                      <span className="text-3xs text-slate-400 block font-bold uppercase">গ্রাহকের নাম</span>
+                      <strong className="text-slate-900 text-sm">{client.name}</strong>
+                      {client.phone && <div className="text-slate-500 text-2xs font-mono">{client.phone}</div>}
+                    </div>
+
+                    <div>
+                      <span className="text-3xs text-slate-400 block font-bold uppercase">বরাদ্দকৃত প্রকল্প ও ইউনিট</span>
+                      <strong className="text-[#006231] text-xs block">{client.projectName}</strong>
+                      <div className="text-slate-600 text-2xs font-medium">{client.flatNo || 'বরাদ্দকৃত ইউনিট'}</div>
+                    </div>
+                  </div>
+
+                  {/* Payment Breakdown Table */}
+                  <div className="border border-slate-200/80 rounded-xl overflow-hidden">
+                    <table className="w-full text-xs">
+                      <thead className="bg-slate-100/70 border-b border-slate-200/80 text-slate-600 font-bold uppercase text-3xs">
+                        <tr>
+                          <th className="py-2.5 px-3 text-left">বিবরণ / খাত</th>
+                          <th className="py-2.5 px-3 text-center">পরিশোধের মাধ্যম</th>
+                          <th className="py-2.5 px-3 text-right">জমার পরিমাণ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-slate-100">
+                          <td className="py-3 px-3 font-medium text-slate-800">
+                            ফ্ল্যাট / ইউনিট চুক্তি কিস্তি জমা
+                          </td>
+                          <td className="py-3 px-3 text-center font-bold text-slate-700">
+                            {trx.method}
+                          </td>
+                          <td className="py-3 px-3 text-right font-mono font-bold text-sm text-[#006231]">
+                            {formatBDT(trx.amount)}
+                          </td>
+                        </tr>
+                        <tr className="bg-slate-50/60 font-bold">
+                          <td colSpan="2" className="py-2.5 px-3 text-right text-slate-600 text-xs">
+                            সর্বমোট সংগৃহীত টাকা:
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono font-black text-base text-[#006231]">
+                            {formatBDT(trx.amount)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Authorization & Signatures */}
+                  <div className="grid grid-cols-2 gap-8 pt-8 border-t border-slate-200/80 text-center text-xs">
+                    <div>
+                      <div className="w-32 h-8 border-b border-slate-400 mx-auto"></div>
+                      <div className="text-3xs font-bold text-slate-600 mt-1">আদায়কারীর স্বাক্ষর</div>
+                      <div className="text-[10px] text-slate-400">হিসাব বিভাগ, আল-ইমারাহ</div>
+                    </div>
+
+                    <div>
+                      <div className="w-32 h-8 border-b border-slate-400 mx-auto"></div>
+                      <div className="text-3xs font-bold text-slate-600 mt-1">অনুমোদিত স্বাক্ষর</div>
+                      <div className="text-[10px] text-slate-400">ম্যানেজমেন্ট কন্ট্রোল</div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Modal Bottom Bar */}
+              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end rounded-b-3xl">
+                <button
+                  type="button"
+                  onClick={() => setSelectedReceiptForPrint(null)}
+                  className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs cursor-pointer"
+                >
+                  বন্ধ করুন
                 </button>
               </div>
 
