@@ -820,44 +820,44 @@ export default function ManagementDashboard({
       <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 pt-5">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-slate-500 text-3xs sm:text-2xs font-bold uppercase">
+            <div className="flex items-center justify-between text-slate-500 text-3xs sm:text-2xs font-medium tracking-wide">
               <span>মোট ক্লায়েন্ট</span>
               <Users className="w-4 h-4 text-blue-600 shrink-0" />
             </div>
-            <div className="text-base sm:text-2xl font-black text-slate-900 truncate">
+            <div className="text-base sm:text-2xl font-bold text-slate-800 truncate">
               {totalClientsCount} জন
             </div>
             <div className="text-3xs text-slate-400 truncate">নিবন্ধিত ফ্ল্যাট ক্রেতা</div>
           </div>
 
           <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-emerald-200/80 bg-gradient-to-b from-white to-emerald-50/20 shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-[#006231] text-3xs sm:text-2xs font-bold uppercase">
+            <div className="flex items-center justify-between text-[#006231] text-3xs sm:text-2xs font-medium tracking-wide">
               <span className="truncate">সংগৃহীত টাকা</span>
               <DollarSign className="w-4 h-4 text-[#006231] shrink-0" />
             </div>
-            <div className="text-base sm:text-2xl font-black text-[#006231] truncate">
+            <div className="text-base sm:text-2xl font-bold text-[#006231] truncate">
               {formatBDT(totalCollections)}
             </div>
-            <div className="text-3xs text-[#006231] font-semibold truncate">মোট পরিশোধিত জমা</div>
+            <div className="text-3xs text-[#006231] font-medium truncate">মোট পরিশোধিত জমা</div>
           </div>
 
           <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/20 shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-amber-800 text-3xs sm:text-2xs font-bold uppercase">
+            <div className="flex items-center justify-between text-amber-800 text-3xs sm:text-2xs font-medium tracking-wide">
               <span className="truncate">মোট বাকি / বকেয়া</span>
               <Clock className="w-4 h-4 text-amber-600 shrink-0" />
             </div>
-            <div className="text-base sm:text-2xl font-black text-amber-700 truncate">
+            <div className="text-base sm:text-2xl font-bold text-amber-700 truncate">
               {formatBDT(totalDues)}
             </div>
-            <div className="text-3xs text-amber-700 font-semibold truncate">ভবিষ্যত প্রাপ্য কিস্তি</div>
+            <div className="text-3xs text-amber-700 font-medium truncate">ভবিষ্যত প্রাপ্য কিস্তি</div>
           </div>
 
           <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-slate-500 text-3xs sm:text-2xs font-bold uppercase">
+            <div className="flex items-center justify-between text-slate-500 text-3xs sm:text-2xs font-medium tracking-wide">
               <span className="truncate">প্রজেক্টে মোট ব্যয়</span>
               <HardHat className="w-4 h-4 text-[#CE2028] shrink-0" />
             </div>
-            <div className="text-base sm:text-2xl font-black text-[#CE2028] truncate">
+            <div className="text-base sm:text-2xl font-bold text-[#CE2028] truncate">
               {formatBDT(totalConstructionSpent)}
             </div>
             <div className="text-3xs text-slate-400 truncate">{data.projects.length}টি প্রকল্পে মোট ব্যয়</div>
@@ -1803,56 +1803,56 @@ export default function ManagementDashboard({
             {/* Top KPI Metrics for Directors */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider">মোট পরিশোধিত মূলধন</span>
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-3xs sm:text-2xs font-medium tracking-wide">মোট পরিশোধিত মূলধন</span>
                   <DollarSign className="w-4 h-4 text-[#006231]" />
                 </div>
-                <div className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                <div className="text-base sm:text-xl font-bold text-slate-800 tracking-tight">
                   {formatBDT(totalDirectorInvestment)}
                 </div>
-                <div className="text-3xs text-emerald-600 font-bold flex items-center space-x-1">
+                <div className="text-3xs text-emerald-600 font-medium flex items-center space-x-1">
                   <CheckCircle2 className="w-3 h-3" />
                   <span>১০০% পেইড-আপ ইকুইটি</span>
                 </div>
               </div>
 
               <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider">মোট শেয়ার বণ্টন</span>
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-3xs sm:text-2xs font-medium tracking-wide">মোট শেয়ার বণ্টন</span>
                   <PieChart className="w-4 h-4 text-[#CE2028]" />
                 </div>
-                <div className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                <div className="text-base sm:text-xl font-bold text-slate-800 tracking-tight">
                   {totalDirectorShares}% / ১০০%
                 </div>
-                <div className="text-3xs text-[#CE2028] font-bold flex items-center space-x-1">
+                <div className="text-3xs text-[#CE2028] font-medium flex items-center space-x-1">
                   <Award className="w-3 h-3" />
                   <span>{totalDirectorShares === 100 ? 'সম্পূর্ণ ১০০% বণ্টিত' : `${100 - totalDirectorShares}% অবশিষ্ট উন্মুক্ত`}</span>
                 </div>
               </div>
 
               <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider">বোর্ড ডিরেক্টর সংখ্যা</span>
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-3xs sm:text-2xs font-medium tracking-wide">বোর্ড ডিরেক্টর সংখ্যা</span>
                   <Users className="w-4 h-4 text-blue-600" />
                 </div>
-                <div className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                <div className="text-base sm:text-xl font-bold text-slate-800 tracking-tight">
                   {directorsList.length} জন সম্মানিত সদস্য
                 </div>
-                <div className="text-3xs text-blue-600 font-bold flex items-center space-x-1">
+                <div className="text-3xs text-blue-600 font-medium flex items-center space-x-1">
                   <ShieldCheck className="w-3 h-3" />
                   <span>কার্যনির্বাহী কমিটি সক্রিয়</span>
                 </div>
               </div>
 
               <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider">মোট বণ্টিত ডিভিডেন্ড</span>
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-3xs sm:text-2xs font-medium tracking-wide">মোট বণ্টিত ডিভিডেন্ড</span>
                   <TrendingUp className="w-4 h-4 text-purple-600" />
                 </div>
-                <div className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                <div className="text-base sm:text-xl font-bold text-slate-800 tracking-tight">
                   {formatBDT(totalDirectorDividends)}
                 </div>
-                <div className="text-3xs text-purple-600 font-bold flex items-center space-x-1">
+                <div className="text-3xs text-purple-600 font-medium flex items-center space-x-1">
                   <Sparkles className="w-3 h-3" />
                   <span>নিয়মিত লভ্যাংশ পরিশোধিত</span>
                 </div>
