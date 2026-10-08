@@ -618,15 +618,7 @@ export default function ManagementDashboard({
             </button>
           </div>
 
-          {/* Software Tag (expanded mode only) */}
-          {!isSidebarCollapsed && (
-            <div className="-mt-2 inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#CE2028] text-3xs font-bold border border-red-200/60">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] animate-pulse"></span>
-              <span>ম্যানেজমেন্ট সফটওয়্যার v2.0</span>
-            </div>
-          )}
-
-          {/* Manager / Super Admin Mini Profile Card in Sidebar */}
+            {/* Manager / Super Admin Mini Profile Card in Sidebar */}
           <div className={`rounded-2xl transition-all ${
             isSuperAdmin 
               ? 'bg-gradient-to-r from-slate-900 via-zinc-900 to-amber-950/80 border border-amber-500/30 text-white shadow-sm'
@@ -662,12 +654,6 @@ export default function ManagementDashboard({
 
           {/* Sidebar Navigation Menu */}
           <nav className="space-y-1.5 pt-1">
-            {!isSidebarCollapsed && (
-              <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 flex items-center justify-between">
-                <span>নেভিগেশন মেনু</span>
-                <span className="text-[10px] text-slate-400">৬টি মডিউল</span>
-              </div>
-            )}
             {managementNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
