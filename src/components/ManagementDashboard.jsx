@@ -1648,144 +1648,8 @@ export default function ManagementDashboard({
                 })}
               </div>
             </div>
-
-            {/* Directors Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-              {directorsList.map((dir) => {
-                const isChairman = dir.role?.includes('চেয়ারম্যান') || dir.roleEn?.toLowerCase().includes('chairman');
-                const isMD = dir.role?.includes('ব্যবস্থাপনা') || dir.roleEn?.toLowerCase().includes('managing');
-
-                return (
-                  <div
-                    key={dir.id}
-                    className="bg-white rounded-3xl border border-slate-200/90 hover:border-slate-300 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between overflow-hidden group"
-                  >
-                    <div>
-                      {/* Top Header with Image & Title */}
-                      <div className="p-5 pb-4 border-b border-slate-100 flex items-start space-x-3.5">
-                        <div className="relative w-16 h-20 sm:w-18 sm:h-22 rounded-2xl overflow-hidden shrink-0 bg-slate-100 border border-slate-200 shadow-2xs group-hover:scale-105 transition-transform">
-                          {dir.image ? (
-                            <img
-                              src={dir.image}
-                              alt={dir.name}
-                              className="w-full h-full object-cover object-top"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-tr from-slate-100 to-slate-200 text-slate-500 font-black text-xl">
-                              <Award className="w-7 h-7 text-slate-400 mb-1" />
-                              <span className="text-3xs font-bold text-slate-500">বোর্ড সদস্য</span>
-                            </div>
-                          )}
-                          <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-black/60 text-white font-mono text-[9px] font-bold">
-                            #{dir.id}
-                          </div>
-                        </div>
-
-                        <div className="min-w-0 flex-1 space-y-1">
-                          <div className="flex items-center justify-between gap-1">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-3xs font-black uppercase tracking-wider ${
-                              isChairman 
-                                ? 'bg-red-50 text-[#CE2028] border border-red-200' 
-                                : isMD 
-                                ? 'bg-emerald-50 text-[#006231] border border-emerald-200'
-                                : 'bg-slate-100 text-slate-700 border border-slate-200'
-                            }`}>
-                              {dir.role}
-                            </span>
-                            <span className="font-mono text-3xs text-slate-400 font-semibold">{dir.folioNo}</span>
-                          </div>
-
-                          <h4 className="text-base font-black text-slate-900 group-hover:text-[#CE2028] transition-colors truncate">
-                            {dir.name}
-                          </h4>
-
-                          <div className="text-3xs text-slate-400 flex items-center space-x-1 pt-0.5">
-                            <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
-                            <span>যোগদান: {dir.joiningDate}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Main Financial Highlights */}
-                      <div className="p-4 sm:p-5 space-y-3">
-                        {/* Prominent Investment & Share Section */}
-                        <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-50/80 via-white to-slate-50 border-2 border-emerald-200 shadow-2xs space-y-2">
-                          <div className="flex items-center justify-between text-2xs">
-                            <span className="font-extrabold text-emerald-950 uppercase tracking-wider flex items-center space-x-1">
-                              <DollarSign className="w-3.5 h-3.5 text-[#006231]" />
-                              <span>বিনিয়োগকৃত মোট টাকা (Investment)</span>
-                            </span>
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black tracking-wide">
-                              পরিশোধিত
-                            </span>
-                          </div>
-
-                          <div className="flex items-baseline justify-between gap-2">
-                            <div className="text-xl sm:text-2xl font-black text-[#006231] tracking-tight">
-                              {formatBDT(dir.investment)}
-                            </div>
-                            <div className="text-right">
-                              <span className="text-xs sm:text-sm font-black text-[#CE2028] bg-red-100/90 border border-red-200 px-2.5 py-1 rounded-xl inline-block shadow-2xs">
-                                {dir.sharePercentage}% শেয়ার
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold pt-1.5 border-t border-emerald-100">
-                            <span>কোম্পানির মোট ১০০% শেয়ারে অংশীদারিত্ব:</span>
-                            <span className="font-black text-[#CE2028]">{dir.sharePercentage}% মালিকানা</span>
-                          </div>
-                        </div>
-
-                        {/* Nominee Details & Dividend Strip */}
-                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5 text-2xs">
-                          <div className="flex items-center justify-between">
-                            <span className="text-slate-500 font-medium">মনোনীত নমিনি:</span>
-                            <span className="font-bold text-slate-800">{dir.nomineeName || 'সংরক্ষিত'} ({dir.nomineeRelation || 'উত্তরাধিকারী'})</span>
-                          </div>
-                          {dir.nomineePhone && (
-                            <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
-                              <span className="text-slate-500 font-medium">নমিনির মোবাইল:</span>
-                              <a href={`tel:${dir.nomineePhone}`} className="font-mono font-bold text-[#006231] hover:underline">
-                                {dir.nomineePhone}
-                              </a>
-                            </div>
-                          )}
-                          <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
-                            <span className="text-slate-500 font-medium">অর্জিত লভ্যাংশ:</span>
-                            <span className="font-black text-[#006231] font-mono text-xs">{formatBDT(dir.dividendEarned)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card Footer Actions */}
-                    <div className="p-4 pt-2 border-t border-slate-100 flex items-center space-x-2 bg-slate-50/50">
-                      <a
-                        href={`tel:${dir.phone}`}
-                        className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200 shadow-2xs flex items-center space-x-1.5 transition-colors cursor-pointer"
-                        title="সরাসরি কল দিন"
-                      >
-                        <Phone className="w-3.5 h-3.5 text-[#006231]" />
-                        <span className="hidden sm:inline">কল দিন</span>
-                      </a>
-
-                      <button
-                        type="button"
-                        onClick={() => setSelectedDirectorForProfile(dir)}
-                        className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white hover:opacity-95 text-xs font-bold shadow-md shadow-[#CE2028]/20 flex items-center justify-center space-x-1.5 transition-all cursor-pointer active:scale-95"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>পূর্ণাঙ্গ প্রোফাইল ও সনদ</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
             {/* Comprehensive Table: All Directors Investment & Share Breakdown */}
-            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden">
+            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden mt-6">
               <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/50">
                 <div>
                   <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
@@ -1817,7 +1681,7 @@ export default function ManagementDashboard({
                       <tr key={dir.id} className="hover:bg-slate-50/80 transition-colors">
                         <td className="py-3 px-4">
                           <div className="flex items-center space-x-3">
-                            <div className="w-9 h-11 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                            <div className="w-10 h-12 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
                               {dir.image ? (
                                 <img src={dir.image} alt={dir.name} className="w-full h-full object-cover object-top" />
                               ) : (
@@ -1827,8 +1691,13 @@ export default function ManagementDashboard({
                               )}
                             </div>
                             <div>
-                              <div className="font-bold text-slate-900">{dir.name}</div>
+                              <div className="font-bold text-slate-900 text-sm">{dir.name}</div>
                               <div className="text-3xs text-[#CE2028] font-bold">{dir.role}</div>
+                              {dir.phone && (
+                                <a href={`tel:${dir.phone}`} className="text-3xs text-slate-500 font-mono font-bold hover:text-[#006231] inline-block mt-0.5">
+                                  {dir.phone}
+                                </a>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -1850,15 +1719,16 @@ export default function ManagementDashboard({
                         <td className="py-3 px-4">
                           <div className="font-semibold text-slate-800">{dir.nomineeName || 'সংরক্ষিত'} ({dir.nomineeRelation || 'উত্তরাধিকারী'})</div>
                           {dir.nomineePhone && (
-                            <div className="text-3xs font-mono font-bold text-[#006231]">{dir.nomineePhone}</div>
+                            <div className="text-3xs font-mono font-bold text-[#006231] mt-0.5">{dir.nomineePhone}</div>
                           )}
                         </td>
                         <td className="py-3 px-4 text-right">
                           <button
                             onClick={() => setSelectedDirectorForProfile(dir)}
-                            className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs cursor-pointer shadow-2xs"
+                            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs cursor-pointer shadow-2xs inline-flex items-center space-x-1.5 transition-all hover:scale-105 active:scale-95"
                           >
-                            সনদ দেখুন
+                            <Eye className="w-3.5 h-3.5 text-white/80" />
+                            <span>সনদ ও প্রোফাইল</span>
                           </button>
                         </td>
                       </tr>
