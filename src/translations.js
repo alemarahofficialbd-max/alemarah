@@ -228,7 +228,73 @@ export const translations = {
       mdQuote: "As the Managing Director, my primary duty is advancing our organization into a powerful, multifaceted, and publicly trusted enterprise through sound planning, skilled management, and pragmatic execution. Alongside residential and commercial towers like Al Quds Tower and Barakah Tower 01, our Emarah Agro initiative is opening new frontiers in sustainable agriculture and participatory returns. Because behind a person's savings lie their hard work, their family's future, and their aspiration to build something lasting. From that accountability, our journey continues from planning to execution, from a single initiative toward multi-asset development.",
       mdName: "Talukdar Tariq Masud",
       mdDesignation: "Managing Director",
-      mdEducation: "BSS Political Science, Govt Titumir College"
+      mdEducation: "BSS Political Science, Govt Titumir College",
+
+      // Executive Committee Board of Directors
+      board: {
+        badge: "Leadership & Governance",
+        title: "Executive Committee Board of Directors",
+        subtitle: "Visionary leadership upholding ethical governance, transparent management, and strategic development for Al-Emarah Properties.",
+        leadershipBadge: "Executive Leadership",
+        directorsBadge: "Board of Directors (Upcoming Inductions)",
+        directorsNote: "Additional executive and advisory board members are currently in the process of induction.",
+        members: [
+          {
+            id: "chairman",
+            name: "Sheikh Fazlul Karim Maroof",
+            role: "Chairman",
+            education: "Graduate, Public Administration, University of Dhaka",
+            image: "/images/chairman.webp",
+            isPrincipal: true,
+            theme: "crimson"
+          },
+          {
+            id: "md",
+            name: "Talukdar Tariq Masud",
+            role: "Managing Director",
+            education: "BSS Political Science, Govt. Titumir College",
+            image: "/images/managing_director.webp",
+            isPrincipal: true,
+            theme: "emerald"
+          },
+          {
+            id: "dir_technical",
+            name: "Engr. M. A. Rahman",
+            role: "Director (Technical & Engineering)",
+            education: "B.Sc Civil Engineering, BUET",
+            image: null,
+            isPrincipal: false,
+            isDemo: true
+          },
+          {
+            id: "dir_legal",
+            name: "Barrister S. H. Chowdhury",
+            role: "Director (Legal & Compliance)",
+            education: "LL.B (Hons), LL.M, University of Dhaka",
+            image: null,
+            isPrincipal: false,
+            isDemo: true
+          },
+          {
+            id: "dir_finance",
+            name: "Tanvir Hasan, FCA",
+            role: "Director (Finance & Accounts)",
+            education: "Fellow Chartered Accountant (ICAB)",
+            image: null,
+            isPrincipal: false,
+            isDemo: true
+          },
+          {
+            id: "dir_planning",
+            name: "Syed Mahmudul Huq",
+            role: "Director (Planning & Business Dev.)",
+            education: "MBA in Urban Management, DU",
+            image: null,
+            isPrincipal: false,
+            isDemo: true
+          }
+        ]
+      }
     },
 
     // Special Project Amenities (From Corporate Profile)
@@ -877,7 +943,74 @@ export const translations = {
       mdQuote: "আল ইমারাহ প্রোপার্টিজের ব্যবস্থাপনা পরিচালক হিসেবে আমার প্রধান দায়িত্ব হলো—সুষ্ঠু পরিকল্পনা, দক্ষ ব্যবস্থাপনা ও কার্যকর বাস্তবায়নের মাধ্যমে প্রতিষ্ঠানকে একটি শক্তিশালী, বহুমুখী ও জনআস্থাসম্পন্ন প্রতিষ্ঠানে এগিয়ে নেওয়া। আবাসিক ও বাণিজ্যিক কার্যক্রমের পাশাপাশি রিয়েল এস্টেট ডেভেলপমেন্ট অ্যান্ড হাউজিং, পরিকল্পিত আবাসন, ভূমি উন্নয়ন এবং কৃষিভিত্তিক সম্পদ উন্নয়ন খাতেও আমাদের কার্যক্রম সম্প্রসারিত হচ্ছে। বিশেষ করে আল ইমারাহ এগ্রো উদ্যোগের মাধ্যমে কৃষি, উৎপাদন ও অংশীদারিত্বের নতুন সম্ভাবনা তৈরি হচ্ছে। কারণ মানুষের সঞ্চয়ের সঙ্গে জড়িয়ে থাকে তার পরিশ্রম, পরিবারের ভবিষ্যৎ এবং নিজের জন্য কিছু গড়ে তোলার আকাঙ্ক্ষা। সেই দায়বদ্ধতা থেকেই আমরা এমন একটি প্রতিষ্ঠান গড়ে তুলতে চাই, যেখানে মানুষের অংশগ্রহণ ভবিষ্যতের একটি সম্পদ ও সম্ভাবনার সঙ্গে যুক্ত হবে। পরিকল্পনা থেকে বাস্তবায়নে, একটি উদ্যোগ থেকে বহুমুখী সম্পদ উন্নয়নের দিকে আমাদের পথচলা চলমান।",
       mdName: "তালুকদার তারিক মাসউদ",
       mdDesignation: "ব্যবস্থাপনা পরিচালক",
-      mdEducation: "BSS রাষ্ট্রবিজ্ঞান, সরকারি তিতুমীর কলেজ"
+      mdEducation: "BSS রাষ্ট্রবিজ্ঞান, সরকারি তিতুমীর কলেজ",
+
+      // Executive Committee Board of Directors
+      board: {
+        badge: "নির্বাহী নেতৃত্ব ও সুশাসন",
+        title: "Executive Committee Board of Directors",
+        subtitle: "সুপরিকল্পিত উন্নয়ন, স্বচ্ছ ব্যবস্থাপনা ও আস্থার সাথে স্থায়ী সম্পদ গড়ার লক্ষ্যে পরিচালিত কার্যনির্বাহী কমিটি ও পরিচালনা পর্ষদ।",
+        leadershipBadge: "শীর্ষ নির্বাহী নেতৃত্ব",
+        directorsBadge: "পরিচালকবৃন্দ (আসন্ন সদস্য / প্রস্তাবিত)",
+        directorsNote: "কার্যনির্বাহী পরিচালনা পর্ষদে আরো সম্মানিত পরিচালক সদস্য যুক্ত করার কার্যক্রম চলমান রয়েছে।",
+        members: [
+          {
+            id: "chairman",
+            name: "শেখ ফজলুল করিম মারুফ",
+            nameDisplay: "শেখ ফজলুল করিম মারুফ",
+            role: "চেয়ারম্যান",
+            education: "স্নাতক, লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়",
+            image: "/images/chairman.webp",
+            isPrincipal: true,
+            theme: "crimson"
+          },
+          {
+            id: "md",
+            name: "তালুকদার তারিক মাসউদ",
+            role: "ব্যবস্থাপনা পরিচালক",
+            education: "BSS রাষ্ট্রবিজ্ঞান, সরকারি তিতুমীর কলেজ",
+            image: "/images/managing_director.webp",
+            isPrincipal: true,
+            theme: "emerald"
+          },
+          {
+            id: "dir_technical",
+            name: "ইঞ্জি. এম. এ. রহমান",
+            role: "পরিচালক (প্রকৌশল ও কারিগরি)",
+            education: "বিএসসি ইন সিভিল ইঞ্জিনিয়ারিং, বুয়েট",
+            image: null,
+            isPrincipal: false,
+            isDemo: true
+          },
+          {
+            id: "dir_legal",
+            name: "ব্যারিস্টার এস. এইচ. চৌধুরী",
+            role: "পরিচালক (আইন ও কমপ্লায়েন্স)",
+            education: "এলএলবি (অনার্স), এলএলএম, ঢাকা বিশ্ববিদ্যালয়",
+            image: null,
+            isPrincipal: false,
+            isDemo: true
+          },
+          {
+            id: "dir_finance",
+            name: "তানভীর হাসান, এফসিএ",
+            role: "পরিচালক (অর্থ ও নিরীক্ষা)",
+            education: "চার্টার্ড অ্যাকাউন্ট্যান্ট (আইসিএবি)",
+            image: null,
+            isPrincipal: false,
+            isDemo: true
+          },
+          {
+            id: "dir_planning",
+            name: "সৈয়দ মাহমুদুল হক",
+            role: "পরিচালক (পরিকল্পনা ও বিজনেস ডেভ.)",
+            education: "এমবিএ, ঢাকা বিশ্ববিদ্যালয়",
+            image: null,
+            isPrincipal: false,
+            isDemo: true
+          }
+        ]
+      }
     },
 
     // Special Project Amenities (From Corporate Profile)
