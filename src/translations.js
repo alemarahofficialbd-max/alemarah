@@ -11,7 +11,7 @@ export const translations = {
       login: "Client Dashboard",
       bookVisit: "Schedule Visit",
       callUs: "Hotline",
-      phoneNo: "01918-646575",
+      phoneNo: "01816-233013",
       menu: "Menu",
       close: "Close",
       langName: "বাংলা",
@@ -313,9 +313,9 @@ export const translations = {
         hours: "Saturday – Thursday: 9:30 AM – 7:00 PM",
         email: "info@alemarahproperties.com",
         salesEmail: "sales@alemarahproperties.com",
-        hotline: "01918-646575, 01743-926926",
+        hotline: "01816-233013, 01918-646575, 01743-926926",
         phoneSecondary: "01914-425073, 01833-544548",
-        phonesList: ["01918-646575", "01743-926926", "01914-425073", "01833-544548"]
+        phonesList: ["01816-233013", "01918-646575", "01743-926926", "01914-425073", "01833-544548"]
       },
       map: {
         badge: "Interactive Google Map",
@@ -347,7 +347,7 @@ export const translations = {
       forgotPass: "Forgot Password?",
       loginBtn: "Access Owner Dashboard",
       orText: "Need assistance with your account?",
-      supportText: "For account verification or credentials, contact: support@alemarahproperties.com or call 01918-646575 / 01743-926926",
+      supportText: "For account verification or credentials, contact: support@alemarahproperties.com or call 01816-233013 / 01918-646575 / 01743-926926",
       closeBtn: "Close Portal",
       securityNotice: "256-Bit SSL Encrypted Enterprise Protection",
       portalBadge: "Al-Emarah Smart Living Suite",
@@ -433,7 +433,7 @@ export const translations = {
         engineerRole: "Senior Executive Project Engineer",
         officerName: "Ms. Rifat Jahan",
         officerRole: "Client Relationship Manager",
-        contactHotline: "01918-646575",
+        contactHotline: "01816-233013",
         whatsappChat: "Direct WhatsApp",
         callNow: "Call Engineer"
       }
@@ -660,7 +660,7 @@ export const translations = {
       login: "সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড",
       bookVisit: "সাইট ভিজিট বুক করুন",
       callUs: "হটলাইন",
-      phoneNo: "০১৯১৮-৬৪৬৫৭৫",
+      phoneNo: "০১৮১৬-২৩৩০১৩",
       menu: "মেনু",
       close: "বন্ধ করুন",
       langName: "English",
@@ -962,9 +962,9 @@ export const translations = {
         hours: "শনিবার – বৃহস্পতিবার: সকাল ৯:৩০ – সন্ধ্যা ৭:০০",
         email: "info@alemarahproperties.com",
         salesEmail: "sales@alemarahproperties.com",
-        hotline: "০১৯১৮-৬৪৬৫৭৫, ০১৭৪৩-৯২৬৯২৬",
+        hotline: "০১৮১৬-২৩৩০১৩, ০১৯১৮-৬৪৬৫৭৫, ০১৭৪৩-৯২৬৯২৬",
         phoneSecondary: "০১৯১৪-৪২৫০৭৩, ০১৮৩৩-৫৪৪৫৪৮",
-        phonesList: ["০১৯১৮-৬৪৬৫৭৫", "০১৭৪৩-৯২৬৯২৬", "০১৯১৪-৪২৫০৭৩", "০১৮৩৩-৫৪৪৫৪৮"]
+        phonesList: ["০১৮১৬-২৩৩০১৩", "০১৯১৮-৬৪৬৫৭৫", "০১৭৪৩-৯২৬৯২৬", "০১৯১৪-৪২৫০৭৩", "০১৮৩৩-৫৪৪৫৪৮"]
       },
       map: {
         badge: "ইন্টারেক্টিভ গুগল ম্যাপ",
@@ -996,7 +996,7 @@ export const translations = {
       forgotPass: "পাসওয়ার্ড ভুলে গেছেন?",
       loginBtn: "ড্যাশবোর্ডে প্রবেশ করুন",
       orText: "একাউন্ট সংক্রান্ত যেকোনো প্রয়োজনে সহায়তা চান?",
-      supportText: "আইডি ভেরিফিকেশন বা পাসওয়ার্ডের জন্য যোগাযোগ: support@alemarahproperties.com অথবা কল করুন ০১৯১৮-৬৪৬৫৭৫ / ০১৭৪৩-৯২৬৯২৬",
+      supportText: "আইডি ভেরিফিকেশন বা পাসওয়ার্ডের জন্য যোগাযোগ: support@alemarahproperties.com অথবা কল করুন ০১৮১৬-২৩৩০১৩ / ০১৯১৮-৬৪৬৫৭৫ / ০১৭৪৩-৯২৬৯২৬",
       closeBtn: "পোর্টাল বন্ধ করুন",
       securityNotice: "২৫৬-বিট এসএসএল এনক্রিপ্টেড সম্পূর্ণ সুরক্ষিত ড্যাশবোর্ড",
       portalBadge: "আল-ইমারাহ স্মার্ট লিভিং স্যুট",
@@ -1082,7 +1082,7 @@ export const translations = {
         engineerRole: "সিনিয়র এক্সিকিউটিভ প্রজেক্ট ইঞ্জিনিয়ার",
         officerName: "মোসা. রিফাত জাহান",
         officerRole: "ক্লায়েন্ট রিলেশনশিপ ম্যানেজার",
-        contactHotline: "০১৯১৮-৬৪৬৫৭৫",
+        contactHotline: "০১৮১৬-২৩৩০১৩",
         whatsappChat: "সরাসরি WhatsApp চ্যাট",
         callNow: "সরাসরি কল দিন"
       }

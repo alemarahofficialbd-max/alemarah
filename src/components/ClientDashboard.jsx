@@ -198,11 +198,11 @@ export default function ClientDashboard({
         {/* Bottom Sidebar Actions */}
         <div className="space-y-2 pt-4 border-t border-slate-100">
           <a
-            href="tel:01918646575"
+            href="tel:01816233013"
             className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-2xs font-semibold transition-colors"
           >
             <Phone className="w-3.5 h-3.5 text-[#006231]" />
-            <span>হেল্পলাইন: ০১৯১৮-৬৪৬৫৭৫</span>
+            <span>হেল্পলাইন: ০১৮১৬-২৩৩০১৩</span>
           </a>
 
           <button

@@ -71,7 +71,7 @@ export default function Navbar({
               <span className="font-medium">{lang === 'en' ? 'Planned Development, Creating Wealth with Trust' : 'পরিকল্পিত উন্নয়ন, আস্থার সঙ্গে সম্পদ সৃষ্টি'}</span>
             </span>
             <span className="text-gray-500">|</span>
-            <a href="tel:+8801918646575" className="flex items-center space-x-1 hover:text-white transition-colors">
+            <a href="tel:+8801816233013" className="flex items-center space-x-1 hover:text-white transition-colors">
               <Phone className="w-3.5 h-3.5 text-[#8EBF40]" />
               <span>{t.nav.callUs}: {t.nav.phoneNo}</span>
             </a>
@@ -211,7 +211,7 @@ export default function Navbar({
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 font-medium">{t.nav.callUs}</div>
-                    <a href="tel:+8801918646575" className="text-xs sm:text-sm font-bold text-gray-900">{t.nav.phoneNo}</a>
+                    <a href="tel:+8801816233013" className="text-xs sm:text-sm font-bold text-gray-900">{t.nav.phoneNo}</a>
                   </div>
                 </div>
                 <button

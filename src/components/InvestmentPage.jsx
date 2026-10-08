@@ -157,11 +157,11 @@ export default function InvestmentPage({
                 {isEn ? 'Apply for Investment Consultation' : 'বিনিয়োগ পরামর্শের জন্য আবেদন করুন'}
               </a>
               <a
-                href="tel:+8801918646575"
+                href="tel:+8801816233013"
                 className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all flex items-center space-x-2"
               >
                 <Phone className="w-4 h-4 text-[#8EBF40]" />
-                <span>{isEn ? 'Investment Hotline: 01918-646575' : 'ইনভেস্টমেন্ট হটলাইন: ০১৯১৮-৬৪৬৫৭৫'}</span>
+                <span>{isEn ? 'Investment Hotline: 01816-233013' : 'ইনভেস্টমেন্ট হটলাইন: ০১৮১৬-২৩৩০১৩'}</span>
               </a>
             </div>
           </div>
@@ -474,13 +474,17 @@ export default function InvestmentPage({
                   {isEn ? 'Dedicated Investment Hotlines' : 'সরাসরি ইনভেস্টমেন্ট হটলাইন নম্বর'}
                 </div>
                 <div className="flex flex-wrap gap-4 text-sm sm:text-base font-bold">
+                  <a href="tel:+8801816233013" className="hover:text-[#8EBF40] transition-colors flex items-center space-x-1.5">
+                    <Phone className="w-4 h-4 text-[#8EBF40]" />
+                    <span>{isEn ? '01816-233013' : '০১৮১৬-২৩৩০১৩'}</span>
+                  </a>
                   <a href="tel:+8801918646575" className="hover:text-[#8EBF40] transition-colors flex items-center space-x-1.5">
                     <Phone className="w-4 h-4 text-[#8EBF40]" />
-                    <span>০১৯১৮-৬৪৬৫৭৫</span>
+                    <span>{isEn ? '01918-646575' : '০১৯১৮-৬৪৬৫৭৫'}</span>
                   </a>
                   <a href="tel:+8801743926926" className="hover:text-[#8EBF40] transition-colors flex items-center space-x-1.5">
                     <Phone className="w-4 h-4 text-[#8EBF40]" />
-                    <span>০১৭৪৩-৯২৬৯২৬</span>
+                    <span>{isEn ? '01743-926926' : '০১৭৪৩-৯২৬৯২৬'}</span>
                   </a>
                 </div>
                 <p className="text-[11px] text-gray-400">

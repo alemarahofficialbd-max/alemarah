@@ -399,7 +399,7 @@ export default function WhyChooseUs({ lang, t }) {
               </a>
 
               <a
-                href="tel:01918646575"
+                href="tel:01816233013"
                 className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
               >
                 <Phone className="w-4 h-4" />
