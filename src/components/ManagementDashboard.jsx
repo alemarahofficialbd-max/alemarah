@@ -1859,62 +1859,7 @@ export default function ManagementDashboard({
               </div>
             </div>
 
-            {/* Equity Breakdown Progress Bar */}
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-                <div className="flex items-center space-x-2">
-                  <PieChart className="w-4 h-4 text-[#006231]" />
-                  <span>শেয়ারহোল্ডিং ইকুইটি ডিস্ট্রিবিউশন বার (১০০%)</span>
-                </div>
-                <span className="text-3xs text-slate-500 font-bold">মোট প্রাতিষ্ঠানিক শেয়ার: ১০০%</span>
-              </div>
 
-              {/* Stacked Progress Bar */}
-              <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
-                {directorsList.map((dir, idx) => {
-                  const colors = [
-                    'bg-[#CE2028]',
-                    'bg-[#006231]',
-                    'bg-blue-600',
-                    'bg-amber-500',
-                    'bg-purple-600',
-                    'bg-cyan-600'
-                  ];
-                  const color = colors[idx % colors.length];
-                  return (
-                    <div
-                      key={dir.id}
-                      style={{ width: `${dir.sharePercentage}%` }}
-                      className={`${color} hover:opacity-90 transition-all relative group cursor-pointer`}
-                      title={`${dir.name}: ${dir.sharePercentage}%`}
-                    />
-                  );
-                })}
-              </div>
-
-              {/* Legend with Investment & Share % */}
-              <div className="flex flex-wrap gap-2.5 pt-1 text-2xs font-semibold">
-                {directorsList.map((dir, idx) => {
-                  const dotColors = [
-                    'bg-[#CE2028]',
-                    'bg-[#006231]',
-                    'bg-blue-600',
-                    'bg-amber-500',
-                    'bg-purple-600',
-                    'bg-cyan-600'
-                  ];
-                  return (
-                    <div key={dir.id} className="flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs">
-                      <span className={`w-2.5 h-2.5 rounded-full ${dotColors[idx % dotColors.length]}`}></span>
-                      <span className="text-slate-900 font-bold">{dir.name}</span>
-                      <span className="text-[#CE2028] font-black">({dir.sharePercentage}% শেয়ার)</span>
-                      <span className="text-slate-300">|</span>
-                      <span className="text-[#006231] font-black">বিনিয়োগ: {formatBDT(dir.investment)}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
             {/* Comprehensive Table: All Directors Investment & Share Breakdown */}
             <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden mt-6">
               <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/50">
