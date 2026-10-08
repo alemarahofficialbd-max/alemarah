@@ -235,63 +235,47 @@ export const translations = {
         badge: "Leadership & Governance",
         title: "Executive Committee Board of Directors",
         subtitle: "Visionary leadership upholding ethical governance, transparent management, and strategic development for Al-Emarah Properties.",
-        leadershipBadge: "Executive Leadership",
-        directorsBadge: "Board of Directors (Upcoming Inductions)",
-        directorsNote: "Additional executive and advisory board members are currently in the process of induction.",
+        leadershipBadge: "Executive Board",
         members: [
           {
             id: "chairman",
             name: "Sheikh Fazlul Karim Maroof",
             role: "Chairman",
+            organization: "Al-Emarah Properties",
             education: "Graduate, Public Administration, University of Dhaka",
-            image: "/images/chairman.webp",
-            isPrincipal: true,
-            theme: "crimson"
+            image: "/images/chairman.webp"
+          },
+          {
+            id: "dir_nur_hossain",
+            name: "Alhaj Mawlana Nur Hossain",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Prominent Islamic Scholar & Entrepreneur",
+            image: "/images/alhaj_mawlana_nur_hossain.jpg"
           },
           {
             id: "md",
             name: "Talukdar Tariq Masud",
             role: "Managing Director",
+            organization: "Al-Emarah Properties",
             education: "BSS Political Science, Govt. Titumir College",
-            image: "/images/managing_director.webp",
-            isPrincipal: true,
-            theme: "emerald"
+            image: "/images/managing_director.webp"
           },
           {
-            id: "dir_technical",
-            name: "Engr. M. A. Rahman",
-            role: "Director (Technical & Engineering)",
-            education: "B.Sc Civil Engineering, BUET",
-            image: null,
-            isPrincipal: false,
-            isDemo: true
+            id: "dir_al_amin",
+            name: "Al Amin Hawladar",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/al_amin_hawladar.jpg"
           },
           {
-            id: "dir_legal",
-            name: "Barrister S. H. Chowdhury",
-            role: "Director (Legal & Compliance)",
-            education: "LL.B (Hons), LL.M, University of Dhaka",
-            image: null,
-            isPrincipal: false,
-            isDemo: true
-          },
-          {
-            id: "dir_finance",
-            name: "Tanvir Hasan, FCA",
-            role: "Director (Finance & Accounts)",
-            education: "Fellow Chartered Accountant (ICAB)",
-            image: null,
-            isPrincipal: false,
-            isDemo: true
-          },
-          {
-            id: "dir_planning",
-            name: "Syed Mahmudul Huq",
-            role: "Director (Planning & Business Dev.)",
-            education: "MBA in Urban Management, DU",
-            image: null,
-            isPrincipal: false,
-            isDemo: true
+            id: "dir_taneem",
+            name: "Taneem Mahfuj",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/taneem_mahfuj.jpg"
           }
         ]
       }
@@ -950,64 +934,47 @@ export const translations = {
         badge: "নির্বাহী নেতৃত্ব ও সুশাসন",
         title: "Executive Committee Board of Directors",
         subtitle: "সুপরিকল্পিত উন্নয়ন, স্বচ্ছ ব্যবস্থাপনা ও আস্থার সাথে স্থায়ী সম্পদ গড়ার লক্ষ্যে পরিচালিত কার্যনির্বাহী কমিটি ও পরিচালনা পর্ষদ।",
-        leadershipBadge: "শীর্ষ নির্বাহী নেতৃত্ব",
-        directorsBadge: "পরিচালকবৃন্দ (আসন্ন সদস্য / প্রস্তাবিত)",
-        directorsNote: "কার্যনির্বাহী পরিচালনা পর্ষদে আরো সম্মানিত পরিচালক সদস্য যুক্ত করার কার্যক্রম চলমান রয়েছে।",
+        leadershipBadge: "কার্যনির্বাহী পরিচালনা পর্ষদ",
         members: [
           {
             id: "chairman",
-            name: "শেখ ফজলুল করিম মারুফ",
-            nameDisplay: "শেখ ফজলুল করিম মারুফ",
+            name: "শেখ ফজলুল করীম মারুফ",
             role: "চেয়ারম্যান",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "স্নাতক, লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়",
-            image: "/images/chairman.webp",
-            isPrincipal: true,
-            theme: "crimson"
+            image: "/images/chairman.webp"
+          },
+          {
+            id: "dir_nur_hossain",
+            name: "আলহাজ্ব মাওলানা নূর হোসাইন",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "বিশিষ্ট ইসলামি ব্যক্তিত্ব ও উদ্যোক্তা",
+            image: "/images/alhaj_mawlana_nur_hossain.jpg"
           },
           {
             id: "md",
             name: "তালুকদার তারিক মাসউদ",
             role: "ব্যবস্থাপনা পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "BSS রাষ্ট্রবিজ্ঞান, সরকারি তিতুমীর কলেজ",
-            image: "/images/managing_director.webp",
-            isPrincipal: true,
-            theme: "emerald"
+            image: "/images/managing_director.webp"
           },
           {
-            id: "dir_technical",
-            name: "ইঞ্জি. এম. এ. রহমান",
-            role: "পরিচালক (প্রকৌশল ও কারিগরি)",
-            education: "বিএসসি ইন সিভিল ইঞ্জিনিয়ারিং, বুয়েট",
-            image: null,
-            isPrincipal: false,
-            isDemo: true
+            id: "dir_al_amin",
+            name: "আল আমিন হাওলাদার",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/al_amin_hawladar.jpg"
           },
           {
-            id: "dir_legal",
-            name: "ব্যারিস্টার এস. এইচ. চৌধুরী",
-            role: "পরিচালক (আইন ও কমপ্লায়েন্স)",
-            education: "এলএলবি (অনার্স), এলএলএম, ঢাকা বিশ্ববিদ্যালয়",
-            image: null,
-            isPrincipal: false,
-            isDemo: true
-          },
-          {
-            id: "dir_finance",
-            name: "তানভীর হাসান, এফসিএ",
-            role: "পরিচালক (অর্থ ও নিরীক্ষা)",
-            education: "চার্টার্ড অ্যাকাউন্ট্যান্ট (আইসিএবি)",
-            image: null,
-            isPrincipal: false,
-            isDemo: true
-          },
-          {
-            id: "dir_planning",
-            name: "সৈয়দ মাহমুদুল হক",
-            role: "পরিচালক (পরিকল্পনা ও বিজনেস ডেভ.)",
-            education: "এমবিএ, ঢাকা বিশ্ববিদ্যালয়",
-            image: null,
-            isPrincipal: false,
-            isDemo: true
+            id: "dir_taneem",
+            name: "তানিম মাহফুজ",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/taneem_mahfuj.jpg"
           }
         ]
       }
