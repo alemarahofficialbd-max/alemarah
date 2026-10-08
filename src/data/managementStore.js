@@ -108,17 +108,14 @@ export const initialManagementData = {
       image: '/images/chairman.webp',
       investment: 25000000, // ৳ ২,৫০,০০,০০০
       sharePercentage: 35, // 35%
-      totalShares: 35000,
-      shareFaceValue: 1000,
       dividendEarned: 3650000, // ৳ ৩৬,৫০,০০০
-      education: 'স্নাতক, লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়',
       phone: '01816233013',
       email: 'chairman@alemarahproperties.com',
       joiningDate: '১ জানুয়ারি, ২০২৪',
       status: 'সক্রিয় (Active)',
-      allocatedProjects: ['আল কুদস টাওয়ার', 'বারাকাহ টাওয়ার ০১', 'আল ইমারাহ এগ্রো'],
-      nomineeName: 'পারিবারিক ট্রাস্ট / আইনানুগ উত্তরসূরি',
-      nomineeRelation: 'উত্তরাধিকারী',
+      nomineeName: 'আইনানুগ উত্তরসূরি',
+      nomineeRelation: 'পরিবার',
+      nomineePhone: '01816-233013',
       theme: 'crimson'
     },
     {
@@ -131,17 +128,14 @@ export const initialManagementData = {
       image: '/images/managing_director.webp',
       investment: 20000000, // ৳ ২,০০,০০,০০০
       sharePercentage: 30, // 30%
-      totalShares: 30000,
-      shareFaceValue: 1000,
       dividendEarned: 2920000, // ৳ ২৯,২০,০০০
-      education: 'BSS রাষ্ট্রবিজ্ঞান, সরকারি তিতুমীর কলেজ',
       phone: '01918646575',
       email: 'md@alemarahproperties.com',
       joiningDate: '১ জানুয়ারি, ২০২৪',
       status: 'সক্রিয় (Active)',
-      allocatedProjects: ['আল কুদস টাওয়ার', 'বারাকাহ টাওয়ার ০১', 'আল ইমারাহ শপিং মল'],
-      nomineeName: 'পারিবারিক ট্রাস্ট / আইনানুগ উত্তরসূরি',
-      nomineeRelation: 'উত্তরাধিকারী',
+      nomineeName: 'আইনানুগ উত্তরসূরি',
+      nomineeRelation: 'পরিবার',
+      nomineePhone: '01918-646575',
       theme: 'emerald'
     },
     {
@@ -154,17 +148,14 @@ export const initialManagementData = {
       image: null,
       investment: 10000000, // ৳ ১,০০,০০,০০০
       sharePercentage: 15, // 15%
-      totalShares: 15000,
-      shareFaceValue: 1000,
       dividendEarned: 1460000, // ৳ ১৪,৬০,০০০
-      education: 'বিএসসি ইন সিভিল ইঞ্জিনিয়ারিং, বুয়েট',
       phone: '01743926926',
       email: 'technical@alemarahproperties.com',
       joiningDate: '১৫ মার্চ, ২০২৪',
       status: 'সক্রিয় (Active)',
-      allocatedProjects: ['আল কুদস টাওয়ার'],
       nomineeName: 'মোসা. ফারহানা রহমান',
       nomineeRelation: 'স্ত্রী',
+      nomineePhone: '01711-223344',
       theme: 'blue'
     },
     {
@@ -177,17 +168,14 @@ export const initialManagementData = {
       image: null,
       investment: 7500000, // ৳ ৭৫,০০,০০০
       sharePercentage: 10, // 10%
-      totalShares: 7500,
-      shareFaceValue: 1000,
       dividendEarned: 1095000, // ৳ ১০,৯৫,০০০
-      education: 'এলএলবি (অনার্স), এলএলএম, ঢাকা বিশ্ববিদ্যালয়',
       phone: '01914425073',
       email: 'legal@alemarahproperties.com',
       joiningDate: '১০ মে, ২০২৪',
       status: 'সক্রিয় (Active)',
-      allocatedProjects: ['আল ইমারাহ শপিং মল'],
       nomineeName: 'সাইফুল চৌধুরী',
       nomineeRelation: 'পুত্র',
+      nomineePhone: '01911-334455',
       theme: 'amber'
     },
     {
@@ -200,17 +188,14 @@ export const initialManagementData = {
       image: null,
       investment: 7500000, // ৳ ৭৫,০০,০০০
       sharePercentage: 10, // 10%
-      totalShares: 7500,
-      shareFaceValue: 1000,
       dividendEarned: 1095000, // ৳ ১০,৯৫,০০০
-      education: 'চার্টার্ড অ্যাকাউন্ট্যান্ট (আইসিএবি)',
       phone: '01833544548',
       email: 'accounts@alemarahproperties.com',
       joiningDate: '১ জুলাই, ২০২৪',
       status: 'সক্রিয় (Active)',
-      allocatedProjects: ['আল কুদস টাওয়ার', 'বারাকাহ টাওয়ার ০১'],
       nomineeName: 'নাজমিন হাসান',
       nomineeRelation: 'স্ত্রী',
+      nomineePhone: '01811-556677',
       theme: 'purple'
     }
   ]

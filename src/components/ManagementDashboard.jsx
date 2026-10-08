@@ -156,16 +156,13 @@ export default function ManagementDashboard({
   const [directorForm, setDirectorForm] = useState({
     name: '',
     role: 'পরিচালক',
-    folioNo: '',
     investment: '',
     sharePercentage: '',
-    totalShares: '',
-    education: '',
     phone: '',
     email: '',
-    allocatedProjects: 'আল কুদস টাওয়ার, বারাকাহ টাওয়ার ০১',
     nomineeName: '',
-    nomineeRelation: ''
+    nomineeRelation: '',
+    nomineePhone: ''
   });
 
   // -------------------------------------------------------------
@@ -393,29 +390,25 @@ export default function ManagementDashboard({
     const currentDirectors = data.directors || [];
     const invAmt = Number(directorForm.investment) || 0;
     const sharePct = Number(directorForm.sharePercentage) || 0;
-    const shareCount = Number(directorForm.totalShares) || Math.round(invAmt / 1000) || 1000;
+    const nextIndex = currentDirectors.length + 1;
+    const autoFolioNo = `AEP-DIR-${String(nextIndex).padStart(3, '0')}`;
 
     const newDirector = {
-      id: `DIR-0${currentDirectors.length + 1}`,
+      id: `DIR-${String(nextIndex).padStart(2, '0')}`,
       name: directorForm.name,
       role: directorForm.role || 'পরিচালক',
-      folioNo: directorForm.folioNo || `AEP-DIR-00${currentDirectors.length + 1}`,
+      folioNo: autoFolioNo,
       image: null,
       investment: invAmt,
       sharePercentage: sharePct,
-      totalShares: shareCount,
-      shareFaceValue: 1000,
       dividendEarned: 0,
-      education: directorForm.education || '',
       phone: directorForm.phone || '01918-646575',
       email: directorForm.email || 'director@alemarahproperties.com',
       joiningDate: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       status: 'সক্রিয় (Active)',
-      allocatedProjects: directorForm.allocatedProjects 
-        ? directorForm.allocatedProjects.split(',').map(s => s.trim()) 
-        : ['আল কুদস টাওয়ার'],
       nomineeName: directorForm.nomineeName || 'সংরক্ষিত',
       nomineeRelation: directorForm.nomineeRelation || 'উত্তরাধিকারী',
+      nomineePhone: directorForm.nomineePhone || '',
       theme: 'blue'
     };
 
@@ -428,18 +421,15 @@ export default function ManagementDashboard({
     setDirectorForm({
       name: '',
       role: 'পরিচালক',
-      folioNo: '',
       investment: '',
       sharePercentage: '',
-      totalShares: '',
-      education: '',
       phone: '',
       email: '',
-      allocatedProjects: 'আল কুদস টাওয়ার, বারাকাহ টাওয়ার ০১',
       nomineeName: '',
-      nomineeRelation: ''
+      nomineeRelation: '',
+      nomineePhone: ''
     });
-    triggerAlert(`পরিচালক ${newDirector.name} (${newDirector.sharePercentage}% শেয়ার) সফলভাবে যুক্ত হয়েছেন!`);
+    triggerAlert(`পরিচালক ${newDirector.name} (${newDirector.sharePercentage}% শেয়ার, ফোলিও: ${autoFolioNo}) সফলভাবে যুক্ত হয়েছেন!`);
   };
 
   // Calculations for Stats
@@ -1709,13 +1699,6 @@ export default function ManagementDashboard({
                             {dir.name}
                           </h4>
 
-                          {dir.education && (
-                            <div className="flex items-center space-x-1 text-3xs text-slate-500 truncate font-medium">
-                              <GraduationCap className="w-3 h-3 text-slate-400 shrink-0" />
-                              <span className="truncate">{dir.education}</span>
-                            </div>
-                          )}
-
                           <div className="text-3xs text-slate-400 flex items-center space-x-1 pt-0.5">
                             <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
                             <span>যোগদান: {dir.joiningDate}</span>
@@ -1754,23 +1737,24 @@ export default function ManagementDashboard({
                           </div>
                         </div>
 
-                        {/* Dividend & Projects Strip */}
-                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                          <div className="flex items-center justify-between text-2xs">
-                            <span className="text-slate-600 font-semibold">অর্জিত লভ্যাংশ (ডিভিডেন্ড):</span>
-                            <span className="font-black text-[#006231] font-mono text-xs sm:text-sm">{formatBDT(dir.dividendEarned)}</span>
+                        {/* Nominee Details & Dividend Strip */}
+                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5 text-2xs">
+                          <div className="flex items-center justify-between">
+                            <span className="text-slate-500 font-medium">মনোনীত নমিনি:</span>
+                            <span className="font-bold text-slate-800">{dir.nomineeName || 'সংরক্ষিত'} ({dir.nomineeRelation || 'উত্তরাধিকারী'})</span>
                           </div>
-
-                          {dir.allocatedProjects && dir.allocatedProjects.length > 0 && (
-                            <div className="pt-1.5 border-t border-slate-200/60 flex items-center gap-1.5 flex-wrap">
-                              <span className="text-[10px] font-bold text-slate-400">প্রকল্প:</span>
-                              {dir.allocatedProjects.map((pName, pIdx) => (
-                                <span key={pIdx} className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 text-[10px] font-semibold">
-                                  {pName}
-                                </span>
-                              ))}
+                          {dir.nomineePhone && (
+                            <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                              <span className="text-slate-500 font-medium">নমিনির মোবাইল:</span>
+                              <a href={`tel:${dir.nomineePhone}`} className="font-mono font-bold text-[#006231] hover:underline">
+                                {dir.nomineePhone}
+                              </a>
                             </div>
                           )}
+                          <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                            <span className="text-slate-500 font-medium">অর্জিত লভ্যাংশ:</span>
+                            <span className="font-black text-[#006231] font-mono text-xs">{formatBDT(dir.dividendEarned)}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1821,10 +1805,10 @@ export default function ManagementDashboard({
                   <thead className="bg-slate-100/70 border-b border-slate-200/80 text-slate-600 font-bold uppercase tracking-wider text-3xs">
                     <tr>
                       <th className="py-3 px-4">পরিচালকের নাম ও পদবি</th>
+                      <th className="py-3 px-4">ফোলিও নং</th>
                       <th className="py-3 px-4">বিনিয়োগকৃত টাকা (Investment)</th>
                       <th className="py-3 px-4">শেয়ার অংশীদারিত্ব (% Share)</th>
-                      <th className="py-3 px-4">অর্জিত মোট ডিভিডেন্ড</th>
-                      <th className="py-3 px-4">মোবাইল নম্বর</th>
+                      <th className="py-3 px-4">মনোনীত নমিনি ও মোবাইল</th>
                       <th className="py-3 px-4 text-right">সনদ ও প্রোফাইল</th>
                     </tr>
                   </thead>
@@ -1849,6 +1833,11 @@ export default function ManagementDashboard({
                           </div>
                         </td>
                         <td className="py-3 px-4">
+                          <span className="font-mono text-3xs text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md font-bold border border-emerald-200">
+                            {dir.folioNo}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
                           <div className="font-black text-sm text-[#006231] font-mono">{formatBDT(dir.investment)}</div>
                           <div className="text-3xs text-emerald-600 font-bold">পরিশোধিত বিনিয়োগ</div>
                         </td>
@@ -1858,11 +1847,11 @@ export default function ManagementDashboard({
                             <span className="text-[10px] font-normal text-slate-500">(১০০% এর মধ্যে)</span>
                           </div>
                         </td>
-                        <td className="py-3 px-4 font-mono font-bold text-slate-700">
-                          {formatBDT(dir.dividendEarned)}
-                        </td>
-                        <td className="py-3 px-4 font-mono font-semibold text-slate-600">
-                          {dir.phone}
+                        <td className="py-3 px-4">
+                          <div className="font-semibold text-slate-800">{dir.nomineeName || 'সংরক্ষিত'} ({dir.nomineeRelation || 'উত্তরাধিকারী'})</div>
+                          {dir.nomineePhone && (
+                            <div className="text-3xs font-mono font-bold text-[#006231]">{dir.nomineePhone}</div>
+                          )}
                         </td>
                         <td className="py-3 px-4 text-right">
                           <button
@@ -1973,24 +1962,18 @@ export default function ManagementDashboard({
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                    শেয়ার সার্টিফিকেট / ফোলিও নং
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="উদাঃ AEP-DIR-006"
-                    value={directorForm.folioNo}
-                    onChange={(e) => setDirectorForm({ ...directorForm, folioNo: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-                  />
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-center">
+                  <span className="text-3xs font-bold text-slate-400 uppercase">শেয়ার সার্টিফিকেট / ফোলিও নং</span>
+                  <span className="font-mono text-xs font-bold text-[#006231] mt-0.5">
+                    AEP-DIR-{String((data.directors || []).length + 1).padStart(3, '0')} (স্বয়ংক্রিয়)
+                  </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                    বিনিয়োগকৃত মূলধন (টাকা) *
+                    বিনিয়োগকৃত টাকা (BDT) *
                   </label>
                   <input
                     type="number"
@@ -2010,7 +1993,7 @@ export default function ManagementDashboard({
                     type="number"
                     required
                     step="0.5"
-                    placeholder="উদাঃ 7.5"
+                    placeholder="যেমন: 5, 10, 20"
                     value={directorForm.sharePercentage}
                     onChange={(e) => setDirectorForm({ ...directorForm, sharePercentage: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
@@ -2021,11 +2004,11 @@ export default function ManagementDashboard({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                    মোবাইল নম্বর
+                    পরিচালকের মোবাইল নম্বর
                   </label>
                   <input
                     type="tel"
-                    placeholder="017XXXXXXXX"
+                    placeholder="01XXXXXXXXX"
                     value={directorForm.phone}
                     onChange={(e) => setDirectorForm({ ...directorForm, phone: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
@@ -2034,56 +2017,63 @@ export default function ManagementDashboard({
 
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                    শিক্ষাগত যোগ্যতা
+                    ইমেইল (ঐচ্ছিক)
                   </label>
                   <input
-                    type="text"
-                    placeholder="উদাঃ বিএসসি সিভিল, বুয়েট"
-                    value={directorForm.education}
-                    onChange={(e) => setDirectorForm({ ...directorForm, education: e.target.value })}
+                    type="email"
+                    placeholder="director@alemarahproperties.com"
+                    value={directorForm.email}
+                    onChange={(e) => setDirectorForm({ ...directorForm, email: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                  বরাদ্দকৃত প্রকল্পসমূহ (কমা দিয়ে লিখুন)
-                </label>
-                <input
-                  type="text"
-                  placeholder="আল কুদস টাওয়ার, বারাকাহ টাওয়ার ০১"
-                  value={directorForm.allocatedProjects}
-                  onChange={(e) => setDirectorForm({ ...directorForm, allocatedProjects: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                    নমিনির নাম
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="নমিনির নাম"
-                    value={directorForm.nomineeName}
-                    onChange={(e) => setDirectorForm({ ...directorForm, nomineeName: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-                  />
+              {/* Nominee Details Section */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3">
+                <div className="text-2xs font-bold text-slate-600 uppercase tracking-wider flex items-center space-x-1">
+                  <span>মনোনীত নমিনির তথ্য</span>
                 </div>
 
-                <div>
-                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                    সম্পর্ক
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="স্ত্রী / সন্তান / উত্তরসূরি"
-                    value={directorForm.nomineeRelation}
-                    onChange={(e) => setDirectorForm({ ...directorForm, nomineeRelation: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-3xs font-bold text-slate-500 uppercase mb-1">
+                      নমিনির নাম
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="নমিনির নাম"
+                      value={directorForm.nomineeName}
+                      onChange={(e) => setDirectorForm({ ...directorForm, nomineeName: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-3xs font-bold text-slate-500 uppercase mb-1">
+                      সম্পর্ক
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="স্ত্রী / সন্তান / উত্তরসূরি"
+                      value={directorForm.nomineeRelation}
+                      onChange={(e) => setDirectorForm({ ...directorForm, nomineeRelation: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-3xs font-bold text-slate-500 uppercase mb-1">
+                      নমিনির মোবাইল নম্বর *
+                    </label>
+                    <input
+                      type="tel"
+                      placeholder="01XXXXXXXXX"
+                      value={directorForm.nomineePhone}
+                      onChange={(e) => setDirectorForm({ ...directorForm, nomineePhone: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -2138,11 +2128,6 @@ export default function ManagementDashboard({
                     <div className="text-3xs text-slate-300 font-mono">
                       ফোলিও নং: {d.folioNo} | আইডি: #{d.id}
                     </div>
-                    {d.education && (
-                      <div className="text-3xs text-slate-400 font-medium truncate">
-                        {d.education}
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -2193,6 +2178,10 @@ export default function ManagementDashboard({
                     <span className="font-bold text-slate-800">{d.nomineeName || 'সংরক্ষিত'} ({d.nomineeRelation || 'উত্তরাধিকারী'})</span>
                   </div>
                   <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
+                    <span className="text-slate-500">নমিনির মোবাইল নম্বর:</span>
+                    <span className="font-bold text-[#006231] font-mono">{d.nomineePhone || 'সংরক্ষিত নেই'}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
                     <span className="text-slate-500">অফিশিয়াল ইমেইল:</span>
                     <span className="font-bold text-slate-800">{d.email}</span>
                   </div>
@@ -2201,23 +2190,6 @@ export default function ManagementDashboard({
                     <span className="font-bold text-slate-800 font-mono">{d.phone}</span>
                   </div>
                 </div>
-
-                {/* Projects Allocated */}
-                {d.allocatedProjects && d.allocatedProjects.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="text-2xs font-bold text-slate-500 uppercase tracking-wider">
-                      বিনিয়োগ সংশ্লিষ্ট চলমান প্রকল্পসমূহ:
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {d.allocatedProjects.map((p, i) => (
-                        <div key={i} className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold">
-                          <Building2 className="w-3.5 h-3.5 text-[#006231]" />
-                          <span>{p}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Actions */}
