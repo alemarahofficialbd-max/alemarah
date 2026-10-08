@@ -1498,11 +1498,11 @@ export default function ManagementDashboard({
                   <PieChart className="w-4 h-4 text-[#CE2028]" />
                 </div>
                 <div className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
-                  {totalDirectorShares}% ({directorsList.reduce((acc, d) => acc + (d.totalShares || 0), 0).toLocaleString('bn-BD')} টি)
+                  {totalDirectorShares}% / ১০০%
                 </div>
                 <div className="text-3xs text-[#CE2028] font-bold flex items-center space-x-1">
                   <Award className="w-3 h-3" />
-                  <span>বোর্ডে পূর্ণাঙ্গ বণ্টনকৃত</span>
+                  <span>{totalDirectorShares === 100 ? 'সম্পূর্ণ ১০০% বণ্টিত' : `${100 - totalDirectorShares}% অবশিষ্ট উন্মুক্ত`}</span>
                 </div>
               </div>
 
@@ -1542,7 +1542,7 @@ export default function ManagementDashboard({
                   <PieChart className="w-4 h-4 text-[#006231]" />
                   <span>শেয়ারহোল্ডিং ইকুইটি ডিস্ট্রিবিউশন বার (১০০%)</span>
                 </div>
-                <span className="text-3xs text-slate-400">Face Value: ৳১,০০০ / শেয়ার</span>
+                <span className="text-3xs text-slate-500 font-bold">মোট প্রাতিষ্ঠানিক শেয়ার: ১০০%</span>
               </div>
 
               {/* Stacked Progress Bar */}
@@ -1671,16 +1671,16 @@ export default function ManagementDashboard({
                           </div>
 
                           {/* Share Percentage */}
-                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100/90 space-y-0.5">
-                            <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider">
-                              শেয়ার মালিকানা
+                          <div className="p-3 rounded-2xl bg-red-50/60 border border-red-100/90 space-y-0.5">
+                            <div className="text-3xs font-bold text-red-800 uppercase tracking-wider">
+                              শেয়ার অংশীদারিত্ব
                             </div>
-                            <div className="text-sm font-black text-[#CE2028] flex items-center space-x-1">
+                            <div className="text-sm sm:text-base font-black text-[#CE2028] flex items-center space-x-1">
                               <span>{dir.sharePercentage}%</span>
-                              <span className="text-3xs text-slate-400 font-normal">ইকুইটি</span>
+                              <span className="text-3xs text-red-600 font-semibold">শেয়ার</span>
                             </div>
-                            <div className="text-[10px] text-slate-500 font-semibold truncate">
-                              {dir.totalShares?.toLocaleString('bn-BD')} টি শেয়ার
+                            <div className="text-[10px] text-emerald-700 font-bold truncate">
+                              মোট ১০০% এর মধ্যে
                             </div>
                           </div>
                         </div>
@@ -2018,9 +2018,9 @@ export default function ManagementDashboard({
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-red-50/70 border border-red-100">
-                    <div className="text-3xs font-bold text-red-800 uppercase">শেয়ার মালিকানা</div>
+                    <div className="text-3xs font-bold text-red-800 uppercase">শেয়ার অংশীদারিত্ব</div>
                     <div className="text-base font-black text-[#CE2028] mt-0.5">{d.sharePercentage}%</div>
-                    <div className="text-3xs text-red-600 font-medium">{d.totalShares?.toLocaleString('bn-BD')} টি শেয়ার</div>
+                    <div className="text-3xs text-red-700 font-bold">মোট ১০০% এর মধ্যে</div>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-100 col-span-2 sm:col-span-1">
@@ -2033,8 +2033,8 @@ export default function ManagementDashboard({
                 {/* Corporate Details */}
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5 text-xs">
                   <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                    <span className="text-slate-500">শেয়ারের অভিহিত মূল্য (Face Value):</span>
-                    <span className="font-bold text-slate-800">৳ ১,০০০ প্রতি শেয়ার</span>
+                    <span className="text-slate-500">কোম্পানির মোট ইকুইটি শেয়ার:</span>
+                    <span className="font-bold text-slate-800">১০০% এর মধ্যে {d.sharePercentage}% অংশীদারিত্ব</span>
                   </div>
                   <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
                     <span className="text-slate-500">বোর্ড সদস্য হিসেবে অন্তর্ভুক্তি:</span>
