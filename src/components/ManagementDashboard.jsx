@@ -1965,7 +1965,7 @@ export default function ManagementDashboard({
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-center">
                   <span className="text-3xs font-bold text-slate-400 uppercase">শেয়ার সার্টিফিকেট / ফোলিও নং</span>
                   <span className="font-mono text-xs font-bold text-[#006231] mt-0.5">
-                    AEP-DIR-{String((data.directors || []).length + 1).padStart(3, '0')} (স্বয়ংক্রিয়)
+                    AEP-DIR-{String((data.directors || []).length + 1).padStart(3, '0')}
                   </span>
                 </div>
               </div>
