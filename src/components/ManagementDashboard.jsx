@@ -590,9 +590,11 @@ export default function ManagementDashboard({
               title="ওয়েবসাইটে ফিরে যান"
             >
               {isSidebarCollapsed ? (
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white flex items-center justify-center font-black text-base shadow-sm">
-                  AE
-                </div>
+                <img 
+                  src="/alemarah_favicon.svg" 
+                  alt="Al-Emarah" 
+                  className="w-9 h-9 object-contain transition-transform group-hover:scale-110"
+                />
               ) : (
                 <img 
                   src="/alemarah_logo_header.svg" 
