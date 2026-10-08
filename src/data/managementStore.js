@@ -136,11 +136,11 @@ export const initialManagementData = {
   directors: [
     {
       id: 'DIR-01',
-      name: 'শেখ ফজলুল করিম মারুফ',
+      name: 'শেখ ফজলুল করীম মারুফ',
       nameEn: 'Sheikh Fazlul Karim Maroof',
       role: 'চেয়ারম্যান',
       roleEn: 'Chairman',
-      folioNo: 'AEP-DIR-001',
+      folioNo: 'DIR-001',
       image: '/images/chairman.webp',
       investment: 25000000, // ৳ ২,৫০,০০,০০০
       sharePercentage: 35, // 35%
@@ -169,7 +169,7 @@ export const initialManagementData = {
       nameEn: 'Talukdar Tariq Masud',
       role: 'ব্যবস্থাপনা পরিচালক',
       roleEn: 'Managing Director',
-      folioNo: 'AEP-DIR-002',
+      folioNo: 'DIR-002',
       image: '/images/managing_director.webp',
       investment: 20000000, // ৳ ২,০০,০০,০০০
       sharePercentage: 30, // 30%
@@ -197,7 +197,7 @@ export const initialManagementData = {
       nameEn: 'Engr. M. A. Rahman',
       role: 'পরিচালক (প্রকৌশল ও কারিগরি)',
       roleEn: 'Director (Technical & Engineering)',
-      folioNo: 'AEP-DIR-003',
+      folioNo: 'DIR-003',
       image: null,
       investment: 10000000, // ৳ ১,০০,০০,০০০
       sharePercentage: 15, // 15%
@@ -224,7 +224,7 @@ export const initialManagementData = {
       nameEn: 'Barrister S. H. Chowdhury',
       role: 'পরিচালক (আইন ও কমপ্লায়েন্স)',
       roleEn: 'Director (Legal & Compliance)',
-      folioNo: 'AEP-DIR-004',
+      folioNo: 'DIR-004',
       image: null,
       investment: 7500000, // ৳ ৭৫,০০,০০০
       sharePercentage: 10, // 10%
@@ -251,7 +251,7 @@ export const initialManagementData = {
       nameEn: 'Tanvir Hasan, FCA',
       role: 'পরিচালক (অর্থ ও নিরীক্ষা)',
       roleEn: 'Director (Finance & Audit)',
-      folioNo: 'AEP-DIR-005',
+      folioNo: 'DIR-005',
       image: null,
       investment: 7500000, // ৳ ৭৫,০০,০০০
       sharePercentage: 10, // 10%
@@ -285,17 +285,19 @@ export const getManagementData = () => {
       } else {
         parsed.directors = parsed.directors.map(d => {
           const defaultDir = initialManagementData.directors.find(x => x.id === d.id);
+          const cleanedFolioNo = d.folioNo ? d.folioNo.replace(/^AEP-/, '') : (defaultDir?.folioNo || `DIR-00${d.id?.slice(-1) || '1'}`);
           return {
             ...d,
+            folioNo: cleanedFolioNo,
             installments: d.installments && d.installments.length > 0 
               ? d.installments 
               : (defaultDir?.installments || [
-                  { id: `INS-${d.id}-1`, date: d.joiningDate || '১ জানুয়ারি, ২০২৪', amount: d.investment, method: 'ব্যাংক স্থানান্তর', receiptNo: `RCPT-${d.folioNo || '001'}`, note: 'পরিশোধিত মূলধন জমা' }
+                  { id: `INS-${d.id}-1`, date: d.joiningDate || '১ জানুয়ারি, ২০২৪', amount: d.investment, method: 'ব্যাংক স্থানান্তর', receiptNo: `RCPT-${cleanedFolioNo || '001'}`, note: 'পরিশোধিত মূলধন জমা' }
                 ]),
             dividendHistory: d.dividendHistory && d.dividendHistory.length > 0
               ? d.dividendHistory
               : (defaultDir?.dividendHistory || (d.dividendEarned > 0 ? [
-                  { id: `DIV-${d.id}-1`, date: '৩১ ডিসেম্বর, ২০২৪', amount: d.dividendEarned, method: 'ব্যাংক ট্রান্সফার', voucherNo: `VCH-${d.folioNo || '001'}`, note: 'বার্ষিক লভ্যাংশ পরিশোধ' }
+                  { id: `DIV-${d.id}-1`, date: '৩১ ডিসেম্বর, ২০২৪', amount: d.dividendEarned, method: 'ব্যাংক ট্রান্সফার', voucherNo: `VCH-${cleanedFolioNo || '001'}`, note: 'বার্ষিক লভ্যাংশ পরিশোধ' }
                 ] : []))
           };
         });

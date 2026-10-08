@@ -509,7 +509,7 @@ export default function ManagementDashboard({
     const invAmt = Number(directorForm.investment) || 0;
     const sharePct = Number(directorForm.sharePercentage) || 0;
     const nextIndex = currentDirectors.length + 1;
-    const autoFolioNo = `AEP-DIR-${String(nextIndex).padStart(3, '0')}`;
+    const autoFolioNo = `DIR-${String(nextIndex).padStart(3, '0')}`;
 
     const newDirector = {
       id: `DIR-${String(nextIndex).padStart(2, '0')}`,
@@ -2216,7 +2216,7 @@ export default function ManagementDashboard({
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-center">
                   <span className="text-3xs font-bold text-slate-400 uppercase">শেয়ার সার্টিফিকেট / ফোলিও নং</span>
                   <span className="font-mono text-xs font-bold text-[#006231] mt-0.5">
-                    AEP-DIR-{String((data.directors || []).length + 1).padStart(3, '0')}
+                    DIR-{String((data.directors || []).length + 1).padStart(3, '0')}
                   </span>
                 </div>
               </div>
