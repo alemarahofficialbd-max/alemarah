@@ -2064,7 +2064,7 @@ export default function ManagementDashboard({
 
                   <div>
                     <label className="block text-3xs font-bold text-slate-500 uppercase mb-1">
-                      নমিনির মোবাইল নম্বর *
+                      মোবাইল নম্বর *
                     </label>
                     <input
                       type="tel"
