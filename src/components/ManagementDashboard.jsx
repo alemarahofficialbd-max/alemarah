@@ -2349,7 +2349,7 @@ export default function ManagementDashboard({
       )}
 
       {/* ========================================================= */}
-      {/* MODAL: FULL DIRECTOR PROFILE & PAYMENT RECEIPTS LEDGER     */}
+      {/* FULL SCREEN VIEW 1: DIRECTOR PROFILE & PAYMENT RECEIPTS   */}
       {/* ========================================================= */}
       {selectedDirectorForProfile && (() => {
         const d = selectedDirectorForProfile;
@@ -2357,114 +2357,157 @@ export default function ManagementDashboard({
         const totalDividendsReceived = (d.dividendHistory || []).reduce((acc, div) => acc + (div.amount || 0), 0) || d.dividendEarned;
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 relative divide-y divide-slate-100">
-              
-              {/* Header */}
-              <div className="p-5 sm:p-6 flex items-start justify-between bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 text-white rounded-t-3xl relative">
-                <div className="flex items-center space-x-3.5 min-w-0">
-                  <div className="w-14 h-16 sm:w-16 sm:h-20 rounded-2xl overflow-hidden shrink-0 bg-slate-800 border-2 border-white/20 shadow-md">
+          <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+            {/* Top Fullscreen Header Navbar */}
+            <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md">
+              <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
+                <button
+                  type="button"
+                  onClick={() => setSelectedDirectorForProfile(null)}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center space-x-1"
+                  title="ফিরে যান"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                  <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
+                </button>
+
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 border border-white/20 shrink-0">
                     {d.image ? (
                       <img src={d.image} alt={d.name} className="w-full h-full object-cover object-top" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-slate-800 text-white">
-                        <Award className="w-8 h-8 text-[#8EBF40]" />
+                        <Award className="w-5 h-5 text-[#8EBF40]" />
                       </div>
                     )}
                   </div>
-                  <div className="min-w-0 space-y-1">
+                  <div className="min-w-0">
                     <div className="flex items-center space-x-2">
-                      <h3 className="text-base sm:text-lg font-black text-white truncate">{d.name}</h3>
+                      <h3 className="text-sm sm:text-base font-bold text-white truncate">{d.name}</h3>
                       <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-[#8EBF40] border border-emerald-400/30 text-3xs font-bold shrink-0">
                         {d.role}
                       </span>
                     </div>
-                    <div className="text-3xs text-slate-300 font-mono flex items-center space-x-2">
+                    <div className="text-3xs text-slate-400 font-mono flex items-center space-x-2">
                       <span>ফোলিও: <strong className="text-white">{d.folioNo}</strong></span>
-                      <span>•</span>
-                      <span>আইডি: #{d.id}</span>
                       <span>•</span>
                       <span className="text-amber-300 font-bold">শেয়ার: {d.sharePercentage}%</span>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="flex items-center space-x-1.5 shrink-0 ml-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedDirectorForCertificate(d);
-                    }}
-                    title="শেয়ার সনদপত্র দেখুন"
-                    className="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-colors cursor-pointer text-xs font-bold flex items-center space-x-1"
-                  >
-                    <Award className="w-4 h-4 text-amber-400" />
-                    <span className="hidden sm:inline">সনদপত্র</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDirectorForProfile(null)}
-                    className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+              <div className="flex items-center space-x-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedDirectorForProfile(null);
+                    setSelectedDirectorForCertificate(d);
+                  }}
+                  className="px-3 sm:px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-colors cursor-pointer text-xs font-bold flex items-center space-x-1.5"
+                >
+                  <Award className="w-4 h-4 text-amber-400" />
+                  <span>শেয়ার সনদপত্র</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedDirectorForProfile(null)}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-red-600 text-white transition-colors cursor-pointer"
+                  title="বন্ধ করুন"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Sub-Header Navigation Tabs */}
+            <div className="sticky top-[58px] z-20 bg-white border-b border-slate-200/80 px-4 sm:px-8 flex items-center space-x-4 overflow-x-auto shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setDirectorProfileActiveTab('installments')}
+                className={`py-3.5 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center space-x-2 shrink-0 ${
+                  directorProfileActiveTab === 'installments'
+                    ? 'border-[#006231] text-[#006231]'
+                    : 'border-transparent text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                <DollarSign className="w-4 h-4" />
+                <span>মূলধন জমার কিস্তি ও রসিদ ({(d.installments || []).length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setDirectorProfileActiveTab('dividends')}
+                className={`py-3.5 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center space-x-2 shrink-0 ${
+                  directorProfileActiveTab === 'dividends'
+                    ? 'border-[#CE2028] text-[#CE2028]'
+                    : 'border-transparent text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                <TrendingUp className="w-4 h-4" />
+                <span>লভ্যাংশ বিবরণী / ডিভিডেন্ড ({(d.dividendHistory || []).length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setDirectorProfileActiveTab('info')}
+                className={`py-3.5 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center space-x-2 shrink-0 ${
+                  directorProfileActiveTab === 'info'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>নমিনি ও কর্পোরেট তথ্য</span>
+              </button>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-8 space-y-6">
+              
+              {/* Quick Summary Cards (Always Visible in Profile) */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
+                  <div className="text-3xs font-medium text-slate-500 uppercase tracking-wide">পরিশোধিত মূলধন</div>
+                  <div className="text-base sm:text-xl font-bold text-[#006231] font-mono">{formatBDT(totalPaidCapital)}</div>
+                  <div className="text-3xs text-emerald-600 font-medium">১০০% ভেরিফাইড জমা</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
+                  <div className="text-3xs font-medium text-slate-500 uppercase tracking-wide">শেয়ার অংশীদারিত্ব</div>
+                  <div className="text-base sm:text-xl font-bold text-[#CE2028] font-mono">{d.sharePercentage}%</div>
+                  <div className="text-3xs text-red-600 font-medium">কোম্পানির মোট ইকুইটি</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
+                  <div className="text-3xs font-medium text-slate-500 uppercase tracking-wide">অর্জিত লভ্যাংশ</div>
+                  <div className="text-base sm:text-xl font-bold text-purple-900 font-mono">{formatBDT(totalDividendsReceived)}</div>
+                  <div className="text-3xs text-purple-600 font-medium">মোট বণ্টিত ডিভিডেন্ড</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
+                  <div className="text-3xs font-medium text-slate-500 uppercase tracking-wide">বোর্ড অন্তর্ভুক্তি</div>
+                  <div className="text-base sm:text-sm font-bold text-slate-800">{d.joiningDate}</div>
+                  <div className="text-3xs text-slate-400 font-medium font-mono">{d.folioNo}</div>
                 </div>
               </div>
 
-              {/* Navigation Tabs Inside Director Profile */}
-              <div className="bg-slate-50/80 px-5 pt-3 border-b border-slate-200/80 flex items-center space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setDirectorProfileActiveTab('installments')}
-                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer flex items-center space-x-1.5 ${
-                    directorProfileActiveTab === 'installments'
-                      ? 'border-[#006231] text-[#006231]'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <DollarSign className="w-3.5 h-3.5" />
-                  <span>মূলধন জমার কিস্তি ও রসিদ ({(d.installments || []).length})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setDirectorProfileActiveTab('dividends')}
-                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer flex items-center space-x-1.5 ${
-                    directorProfileActiveTab === 'dividends'
-                      ? 'border-[#CE2028] text-[#CE2028]'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  <span>লভ্যাংশ বিবরণী / ডিভিডেন্ড ({(d.dividendHistory || []).length})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setDirectorProfileActiveTab('info')}
-                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer flex items-center space-x-1.5 ${
-                    directorProfileActiveTab === 'info'
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>নমিনি ও কর্পোরেট তথ্য</span>
-                </button>
-              </div>
-
-              {/* Body Content */}
-              <div className="p-5 sm:p-6 space-y-4">
-                {/* Tab 1: Capital Installments Statement with Individual Receipts */}
-                {directorProfileActiveTab === 'installments' && (
-                  <div className="space-y-4">
-                    {/* Top Metric Bar */}
-                    <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between">
+              {/* Tab 1: Capital Installments Statement with Individual Receipts */}
+              {directorProfileActiveTab === 'installments' && (
+                <div className="space-y-4">
+                  <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                       <div>
-                        <div className="text-3xs font-bold text-emerald-800 uppercase tracking-wide">সর্বমোট পরিশোধিত মূলধন (Paid Capital)</div>
-                        <div className="text-lg sm:text-xl font-bold text-[#006231] font-mono mt-0.5">{formatBDT(totalPaidCapital)}</div>
-                        <div className="text-3xs text-emerald-700 font-medium">মোট {(d.installments || []).length}টি কিস্তিতে প্রাপ্ত ও ভেরিফাইড</div>
+                        <h4 className="text-base font-bold text-slate-900 flex items-center space-x-2">
+                          <DollarSign className="w-5 h-5 text-[#006231]" />
+                          <span>কিস্তিতে মূলধন জমার অফিসিয়াল রসিদ বিবরণী</span>
+                        </h4>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          সম্মানিত পরিচালক কর্তৃক ভেঙে ভেঙে পরিশোধকৃত প্রতিটি কিস্তির রেকর্ড
+                        </p>
                       </div>
+
                       <button
                         type="button"
                         onClick={() => {
@@ -2478,71 +2521,76 @@ export default function ManagementDashboard({
                           });
                           setIsCapitalDepositModalOpen(true);
                         }}
-                        className="px-3.5 py-2 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-2xs shadow-sm flex items-center space-x-1 cursor-pointer active:scale-95 transition-all"
+                        className="px-4 py-2.5 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-all self-start sm:self-auto"
                       >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>+ মূলধন কিস্তি জমা দিন</span>
+                        <Plus className="w-4 h-4" />
+                        <span>+ নতুন মূলধন কিস্তি জমা দিন</span>
                       </button>
                     </div>
 
-                    {/* Receipts List */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-2xs font-bold text-slate-700 px-1">
-                        <span className="flex items-center space-x-1.5">
-                          <FileText className="w-3.5 h-3.5 text-[#006231]" />
-                          <span>কিস্তিতে মূলধন জমার অফিসিয়াল রসিদ তালিকা:</span>
-                        </span>
-                        <span className="text-3xs text-slate-400">অডিট অনুমোদিত লেজার</span>
-                      </div>
-
-                      {d.installments && d.installments.length > 0 ? (
-                        <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                          {d.installments.map((inst, idx) => (
-                            <div key={idx} className="p-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-colors flex items-center justify-between">
-                              <div className="space-y-1">
-                                <div className="flex items-center space-x-2">
-                                  <span className="font-mono text-3xs font-bold text-emerald-900 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-emerald-200">
+                    {/* Full Receipts Table */}
+                    {d.installments && d.installments.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider text-3xs border-y border-slate-200/80">
+                            <tr>
+                              <th className="py-3 px-4">রসিদ নম্বর</th>
+                              <th className="py-3 px-4">তারিখ</th>
+                              <th className="py-3 px-4">পেমেন্ট মেথড ও মাধ্যম</th>
+                              <th className="py-3 px-4">বিবরণ / নোট</th>
+                              <th className="py-3 px-4 text-right">জমার পরিমাণ</th>
+                              <th className="py-3 px-4 text-right">স্ট্যাটাস</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-medium">
+                            {d.installments.map((inst, idx) => (
+                              <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
+                                <td className="py-3 px-4">
+                                  <span className="font-mono text-3xs font-bold text-emerald-900 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-200">
                                     {inst.receiptNo || `RCPT-0${idx + 1}`}
                                   </span>
-                                  <span className="text-xs font-bold text-slate-800">{inst.method}</span>
-                                </div>
-                                <div className="text-3xs text-slate-500 flex items-center space-x-2">
-                                  <span>তারিখ: <strong className="text-slate-700">{inst.date}</strong></span>
-                                  {inst.note && <span>• {inst.note}</span>}
-                                </div>
-                              </div>
-
-                              <div className="text-right">
-                                <div className="font-bold text-sm text-[#006231] font-mono">
+                                </td>
+                                <td className="py-3 px-4 text-slate-700">{inst.date}</td>
+                                <td className="py-3 px-4 font-bold text-slate-800">{inst.method}</td>
+                                <td className="py-3 px-4 text-slate-500">{inst.note || 'মূলধন জমা'}</td>
+                                <td className="py-3 px-4 text-right font-mono font-bold text-sm text-[#006231]">
                                   +{formatBDT(inst.amount)}
-                                </div>
-                                <div className="text-3xs text-emerald-600 font-medium flex items-center justify-end space-x-1 mt-0.5">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                  <span>রসিদ ভেরিফাইড</span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-200/60">
-                          এখনো কোনো পৃথক কিস্তির রসিদ এন্ট্রি দেওয়া হয়নি।
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Tab 2: Dividend Payouts Ledger */}
-                {directorProfileActiveTab === 'dividends' && (
-                  <div className="space-y-4">
-                    {/* Top Metric Bar */}
-                    <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200/80 flex items-center justify-between">
-                      <div>
-                        <div className="text-3xs font-bold text-purple-800 uppercase tracking-wide">সর্বমোট বণ্টিত লভ্যাংশ (Disbursed Dividend)</div>
-                        <div className="text-lg sm:text-xl font-bold text-purple-900 font-mono mt-0.5">{formatBDT(totalDividendsReceived)}</div>
-                        <div className="text-3xs text-purple-700 font-medium">কোম্পানির শেয়ার মুনাফা বাবদ পরিশোধিত</div>
+                                </td>
+                                <td className="py-3 px-4 text-right">
+                                  <span className="inline-flex items-center space-x-1 text-3xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                    <span>অনুমোদিত</span>
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
+                    ) : (
+                      <div className="p-8 text-center text-sm text-slate-400 bg-slate-50 rounded-2xl border border-slate-200/60">
+                        এখনো কোনো পৃথক কিস্তির রসিদ এন্ট্রি দেওয়া হয়নি।
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Tab 2: Dividend Payouts Ledger */}
+              {directorProfileActiveTab === 'dividends' && (
+                <div className="space-y-4">
+                  <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                      <div>
+                        <h4 className="text-base font-bold text-slate-900 flex items-center space-x-2">
+                          <TrendingUp className="w-5 h-5 text-purple-700" />
+                          <span>মুনাফা ও লভ্যাংশ (ডিভিডেন্ড) বিতরণ বিবরণী</span>
+                        </h4>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          কোম্পানির শেয়ার মুনাফা বাবদ পরিচালককে ব্যাংক ট্রান্সফার স্টেটমেন্ট
+                        </p>
+                      </div>
+
                       <button
                         type="button"
                         onClick={() => {
@@ -2556,123 +2604,107 @@ export default function ManagementDashboard({
                           });
                           setIsDividendModalOpen(true);
                         }}
-                        className="px-3.5 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-2xs shadow-sm flex items-center space-x-1 cursor-pointer active:scale-95 transition-all"
+                        className="px-4 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-md shadow-purple-700/20 flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-all self-start sm:self-auto"
                       >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>+ ডিভিডেন্ড পে করুন</span>
+                        <Plus className="w-4 h-4" />
+                        <span>+ নতুন ডিভিডেন্ড পে করুন</span>
                       </button>
                     </div>
 
-                    {/* Vouchers List */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-2xs font-bold text-slate-700 px-1">
-                        <span className="flex items-center space-x-1.5">
-                          <FileText className="w-3.5 h-3.5 text-purple-600" />
-                          <span>লভ্যাংশ পরিশোধের ভাউচার ও ট্রানজ্যাকশন হিস্ট্রি:</span>
-                        </span>
-                        <span className="text-3xs text-slate-400">ব্যাংক ট্রান্সফার স্টেটমেন্ট</span>
-                      </div>
-
-                      {d.dividendHistory && d.dividendHistory.length > 0 ? (
-                        <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                          {d.dividendHistory.map((div, vIdx) => (
-                            <div key={vIdx} className="p-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-purple-300 transition-colors flex items-center justify-between">
-                              <div className="space-y-1">
-                                <div className="flex items-center space-x-2">
-                                  <span className="font-mono text-3xs font-bold text-purple-900 bg-purple-100/70 px-2 py-0.5 rounded-md border border-purple-200">
+                    {/* Vouchers Table */}
+                    {d.dividendHistory && d.dividendHistory.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider text-3xs border-y border-slate-200/80">
+                            <tr>
+                              <th className="py-3 px-4">ভাউচার নম্বর</th>
+                              <th className="py-3 px-4">তারিখ</th>
+                              <th className="py-3 px-4">পরিশোধের মাধ্যম</th>
+                              <th className="py-3 px-4">বিবরণ / খাত</th>
+                              <th className="py-3 px-4 text-right">বিতরণকৃত লভ্যাংশ</th>
+                              <th className="py-3 px-4 text-right">স্ট্যাটাস</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-medium">
+                            {d.dividendHistory.map((div, vIdx) => (
+                              <tr key={vIdx} className="hover:bg-slate-50/70 transition-colors">
+                                <td className="py-3 px-4">
+                                  <span className="font-mono text-3xs font-bold text-purple-900 bg-purple-100/70 px-2.5 py-1 rounded-md border border-purple-200">
                                     {div.voucherNo || `VCH-0${vIdx + 1}`}
                                   </span>
-                                  <span className="text-xs font-bold text-slate-800">{div.method}</span>
-                                </div>
-                                <div className="text-3xs text-slate-500 flex items-center space-x-2">
-                                  <span>তারিখ: <strong className="text-slate-700">{div.date}</strong></span>
-                                  {div.note && <span>• {div.note}</span>}
-                                </div>
-                              </div>
-
-                              <div className="text-right">
-                                <div className="font-bold text-sm text-purple-800 font-mono">
+                                </td>
+                                <td className="py-3 px-4 text-slate-700">{div.date}</td>
+                                <td className="py-3 px-4 font-bold text-slate-800">{div.method}</td>
+                                <td className="py-3 px-4 text-slate-500">{div.note || 'শেয়ার লভ্যাংশ পরিশোধ'}</td>
+                                <td className="py-3 px-4 text-right font-mono font-bold text-sm text-purple-900">
                                   +{formatBDT(div.amount)}
-                                </div>
-                                <div className="text-3xs text-purple-600 font-medium flex items-center justify-end space-x-1 mt-0.5">
-                                  <Sparkles className="w-3 h-3 text-purple-600" />
-                                  <span>পরিশোধ সম্পন্ন</span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-200/60">
-                          এখনো কোনো ডিভিডেন্ড পরিশোধের ভাউচার রেকর্ড করা হয়নি।
-                        </div>
-                      )}
-                    </div>
+                                </td>
+                                <td className="py-3 px-4 text-right">
+                                  <span className="inline-flex items-center space-x-1 text-3xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                                    <Sparkles className="w-3 h-3 text-purple-600" />
+                                    <span>পরিশোধিত</span>
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center text-sm text-slate-400 bg-slate-50 rounded-2xl border border-slate-200/60">
+                        এখনো কোনো ডিভিডেন্ড পরিশোধের ভাউচার রেকর্ড করা হয়নি।
+                      </div>
+                    )}
                   </div>
-                )}
-
-                {/* Tab 3: Nominee & Corporate Information */}
-                {directorProfileActiveTab === 'info' && (
-                  <div className="space-y-3">
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5 text-xs">
-                      <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                        <span className="text-slate-500">কোম্পানির মোট ইকুইটি শেয়ার:</span>
-                        <span className="font-bold text-slate-800">{d.sharePercentage}%</span>
-                      </div>
-                      <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                        <span className="text-slate-500">বোর্ড সদস্য হিসেবে অন্তর্ভুক্তি:</span>
-                        <span className="font-bold text-slate-800">{d.joiningDate}</span>
-                      </div>
-                      <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                        <span className="text-slate-500">আইনানুগ মনোনীত নমিনি:</span>
-                        <span className="font-bold text-slate-800">{d.nomineeName || 'সংরক্ষিত'} ({d.nomineeRelation || 'উত্তরাধিকারী'})</span>
-                      </div>
-                      <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                        <span className="text-slate-500">নমিনির মোবাইল নম্বর:</span>
-                        <span className="font-bold text-[#006231] font-mono">{d.nomineePhone || 'সংরক্ষিত নেই'}</span>
-                      </div>
-                      <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                        <span className="text-slate-500">অফিশিয়াল ইমেইল:</span>
-                        <span className="font-bold text-slate-800">{d.email}</span>
-                      </div>
-                      <div className="flex items-center justify-between py-1">
-                        <span className="text-slate-500">যোগাযোগের মোবাইল:</span>
-                        <span className="font-bold text-slate-800 font-mono">{d.phone}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="p-4 sm:p-5 flex items-center justify-between gap-2.5 bg-slate-50 rounded-b-3xl">
-                <div className="flex items-center space-x-2">
-                  <a
-                    href={`tel:${d.phone}`}
-                    className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 shadow-2xs flex items-center space-x-1.5 transition-colors cursor-pointer"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-[#006231]" />
-                    <span>কল দিন</span>
-                  </a>
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDirectorForCertificate(d)}
-                    className="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-xs border border-amber-200 shadow-2xs flex items-center space-x-1.5 transition-colors cursor-pointer"
-                  >
-                    <Award className="w-3.5 h-3.5 text-amber-600" />
-                    <span>শেয়ার সনদপত্র</span>
-                  </button>
                 </div>
+              )}
 
-                <button
-                  type="button"
-                  onClick={() => setSelectedDirectorForProfile(null)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs transition-colors cursor-pointer"
-                >
-                  বন্ধ করুন
-                </button>
-              </div>
+              {/* Tab 3: Nominee & Corporate Information */}
+              {directorProfileActiveTab === 'info' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-xs space-y-3">
+                    <h5 className="font-bold text-sm text-slate-900 flex items-center space-x-2 border-b border-slate-100 pb-2">
+                      <ShieldCheck className="w-4 h-4 text-blue-600" />
+                      <span>মনোনীত নমিনির বিস্তারিত তথ্য</span>
+                    </h5>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between py-1 border-b border-slate-100">
+                        <span className="text-slate-500">নমিনির পূর্ণ নাম:</span>
+                        <strong className="text-slate-800">{d.nomineeName || 'সংরক্ষিত'}</strong>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-100">
+                        <span className="text-slate-500">পরিচালকের সাথে সম্পর্ক:</span>
+                        <strong className="text-slate-800">{d.nomineeRelation || 'উত্তরাধিকারী'}</strong>
+                      </div>
+                      <div className="flex justify-between py-1">
+                        <span className="text-slate-500">নমিনির মোবাইল নম্বর:</span>
+                        <strong className="text-[#006231] font-mono">{d.nomineePhone || 'সংরক্ষিত নেই'}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-xs space-y-3">
+                    <h5 className="font-bold text-sm text-slate-900 flex items-center space-x-2 border-b border-slate-100 pb-2">
+                      <Users className="w-4 h-4 text-purple-600" />
+                      <span>পরিচালকের অফিসিয়াল যোগাযোগ</span>
+                    </h5>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between py-1 border-b border-slate-100">
+                        <span className="text-slate-500">মোবাইল ফোন:</span>
+                        <a href={`tel:${d.phone}`} className="text-blue-600 font-mono font-bold">{d.phone}</a>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-100">
+                        <span className="text-slate-500">অফিশিয়াল ইমেইল:</span>
+                        <strong className="text-slate-800">{d.email}</strong>
+                      </div>
+                      <div className="flex justify-between py-1">
+                        <span className="text-slate-500">কোম্পানিতে স্ট্যাটাস:</span>
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-bold border border-emerald-200">{d.status}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
             </div>
           </div>
@@ -2680,154 +2712,158 @@ export default function ManagementDashboard({
       })()}
 
       {/* ========================================================= */}
-      {/* MODAL: EXCLUSIVE OFFICIAL SHARE CERTIFICATE DOSSIER       */}
+      {/* FULL SCREEN VIEW 2: OFFICIAL SHARE CERTIFICATE DOSSIER    */}
       {/* ========================================================= */}
       {selectedDirectorForCertificate && (() => {
         const certDir = selectedDirectorForCertificate;
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs animate-fadeIn">
-            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[95vh] overflow-y-auto shadow-2xl border border-slate-100 relative">
-              
-              {/* Modal Top Bar */}
-              <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 rounded-t-3xl">
+          <div className="fixed inset-0 z-50 bg-[#F4F1EA] flex flex-col overflow-y-auto animate-fadeIn select-none">
+            {/* Top Fullscreen Header Navigation */}
+            <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md">
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setSelectedDirectorForCertificate(null)}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center space-x-1"
+                  title="ফিরে যান"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                  <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
+                </button>
+
                 <div className="flex items-center space-x-2">
-                  <Award className="w-5 h-5 text-amber-600" />
-                  <span className="font-bold text-sm text-slate-800">অফিশিয়াল শেয়ার সার্টিফিকেট প্রিভিউ</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs flex items-center space-x-1 cursor-pointer"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    <span>প্রিন্ট করুন</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDirectorForCertificate(null)}
-                    className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  <Award className="w-5 h-5 text-amber-400" />
+                  <span className="font-bold text-sm text-white">অফিশিয়াল শেয়ার মালিকানা সনদপত্র</span>
+                  <span className="text-xs text-slate-400 hidden sm:inline">({certDir.name} • {certDir.folioNo})</span>
                 </div>
               </div>
 
-              {/* Classic Corporate Share Certificate Frame */}
-              <div className="p-6 sm:p-8 bg-amber-50/20">
-                <div className="relative p-6 sm:p-10 rounded-2xl border-4 border-double border-amber-800/40 bg-gradient-to-b from-[#FFFDF9] to-[#FDF8EC] shadow-inner text-center space-y-6">
-                  
-                  {/* Decorative Corner Filigrees */}
-                  <div className="absolute top-2 left-2 text-amber-700/40 text-xs font-serif font-black">❖</div>
-                  <div className="absolute top-2 right-2 text-amber-700/40 text-xs font-serif font-black">❖</div>
-                  <div className="absolute bottom-2 left-2 text-amber-700/40 text-xs font-serif font-black">❖</div>
-                  <div className="absolute bottom-2 right-2 text-amber-700/40 text-xs font-serif font-black">❖</div>
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-sm active:scale-95 transition-all"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>প্রিন্ট / ডাউনলোড করুন</span>
+                </button>
 
-                  {/* Company Crest & Header */}
-                  <div className="space-y-2">
-                    <img 
-                      src="/alemarah_logo_header.svg" 
-                      alt="Al-Emarah Properties" 
-                      className="h-12 mx-auto object-contain"
-                    />
-                    <div className="text-2xs font-bold tracking-widest text-slate-500 uppercase">
-                      আল-ইমারাহ প্রপার্টিজ লিমিটেড • কর্পোরেট ইকুইটি রেজিস্ট্রেশন
-                    </div>
-                    <div className="pt-2">
-                      <h2 className="text-xl sm:text-2xl font-serif font-bold text-amber-950 tracking-wider">
-                        শেয়ার মালিকানা ও অংশীদারিত্ব সনদ
-                      </h2>
-                      <p className="text-3xs sm:text-2xs font-serif text-amber-800/80 italic mt-0.5">
-                        OFFICIAL CERTIFICATE OF SHARE OWNERSHIP
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Folio & ID Row */}
-                  <div className="flex items-center justify-between text-2xs font-mono font-bold text-amber-900/70 border-y border-amber-200/80 py-2 px-4 bg-amber-50/50 rounded-lg">
-                    <span>ফোলিও নং: <strong className="text-amber-950">{certDir.folioNo}</strong></span>
-                    <span>সার্টিফিকেট নং: <strong className="text-amber-950">AEP-CERT-{certDir.id}</strong></span>
-                    <span>অন্তর্ভুক্তি: <strong className="text-amber-950">{certDir.joiningDate}</strong></span>
-                  </div>
-
-                  {/* Certificate Body Text */}
-                  <div className="space-y-4 text-xs sm:text-sm text-slate-800 leading-relaxed font-serif">
-                    <p className="text-slate-600">
-                      এই মর্মে প্রত্যায়ন করা যাইতেছে যে, আল-ইমারাহ প্রপার্টিজ লিমিটেড-এর সংঘস্মারক ও সংঘবিধি অনুযায়ী নিম্নোক্ত সম্মানিত পরিচালক
-                    </p>
-
-                    <div className="py-2">
-                      <div className="text-lg sm:text-2xl font-bold text-slate-900 border-b-2 border-dotted border-amber-800/40 inline-block px-6 pb-1">
-                        {certDir.name}
-                      </div>
-                      <div className="text-xs font-bold text-[#CE2028] mt-1">
-                        {certDir.role}
-                      </div>
-                    </div>
-
-                    <p className="text-slate-700 max-w-lg mx-auto">
-                      কোম্পানিতে সর্বমোট <strong className="font-bold text-[#006231] font-mono">{formatBDT(certDir.investment)}</strong> পরিশোধিত মূলধন বিনিয়োগপূর্বক কোম্পানির মোট শেয়ারের—
-                    </p>
-
-                    {/* Grand Share Badge */}
-                    <div className="inline-block p-4 rounded-2xl bg-white border-2 border-amber-300 shadow-md">
-                      <div className="text-3xs font-bold text-amber-800 uppercase tracking-widest">বরাদ্দকৃত ইকুইটি শেয়ার অংশ</div>
-                      <div className="text-3xl sm:text-4xl font-black text-[#CE2028] font-mono mt-1">
-                        {certDir.sharePercentage}%
-                      </div>
-                      <div className="text-3xs text-slate-500 mt-0.5">স্বত্বাধিকারী ও বোর্ড সদস্য</div>
-                    </div>
-
-                    <p className="text-3xs sm:text-2xs text-slate-500 max-w-md mx-auto pt-2">
-                      উক্ত শেয়ারহোল্ডার কোম্পানির সকল বোর্ড মিটিং, নীতি নির্ধারণী সিদ্ধান্ত গ্রহণ এবং বার্ষিক অর্জিত মুনাফা/লভ্যাংশ প্রাপ্তির পূর্ণ অধিকারী।
-                    </p>
-                  </div>
-
-                  {/* Signatures Row */}
-                  <div className="grid grid-cols-2 gap-8 pt-8 border-t border-amber-200/70 text-center">
-                    <div>
-                      <div className="w-28 sm:w-36 h-10 border-b border-slate-400 mx-auto flex items-end justify-center pb-1">
-                        <span className="font-serif italic text-2xs text-slate-400">ব্যবস্থাপনা পরিচালক</span>
-                      </div>
-                      <div className="text-3xs font-bold text-slate-700 mt-1">ব্যবস্থাপনা পরিচালক</div>
-                      <div className="text-[10px] text-slate-400">আল-ইমারাহ প্রপার্টিজ</div>
-                    </div>
-
-                    <div>
-                      <div className="w-28 sm:w-36 h-10 border-b border-slate-400 mx-auto flex items-end justify-center pb-1">
-                        <span className="font-serif italic text-2xs text-slate-400">চেয়ারম্যান স্বাক্ষর</span>
-                      </div>
-                      <div className="text-3xs font-bold text-slate-700 mt-1">বোর্ড চেয়ারম্যান</div>
-                      <div className="text-[10px] text-slate-400">আল-ইমারাহ প্রপার্টিজ</div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="p-4 bg-slate-50 flex items-center justify-between rounded-b-3xl">
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedDirectorForCertificate(null);
                     setSelectedDirectorForProfile(certDir);
                   }}
-                  className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 cursor-pointer"
+                  className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs hidden sm:flex items-center space-x-1 cursor-pointer"
                 >
-                  প্রোফাইল ও জমা হিস্ট্রি দেখুন
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>প্রোফাইল দেখুন</span>
                 </button>
+
                 <button
                   type="button"
                   onClick={() => setSelectedDirectorForCertificate(null)}
-                  className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs cursor-pointer"
+                  className="p-2 rounded-xl bg-white/10 hover:bg-red-600 text-white transition-colors cursor-pointer"
+                  title="বন্ধ করুন"
                 >
-                  বন্ধ করুন
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-
             </div>
+
+            {/* Certificate Canvas Container */}
+            <div className="flex-1 flex items-center justify-center p-4 sm:p-10">
+              <div className="max-w-4xl w-full relative p-6 sm:p-14 rounded-3xl border-8 border-double border-amber-900/30 bg-gradient-to-b from-[#FFFDF9] via-[#FCF8EE] to-[#FAF4E2] shadow-2xl text-center space-y-7">
+                
+                {/* Decorative Corner Filigrees */}
+                <div className="absolute top-4 left-4 text-amber-700/50 text-base font-serif font-black">❖</div>
+                <div className="absolute top-4 right-4 text-amber-700/50 text-base font-serif font-black">❖</div>
+                <div className="absolute bottom-4 left-4 text-amber-700/50 text-base font-serif font-black">❖</div>
+                <div className="absolute bottom-4 right-4 text-amber-700/50 text-base font-serif font-black">❖</div>
+
+                {/* Company Crest & Header */}
+                <div className="space-y-3">
+                  <img 
+                    src="/alemarah_logo_header.svg" 
+                    alt="Al-Emarah Properties" 
+                    className="h-16 mx-auto object-contain drop-shadow-xs"
+                  />
+                  <div className="text-3xs sm:text-2xs font-bold tracking-widest text-slate-500 uppercase">
+                    আল-ইমারাহ প্রপার্টিজ লিমিটেড • গণপ্রজাতন্ত্রী বাংলাদেশ সরকারের রেজিস্টার্ড কর্পোরেট ইকুইটি
+                  </div>
+                  <div className="pt-2">
+                    <h2 className="text-2xl sm:text-4xl font-serif font-bold text-amber-950 tracking-wider">
+                      শেয়ার মালিকানা ও অংশীদারিত্ব সনদ
+                    </h2>
+                    <p className="text-xs sm:text-sm font-serif text-amber-800/80 italic mt-1">
+                      OFFICIAL CERTIFICATE OF SHARE OWNERSHIP & DIRECTORSHIP
+                    </p>
+                  </div>
+                </div>
+
+                {/* Folio & ID Row */}
+                <div className="flex items-center justify-between text-xs sm:text-sm font-mono font-bold text-amber-900/80 border-y-2 border-amber-300/60 py-2.5 px-6 bg-amber-50/70 rounded-xl max-w-2xl mx-auto">
+                  <span>ফোলিও নং: <strong className="text-amber-950">{certDir.folioNo}</strong></span>
+                  <span>সার্টিফিকেট আইডি: <strong className="text-amber-950">AEP-CERT-{certDir.id}</strong></span>
+                  <span>অন্তর্ভুক্তি: <strong className="text-amber-950">{certDir.joiningDate}</strong></span>
+                </div>
+
+                {/* Certificate Body Text */}
+                <div className="space-y-5 text-sm sm:text-base text-slate-800 leading-relaxed font-serif max-w-3xl mx-auto">
+                  <p className="text-slate-600">
+                    এই মর্মে প্রত্যায়ন করা যাইতেছে যে, আল-ইমারাহ প্রপার্টিজ লিমিটেড-এর সংঘস্মারক ও সংঘবিধি অনুযায়ী নিম্নোক্ত সম্মানিত পরিচালক—
+                  </p>
+
+                  <div className="py-2">
+                    <div className="text-2xl sm:text-4xl font-bold text-slate-900 border-b-2 border-dotted border-amber-800/40 inline-block px-8 pb-2">
+                      {certDir.name}
+                    </div>
+                    <div className="text-sm sm:text-base font-bold text-[#CE2028] mt-2">
+                      {certDir.role}
+                    </div>
+                  </div>
+
+                  <p className="text-slate-700 leading-relaxed">
+                    কোম্পানিতে সর্বমোট <strong className="font-bold text-[#006231] font-mono text-lg">{formatBDT(certDir.investment)}</strong> পরিশোধিত মূলধন বিনিয়োগপূর্বক কোম্পানির সর্বমোট ১০০% শেয়ার মূলধনের মধ্যে নিম্নোক্ত ইকুইটি অংশের একক মালিকানা অর্জন করিয়াছেন:
+                  </p>
+
+                  {/* Grand Share Badge */}
+                  <div className="inline-block p-6 rounded-3xl bg-white border-2 border-amber-300 shadow-xl my-2">
+                    <div className="text-3xs sm:text-2xs font-bold text-amber-800 uppercase tracking-widest">বরাদ্দকৃত ইকুইটি শেয়ার অংশ</div>
+                    <div className="text-4xl sm:text-6xl font-black text-[#CE2028] font-mono mt-2 tracking-tight">
+                      {certDir.sharePercentage}%
+                    </div>
+                    <div className="text-2xs text-slate-500 mt-1 font-sans">স্বত্বাধিকারী পরিচালক ও বোর্ড সদস্য</div>
+                  </div>
+
+                  <p className="text-2xs sm:text-xs text-slate-500 max-w-xl mx-auto pt-2">
+                    উক্ত শেয়ারহোল্ডার কোম্পানির সকল বোর্ড মিটিং, নীতি নির্ধারণী সিদ্ধান্ত গ্রহণ এবং বার্ষিক অর্জিত মুনাফা/ডিভিডেন্ড প্রাপ্তির পূর্ণ অধিকারী।
+                  </p>
+                </div>
+
+                {/* Signatures Row */}
+                <div className="grid grid-cols-2 gap-12 pt-10 border-t border-amber-300/60 max-w-2xl mx-auto">
+                  <div>
+                    <div className="w-36 sm:w-48 h-12 border-b border-slate-500 mx-auto flex items-end justify-center pb-1">
+                      <span className="font-serif italic text-xs text-slate-400">ব্যবস্থাপনা পরিচালক</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-bold text-slate-800 mt-1.5">ব্যবস্থাপনা পরিচালক</div>
+                    <div className="text-2xs text-slate-500">আল-ইমারাহ প্রপার্টিজ লিমিটেড</div>
+                  </div>
+
+                  <div>
+                    <div className="w-36 sm:w-48 h-12 border-b border-slate-500 mx-auto flex items-end justify-center pb-1">
+                      <span className="font-serif italic text-xs text-slate-400">চেয়ারম্যান স্বাক্ষর</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-bold text-slate-800 mt-1.5">বোর্ড চেয়ারম্যান</div>
+                    <div className="text-2xs text-slate-500">আল-ইমারাহ প্রপার্টিজ লিমিটেড</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
           </div>
         );
       })()}
