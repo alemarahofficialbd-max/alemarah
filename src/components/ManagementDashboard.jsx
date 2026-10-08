@@ -1568,8 +1568,8 @@ export default function ManagementDashboard({
                 })}
               </div>
 
-              {/* Legend */}
-              <div className="flex flex-wrap gap-x-4 gap-y-1.5 pt-1 text-2xs font-semibold text-slate-600">
+              {/* Legend with Investment & Share % */}
+              <div className="flex flex-wrap gap-2.5 pt-1 text-2xs font-semibold">
                 {directorsList.map((dir, idx) => {
                   const dotColors = [
                     'bg-[#CE2028]',
@@ -1580,10 +1580,12 @@ export default function ManagementDashboard({
                     'bg-cyan-600'
                   ];
                   return (
-                    <div key={dir.id} className="flex items-center space-x-1.5">
+                    <div key={dir.id} className="flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs">
                       <span className={`w-2.5 h-2.5 rounded-full ${dotColors[idx % dotColors.length]}`}></span>
-                      <span className="text-slate-900 font-bold">{dir.name.split(' ')[0]}</span>
-                      <span className="text-slate-400">({dir.sharePercentage}%)</span>
+                      <span className="text-slate-900 font-bold">{dir.name}</span>
+                      <span className="text-[#CE2028] font-black">({dir.sharePercentage}% শেয়ার)</span>
+                      <span className="text-slate-300">|</span>
+                      <span className="text-[#006231] font-black">বিনিয়োগ: {formatBDT(dir.investment)}</span>
                     </div>
                   );
                 })}
@@ -1656,40 +1658,40 @@ export default function ManagementDashboard({
 
                       {/* Main Financial Highlights */}
                       <div className="p-4 sm:p-5 space-y-3">
-                        <div className="grid grid-cols-2 gap-2.5">
-                          {/* Investment Amount */}
-                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100/90 space-y-0.5">
-                            <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider">
-                              মোট বিনিয়োগ
-                            </div>
-                            <div className="text-sm font-black text-[#006231] truncate">
+                        {/* Prominent Investment & Share Section */}
+                        <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-50/80 via-white to-slate-50 border-2 border-emerald-200 shadow-2xs space-y-2">
+                          <div className="flex items-center justify-between text-2xs">
+                            <span className="font-extrabold text-emerald-950 uppercase tracking-wider flex items-center space-x-1">
+                              <DollarSign className="w-3.5 h-3.5 text-[#006231]" />
+                              <span>বিনিয়োগকৃত মোট টাকা (Investment)</span>
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black tracking-wide">
+                              পরিশোধিত
+                            </span>
+                          </div>
+
+                          <div className="flex items-baseline justify-between gap-2">
+                            <div className="text-xl sm:text-2xl font-black text-[#006231] tracking-tight">
                               {formatBDT(dir.investment)}
                             </div>
-                            <div className="text-[10px] text-slate-500 font-semibold">
-                              পরিশোধিত শেয়ার
+                            <div className="text-right">
+                              <span className="text-xs sm:text-sm font-black text-[#CE2028] bg-red-100/90 border border-red-200 px-2.5 py-1 rounded-xl inline-block shadow-2xs">
+                                {dir.sharePercentage}% শেয়ার
+                              </span>
                             </div>
                           </div>
 
-                          {/* Share Percentage */}
-                          <div className="p-3 rounded-2xl bg-red-50/60 border border-red-100/90 space-y-0.5">
-                            <div className="text-3xs font-bold text-red-800 uppercase tracking-wider">
-                              শেয়ার অংশীদারিত্ব
-                            </div>
-                            <div className="text-sm sm:text-base font-black text-[#CE2028] flex items-center space-x-1">
-                              <span>{dir.sharePercentage}%</span>
-                              <span className="text-3xs text-red-600 font-semibold">শেয়ার</span>
-                            </div>
-                            <div className="text-[10px] text-emerald-700 font-bold truncate">
-                              মোট ১০০% এর মধ্যে
-                            </div>
+                          <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold pt-1.5 border-t border-emerald-100">
+                            <span>কোম্পানির মোট ১০০% শেয়ারে অংশীদারিত্ব:</span>
+                            <span className="font-black text-[#CE2028]">{dir.sharePercentage}% মালিকানা</span>
                           </div>
                         </div>
 
                         {/* Dividend & Projects Strip */}
-                        <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-50/50 to-slate-50 border border-emerald-100/60 space-y-1.5">
+                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
                           <div className="flex items-center justify-between text-2xs">
                             <span className="text-slate-600 font-semibold">অর্জিত লভ্যাংশ (ডিভিডেন্ড):</span>
-                            <span className="font-black text-[#006231] font-mono">{formatBDT(dir.dividendEarned)}</span>
+                            <span className="font-black text-[#006231] font-mono text-xs sm:text-sm">{formatBDT(dir.dividendEarned)}</span>
                           </div>
 
                           {dir.allocatedProjects && dir.allocatedProjects.length > 0 && (
@@ -1729,6 +1731,85 @@ export default function ManagementDashboard({
                   </div>
                 );
               })}
+            </div>
+
+            {/* Comprehensive Table: All Directors Investment & Share Breakdown */}
+            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden">
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/50">
+                <div>
+                  <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+                    <FileSpreadsheet className="w-4 h-4 text-[#006231]" />
+                    <span>পরিচালকগণের মোট বিনিয়োগ ও ১০০% শেয়ার বণ্টন তালিকা</span>
+                  </h4>
+                  <p className="text-2xs text-slate-500 mt-0.5">এক নজরে সকল ডিরেক্টরের বিনিয়োগকৃত টাকার অঙ্ক ও শেয়ার অনুপাত</p>
+                </div>
+                <div className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-[#006231] font-black text-xs border border-emerald-200">
+                  <span>সর্বমোট মূলধন:</span>
+                  <span className="font-mono text-sm">{formatBDT(totalDirectorInvestment)}</span>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-100/70 border-b border-slate-200/80 text-slate-600 font-bold uppercase tracking-wider text-3xs">
+                    <tr>
+                      <th className="py-3 px-4">পরিচালকের নাম ও পদবি</th>
+                      <th className="py-3 px-4">বিনিয়োগকৃত টাকা (Investment)</th>
+                      <th className="py-3 px-4">শেয়ার অংশীদারিত্ব (% Share)</th>
+                      <th className="py-3 px-4">অর্জিত মোট ডিভিডেন্ড</th>
+                      <th className="py-3 px-4">মোবাইল নম্বর</th>
+                      <th className="py-3 px-4 text-right">সনদ ও প্রোফাইল</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {directorsList.map((dir) => (
+                      <tr key={dir.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="py-3 px-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-9 h-11 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                              {dir.image ? (
+                                <img src={dir.image} alt={dir.name} className="w-full h-full object-cover object-top" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs bg-slate-100">
+                                  {dir.name.slice(0, 1)}
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <div className="font-bold text-slate-900">{dir.name}</div>
+                              <div className="text-3xs text-[#CE2028] font-bold">{dir.role}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="font-black text-sm text-[#006231] font-mono">{formatBDT(dir.investment)}</div>
+                          <div className="text-3xs text-emerald-600 font-bold">পরিশোধিত বিনিয়োগ</div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-red-50 text-[#CE2028] font-black text-xs border border-red-200 shadow-2xs">
+                            <span>{dir.sharePercentage}%</span>
+                            <span className="text-[10px] font-normal text-slate-500">(১০০% এর মধ্যে)</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-slate-700">
+                          {formatBDT(dir.dividendEarned)}
+                        </td>
+                        <td className="py-3 px-4 font-mono font-semibold text-slate-600">
+                          {dir.phone}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <button
+                            onClick={() => setSelectedDirectorForProfile(dir)}
+                            className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs cursor-pointer shadow-2xs"
+                          >
+                            সনদ দেখুন
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
