@@ -152,7 +152,16 @@ export const initialManagementData = {
       nomineeName: 'আইনানুগ উত্তরসূরি',
       nomineeRelation: 'পরিবার',
       nomineePhone: '01816-233013',
-      theme: 'crimson'
+      theme: 'crimson',
+      installments: [
+        { id: 'INS-01', date: '১৫ জানুয়ারি, ২০২৪', amount: 10000000, method: 'ব্যাংক স্থানান্তর (সিটি ব্যাংক)', receiptNo: 'RCPT-CAP-101', note: 'প্রাথমিক ইকুইটি মূলধন জমা' },
+        { id: 'INS-02', date: '১০ এপ্রিল, ২০২৪', amount: 8000000, method: 'পে-অর্ডার (ইসলামী ব্যাংক)', receiptNo: 'RCPT-CAP-102', note: '২য় কিস্তির পরিশোধিত ক্যাপিটাল' },
+        { id: 'INS-03', date: '০৫ অক্টোবর, ২০২৪', amount: 7000000, method: 'ব্যাংক চেক (প্রাইম ব্যাংক)', receiptNo: 'RCPT-CAP-103', note: '৩য় কিস্তি (চূড়ান্ত পরিশোধিত মূলধন)' }
+      ],
+      dividendHistory: [
+        { id: 'DIV-01', date: '৩০ জুন, ২০২৪', amount: 1650000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-201', note: 'অর্ধবার্ষিক মুনাফা বণ্টন (H1 ২০২৪)' },
+        { id: 'DIV-02', date: '৩১ ডিসেম্বর, ২০২৪', amount: 2000000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-202', note: 'বার্ষিক ডিভিডেন্ড প্রদান (FY ২০২৪)' }
+      ]
     },
     {
       id: 'DIR-02',
@@ -172,7 +181,15 @@ export const initialManagementData = {
       nomineeName: 'আইনানুগ উত্তরসূরি',
       nomineeRelation: 'পরিবার',
       nomineePhone: '01918-646575',
-      theme: 'emerald'
+      theme: 'emerald',
+      installments: [
+        { id: 'INS-201', date: '২০ জানুয়ারি, ২০২৪', amount: 10000000, method: 'ব্যাংক ট্রান্সফার (উত্তরা ব্যাংক)', receiptNo: 'RCPT-CAP-201', note: '১ম কিস্তি প্রারম্ভিক শেয়ার মূলধন' },
+        { id: 'INS-202', date: '১৫ মে, ২০২৪', amount: 10000000, method: 'পে-অর্ডার (পূবালী ব্যাংক)', receiptNo: 'RCPT-CAP-202', note: '২য় কিস্তি (সম্পূর্ণ পরিশোধিত)' }
+      ],
+      dividendHistory: [
+        { id: 'DIV-101', date: '৩০ জুন, ২০২৪', amount: 1320000, method: 'ব্যাংক ট্রান্সফার', voucherNo: 'VCH-DIV-203', note: 'অর্ধবার্ষিক মুনাফা বণ্টন' },
+        { id: 'DIV-102', date: '৩১ ডিসেম্বর, ২০২৪', amount: 1600000, method: 'ব্যাংক ট্রান্সফার', voucherNo: 'VCH-DIV-204', note: 'বার্ষিক ডিভিডেন্ড ক্লিয়ারেন্স' }
+      ]
     },
     {
       id: 'DIR-03',
@@ -192,7 +209,14 @@ export const initialManagementData = {
       nomineeName: 'মোসা. ফারহানা রহমান',
       nomineeRelation: 'স্ত্রী',
       nomineePhone: '01711-223344',
-      theme: 'blue'
+      theme: 'blue',
+      installments: [
+        { id: 'INS-301', date: '১৫ মার্চ, ২০২৪', amount: 5000000, method: 'চেক ডিপোজিট', receiptNo: 'RCPT-CAP-301', note: '১ম কিস্তি মূলধন' },
+        { id: 'INS-302', date: '১ আগস্ট, ২০২৪', amount: 5000000, method: 'ব্যাংক ট্রান্সফার', receiptNo: 'RCPT-CAP-302', note: '২য় কিস্তি মূলধন' }
+      ],
+      dividendHistory: [
+        { id: 'DIV-301', date: '৩১ ডিসেম্বর, ২০২৪', amount: 1460000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-301', note: 'বার্ষিক শেয়ার লভ্যাংশ' }
+      ]
     },
     {
       id: 'DIR-04',
@@ -212,7 +236,14 @@ export const initialManagementData = {
       nomineeName: 'সাইফুল চৌধুরী',
       nomineeRelation: 'পুত্র',
       nomineePhone: '01911-334455',
-      theme: 'amber'
+      theme: 'amber',
+      installments: [
+        { id: 'INS-401', date: '১০ মে, ২০২৪', amount: 4000000, method: 'পে-অর্ডার', receiptNo: 'RCPT-CAP-401', note: '১ম কিস্তি' },
+        { id: 'INS-402', date: '২০ সেপ্টেম্বর, ২০২৪', amount: 3500000, method: 'ব্যাংক চেক', receiptNo: 'RCPT-CAP-402', note: '২য় কিস্তি' }
+      ],
+      dividendHistory: [
+        { id: 'DIV-401', date: '৩১ ডিসেম্বর, ২০২৪', amount: 1095000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-401', note: 'বার্ষিক শেয়ার লভ্যাংশ' }
+      ]
     },
     {
       id: 'DIR-05',
@@ -232,7 +263,13 @@ export const initialManagementData = {
       nomineeName: 'নাজমিন হাসান',
       nomineeRelation: 'স্ত্রী',
       nomineePhone: '01811-556677',
-      theme: 'purple'
+      theme: 'purple',
+      installments: [
+        { id: 'INS-501', date: '১ জুলাই, ২০২৪', amount: 7500000, method: 'ব্যাংক ট্রান্সফার', receiptNo: 'RCPT-CAP-501', note: 'এককালীন পরিশোধিত মূলধন' }
+      ],
+      dividendHistory: [
+        { id: 'DIV-501', date: '৩১ ডিসেম্বর, ২০২৪', amount: 1095000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-501', note: 'বার্ষিক শেয়ার লভ্যাংশ' }
+      ]
     }
   ]
 };
@@ -245,6 +282,23 @@ export const getManagementData = () => {
       const parsed = JSON.parse(data);
       if (!parsed.directors || parsed.directors.length === 0) {
         parsed.directors = initialManagementData.directors;
+      } else {
+        parsed.directors = parsed.directors.map(d => {
+          const defaultDir = initialManagementData.directors.find(x => x.id === d.id);
+          return {
+            ...d,
+            installments: d.installments && d.installments.length > 0 
+              ? d.installments 
+              : (defaultDir?.installments || [
+                  { id: `INS-${d.id}-1`, date: d.joiningDate || '১ জানুয়ারি, ২০২৪', amount: d.investment, method: 'ব্যাংক স্থানান্তর', receiptNo: `RCPT-${d.folioNo || '001'}`, note: 'পরিশোধিত মূলধন জমা' }
+                ]),
+            dividendHistory: d.dividendHistory && d.dividendHistory.length > 0
+              ? d.dividendHistory
+              : (defaultDir?.dividendHistory || (d.dividendEarned > 0 ? [
+                  { id: `DIV-${d.id}-1`, date: '৩১ ডিসেম্বর, ২০২৪', amount: d.dividendEarned, method: 'ব্যাংক ট্রান্সফার', voucherNo: `VCH-${d.folioNo || '001'}`, note: 'বার্ষিক লভ্যাংশ পরিশোধ' }
+                ] : []))
+          };
+        });
       }
       if (!parsed.superAdmin) {
         parsed.superAdmin = initialManagementData.superAdmin;

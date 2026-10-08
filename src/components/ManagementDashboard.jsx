@@ -41,7 +41,9 @@ import {
   Trash2,
   Edit3,
   Mail,
-  KeyRound
+  KeyRound,
+  Printer,
+  Download
 } from 'lucide-react';
 import { 
   formatBDT, 
@@ -166,9 +168,35 @@ export default function ManagementDashboard({
     permissions: ['projects', 'expenses']
   });
 
-  // 6. Board Director Form & Profile
+  // 6. Board Director Form, Profile, Certificate, Capital Deposit, and Dividend Modals
   const [isDirectorModalOpen, setIsDirectorModalOpen] = useState(false);
   const [selectedDirectorForProfile, setSelectedDirectorForProfile] = useState(null);
+  const [selectedDirectorForCertificate, setSelectedDirectorForCertificate] = useState(null);
+  
+  // Capital Installment Deposit modal state
+  const [isCapitalDepositModalOpen, setIsCapitalDepositModalOpen] = useState(false);
+  const [capitalDepositTargetDirector, setCapitalDepositTargetDirector] = useState(null);
+  const [capitalDepositForm, setCapitalDepositForm] = useState({
+    amount: '',
+    date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+    method: 'ব্যাংক চেক',
+    receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
+    note: 'মূলধনের কিস্তি জমা'
+  });
+
+  // Dividend Payout modal state
+  const [isDividendModalOpen, setIsDividendModalOpen] = useState(false);
+  const [dividendTargetDirector, setDividendTargetDirector] = useState(null);
+  const [dividendForm, setDividendForm] = useState({
+    amount: '',
+    date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+    method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
+    voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
+    note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
+  });
+
+  const [directorProfileActiveTab, setDirectorProfileActiveTab] = useState('installments'); // 'installments' | 'dividends' | 'info'
+
   const [directorForm, setDirectorForm] = useState({
     name: '',
     role: 'পরিচালক',
@@ -499,7 +527,18 @@ export default function ManagementDashboard({
       nomineeName: directorForm.nomineeName || 'সংরক্ষিত',
       nomineeRelation: directorForm.nomineeRelation || 'উত্তরাধিকারী',
       nomineePhone: directorForm.nomineePhone || '',
-      theme: 'blue'
+      theme: 'blue',
+      installments: invAmt > 0 ? [
+        {
+          id: `INS-${nextIndex}-01`,
+          date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+          amount: invAmt,
+          method: 'প্রাথমিক ইকুইটি জমা',
+          receiptNo: `RCPT-CAP-${String(nextIndex).padStart(3, '0')}-01`,
+          note: 'প্রারম্ভিক শেয়ার মূলধন জমা'
+        }
+      ] : [],
+      dividendHistory: []
     };
 
     updateStore((prev) => ({
@@ -520,6 +559,120 @@ export default function ManagementDashboard({
       nomineePhone: ''
     });
     triggerAlert(`পরিচালক ${newDirector.name} (${newDirector.sharePercentage}% শেয়ার, ফোলিও: ${autoFolioNo}) সফলভাবে যুক্ত হয়েছেন!`);
+  };
+
+  // Handler: Add Capital Installment for a Director
+  const handleAddCapitalInstallment = (e) => {
+    e.preventDefault();
+    if (!capitalDepositTargetDirector) return;
+    const amountNum = Number(capitalDepositForm.amount);
+    if (!amountNum || amountNum <= 0) {
+      alert('অনুগ্রহ করে জমার সঠিক টাকার পরিমাণ লিখুন।');
+      return;
+    }
+
+    const newInst = {
+      id: `INS-${Date.now().toString().slice(-5)}`,
+      date: capitalDepositForm.date || new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      amount: amountNum,
+      method: capitalDepositForm.method,
+      receiptNo: capitalDepositForm.receiptNo || `RCPT-${Math.floor(100 + Math.random() * 900)}`,
+      note: capitalDepositForm.note || 'মূলধনের কিস্তি জমা'
+    };
+
+    updateStore((prev) => {
+      const updatedDirs = (prev.directors || []).map((dir) => {
+        if (dir.id === capitalDepositTargetDirector.id) {
+          const currentInsts = dir.installments || [];
+          const updatedInsts = [newInst, ...currentInsts];
+          const newTotalInvestment = (dir.investment || 0) + amountNum;
+          return {
+            ...dir,
+            investment: newTotalInvestment,
+            installments: updatedInsts
+          };
+        }
+        return dir;
+      });
+      return { ...prev, directors: updatedDirs };
+    });
+
+    // Also update selected director if in profile modal
+    if (selectedDirectorForProfile?.id === capitalDepositTargetDirector.id) {
+      setSelectedDirectorForProfile((prev) => ({
+        ...prev,
+        investment: (prev.investment || 0) + amountNum,
+        installments: [newInst, ...(prev.installments || [])]
+      }));
+    }
+
+    setIsCapitalDepositModalOpen(false);
+    setCapitalDepositTargetDirector(null);
+    setCapitalDepositForm({
+      amount: '',
+      date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      method: 'ব্যাংক চেক',
+      receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
+      note: 'মূলধনের কিস্তি জমা'
+    });
+    triggerAlert(`পরিচালক ${capitalDepositTargetDirector.name}-এর ${formatBDT(amountNum)} মূলধন কিস্তি সফলভাবে জমা হয়েছে!`);
+  };
+
+  // Handler: Disburse Dividend to a Director
+  const handleAddDividendPayout = (e) => {
+    e.preventDefault();
+    if (!dividendTargetDirector) return;
+    const amountNum = Number(dividendForm.amount);
+    if (!amountNum || amountNum <= 0) {
+      alert('অনুগ্রহ করে ডিভিডেন্ডের সঠিক টাকার পরিমাণ লিখুন।');
+      return;
+    }
+
+    const newDiv = {
+      id: `DIV-${Date.now().toString().slice(-5)}`,
+      date: dividendForm.date || new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      amount: amountNum,
+      method: dividendForm.method,
+      voucherNo: dividendForm.voucherNo || `VCH-${Math.floor(100 + Math.random() * 900)}`,
+      note: dividendForm.note || 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
+    };
+
+    updateStore((prev) => {
+      const updatedDirs = (prev.directors || []).map((dir) => {
+        if (dir.id === dividendTargetDirector.id) {
+          const currentDivs = dir.dividendHistory || [];
+          const updatedDivs = [newDiv, ...currentDivs];
+          const newTotalDividends = (dir.dividendEarned || 0) + amountNum;
+          return {
+            ...dir,
+            dividendEarned: newTotalDividends,
+            dividendHistory: updatedDivs
+          };
+        }
+        return dir;
+      });
+      return { ...prev, directors: updatedDirs };
+    });
+
+    // Also update selected director if in profile modal
+    if (selectedDirectorForProfile?.id === dividendTargetDirector.id) {
+      setSelectedDirectorForProfile((prev) => ({
+        ...prev,
+        dividendEarned: (prev.dividendEarned || 0) + amountNum,
+        dividendHistory: [newDiv, ...(prev.dividendHistory || [])]
+      }));
+    }
+
+    setIsDividendModalOpen(false);
+    setDividendTargetDirector(null);
+    setDividendForm({
+      amount: '',
+      date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
+      voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
+      note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
+    });
+    triggerAlert(`পরিচালক ${dividendTargetDirector.name}-কে ${formatBDT(amountNum)} ডিভিডেন্ড সফলভাবে প্রদান করা হয়েছে!`);
   };
 
   // Calculations for Stats
@@ -1885,7 +2038,7 @@ export default function ManagementDashboard({
                       <th className="py-3 px-4">বিনিয়োগকৃত টাকা (Investment)</th>
                       <th className="py-3 px-4">শেয়ার অংশীদারিত্ব (% Share)</th>
                       <th className="py-3 px-4">মনোনীত নমিনি ও মোবাইল</th>
-                      <th className="py-3 px-4 text-right">সনদ ও প্রোফাইল</th>
+                      <th className="py-3 px-4 text-right">কার্যক্রম ও সনদ</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -1920,7 +2073,7 @@ export default function ManagementDashboard({
                         </td>
                         <td className="py-3 px-4">
                           <div className="font-black text-sm text-[#006231] font-mono">{formatBDT(dir.investment)}</div>
-                          <div className="text-3xs text-emerald-600 font-bold">পরিশোধিত বিনিয়োগ</div>
+                          <div className="text-3xs text-emerald-600 font-medium">পরিশোধিত বিনিয়োগ</div>
                         </td>
                         <td className="py-3 px-4">
                           <div className="inline-flex items-center px-2.5 py-1 rounded-xl bg-red-50 text-[#CE2028] font-bold text-xs border border-red-200 shadow-2xs font-mono">
@@ -1934,13 +2087,30 @@ export default function ManagementDashboard({
                           )}
                         </td>
                         <td className="py-3 px-4 text-right">
-                          <button
-                            onClick={() => setSelectedDirectorForProfile(dir)}
-                            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs cursor-pointer shadow-2xs inline-flex items-center space-x-1.5 transition-all hover:scale-105 active:scale-95"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-white/80" />
-                            <span>সনদ ও প্রোফাইল</span>
-                          </button>
+                          <div className="inline-flex items-center space-x-1.5 justify-end">
+                            {/* 1. Share Certificate Button */}
+                            <button
+                              onClick={() => setSelectedDirectorForCertificate(dir)}
+                              title="শেয়ার সনদপত্র দেখুন ও প্রিন্ট করুন"
+                              className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-2xs border border-amber-200/80 cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
+                            >
+                              <Award className="w-3.5 h-3.5 text-amber-600" />
+                              <span className="hidden sm:inline">শেয়ার সনদ</span>
+                            </button>
+
+                            {/* 2. Full Profile & Ledgers Button */}
+                            <button
+                              onClick={() => {
+                                setSelectedDirectorForProfile(dir);
+                                setDirectorProfileActiveTab('installments');
+                              }}
+                              title="বিস্তারিত প্রোফাইল ও জমার রসিদ হিসাব"
+                              className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
+                            >
+                              <Eye className="w-3.5 h-3.5 text-white/80" />
+                              <span>প্রোফাইল</span>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -2179,16 +2349,19 @@ export default function ManagementDashboard({
       )}
 
       {/* ========================================================= */}
-      {/* MODAL: FULL DIRECTOR PROFILE & SHARE CERTIFICATE DOSSIER  */}
+      {/* MODAL: FULL DIRECTOR PROFILE & PAYMENT RECEIPTS LEDGER     */}
       {/* ========================================================= */}
       {selectedDirectorForProfile && (() => {
         const d = selectedDirectorForProfile;
+        const totalPaidCapital = (d.installments || []).reduce((acc, i) => acc + (i.amount || 0), 0) || d.investment;
+        const totalDividendsReceived = (d.dividendHistory || []).reduce((acc, div) => acc + (div.amount || 0), 0) || d.dividendEarned;
+
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-            <div className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 relative divide-y divide-slate-100">
+            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 relative divide-y divide-slate-100">
               
               {/* Header */}
-              <div className="p-5 sm:p-6 flex items-start justify-between bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-t-3xl relative">
+              <div className="p-5 sm:p-6 flex items-start justify-between bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 text-white rounded-t-3xl relative">
                 <div className="flex items-center space-x-3.5 min-w-0">
                   <div className="w-14 h-16 sm:w-16 sm:h-20 rounded-2xl overflow-hidden shrink-0 bg-slate-800 border-2 border-white/20 shadow-md">
                     {d.image ? (
@@ -2206,82 +2379,291 @@ export default function ManagementDashboard({
                         {d.role}
                       </span>
                     </div>
-                    <div className="text-3xs text-slate-300 font-mono">
-                      ফোলিও নং: {d.folioNo} | আইডি: #{d.id}
+                    <div className="text-3xs text-slate-300 font-mono flex items-center space-x-2">
+                      <span>ফোলিও: <strong className="text-white">{d.folioNo}</strong></span>
+                      <span>•</span>
+                      <span>আইডি: #{d.id}</span>
+                      <span>•</span>
+                      <span className="text-amber-300 font-bold">শেয়ার: {d.sharePercentage}%</span>
                     </div>
                   </div>
                 </div>
 
+                <div className="flex items-center space-x-1.5 shrink-0 ml-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedDirectorForCertificate(d);
+                    }}
+                    title="শেয়ার সনদপত্র দেখুন"
+                    className="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-colors cursor-pointer text-xs font-bold flex items-center space-x-1"
+                  >
+                    <Award className="w-4 h-4 text-amber-400" />
+                    <span className="hidden sm:inline">সনদপত্র</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDirectorForProfile(null)}
+                    className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Navigation Tabs Inside Director Profile */}
+              <div className="bg-slate-50/80 px-5 pt-3 border-b border-slate-200/80 flex items-center space-x-2">
                 <button
                   type="button"
-                  onClick={() => setSelectedDirectorForProfile(null)}
-                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer shrink-0 ml-2"
+                  onClick={() => setDirectorProfileActiveTab('installments')}
+                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer flex items-center space-x-1.5 ${
+                    directorProfileActiveTab === 'installments'
+                      ? 'border-[#006231] text-[#006231]'
+                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                  }`}
                 >
-                  <X className="w-5 h-5" />
+                  <DollarSign className="w-3.5 h-3.5" />
+                  <span>মূলধন জমার কিস্তি ও রসিদ ({(d.installments || []).length})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setDirectorProfileActiveTab('dividends')}
+                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer flex items-center space-x-1.5 ${
+                    directorProfileActiveTab === 'dividends'
+                      ? 'border-[#CE2028] text-[#CE2028]'
+                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span>লভ্যাংশ বিবরণী / ডিভিডেন্ড ({(d.dividendHistory || []).length})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setDirectorProfileActiveTab('info')}
+                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer flex items-center space-x-1.5 ${
+                    directorProfileActiveTab === 'info'
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>নমিনি ও কর্পোরেট তথ্য</span>
                 </button>
               </div>
 
-              {/* Body */}
-              <div className="p-5 sm:p-6 space-y-5">
-                {/* Financial Summary */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100">
-                    <div className="text-3xs font-bold text-emerald-800 uppercase">মোট পরিশোধিত মূলধন</div>
-                    <div className="text-base font-black text-[#006231] mt-0.5">{formatBDT(d.investment)}</div>
-                    <div className="text-3xs text-emerald-600 font-medium">১০০% পরিশোধিত</div>
-                  </div>
+              {/* Body Content */}
+              <div className="p-5 sm:p-6 space-y-4">
+                {/* Tab 1: Capital Installments Statement with Individual Receipts */}
+                {directorProfileActiveTab === 'installments' && (
+                  <div className="space-y-4">
+                    {/* Top Metric Bar */}
+                    <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between">
+                      <div>
+                        <div className="text-3xs font-bold text-emerald-800 uppercase tracking-wide">সর্বমোট পরিশোধিত মূলধন (Paid Capital)</div>
+                        <div className="text-lg sm:text-xl font-bold text-[#006231] font-mono mt-0.5">{formatBDT(totalPaidCapital)}</div>
+                        <div className="text-3xs text-emerald-700 font-medium">মোট {(d.installments || []).length}টি কিস্তিতে প্রাপ্ত ও ভেরিফাইড</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCapitalDepositTargetDirector(d);
+                          setCapitalDepositForm({
+                            amount: '',
+                            date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+                            method: 'ব্যাংক চেক',
+                            receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
+                            note: 'মূলধনের কিস্তি জমা'
+                          });
+                          setIsCapitalDepositModalOpen(true);
+                        }}
+                        className="px-3.5 py-2 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-2xs shadow-sm flex items-center space-x-1 cursor-pointer active:scale-95 transition-all"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>+ মূলধন কিস্তি জমা দিন</span>
+                      </button>
+                    </div>
 
-                  <div className="p-3.5 rounded-2xl bg-red-50/70 border border-red-100">
-                    <div className="text-3xs font-bold text-red-800 uppercase">শেয়ার অংশীদারিত্ব</div>
-                    <div className="text-base font-bold text-[#CE2028] mt-0.5">{d.sharePercentage}%</div>
-                    <div className="text-3xs text-red-700 font-medium">অংশীদারিত্ব ইকুইটি</div>
-                  </div>
+                    {/* Receipts List */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-2xs font-bold text-slate-700 px-1">
+                        <span className="flex items-center space-x-1.5">
+                          <FileText className="w-3.5 h-3.5 text-[#006231]" />
+                          <span>কিস্তিতে মূলধন জমার অফিসিয়াল রসিদ তালিকা:</span>
+                        </span>
+                        <span className="text-3xs text-slate-400">অডিট অনুমোদিত লেজার</span>
+                      </div>
 
-                  <div className="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-100 col-span-2 sm:col-span-1">
-                    <div className="text-3xs font-bold text-purple-800 uppercase">অর্জিত মোট ডিভিডেন্ড</div>
-                    <div className="text-base font-bold text-purple-800 mt-0.5">{formatBDT(d.dividendEarned)}</div>
-                    <div className="text-3xs text-purple-600 font-medium">পরিশোধিত হিসাব</div>
-                  </div>
-                </div>
+                      {d.installments && d.installments.length > 0 ? (
+                        <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                          {d.installments.map((inst, idx) => (
+                            <div key={idx} className="p-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-colors flex items-center justify-between">
+                              <div className="space-y-1">
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-mono text-3xs font-bold text-emerald-900 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-emerald-200">
+                                    {inst.receiptNo || `RCPT-0${idx + 1}`}
+                                  </span>
+                                  <span className="text-xs font-bold text-slate-800">{inst.method}</span>
+                                </div>
+                                <div className="text-3xs text-slate-500 flex items-center space-x-2">
+                                  <span>তারিখ: <strong className="text-slate-700">{inst.date}</strong></span>
+                                  {inst.note && <span>• {inst.note}</span>}
+                                </div>
+                              </div>
 
-                {/* Corporate Details */}
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5 text-xs">
-                  <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                    <span className="text-slate-500">কোম্পানির মোট ইকুইটি শেয়ার:</span>
-                    <span className="font-bold text-slate-800">{d.sharePercentage}%</span>
+                              <div className="text-right">
+                                <div className="font-bold text-sm text-[#006231] font-mono">
+                                  +{formatBDT(inst.amount)}
+                                </div>
+                                <div className="text-3xs text-emerald-600 font-medium flex items-center justify-end space-x-1 mt-0.5">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                  <span>রসিদ ভেরিফাইড</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-200/60">
+                          এখনো কোনো পৃথক কিস্তির রসিদ এন্ট্রি দেওয়া হয়নি।
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                    <span className="text-slate-500">বোর্ড সদস্য হিসেবে অন্তর্ভুক্তি:</span>
-                    <span className="font-bold text-slate-800">{d.joiningDate}</span>
+                )}
+
+                {/* Tab 2: Dividend Payouts Ledger */}
+                {directorProfileActiveTab === 'dividends' && (
+                  <div className="space-y-4">
+                    {/* Top Metric Bar */}
+                    <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200/80 flex items-center justify-between">
+                      <div>
+                        <div className="text-3xs font-bold text-purple-800 uppercase tracking-wide">সর্বমোট বণ্টিত লভ্যাংশ (Disbursed Dividend)</div>
+                        <div className="text-lg sm:text-xl font-bold text-purple-900 font-mono mt-0.5">{formatBDT(totalDividendsReceived)}</div>
+                        <div className="text-3xs text-purple-700 font-medium">কোম্পানির শেয়ার মুনাফা বাবদ পরিশোধিত</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDividendTargetDirector(d);
+                          setDividendForm({
+                            amount: '',
+                            date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+                            method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
+                            voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
+                            note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
+                          });
+                          setIsDividendModalOpen(true);
+                        }}
+                        className="px-3.5 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-2xs shadow-sm flex items-center space-x-1 cursor-pointer active:scale-95 transition-all"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>+ ডিভিডেন্ড পে করুন</span>
+                      </button>
+                    </div>
+
+                    {/* Vouchers List */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-2xs font-bold text-slate-700 px-1">
+                        <span className="flex items-center space-x-1.5">
+                          <FileText className="w-3.5 h-3.5 text-purple-600" />
+                          <span>লভ্যাংশ পরিশোধের ভাউচার ও ট্রানজ্যাকশন হিস্ট্রি:</span>
+                        </span>
+                        <span className="text-3xs text-slate-400">ব্যাংক ট্রান্সফার স্টেটমেন্ট</span>
+                      </div>
+
+                      {d.dividendHistory && d.dividendHistory.length > 0 ? (
+                        <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                          {d.dividendHistory.map((div, vIdx) => (
+                            <div key={vIdx} className="p-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-purple-300 transition-colors flex items-center justify-between">
+                              <div className="space-y-1">
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-mono text-3xs font-bold text-purple-900 bg-purple-100/70 px-2 py-0.5 rounded-md border border-purple-200">
+                                    {div.voucherNo || `VCH-0${vIdx + 1}`}
+                                  </span>
+                                  <span className="text-xs font-bold text-slate-800">{div.method}</span>
+                                </div>
+                                <div className="text-3xs text-slate-500 flex items-center space-x-2">
+                                  <span>তারিখ: <strong className="text-slate-700">{div.date}</strong></span>
+                                  {div.note && <span>• {div.note}</span>}
+                                </div>
+                              </div>
+
+                              <div className="text-right">
+                                <div className="font-bold text-sm text-purple-800 font-mono">
+                                  +{formatBDT(div.amount)}
+                                </div>
+                                <div className="text-3xs text-purple-600 font-medium flex items-center justify-end space-x-1 mt-0.5">
+                                  <Sparkles className="w-3 h-3 text-purple-600" />
+                                  <span>পরিশোধ সম্পন্ন</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-200/60">
+                          এখনো কোনো ডিভিডেন্ড পরিশোধের ভাউচার রেকর্ড করা হয়নি।
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                    <span className="text-slate-500">আইনানুগ মনোনীত নমিনি:</span>
-                    <span className="font-bold text-slate-800">{d.nomineeName || 'সংরক্ষিত'} ({d.nomineeRelation || 'উত্তরাধিকারী'})</span>
+                )}
+
+                {/* Tab 3: Nominee & Corporate Information */}
+                {directorProfileActiveTab === 'info' && (
+                  <div className="space-y-3">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5 text-xs">
+                      <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
+                        <span className="text-slate-500">কোম্পানির মোট ইকুইটি শেয়ার:</span>
+                        <span className="font-bold text-slate-800">{d.sharePercentage}%</span>
+                      </div>
+                      <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
+                        <span className="text-slate-500">বোর্ড সদস্য হিসেবে অন্তর্ভুক্তি:</span>
+                        <span className="font-bold text-slate-800">{d.joiningDate}</span>
+                      </div>
+                      <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
+                        <span className="text-slate-500">আইনানুগ মনোনীত নমিনি:</span>
+                        <span className="font-bold text-slate-800">{d.nomineeName || 'সংরক্ষিত'} ({d.nomineeRelation || 'উত্তরাধিকারী'})</span>
+                      </div>
+                      <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
+                        <span className="text-slate-500">নমিনির মোবাইল নম্বর:</span>
+                        <span className="font-bold text-[#006231] font-mono">{d.nomineePhone || 'সংরক্ষিত নেই'}</span>
+                      </div>
+                      <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
+                        <span className="text-slate-500">অফিশিয়াল ইমেইল:</span>
+                        <span className="font-bold text-slate-800">{d.email}</span>
+                      </div>
+                      <div className="flex items-center justify-between py-1">
+                        <span className="text-slate-500">যোগাযোগের মোবাইল:</span>
+                        <span className="font-bold text-slate-800 font-mono">{d.phone}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                    <span className="text-slate-500">নমিনির মোবাইল নম্বর:</span>
-                    <span className="font-bold text-[#006231] font-mono">{d.nomineePhone || 'সংরক্ষিত নেই'}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
-                    <span className="text-slate-500">অফিশিয়াল ইমেইল:</span>
-                    <span className="font-bold text-slate-800">{d.email}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-slate-500">যোগাযোগের মোবাইল:</span>
-                    <span className="font-bold text-slate-800 font-mono">{d.phone}</span>
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Actions */}
               <div className="p-4 sm:p-5 flex items-center justify-between gap-2.5 bg-slate-50 rounded-b-3xl">
-                <a
-                  href={`tel:${d.phone}`}
-                  className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 shadow-2xs flex items-center space-x-1.5 transition-colors cursor-pointer"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#006231]" />
-                  <span>কল দিন</span>
-                </a>
+                <div className="flex items-center space-x-2">
+                  <a
+                    href={`tel:${d.phone}`}
+                    className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 shadow-2xs flex items-center space-x-1.5 transition-colors cursor-pointer"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-[#006231]" />
+                    <span>কল দিন</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDirectorForCertificate(d)}
+                    className="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-xs border border-amber-200 shadow-2xs flex items-center space-x-1.5 transition-colors cursor-pointer"
+                  >
+                    <Award className="w-3.5 h-3.5 text-amber-600" />
+                    <span>শেয়ার সনদপত্র</span>
+                  </button>
+                </div>
 
                 <button
                   type="button"
@@ -2296,6 +2678,398 @@ export default function ManagementDashboard({
           </div>
         );
       })()}
+
+      {/* ========================================================= */}
+      {/* MODAL: EXCLUSIVE OFFICIAL SHARE CERTIFICATE DOSSIER       */}
+      {/* ========================================================= */}
+      {selectedDirectorForCertificate && (() => {
+        const certDir = selectedDirectorForCertificate;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs animate-fadeIn">
+            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[95vh] overflow-y-auto shadow-2xl border border-slate-100 relative">
+              
+              {/* Modal Top Bar */}
+              <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 rounded-t-3xl">
+                <div className="flex items-center space-x-2">
+                  <Award className="w-5 h-5 text-amber-600" />
+                  <span className="font-bold text-sm text-slate-800">অফিশিয়াল শেয়ার সার্টিফিকেট প্রিভিউ</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs flex items-center space-x-1 cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>প্রিন্ট করুন</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDirectorForCertificate(null)}
+                    className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Classic Corporate Share Certificate Frame */}
+              <div className="p-6 sm:p-8 bg-amber-50/20">
+                <div className="relative p-6 sm:p-10 rounded-2xl border-4 border-double border-amber-800/40 bg-gradient-to-b from-[#FFFDF9] to-[#FDF8EC] shadow-inner text-center space-y-6">
+                  
+                  {/* Decorative Corner Filigrees */}
+                  <div className="absolute top-2 left-2 text-amber-700/40 text-xs font-serif font-black">❖</div>
+                  <div className="absolute top-2 right-2 text-amber-700/40 text-xs font-serif font-black">❖</div>
+                  <div className="absolute bottom-2 left-2 text-amber-700/40 text-xs font-serif font-black">❖</div>
+                  <div className="absolute bottom-2 right-2 text-amber-700/40 text-xs font-serif font-black">❖</div>
+
+                  {/* Company Crest & Header */}
+                  <div className="space-y-2">
+                    <img 
+                      src="/alemarah_logo_header.svg" 
+                      alt="Al-Emarah Properties" 
+                      className="h-12 mx-auto object-contain"
+                    />
+                    <div className="text-2xs font-bold tracking-widest text-slate-500 uppercase">
+                      আল-ইমারাহ প্রপার্টিজ লিমিটেড • কর্পোরেট ইকুইটি রেজিস্ট্রেশন
+                    </div>
+                    <div className="pt-2">
+                      <h2 className="text-xl sm:text-2xl font-serif font-bold text-amber-950 tracking-wider">
+                        শেয়ার মালিকানা ও অংশীদারিত্ব সনদ
+                      </h2>
+                      <p className="text-3xs sm:text-2xs font-serif text-amber-800/80 italic mt-0.5">
+                        OFFICIAL CERTIFICATE OF SHARE OWNERSHIP
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Folio & ID Row */}
+                  <div className="flex items-center justify-between text-2xs font-mono font-bold text-amber-900/70 border-y border-amber-200/80 py-2 px-4 bg-amber-50/50 rounded-lg">
+                    <span>ফোলিও নং: <strong className="text-amber-950">{certDir.folioNo}</strong></span>
+                    <span>সার্টিফিকেট নং: <strong className="text-amber-950">AEP-CERT-{certDir.id}</strong></span>
+                    <span>অন্তর্ভুক্তি: <strong className="text-amber-950">{certDir.joiningDate}</strong></span>
+                  </div>
+
+                  {/* Certificate Body Text */}
+                  <div className="space-y-4 text-xs sm:text-sm text-slate-800 leading-relaxed font-serif">
+                    <p className="text-slate-600">
+                      এই মর্মে প্রত্যায়ন করা যাইতেছে যে, আল-ইমারাহ প্রপার্টিজ লিমিটেড-এর সংঘস্মারক ও সংঘবিধি অনুযায়ী নিম্নোক্ত সম্মানিত পরিচালক
+                    </p>
+
+                    <div className="py-2">
+                      <div className="text-lg sm:text-2xl font-bold text-slate-900 border-b-2 border-dotted border-amber-800/40 inline-block px-6 pb-1">
+                        {certDir.name}
+                      </div>
+                      <div className="text-xs font-bold text-[#CE2028] mt-1">
+                        {certDir.role}
+                      </div>
+                    </div>
+
+                    <p className="text-slate-700 max-w-lg mx-auto">
+                      কোম্পানিতে সর্বমোট <strong className="font-bold text-[#006231] font-mono">{formatBDT(certDir.investment)}</strong> পরিশোধিত মূলধন বিনিয়োগপূর্বক কোম্পানির মোট শেয়ারের—
+                    </p>
+
+                    {/* Grand Share Badge */}
+                    <div className="inline-block p-4 rounded-2xl bg-white border-2 border-amber-300 shadow-md">
+                      <div className="text-3xs font-bold text-amber-800 uppercase tracking-widest">বরাদ্দকৃত ইকুইটি শেয়ার অংশ</div>
+                      <div className="text-3xl sm:text-4xl font-black text-[#CE2028] font-mono mt-1">
+                        {certDir.sharePercentage}%
+                      </div>
+                      <div className="text-3xs text-slate-500 mt-0.5">স্বত্বাধিকারী ও বোর্ড সদস্য</div>
+                    </div>
+
+                    <p className="text-3xs sm:text-2xs text-slate-500 max-w-md mx-auto pt-2">
+                      উক্ত শেয়ারহোল্ডার কোম্পানির সকল বোর্ড মিটিং, নীতি নির্ধারণী সিদ্ধান্ত গ্রহণ এবং বার্ষিক অর্জিত মুনাফা/লভ্যাংশ প্রাপ্তির পূর্ণ অধিকারী।
+                    </p>
+                  </div>
+
+                  {/* Signatures Row */}
+                  <div className="grid grid-cols-2 gap-8 pt-8 border-t border-amber-200/70 text-center">
+                    <div>
+                      <div className="w-28 sm:w-36 h-10 border-b border-slate-400 mx-auto flex items-end justify-center pb-1">
+                        <span className="font-serif italic text-2xs text-slate-400">ব্যবস্থাপনা পরিচালক</span>
+                      </div>
+                      <div className="text-3xs font-bold text-slate-700 mt-1">ব্যবস্থাপনা পরিচালক</div>
+                      <div className="text-[10px] text-slate-400">আল-ইমারাহ প্রপার্টিজ</div>
+                    </div>
+
+                    <div>
+                      <div className="w-28 sm:w-36 h-10 border-b border-slate-400 mx-auto flex items-end justify-center pb-1">
+                        <span className="font-serif italic text-2xs text-slate-400">চেয়ারম্যান স্বাক্ষর</span>
+                      </div>
+                      <div className="text-3xs font-bold text-slate-700 mt-1">বোর্ড চেয়ারম্যান</div>
+                      <div className="text-[10px] text-slate-400">আল-ইমারাহ প্রপার্টিজ</div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 bg-slate-50 flex items-center justify-between rounded-b-3xl">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedDirectorForCertificate(null);
+                    setSelectedDirectorForProfile(certDir);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 cursor-pointer"
+                >
+                  প্রোফাইল ও জমা হিস্ট্রি দেখুন
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDirectorForCertificate(null)}
+                  className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs cursor-pointer"
+                >
+                  বন্ধ করুন
+                </button>
+              </div>
+
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ========================================================= */}
+      {/* MODAL: CAPITAL INSTALLMENT DEPOSIT ENTRY                  */}
+      {/* ========================================================= */}
+      {isCapitalDepositModalOpen && capitalDepositTargetDirector && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center font-bold">
+                  <DollarSign className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-slate-900">মূলধনের কিস্তি জমা এন্ট্রি</h3>
+                  <p className="text-3xs text-slate-500">{capitalDepositTargetDirector.name} ({capitalDepositTargetDirector.folioNo})</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCapitalDepositModalOpen(false);
+                  setCapitalDepositTargetDirector(null);
+                }}
+                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddCapitalInstallment} className="space-y-3.5">
+              <div>
+                <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                  জমার পরিমাণ (BDT) *
+                </label>
+                <input
+                  type="number"
+                  required
+                  placeholder="উদাঃ 1000000"
+                  value={capitalDepositForm.amount}
+                  onChange={(e) => setCapitalDepositForm({ ...capitalDepositForm, amount: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#006231]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    জমার তারিখ
+                  </label>
+                  <input
+                    type="text"
+                    value={capitalDepositForm.date}
+                    onChange={(e) => setCapitalDepositForm({ ...capitalDepositForm, date: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#006231]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    রসিদ নম্বর (Receipt No)
+                  </label>
+                  <input
+                    type="text"
+                    value={capitalDepositForm.receiptNo}
+                    onChange={(e) => setCapitalDepositForm({ ...capitalDepositForm, receiptNo: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 outline-none focus:border-[#006231]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                  পেমেন্ট মেথড
+                </label>
+                <select
+                  value={capitalDepositForm.method}
+                  onChange={(e) => setCapitalDepositForm({ ...capitalDepositForm, method: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#006231]"
+                >
+                  <option value="ব্যাংক চেক">ব্যাংক চেক (Cheque)</option>
+                  <option value="ব্যাংক ট্রান্সফার">ব্যাংক ট্রান্সফার (NPSB / BEFTN / RTGS)</option>
+                  <option value="পে-অর্ডার">পে-অর্ডার (Pay Order)</option>
+                  <option value="নগদ জমা">নগদ ক্যাশ রসিদ</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                  মন্তব্য / বিবরণ
+                </label>
+                <input
+                  type="text"
+                  placeholder="যেমন: ২য় কিস্তির পরিশোধিত মূলধন"
+                  value={capitalDepositForm.note}
+                  onChange={(e) => setCapitalDepositForm({ ...capitalDepositForm, note: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#006231]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCapitalDepositModalOpen(false);
+                    setCapitalDepositTargetDirector(null);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs"
+                >
+                  বাতিল
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 active:scale-95 transition-all"
+                >
+                  রসিদ ইস্যু ও জমা নিশ্চিত করুন
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL: DIVIDEND PAYOUT ENTRY                              */}
+      {/* ========================================================= */}
+      {isDividendModalOpen && dividendTargetDirector && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center font-bold">
+                  <TrendingUp className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-slate-900">লভ্যাংশ / ডিভিডেন্ড প্রদান এন্ট্রি</h3>
+                  <p className="text-3xs text-slate-500">{dividendTargetDirector.name} ({dividendTargetDirector.sharePercentage}% শেয়ার)</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDividendModalOpen(false);
+                  setDividendTargetDirector(null);
+                }}
+                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddDividendPayout} className="space-y-3.5">
+              <div>
+                <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                  প্রদেয় লভ্যাংশের পরিমাণ (BDT) *
+                </label>
+                <input
+                  type="number"
+                  required
+                  placeholder="উদাঃ 500000"
+                  value={dividendForm.amount}
+                  onChange={(e) => setDividendForm({ ...dividendForm, amount: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-purple-600"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    বিতরণের তারিখ
+                  </label>
+                  <input
+                    type="text"
+                    value={dividendForm.date}
+                    onChange={(e) => setDividendForm({ ...dividendForm, date: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-purple-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    ভাউচার নম্বর (Voucher No)
+                  </label>
+                  <input
+                    type="text"
+                    value={dividendForm.voucherNo}
+                    onChange={(e) => setDividendForm({ ...dividendForm, voucherNo: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 outline-none focus:border-purple-600"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                  পরিশোধের মাধ্যম
+                </label>
+                <select
+                  value={dividendForm.method}
+                  onChange={(e) => setDividendForm({ ...dividendForm, method: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-purple-600"
+                >
+                  <option value="ব্যাংক অ্যাকাউন্ট ট্রান্সফার">ব্যাংক একাউন্ট ট্রান্সফার</option>
+                  <option value="ব্যাংক চেক">অ্যাকাউন্ট পেয়ী চেক</option>
+                  <option value="পে-অর্ডার">পে-অর্ডার</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                  বিবরণ
+                </label>
+                <input
+                  type="text"
+                  placeholder="যেমন: ২০২৪ অর্থ-বছরের বার্ষিক ডিভিডেন্ড"
+                  value={dividendForm.note}
+                  onChange={(e) => setDividendForm({ ...dividendForm, note: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-purple-600"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsDividendModalOpen(false);
+                    setDividendTargetDirector(null);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs"
+                >
+                  বাতিল
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-md shadow-purple-700/20 active:scale-95 transition-all"
+                >
+                  ডিভিডেন্ড ভাউচার ইস্যু করুন
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ========================================================= */}
       {/* MODAL 1: ADD CLIENT                                       */}
