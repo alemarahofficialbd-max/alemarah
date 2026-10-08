@@ -158,10 +158,10 @@ export default function InvestmentPage({
               </a>
               <a
                 href="tel:+8801816233013"
-                className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all flex items-center space-x-2"
+                className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs sm:text-sm border border-white/20 transition-all flex items-center space-x-2"
               >
                 <Phone className="w-4 h-4 text-[#8EBF40]" />
-                <span>{isEn ? 'Investment Hotline: 01816-233013' : 'ইনভেস্টমেন্ট হটলাইন: ০১৮১৬-২৩৩০১৩'}</span>
+                <span className="font-extrabold tracking-wide">{isEn ? 'Investment Hotline: 01816-233013' : 'ইনভেস্টমেন্ট হটলাইন: ০১৮১৬-২৩৩০১৩'}</span>
               </a>
             </div>
           </div>
@@ -473,18 +473,18 @@ export default function InvestmentPage({
                 <div className="text-xs font-bold text-[#8EBF40] uppercase tracking-wider">
                   {isEn ? 'Dedicated Investment Hotlines' : 'সরাসরি ইনভেস্টমেন্ট হটলাইন নম্বর'}
                 </div>
-                <div className="flex flex-wrap gap-4 text-sm sm:text-base font-bold">
-                  <a href="tel:+8801816233013" className="hover:text-[#8EBF40] transition-colors flex items-center space-x-1.5">
+                <div className="flex flex-wrap gap-4 text-sm sm:text-base font-extrabold">
+                  <a href="tel:+8801816233013" className="hover:text-[#8EBF40] transition-colors flex items-center space-x-1.5 font-extrabold tracking-wide">
                     <Phone className="w-4 h-4 text-[#8EBF40]" />
-                    <span>{isEn ? '01816-233013' : '০১৮১৬-২৩৩০১৩'}</span>
+                    <span className="font-extrabold">{isEn ? '01816-233013' : '০১৮১৬-২৩৩০১৩'}</span>
                   </a>
-                  <a href="tel:+8801918646575" className="hover:text-[#8EBF40] transition-colors flex items-center space-x-1.5">
+                  <a href="tel:+8801918646575" className="hover:text-[#8EBF40] transition-colors flex items-center space-x-1.5 font-bold tracking-wide">
                     <Phone className="w-4 h-4 text-[#8EBF40]" />
-                    <span>{isEn ? '01918-646575' : '০১৯১৮-৬৪৬৫৭৫'}</span>
+                    <span className="font-bold">{isEn ? '01918-646575' : '০১৯১৮-৬৪৬৫৭৫'}</span>
                   </a>
-                  <a href="tel:+8801743926926" className="hover:text-[#8EBF40] transition-colors flex items-center space-x-1.5">
+                  <a href="tel:+8801743926926" className="hover:text-[#8EBF40] transition-colors flex items-center space-x-1.5 font-bold tracking-wide">
                     <Phone className="w-4 h-4 text-[#8EBF40]" />
-                    <span>{isEn ? '01743-926926' : '০১৭৪৩-৯২৬৯২৬'}</span>
+                    <span className="font-bold">{isEn ? '01743-926926' : '০১৭৪৩-৯২৬৯২৬'}</span>
                   </a>
                 </div>
                 <p className="text-[11px] text-gray-400">

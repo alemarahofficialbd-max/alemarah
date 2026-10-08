@@ -73,7 +73,7 @@ export default function Navbar({
             <span className="text-gray-500">|</span>
             <a href="tel:+8801816233013" className="flex items-center space-x-1 hover:text-white transition-colors">
               <Phone className="w-3.5 h-3.5 text-[#8EBF40]" />
-              <span>{t.nav.callUs}: {t.nav.phoneNo}</span>
+              <span>{t.nav.callUs}: <strong className="font-bold text-white tracking-wide">{t.nav.phoneNo}</strong></span>
             </a>
           </div>
 
@@ -211,7 +211,7 @@ export default function Navbar({
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 font-medium">{t.nav.callUs}</div>
-                    <a href="tel:+8801816233013" className="text-xs sm:text-sm font-bold text-gray-900">{t.nav.phoneNo}</a>
+                    <a href="tel:+8801816233013" className="text-xs sm:text-sm font-extrabold text-gray-900 tracking-wide">{t.nav.phoneNo}</a>
                   </div>
                 </div>
                 <button

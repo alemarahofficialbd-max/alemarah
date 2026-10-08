@@ -753,24 +753,24 @@ export default function ProjectDetailsPage({
                 <div className="space-y-1.5 pt-1">
                   <a 
                     href="tel:01816233013" 
-                    className="flex items-center space-x-2 text-sm font-bold text-gray-900 hover:text-[#CE2028] transition-colors"
+                    className="flex items-center space-x-2 text-sm font-extrabold text-gray-950 hover:text-[#CE2028] transition-colors tracking-wide"
                   >
                     <Phone className="w-3.5 h-3.5 text-[#CE2028]" />
-                    <span>{isEn ? '01816-233013' : '০১৮১৬-২৩৩০১৩'}</span>
+                    <span className="font-extrabold">{isEn ? '01816-233013' : '০১৮১৬-২৩৩০১৩'}</span>
                   </a>
                   <a 
                     href="tel:01918646575" 
-                    className="flex items-center space-x-2 text-sm font-bold text-gray-900 hover:text-[#CE2028] transition-colors"
+                    className="flex items-center space-x-2 text-sm font-bold text-gray-800 hover:text-[#CE2028] transition-colors tracking-wide"
                   >
                     <Phone className="w-3.5 h-3.5 text-[#CE2028]" />
-                    <span>{isEn ? '01918-646575' : '০১৯১৮-৬৪৬৫৭৫'}</span>
+                    <span className="font-bold">{isEn ? '01918-646575' : '০১৯১৮-৬৪৬৫৭৫'}</span>
                   </a>
                   <a 
                     href="tel:01743926926" 
-                    className="flex items-center space-x-2 text-sm font-bold text-gray-900 hover:text-[#CE2028] transition-colors"
+                    className="flex items-center space-x-2 text-sm font-bold text-gray-800 hover:text-[#CE2028] transition-colors tracking-wide"
                   >
                     <Phone className="w-3.5 h-3.5 text-[#CE2028]" />
-                    <span>{isEn ? '01743-926926' : '০১৭৪৩-৯২৬৯২৬'}</span>
+                    <span className="font-bold">{isEn ? '01743-926926' : '০১৭৪৩-৯২৬৯২৬'}</span>
                   </a>
                 </div>
               </div>

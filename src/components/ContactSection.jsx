@@ -99,14 +99,14 @@ export default function ContactSection({ lang, t, preselectedProject }) {
                 </div>
                 <div className="text-sm">
                   <div className="font-bold text-gray-900 mb-1">{lang === 'en' ? 'Direct Hotline & Sales' : 'সরাসরি হটলাইন ও সেলস'}</div>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:text-sm font-semibold text-gray-800">
-                    <a href="tel:01816233013" className="hover:text-[#CE2028] transition-colors">
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs sm:text-sm font-bold text-gray-900">
+                    <a href="tel:01816233013" className="hover:text-[#CE2028] transition-colors font-extrabold tracking-wide text-gray-950">
                       {lang === 'en' ? '01816-233013' : '০১৮১৬-২৩৩০১৩'}
                     </a>
-                    <a href="tel:01918646575" className="hover:text-[#CE2028] transition-colors">
+                    <a href="tel:01918646575" className="hover:text-[#CE2028] transition-colors font-bold tracking-wide">
                       {lang === 'en' ? '01918-646575' : '০১৯১৮-৬৪৬৫৭৫'}
                     </a>
-                    <a href="tel:01743926926" className="hover:text-[#CE2028] transition-colors">
+                    <a href="tel:01743926926" className="hover:text-[#CE2028] transition-colors font-bold tracking-wide">
                       {lang === 'en' ? '01743-926926' : '০১৭৪৩-৯২৬৯২৬'}
                     </a>
                   </div>

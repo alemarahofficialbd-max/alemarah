@@ -660,10 +660,10 @@ export default function App() {
 
                       <a
                         href="tel:01816233013"
-                        className="px-5 py-3.5 rounded-xl bg-white hover:bg-gray-50 text-gray-800 font-bold text-xs sm:text-sm border border-gray-300 transition-all flex items-center space-x-2 shadow-2xs cursor-pointer"
+                        className="px-5 py-3.5 rounded-xl bg-white hover:bg-gray-50 text-gray-900 font-extrabold text-xs sm:text-sm border border-gray-300 transition-all flex items-center space-x-2 shadow-2xs cursor-pointer"
                       >
                         <Phone className="w-4 h-4 text-[#006231]" />
-                        <span>{lang === 'en' ? 'Hotline: 01816-233013' : 'হটলাইন: ০১৮১৬-২৩৩০১৩'}</span>
+                        <span className="font-extrabold tracking-wide">{lang === 'en' ? 'Hotline: 01816-233013' : 'হটলাইন: ০১৮১৬-২৩৩০১৩'}</span>
                       </a>
 
                       <a
@@ -930,8 +930,9 @@ export default function App() {
                     <MapPin className="w-5 h-5 text-[#CE2028]" />
                     <span>{t.contact.office.addressLine1}, {t.contact.office.addressLine2}</span>
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    {lang === 'en' ? 'Hotlines: 01816-233013, 01918-646575, 01743-926926, 01914-425073, 01833-544548' : 'হটলাইন নম্বরসমূহ: ০১৮১৬-২৩৩০১৩, ০১৯১৮-৬৪৬৫৭৫, ০১৭৪৩-৯২৬৯২৬, ০১৯১৪-৪২৫০৭৩, ০১৮৩৩-৫৪৪৫৪৮'}
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium">
+                    <span className="text-gray-500">{lang === 'en' ? 'Hotlines: ' : 'হটলাইন নম্বরসমূহ: '}</span>
+                    <strong className="font-bold text-gray-900 tracking-wide">{lang === 'en' ? '01816-233013, 01918-646575, 01743-926926, 01914-425073, 01833-544548' : '০১৮১৬-২৩৩০১৩, ০১৯১৮-৬৪৬৫৭৫, ০১৭৪৩-৯২৬৯২৬, ০১৯১৪-৪২৫০৭৩, ০১৮৩৩-৫৪৪৫৪৮'}</strong>
                   </p>
                 </div>
                 <button

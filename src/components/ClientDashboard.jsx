@@ -202,7 +202,7 @@ export default function ClientDashboard({
             className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-2xs font-semibold transition-colors"
           >
             <Phone className="w-3.5 h-3.5 text-[#006231]" />
-            <span>হেল্পলাইন: ০১৮১৬-২৩৩০১৩</span>
+            <span className="font-bold tracking-wide">হেল্পলাইন: ০১৮১৬-২৩৩০১৩</span>
           </a>
 
           <button

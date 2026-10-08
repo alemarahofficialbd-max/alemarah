@@ -186,10 +186,10 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
               </a>
               <div className="flex items-center space-x-2.5">
                 <Phone className="w-4 h-4 text-[#8EBF40] shrink-0" />
-                <div className="flex flex-col">
-                  <a href="tel:01816233013" className="hover:text-white transition-colors">{lang === 'en' ? '01816-233013' : '০১৮১৬-২৩৩০১৩'}</a>
-                  <a href="tel:01918646575" className="hover:text-white transition-colors">{lang === 'en' ? '01918-646575' : '০১৯১৮-৬৪৬৫৭৫'}</a>
-                  <a href="tel:01743926926" className="hover:text-white transition-colors">{lang === 'en' ? '01743-926926' : '০১৭৪৩-৯২৬৯২৬'}</a>
+                <div className="flex flex-col space-y-0.5 text-xs sm:text-sm">
+                  <a href="tel:01816233013" className="hover:text-white transition-colors font-bold text-white tracking-wide">{lang === 'en' ? '01816-233013' : '০১৮১৬-২৩৩০১৩'}</a>
+                  <a href="tel:01918646575" className="hover:text-white transition-colors font-bold text-gray-300 tracking-wide">{lang === 'en' ? '01918-646575' : '০১৯১৮-৬৪৬৫৭৫'}</a>
+                  <a href="tel:01743926926" className="hover:text-white transition-colors font-bold text-gray-300 tracking-wide">{lang === 'en' ? '01743-926926' : '০১৭৪৩-৯২৬৯২৬'}</a>
                 </div>
               </div>
               <div className="flex items-center space-x-2.5">
