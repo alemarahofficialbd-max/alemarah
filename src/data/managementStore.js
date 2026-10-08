@@ -81,20 +81,56 @@ export const initialManagementData = {
       ]
     }
   ],
+  superAdmin: {
+    id: 'SUPER-ADMIN-01',
+    name: 'প্রধান নির্বাহী ও সুপার অ্যাডমিন',
+    nameEn: 'Super Administrator',
+    email: 'alemarah.officialbd@gmail.com',
+    phone: '01816233013',
+    role: 'সুপার অ্যাডমিন (Super Admin)',
+    roleType: 'super_admin',
+    accessKey: 'admin123',
+    isSuperAdmin: true,
+    permissions: ['all'],
+    status: 'সক্রিয় (Active)'
+  },
   managementTeam: [
+    {
+      id: 'SUPER-ADMIN-01',
+      name: 'প্রধান নির্বাহী ও সুপার অ্যাডমিন',
+      nameEn: 'Super Administrator',
+      email: 'alemarah.officialbd@gmail.com',
+      phone: '01816233013',
+      role: 'সুপার অ্যাডমিন (Super Admin)',
+      roleType: 'super_admin',
+      accessKey: 'admin123',
+      isSuperAdmin: true,
+      permissions: ['all'],
+      status: 'সক্রিয় (Active)'
+    },
     {
       id: 'MGT-01',
       name: 'প্রকৌশলী মহিউদ্দিন আহমেদ',
+      email: 'engineer@alemarahproperties.com',
       phone: '01918646575',
       role: 'প্রজেক্ট ডিরেক্টর / সাইট ইনচার্জ',
-      accessKey: 'admin123'
+      roleType: 'project_director',
+      accessKey: 'admin123',
+      isSuperAdmin: false,
+      permissions: ['projects', 'expenses'],
+      status: 'সক্রিয় (Active)'
     },
     {
       id: 'MGT-02',
       name: 'মুহাম্মদ আব্দুর রহমান',
+      email: 'accounts@alemarahproperties.com',
       phone: '01743926926',
       role: 'হেড অফ অ্যাকাউন্টস & ফাইন্যান্স',
-      accessKey: 'admin123'
+      roleType: 'accounts_head',
+      accessKey: 'admin123',
+      isSuperAdmin: false,
+      permissions: ['payments', 'expenses', 'clients'],
+      status: 'সক্রিয় (Active)'
     }
   ],
   directors: [
@@ -209,6 +245,14 @@ export const getManagementData = () => {
       const parsed = JSON.parse(data);
       if (!parsed.directors || parsed.directors.length === 0) {
         parsed.directors = initialManagementData.directors;
+      }
+      if (!parsed.superAdmin) {
+        parsed.superAdmin = initialManagementData.superAdmin;
+      }
+      if (!parsed.managementTeam || parsed.managementTeam.length === 0) {
+        parsed.managementTeam = initialManagementData.managementTeam;
+      } else if (!parsed.managementTeam.some(m => m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com')) {
+        parsed.managementTeam = [initialManagementData.superAdmin, ...parsed.managementTeam];
       }
       return parsed;
     }

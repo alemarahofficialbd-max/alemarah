@@ -36,7 +36,12 @@ import {
   Key,
   FileText,
   Layers,
-  Eye
+  Eye,
+  Crown,
+  Trash2,
+  Edit3,
+  Mail,
+  KeyRound
 } from 'lucide-react';
 import { 
   formatBDT, 
@@ -60,6 +65,13 @@ export default function ManagementDashboard({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [successAlert, setSuccessAlert] = useState('');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Check if current logged-in account has Super Admin privileges
+  const isSuperAdmin = admin?.isSuperAdmin || 
+    admin?.roleType === 'super_admin' || 
+    admin?.email === 'alemarah.officialbd@gmail.com' ||
+    admin?.phone === '01816233013' ||
+    Boolean(admin?.role?.includes('সুপার অ্যাডমিন'));
 
   const profileRef = useRef(null);
 
@@ -141,13 +153,17 @@ export default function ManagementDashboard({
     date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })
   });
 
-  // 5. Team Member Form
+  // 5. Team Member & Admin Form
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const [editingTeamMember, setEditingTeamMember] = useState(null);
+  const [showAccessKeys, setShowAccessKeys] = useState({});
   const [teamForm, setTeamForm] = useState({
     name: '',
     phone: '',
+    email: '',
     role: 'সাইট ইঞ্জিনিয়ার',
-    accessKey: 'admin123'
+    accessKey: 'admin123',
+    permissions: ['projects', 'expenses']
   });
 
   // 6. Board Director Form & Profile
@@ -350,34 +366,108 @@ export default function ManagementDashboard({
     triggerAlert('প্রজেক্ট খরচের এন্ট্রি সফলভাবে যুক্ত হয়েছে!');
   };
 
-  const handleAddTeam = (e) => {
-    e.preventDefault();
-    if (!teamForm.name || !teamForm.phone) {
-      alert('নাম এবং ফোন নম্বর লিখুন।');
-      return;
-    }
-
-    const newMember = {
-      id: `MGT-0${data.managementTeam.length + 1}`,
-      name: teamForm.name,
-      phone: teamForm.phone,
-      role: teamForm.role,
-      accessKey: teamForm.accessKey || 'admin123'
-    };
-
-    updateStore((prev) => ({
-      ...prev,
-      managementTeam: [...prev.managementTeam, newMember]
-    }));
-
-    setIsTeamModalOpen(false);
+  const handleOpenAddTeam = () => {
+    setEditingTeamMember(null);
     setTeamForm({
       name: '',
       phone: '',
+      email: '',
       role: 'সাইট ইঞ্জিনিয়ার',
-      accessKey: 'admin123'
+      accessKey: 'admin123',
+      permissions: ['projects', 'expenses']
     });
-    triggerAlert(`কর্মকর্তা ${newMember.name} সফলভাবে যুক্ত হয়েছেন!`);
+    setIsTeamModalOpen(true);
+  };
+
+  const handleOpenEditTeam = (mem) => {
+    setEditingTeamMember(mem);
+    setTeamForm({
+      name: mem.name || '',
+      phone: mem.phone || '',
+      email: mem.email || '',
+      role: mem.role || 'সাইট ইঞ্জিনিয়ার',
+      accessKey: mem.accessKey || 'admin123',
+      permissions: mem.permissions || ['projects', 'expenses']
+    });
+    setIsTeamModalOpen(true);
+  };
+
+  const handleSaveTeam = (e) => {
+    e.preventDefault();
+    if (!teamForm.name || !teamForm.phone) {
+      alert('নাম এবং মোবাইল নম্বর পূরণ করুন।');
+      return;
+    }
+
+    if (editingTeamMember) {
+      updateStore((prev) => {
+        const updatedTeam = prev.managementTeam.map((m) => {
+          if (m.id === editingTeamMember.id) {
+            return {
+              ...m,
+              name: teamForm.name,
+              phone: teamForm.phone,
+              email: teamForm.email,
+              role: teamForm.role,
+              accessKey: teamForm.accessKey || 'admin123',
+              permissions: teamForm.permissions
+            };
+          }
+          return m;
+        });
+
+        let updatedSuperAdmin = prev.superAdmin;
+        if (editingTeamMember.isSuperAdmin && updatedSuperAdmin) {
+          updatedSuperAdmin = {
+            ...updatedSuperAdmin,
+            name: teamForm.name,
+            phone: teamForm.phone,
+            email: teamForm.email || updatedSuperAdmin.email,
+            accessKey: teamForm.accessKey || 'admin123'
+          };
+        }
+
+        return {
+          ...prev,
+          managementTeam: updatedTeam,
+          superAdmin: updatedSuperAdmin
+        };
+      });
+
+      triggerAlert(`অ্যাডমিন/কর্মকর্তা ${teamForm.name}-এর তথ্য সফলভাবে আপডেট হয়েছে!`);
+    } else {
+      const newMember = {
+        id: `MGT-0${data.managementTeam.length + 1}`,
+        name: teamForm.name,
+        phone: teamForm.phone,
+        email: teamForm.email || '',
+        role: teamForm.role,
+        accessKey: teamForm.accessKey || 'admin123',
+        isSuperAdmin: false,
+        permissions: teamForm.permissions || ['projects', 'expenses'],
+        status: 'সক্রিয় (Active)'
+      };
+
+      updateStore((prev) => ({
+        ...prev,
+        managementTeam: [...prev.managementTeam, newMember]
+      }));
+
+      triggerAlert(`নতুন কর্মকর্তা ${newMember.name} সফলভাবে যুক্ত হয়েছেন!`);
+    }
+
+    setIsTeamModalOpen(false);
+    setEditingTeamMember(null);
+  };
+
+  const handleDeleteTeam = (id, name) => {
+    if (window.confirm(`আপনি কি নিশ্চিতভাবে ${name}-কে অ্যাডমিন তালিকা থেকে অপসারণ করতে চান?`)) {
+      updateStore((prev) => ({
+        ...prev,
+        managementTeam: prev.managementTeam.filter(m => m.id !== id)
+      }));
+      triggerAlert(`${name}-কে সফলভাবে অপসারণ করা হয়েছে।`);
+    }
   };
 
   const handleAddDirector = (e) => {
@@ -475,7 +565,7 @@ export default function ManagementDashboard({
     { id: 'payments', label: '২. কিস্তি ও জমা এন্ট্রি', shortLabel: 'জমা এন্ট্রি', icon: DollarSign },
     { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল ও স্টেজ', shortLabel: 'প্রজেক্ট', icon: Building2 },
     { id: 'expenses', label: '৪. প্রজেক্ট বাজেট ও খরচ', shortLabel: 'বাজেট ও খরচ', icon: Wallet },
-    { id: 'team', label: '৫. ম্যানেজমেন্ট টিম ও অফিসার', shortLabel: 'টিম', icon: HardHat },
+    { id: 'team', label: '৫. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
     { id: 'directors', label: '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', shortLabel: 'ডিরেক্টরস', icon: Award }
   ];
 
@@ -536,26 +626,35 @@ export default function ManagementDashboard({
             </div>
           )}
 
-          {/* Manager Mini Profile Card in Sidebar */}
-          <div className={`rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center transition-all ${
+          {/* Manager / Super Admin Mini Profile Card in Sidebar */}
+          <div className={`rounded-2xl transition-all ${
+            isSuperAdmin 
+              ? 'bg-gradient-to-r from-slate-900 via-zinc-900 to-amber-950/80 border border-amber-500/30 text-white shadow-sm'
+              : 'bg-slate-50 border border-slate-200/70'
+          } flex items-center ${
             isSidebarCollapsed ? 'p-2 justify-center' : 'p-3.5 space-x-3'
           }`}>
             <div className="relative shrink-0" title={admin?.name || 'অ্যাডমিন'}>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white flex items-center justify-center font-black text-sm shadow-2xs">
-                {admin?.name ? admin.name.slice(0, 2) : 'ম্যা'}
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shadow-2xs ${
+                isSuperAdmin 
+                  ? 'bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-2 ring-amber-400/50' 
+                  : 'bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white'
+              }`}>
+                {isSuperAdmin ? <Crown className="w-5 h-5 text-amber-200" /> : (admin?.name ? admin.name.slice(0, 2) : 'ম্যা')}
               </div>
               <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
             </div>
             {!isSidebarCollapsed && (
               <div className="min-w-0 flex-1">
-                <div className="text-xs font-black text-slate-900 truncate">
-                  {admin?.name || 'অ্যাডমিন কর্মকর্তা'}
+                <div className={`text-xs font-black truncate flex items-center space-x-1 ${isSuperAdmin ? 'text-amber-100' : 'text-slate-900'}`}>
+                  <span>{admin?.name || 'সুপার অ্যাডমিন'}</span>
+                  {isSuperAdmin && <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0 inline" />}
                 </div>
-                <div className="text-3xs text-[#006231] font-bold truncate">
-                  {admin?.role || 'ম্যানেজমেন্ট টিম'}
+                <div className={`text-3xs font-bold truncate ${isSuperAdmin ? 'text-amber-300' : 'text-[#006231]'}`}>
+                  {isSuperAdmin ? '👑 সুপার অ্যাডমিন (Master)' : (admin?.role || 'ম্যানেজমেন্ট টিম')}
                 </div>
-                <div className="text-3xs text-slate-400 font-semibold truncate">
-                  {admin?.phone || '০১৯১৮-৬৪৬৫৭৫'}
+                <div className={`text-3xs font-semibold truncate ${isSuperAdmin ? 'text-slate-300' : 'text-slate-400'}`}>
+                  {admin?.email || admin?.phone || 'alemarah.officialbd@gmail.com'}
                 </div>
               </div>
             )}
@@ -679,8 +778,12 @@ export default function ManagementDashboard({
                 aria-expanded={isProfileOpen}
                 title="ম্যানেজমেন্ট মেনু"
               >
-                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white flex items-center justify-center font-black text-xs ring-2 ring-[#CE2028]/30 shadow-xs">
-                  {admin?.name ? admin.name.slice(0, 2) : 'ম্যা'}
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs ring-2 shadow-xs ${
+                  isSuperAdmin 
+                    ? 'bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/60' 
+                    : 'bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white ring-[#CE2028]/30'
+                }`}>
+                  {isSuperAdmin ? <Crown className="w-4 h-4 text-amber-200" /> : (admin?.name ? admin.name.slice(0, 2) : 'ম্যা')}
                 </div>
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
               </button>
@@ -697,14 +800,17 @@ export default function ManagementDashboard({
               {isProfileOpen && (
                 <div className="fixed inset-x-4 top-16 max-w-sm mx-auto bg-white rounded-3xl shadow-2xl border border-slate-100 py-3 z-50 animate-fadeIn divide-y divide-slate-100">
                   <div className="px-5 py-3">
-                    <div className="text-sm font-black text-slate-900 truncate">
-                      {admin?.name || 'অ্যাডমিন কর্মকর্তা'}
+                    <div className="flex items-center space-x-1.5">
+                      <span className="text-sm font-black text-slate-900 truncate">
+                        {admin?.name || 'সুপার অ্যাডমিন'}
+                      </span>
+                      {isSuperAdmin && <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
                     </div>
                     <div className="text-xs text-[#006231] font-semibold mt-0.5">
-                      {admin?.role || 'ম্যানেজমেন্ট টিম'}
+                      {isSuperAdmin ? '👑 সুপার অ্যাডমিন (Master Admin)' : (admin?.role || 'ম্যানেজমেন্ট টিম')}
                     </div>
                     <div className="text-2xs text-slate-400 mt-0.5">
-                      মোবাইল: {admin?.phone || '০১৯১৮-৬৪৬৫৭৫'}
+                      {admin?.email || admin?.phone || 'alemarah.officialbd@gmail.com'}
                     </div>
                   </div>
 
@@ -1454,54 +1560,287 @@ export default function ManagementDashboard({
         )}
 
         {/* ------------------------------------------------------- */}
-        {/* TAB 5: MANAGEMENT TEAM                                  */}
+        {/* TAB 5: SUPER ADMIN & TEAM ROLE MANAGEMENT               */}
         {/* ------------------------------------------------------- */}
-        {activeTab === 'team' && (
-          <div className="space-y-4 animate-fadeIn">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-              <div>
-                <h3 className="text-base font-bold text-slate-900">ম্যানেজমেন্ট টিম ও দায়িত্বপ্রাপ্ত কর্মকর্তাগণ</h3>
-                <p className="text-xs text-slate-500">অ্যাডমিন, অ্যাকাউন্টস ও সাইট ইঞ্জিনিয়ারদের তালিকা</p>
-              </div>
-              <button
-                onClick={() => setIsTeamModalOpen(true)}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
-              >
-                <Plus className="w-4 h-4" />
-                <span>+ নতুন কর্মকর্তা যোগ করুন</span>
-              </button>
-            </div>
+        {activeTab === 'team' && (() => {
+          const superAdminMember = data.managementTeam?.find(m => m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com') || data.superAdmin || {
+            name: 'প্রধান নির্বাহী ও সুপার অ্যাডমিন',
+            email: 'alemarah.officialbd@gmail.com',
+            phone: '01816233013',
+            role: 'সুপার অ্যাডমিন (Super Admin)',
+            accessKey: 'admin123',
+            isSuperAdmin: true
+          };
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-              {data.managementTeam.map((mem) => (
-                <div key={mem.id} className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-11 h-11 rounded-2xl bg-red-50 text-[#CE2028] flex items-center justify-center font-black text-base">
-                      <HardHat className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-black text-slate-900">{mem.name}</h4>
-                      <p className="text-xs text-[#006231] font-semibold">{mem.role}</p>
-                    </div>
+          const officerTeam = (data.managementTeam || []).filter(m => !(m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com'));
+
+          return (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Top Header Card */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center space-x-2">
+                      <ShieldCheck className="w-5 h-5 text-[#006231]" />
+                      <span>কেন্দ্রীয় অ্যাডমিন ও ইউজার রোল ম্যানেজমেন্ট</span>
+                    </h3>
                   </div>
-
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1">
-                    <div>মোবাইল: <strong className="text-slate-900 font-mono">{mem.phone}</strong></div>
-                    <div>অ্যাক্সেস কী: <span className="font-mono text-slate-600 font-semibold">{mem.accessKey}</span></div>
-                  </div>
-
-                  <a
-                    href={`tel:${mem.phone}`}
-                    className="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center space-x-1 transition-colors"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-[#006231]" />
-                    <span>কল দিন</span>
-                  </a>
+                  <p className="text-xs text-slate-500 mt-1">
+                    সুপার অ্যাডমিন দ্বারা পরিচালিত — সকল কর্মকর্তা, দায়িত্ব, রোল ও অ্যাক্সেস পারমিশন কন্ট্রোল প্যানেল
+                  </p>
                 </div>
-              ))}
+                <button
+                  type="button"
+                  onClick={handleOpenAddTeam}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 shrink-0"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>+ নতুন কর্মকর্তা / অ্যাডমিন যুক্ত করুন</span>
+                </button>
+              </div>
+
+              {/* KPI Summary Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50 via-white to-red-50 border border-amber-200/80 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xs font-extrabold uppercase text-amber-900 tracking-wider">রুট অ্যাডমিন একাউন্ট</span>
+                    <Crown className="w-4 h-4 text-amber-500" />
+                  </div>
+                  <div className="text-sm font-black text-slate-900 mt-1 truncate">
+                    {superAdminMember.email}
+                  </div>
+                  <div className="text-2xs text-[#006231] font-bold mt-0.5 flex items-center space-x-1">
+                    <CheckCircle2 className="w-3 h-3 text-[#006231]" />
+                    <span>সুরক্ষিত কেন্দ্রীয় নিয়ন্ত্রণাধিকার</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xs font-extrabold uppercase text-slate-500 tracking-wider">মোট কর্মকর্তা ও সাব-অ্যাডমিন</span>
+                    <Users className="w-4 h-4 text-[#006231]" />
+                  </div>
+                  <div className="text-xl font-black text-slate-900 mt-1">
+                    {officerTeam.length} জন
+                  </div>
+                  <div className="text-2xs text-slate-500 mt-0.5 font-medium">
+                    সাইট, ইঞ্জিনিয়ারিং ও ফাইন্যান্স টিম
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xs font-extrabold uppercase text-slate-500 tracking-wider">নিরাপত্তা ও অ্যাক্সেস পলিসি</span>
+                    <KeyRound className="w-4 h-4 text-[#CE2028]" />
+                  </div>
+                  <div className="text-xl font-black text-[#006231] mt-1">
+                    সক্রিয় ও সুরক্ষিত
+                  </div>
+                  <div className="text-2xs text-slate-500 mt-0.5 font-medium">
+                    ভূমিকা ভিত্তিক রোল নির্ধারণ (RBAC)
+                  </div>
+                </div>
+              </div>
+
+              {/* Master Super Admin Spotlight Card */}
+              <div className="bg-gradient-to-r from-slate-950 via-zinc-900 to-[#2A080A] rounded-3xl p-5 sm:p-6 text-white border-2 border-amber-500/40 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                  <div className="flex items-start sm:items-center space-x-4">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white flex items-center justify-center font-black text-2xl shadow-lg ring-4 ring-amber-400/20 shrink-0">
+                      <Crown className="w-8 h-8 text-amber-100" />
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-extrabold text-3xs border border-amber-400/30 uppercase tracking-wider flex items-center space-x-1">
+                          <Crown className="w-3 h-3 text-amber-400" />
+                          <span>প্রধান সুপার অ্যাডমিন (Master Account)</span>
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-3xs font-bold border border-emerald-400/30">
+                          সর্বময় পরিচালিত
+                        </span>
+                      </div>
+
+                      <h4 className="text-lg sm:text-xl font-black text-white">
+                        {superAdminMember.name}
+                      </h4>
+
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300 pt-0.5">
+                        <span className="flex items-center space-x-1">
+                          <Mail className="w-3.5 h-3.5 text-amber-400" />
+                          <span className="font-mono">{superAdminMember.email}</span>
+                        </span>
+                        <span className="text-slate-600">|</span>
+                        <span className="flex items-center space-x-1">
+                          <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                          <span className="font-mono font-bold text-white">{superAdminMember.phone}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Super Admin Access Key & Actions */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2 md:pt-0 border-t md:border-t-0 border-white/10">
+                    <div className="bg-black/50 border border-white/15 px-3.5 py-2 rounded-xl text-xs flex items-center justify-between sm:justify-start space-x-2">
+                      <span className="text-slate-400 font-medium text-3xs uppercase">অ্যাক্সেস কী:</span>
+                      <span className="font-mono font-bold text-amber-300">
+                        {showAccessKeys['super'] ? superAdminMember.accessKey : '••••••••'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowAccessKeys(prev => ({ ...prev, super: !prev.super }))}
+                        className="p-1 rounded text-slate-400 hover:text-white cursor-pointer"
+                        title={showAccessKeys['super'] ? 'পাসওয়ার্ড লুকান' : 'পাসওয়ার্ড দেখুন'}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditTeam(superAdminMember)}
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>পাসওয়ার্ড / তথ্য সম্পাদনা</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3.5 border-t border-white/10 text-2xs text-slate-300 flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-amber-400 font-bold">অনুমোদিত নিয়ন্ত্রণ:</span>
+                    <span>পরিচালক পরিষদ, প্রজেক্ট বাজেট, আয়-ব্যয়, ফ্ল্যাট বুকিং ও কর্মকর্তা রোল নির্ধারণ</span>
+                  </div>
+                  <span className="text-emerald-400 font-bold">✓ রুট প্রোটেকশন সক্রিয়</span>
+                </div>
+              </div>
+
+              {/* Sub-Admins & Officers Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+                      <HardHat className="w-4 h-4 text-[#006231]" />
+                      <span>কর্মকর্তা ও সাব-অ্যাডমিনদের তালিকা ({officerTeam.length})</span>
+                    </h4>
+                    <p className="text-2xs text-slate-500 mt-0.5">
+                      সুপার অ্যাডমিনের অধীনে প্রতিটি কর্মকর্তার দায়িত্ব ও পারমিশন
+                    </p>
+                  </div>
+                </div>
+
+                {officerTeam.length === 0 ? (
+                  <div className="p-8 text-center bg-white rounded-3xl border border-slate-200/80 text-slate-500">
+                    <HardHat className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                    <p className="text-xs font-bold text-slate-700">বর্তমানে কোনো অতিরিক্ত কর্মকর্তা যুক্ত নেই</p>
+                    <p className="text-2xs text-slate-400 mt-0.5">নতুন কর্মকর্তা যুক্ত করতে উপরের বাটনে ক্লিক করুন</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                    {officerTeam.map((mem) => {
+                      const isMemKeyVisible = Boolean(showAccessKeys[mem.id]);
+                      return (
+                        <div key={mem.id} className="bg-white p-5 rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3.5">
+                          <div className="space-y-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-11 h-11 rounded-2xl bg-red-50 text-[#CE2028] flex items-center justify-center font-black text-base border border-red-100">
+                                  <HardHat className="w-5 h-5" />
+                                </div>
+                                <div className="min-w-0">
+                                  <h4 className="text-sm font-black text-slate-900 truncate">{mem.name}</h4>
+                                  <span className="inline-block px-2 py-0.5 rounded-full text-3xs font-black bg-emerald-50 text-[#006231] border border-emerald-200 mt-0.5">
+                                    {mem.role}
+                                  </span>
+                                </div>
+                              </div>
+                              <span className="font-mono text-3xs text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">
+                                #{mem.id}
+                              </span>
+                            </div>
+
+                            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
+                              <div className="flex items-center justify-between text-2xs">
+                                <span className="text-slate-500 font-medium">মোবাইল:</span>
+                                <strong className="text-slate-900 font-mono">{mem.phone}</strong>
+                              </div>
+                              {mem.email && (
+                                <div className="flex items-center justify-between text-2xs">
+                                  <span className="text-slate-500 font-medium">ইমেইল:</span>
+                                  <span className="text-slate-700 font-mono truncate max-w-[170px]">{mem.email}</span>
+                                </div>
+                              )}
+                              <div className="flex items-center justify-between text-2xs pt-1 border-t border-slate-200/60">
+                                <span className="text-slate-500 font-medium">লগইন কী:</span>
+                                <div className="flex items-center space-x-1.5">
+                                  <span className="font-mono font-bold text-slate-800">
+                                    {isMemKeyVisible ? mem.accessKey : '••••••••'}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setShowAccessKeys(prev => ({ ...prev, [mem.id]: !prev[mem.id] }))}
+                                    className="p-0.5 text-slate-400 hover:text-slate-700 cursor-pointer"
+                                  >
+                                    <Eye className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Assigned Permissions Tags */}
+                            <div className="space-y-1">
+                              <div className="text-3xs font-bold uppercase tracking-wider text-slate-400">অনুমোদিত ক্ষমতা:</div>
+                              <div className="flex flex-wrap gap-1">
+                                {(mem.permissions || ['projects', 'expenses']).map((perm, idx) => (
+                                  <span key={idx} className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-3xs font-semibold">
+                                    {perm === 'projects' ? 'প্রজেক্ট' : perm === 'expenses' ? 'খরচ ভাউচার' : perm === 'clients' ? 'ক্লায়েন্ট' : perm === 'payments' ? 'কিস্তি জমা' : perm === 'directors' ? 'পরিচালক' : perm}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="pt-2 border-t border-slate-100 flex items-center space-x-1.5">
+                            <a
+                              href={`tel:${mem.phone}`}
+                              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                              title="কল দিন"
+                            >
+                              <Phone className="w-3.5 h-3.5 text-[#006231]" />
+                            </a>
+
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditTeam(mem)}
+                              className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-2xs font-bold flex items-center justify-center space-x-1 transition-colors cursor-pointer"
+                            >
+                              <Edit3 className="w-3.5 h-3.5 text-slate-600" />
+                              <span>সম্পাদনা</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteTeam(mem.id, mem.name)}
+                              className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-[#CE2028] transition-colors cursor-pointer"
+                              title="অপসারণ করুন"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* ------------------------------------------------------- */}
         {/* TAB 6: BOARD OF DIRECTORS & SHAREHOLDERS                 */}
@@ -2323,24 +2662,34 @@ export default function ManagementDashboard({
       )}
 
       {/* ========================================================= */}
-      {/* MODAL 3: ADD TEAM MEMBER                                  */}
+      {/* MODAL 3: ADD / EDIT TEAM MEMBER & PERMISSIONS             */}
       {/* ========================================================= */}
       {isTeamModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                নতুন কর্মকর্তা / অ্যাডমিন যুক্ত করুন
-              </h3>
+              <div className="flex items-center space-x-2">
+                {editingTeamMember?.isSuperAdmin ? (
+                  <Crown className="w-5 h-5 text-amber-500" />
+                ) : (
+                  <ShieldCheck className="w-5 h-5 text-[#006231]" />
+                )}
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                  {editingTeamMember 
+                    ? (editingTeamMember.isSuperAdmin ? 'সুপার অ্যাডমিন তথ্য ও পাসওয়ার্ড সম্পাদনা' : 'কর্মকর্তার তথ্য ও পারমিশন সম্পাদনা') 
+                    : 'নতুন কর্মকর্তা / সাব-অ্যাডমিন যুক্ত করুন'}
+                </h3>
+              </div>
               <button 
+                type="button"
                 onClick={() => setIsTeamModalOpen(false)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleAddTeam} className="space-y-3.5">
+            <form onSubmit={handleSaveTeam} className="space-y-3.5">
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   কর্মকর্তার নাম *
@@ -2355,47 +2704,101 @@ export default function ManagementDashboard({
                 />
               </div>
 
-              <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  মোবাইল নম্বর *
-                </label>
-                <input
-                  type="tel"
-                  placeholder="যেমন: 01918646575"
-                  value={teamForm.phone}
-                  onChange={(e) => setTeamForm({ ...teamForm, phone: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-                  required
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    মোবাইল নম্বর *
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="যেমন: 01918646575"
+                    value={teamForm.phone}
+                    onChange={(e) => setTeamForm({ ...teamForm, phone: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    ইমেইল (ঐচ্ছিক)
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="officer@alemarah.com"
+                    value={teamForm.email || ''}
+                    onChange={(e) => setTeamForm({ ...teamForm, email: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  />
+                </div>
               </div>
+
+              {!editingTeamMember?.isSuperAdmin && (
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    পদবী / নির্ধারিত রোল
+                  </label>
+                  <select
+                    value={teamForm.role}
+                    onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  >
+                    <option value="সাইট ইঞ্জিনিয়ার">সাইট ইঞ্জিনিয়ার</option>
+                    <option value="প্রজেক্ট ডিরেক্টর / সাইট ইনচার্জ">প্রজেক্ট ডিরেক্টর / সাইট ইনচার্জ</option>
+                    <option value="হেড অফ অ্যাকাউন্টস & ফাইন্যান্স">হেড অফ অ্যাকাউন্টস & ফাইন্যান্স</option>
+                    <option value="সেলস অ্যান্ড মার্কেটিং ম্যানেজার">সেলস অ্যান্ড মার্কেটিং ম্যানেজার</option>
+                    <option value="আইন ও কমপ্লায়েন্স অফিসার">আইন ও কমপ্লায়েন্স অফিসার</option>
+                    <option value="সিনিয়র অ্যাডমিন">সিনিয়র অ্যাডমিন</option>
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  পদবী / রোল
-                </label>
-                <select
-                  value={teamForm.role}
-                  onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-                >
-                  <option value="সাইট ইঞ্জিনিয়ার">সাইট ইঞ্জিনিয়ার</option>
-                  <option value="প্রজেক্ট ডিরেক্টর">প্রজেক্ট ডিরেক্টর</option>
-                  <option value="অ্যাকাউন্টস অফিসার">অ্যাকাউন্টস অফিসার</option>
-                  <option value="সিনিয়র অ্যাডমিন">সিনিয়র অ্যাডমিন</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  লগইন অ্যাক্সেস কী / পাসওয়ার্ড
+                  লগইন অ্যাক্সেস কী / পাসওয়ার্ড *
                 </label>
                 <input
                   type="text"
                   value={teamForm.accessKey}
                   onChange={(e) => setTeamForm({ ...teamForm, accessKey: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  required
                 />
               </div>
+
+              {!editingTeamMember?.isSuperAdmin && (
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    অনুমোদিত দায়িত্ব ও পারমিশনসমূহ:
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-slate-50 border border-slate-200/80 text-2xs font-semibold text-slate-700">
+                    {[
+                      { id: 'projects', label: 'প্রজেক্ট কন্ট্রোল' },
+                      { id: 'expenses', label: 'খরচ ও ব্যয় এন্ট্রি' },
+                      { id: 'clients', label: 'ক্লায়েন্ট তালিকা' },
+                      { id: 'payments', label: 'কিস্তি ও জমা এন্ট্রি' },
+                      { id: 'directors', label: 'পরিচালক পরিষদ' }
+                    ].map(p => {
+                      const isChecked = (teamForm.permissions || []).includes(p.id);
+                      return (
+                        <label key={p.id} className="flex items-center space-x-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={(e) => {
+                              const curr = teamForm.permissions || [];
+                              const next = e.target.checked ? [...curr, p.id] : curr.filter(x => x !== p.id);
+                              setTeamForm({ ...teamForm, permissions: next });
+                            }}
+                            className="w-3.5 h-3.5 text-[#006231] rounded"
+                          />
+                          <span>{p.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
@@ -2409,7 +2812,7 @@ export default function ManagementDashboard({
                   type="submit"
                   className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center active:scale-95"
                 >
-                  যুক্ত করুন
+                  {editingTeamMember ? 'আপডেট করুন' : 'যুক্ত করুন'}
                 </button>
               </div>
             </form>
