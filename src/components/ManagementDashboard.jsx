@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
+  Award,
+  PieChart,
+  GraduationCap,
+  Briefcase,
   Building2, 
   Users, 
   DollarSign, 
@@ -140,6 +144,24 @@ export default function ManagementDashboard({
     phone: '',
     role: 'সাইট ইঞ্জিনিয়ার',
     accessKey: 'admin123'
+  });
+
+  // 6. Board Director Form & Profile
+  const [isDirectorModalOpen, setIsDirectorModalOpen] = useState(false);
+  const [selectedDirectorForProfile, setSelectedDirectorForProfile] = useState(null);
+  const [directorForm, setDirectorForm] = useState({
+    name: '',
+    role: 'পরিচালক',
+    folioNo: '',
+    investment: '',
+    sharePercentage: '',
+    totalShares: '',
+    education: '',
+    phone: '',
+    email: '',
+    allocatedProjects: 'আল কুদস টাওয়ার, বারাকাহ টাওয়ার ০১',
+    nomineeName: '',
+    nomineeRelation: ''
   });
 
   // -------------------------------------------------------------
@@ -357,6 +379,65 @@ export default function ManagementDashboard({
     triggerAlert(`কর্মকর্তা ${newMember.name} সফলভাবে যুক্ত হয়েছেন!`);
   };
 
+  const handleAddDirector = (e) => {
+    e.preventDefault();
+    if (!directorForm.name || !directorForm.investment || !directorForm.sharePercentage) {
+      alert('দয়া করে পরিচালকের নাম, মোট বিনিয়োগ এবং শেয়ার শতাংশ পূরণ করুন।');
+      return;
+    }
+
+    const currentDirectors = data.directors || [];
+    const invAmt = Number(directorForm.investment) || 0;
+    const sharePct = Number(directorForm.sharePercentage) || 0;
+    const shareCount = Number(directorForm.totalShares) || Math.round(invAmt / 1000) || 1000;
+
+    const newDirector = {
+      id: `DIR-0${currentDirectors.length + 1}`,
+      name: directorForm.name,
+      role: directorForm.role || 'পরিচালক',
+      folioNo: directorForm.folioNo || `AEP-DIR-00${currentDirectors.length + 1}`,
+      image: null,
+      investment: invAmt,
+      sharePercentage: sharePct,
+      totalShares: shareCount,
+      shareFaceValue: 1000,
+      dividendEarned: 0,
+      education: directorForm.education || '',
+      phone: directorForm.phone || '01918-646575',
+      email: directorForm.email || 'director@alemarahproperties.com',
+      joiningDate: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      status: 'সক্রিয় (Active)',
+      allocatedProjects: directorForm.allocatedProjects 
+        ? directorForm.allocatedProjects.split(',').map(s => s.trim()) 
+        : ['আল কুদস টাওয়ার'],
+      nomineeName: directorForm.nomineeName || 'সংরক্ষিত',
+      nomineeRelation: directorForm.nomineeRelation || 'উত্তরাধিকারী',
+      theme: 'blue'
+    };
+
+    updateStore((prev) => ({
+      ...prev,
+      directors: [...(prev.directors || []), newDirector]
+    }));
+
+    setIsDirectorModalOpen(false);
+    setDirectorForm({
+      name: '',
+      role: 'পরিচালক',
+      folioNo: '',
+      investment: '',
+      sharePercentage: '',
+      totalShares: '',
+      education: '',
+      phone: '',
+      email: '',
+      allocatedProjects: 'আল কুদস টাওয়ার, বারাকাহ টাওয়ার ০১',
+      nomineeName: '',
+      nomineeRelation: ''
+    });
+    triggerAlert(`পরিচালক ${newDirector.name} (${newDirector.sharePercentage}% শেয়ার) সফলভাবে যুক্ত হয়েছেন!`);
+  };
+
   // Calculations for Stats
   const totalClientsCount = data.clients.length;
   const totalCollections = data.clients.reduce((acc, c) => acc + (c.totalPaid || 0), 0);
@@ -388,13 +469,20 @@ export default function ManagementDashboard({
   const targetClientForCalc = data.clients.find(c => c.id === paymentForm.clientId);
   const targetClientDue = (targetClientForCalc?.totalPrice || 0) - (targetClientForCalc?.totalPaid || 0);
 
-  // Management Footer Navbar items (Exactly 5 icons)
+  // Director calculations
+  const directorsList = data.directors || [];
+  const totalDirectorInvestment = directorsList.reduce((acc, d) => acc + (d.investment || 0), 0);
+  const totalDirectorShares = directorsList.reduce((acc, d) => acc + (d.sharePercentage || 0), 0);
+  const totalDirectorDividends = directorsList.reduce((acc, d) => acc + (d.dividendEarned || 0), 0);
+
+  // Management Footer Navbar items (6 icons including Directors)
   const managementNavItems = [
     { id: 'clients', label: '১. ক্লায়েন্ট তালিকা ও নতুন এন্ট্রি', shortLabel: 'ক্লায়েন্ট', icon: Users },
     { id: 'payments', label: '২. কিস্তি ও জমা এন্ট্রি', shortLabel: 'জমা এন্ট্রি', icon: DollarSign },
     { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল ও স্টেজ', shortLabel: 'প্রজেক্ট', icon: Building2 },
     { id: 'expenses', label: '৪. প্রজেক্ট বাজেট ও খরচ', shortLabel: 'বাজেট ও খরচ', icon: Wallet },
-    { id: 'team', label: '৫. ম্যানেজমেন্ট টিম ও অফিসার', shortLabel: 'টিম', icon: HardHat }
+    { id: 'team', label: '৫. ম্যানেজমেন্ট টিম ও অফিসার', shortLabel: 'টিম', icon: HardHat },
+    { id: 'directors', label: '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', shortLabel: 'ডিরেক্টরস', icon: Award }
   ];
 
   return (
@@ -1358,6 +1446,293 @@ export default function ManagementDashboard({
           </div>
         )}
 
+        {/* ------------------------------------------------------- */}
+        {/* TAB 6: BOARD OF DIRECTORS & SHAREHOLDERS                 */}
+        {/* ------------------------------------------------------- */}
+        {activeTab === 'directors' && (
+          <div className="space-y-6 animate-fadeIn">
+            {/* Header Action Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#CE2028] animate-pulse"></span>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900">
+                    বোর্ড অব ডিরেক্টরস ও শেয়ারহোল্ডার ক্যাপিটাল
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  কোম্পানির সম্মানিত পরিচালকবৃন্দ, বিনিয়োগকৃত মূলধন, শেয়ার শতাংশ এবং ডিভিডেন্ড বিতরণ হিসাব
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setIsDirectorModalOpen(true)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>+ নতুন ডিরেক্টর যুক্ত করুন</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Top KPI Metrics for Directors */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-slate-400">
+                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider">মোট পরিশোধিত মূলধন</span>
+                  <DollarSign className="w-4 h-4 text-[#006231]" />
+                </div>
+                <div className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                  {formatBDT(totalDirectorInvestment)}
+                </div>
+                <div className="text-3xs text-emerald-600 font-bold flex items-center space-x-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>১০০% পেইড-আপ ইকুইটি</span>
+                </div>
+              </div>
+
+              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-slate-400">
+                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider">মোট শেয়ার বণ্টন</span>
+                  <PieChart className="w-4 h-4 text-[#CE2028]" />
+                </div>
+                <div className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                  {totalDirectorShares}% ({directorsList.reduce((acc, d) => acc + (d.totalShares || 0), 0).toLocaleString('bn-BD')} টি)
+                </div>
+                <div className="text-3xs text-[#CE2028] font-bold flex items-center space-x-1">
+                  <Award className="w-3 h-3" />
+                  <span>বোর্ডে পূর্ণাঙ্গ বণ্টনকৃত</span>
+                </div>
+              </div>
+
+              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-slate-400">
+                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider">বোর্ড ডিরেক্টর সংখ্যা</span>
+                  <Users className="w-4 h-4 text-blue-600" />
+                </div>
+                <div className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                  {directorsList.length} জন সম্মানিত সদস্য
+                </div>
+                <div className="text-3xs text-blue-600 font-bold flex items-center space-x-1">
+                  <ShieldCheck className="w-3 h-3" />
+                  <span>কার্যনির্বাহী কমিটি সক্রিয়</span>
+                </div>
+              </div>
+
+              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-slate-400">
+                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider">মোট বণ্টিত ডিভিডেন্ড</span>
+                  <TrendingUp className="w-4 h-4 text-purple-600" />
+                </div>
+                <div className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                  {formatBDT(totalDirectorDividends)}
+                </div>
+                <div className="text-3xs text-purple-600 font-bold flex items-center space-x-1">
+                  <Sparkles className="w-3 h-3" />
+                  <span>নিয়মিত লভ্যাংশ পরিশোধিত</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Equity Breakdown Progress Bar */}
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                <div className="flex items-center space-x-2">
+                  <PieChart className="w-4 h-4 text-[#006231]" />
+                  <span>শেয়ারহোল্ডিং ইকুইটি ডিস্ট্রিবিউশন বার (১০০%)</span>
+                </div>
+                <span className="text-3xs text-slate-400">Face Value: ৳১,০০০ / শেয়ার</span>
+              </div>
+
+              {/* Stacked Progress Bar */}
+              <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                {directorsList.map((dir, idx) => {
+                  const colors = [
+                    'bg-[#CE2028]',
+                    'bg-[#006231]',
+                    'bg-blue-600',
+                    'bg-amber-500',
+                    'bg-purple-600',
+                    'bg-cyan-600'
+                  ];
+                  const color = colors[idx % colors.length];
+                  return (
+                    <div
+                      key={dir.id}
+                      style={{ width: `${dir.sharePercentage}%` }}
+                      className={`${color} hover:opacity-90 transition-all relative group cursor-pointer`}
+                      title={`${dir.name}: ${dir.sharePercentage}%`}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Legend */}
+              <div className="flex flex-wrap gap-x-4 gap-y-1.5 pt-1 text-2xs font-semibold text-slate-600">
+                {directorsList.map((dir, idx) => {
+                  const dotColors = [
+                    'bg-[#CE2028]',
+                    'bg-[#006231]',
+                    'bg-blue-600',
+                    'bg-amber-500',
+                    'bg-purple-600',
+                    'bg-cyan-600'
+                  ];
+                  return (
+                    <div key={dir.id} className="flex items-center space-x-1.5">
+                      <span className={`w-2.5 h-2.5 rounded-full ${dotColors[idx % dotColors.length]}`}></span>
+                      <span className="text-slate-900 font-bold">{dir.name.split(' ')[0]}</span>
+                      <span className="text-slate-400">({dir.sharePercentage}%)</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Directors Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              {directorsList.map((dir) => {
+                const isChairman = dir.role?.includes('চেয়ারম্যান') || dir.roleEn?.toLowerCase().includes('chairman');
+                const isMD = dir.role?.includes('ব্যবস্থাপনা') || dir.roleEn?.toLowerCase().includes('managing');
+
+                return (
+                  <div
+                    key={dir.id}
+                    className="bg-white rounded-3xl border border-slate-200/90 hover:border-slate-300 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between overflow-hidden group"
+                  >
+                    <div>
+                      {/* Top Header with Image & Title */}
+                      <div className="p-5 pb-4 border-b border-slate-100 flex items-start space-x-3.5">
+                        <div className="relative w-16 h-20 sm:w-18 sm:h-22 rounded-2xl overflow-hidden shrink-0 bg-slate-100 border border-slate-200 shadow-2xs group-hover:scale-105 transition-transform">
+                          {dir.image ? (
+                            <img
+                              src={dir.image}
+                              alt={dir.name}
+                              className="w-full h-full object-cover object-top"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-tr from-slate-100 to-slate-200 text-slate-500 font-black text-xl">
+                              <Award className="w-7 h-7 text-slate-400 mb-1" />
+                              <span className="text-3xs font-bold text-slate-500">বোর্ড সদস্য</span>
+                            </div>
+                          )}
+                          <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-black/60 text-white font-mono text-[9px] font-bold">
+                            #{dir.id}
+                          </div>
+                        </div>
+
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-3xs font-black uppercase tracking-wider ${
+                              isChairman 
+                                ? 'bg-red-50 text-[#CE2028] border border-red-200' 
+                                : isMD 
+                                ? 'bg-emerald-50 text-[#006231] border border-emerald-200'
+                                : 'bg-slate-100 text-slate-700 border border-slate-200'
+                            }`}>
+                              {dir.role}
+                            </span>
+                            <span className="font-mono text-3xs text-slate-400 font-semibold">{dir.folioNo}</span>
+                          </div>
+
+                          <h4 className="text-base font-black text-slate-900 group-hover:text-[#CE2028] transition-colors truncate">
+                            {dir.name}
+                          </h4>
+
+                          {dir.education && (
+                            <div className="flex items-center space-x-1 text-3xs text-slate-500 truncate font-medium">
+                              <GraduationCap className="w-3 h-3 text-slate-400 shrink-0" />
+                              <span className="truncate">{dir.education}</span>
+                            </div>
+                          )}
+
+                          <div className="text-3xs text-slate-400 flex items-center space-x-1 pt-0.5">
+                            <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
+                            <span>যোগদান: {dir.joiningDate}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Main Financial Highlights */}
+                      <div className="p-4 sm:p-5 space-y-3">
+                        <div className="grid grid-cols-2 gap-2.5">
+                          {/* Investment Amount */}
+                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100/90 space-y-0.5">
+                            <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider">
+                              মোট বিনিয়োগ
+                            </div>
+                            <div className="text-sm font-black text-[#006231] truncate">
+                              {formatBDT(dir.investment)}
+                            </div>
+                            <div className="text-[10px] text-slate-500 font-semibold">
+                              পরিশোধিত শেয়ার
+                            </div>
+                          </div>
+
+                          {/* Share Percentage */}
+                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100/90 space-y-0.5">
+                            <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider">
+                              শেয়ার মালিকানা
+                            </div>
+                            <div className="text-sm font-black text-[#CE2028] flex items-center space-x-1">
+                              <span>{dir.sharePercentage}%</span>
+                              <span className="text-3xs text-slate-400 font-normal">ইকুইটি</span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 font-semibold truncate">
+                              {dir.totalShares?.toLocaleString('bn-BD')} টি শেয়ার
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Dividend & Projects Strip */}
+                        <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-50/50 to-slate-50 border border-emerald-100/60 space-y-1.5">
+                          <div className="flex items-center justify-between text-2xs">
+                            <span className="text-slate-600 font-semibold">অর্জিত লভ্যাংশ (ডিভিডেন্ড):</span>
+                            <span className="font-black text-[#006231] font-mono">{formatBDT(dir.dividendEarned)}</span>
+                          </div>
+
+                          {dir.allocatedProjects && dir.allocatedProjects.length > 0 && (
+                            <div className="pt-1.5 border-t border-slate-200/60 flex items-center gap-1.5 flex-wrap">
+                              <span className="text-[10px] font-bold text-slate-400">প্রকল্প:</span>
+                              {dir.allocatedProjects.map((pName, pIdx) => (
+                                <span key={pIdx} className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 text-[10px] font-semibold">
+                                  {pName}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Footer Actions */}
+                    <div className="p-4 pt-2 border-t border-slate-100 flex items-center space-x-2 bg-slate-50/50">
+                      <a
+                        href={`tel:${dir.phone}`}
+                        className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200 shadow-2xs flex items-center space-x-1.5 transition-colors cursor-pointer"
+                        title="সরাসরি কল দিন"
+                      >
+                        <Phone className="w-3.5 h-3.5 text-[#006231]" />
+                        <span className="hidden sm:inline">কল দিন</span>
+                      </a>
+
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDirectorForProfile(dir)}
+                        className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white hover:opacity-95 text-xs font-bold shadow-md shadow-[#CE2028]/20 flex items-center justify-center space-x-1.5 transition-all cursor-pointer active:scale-95"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>পূর্ণাঙ্গ প্রোফাইল ও সনদ</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
       </main>
       </div>
 
@@ -1390,6 +1765,336 @@ export default function ManagementDashboard({
           })}
         </div>
       </nav>
+
+      {/* ========================================================= */}
+      {/* MODAL: ADD DIRECTOR                                       */}
+      {/* ========================================================= */}
+      {isDirectorModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-9 h-9 rounded-xl bg-red-50 text-[#CE2028] flex items-center justify-center">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-slate-900">নতুন বোর্ড ডিরেক্টর এন্ট্রি</h3>
+                  <p className="text-3xs text-slate-500">বোর্ড অব ডিরেক্টরস তালিকায় নতুন শেয়ারহোল্ডার যুক্ত করুন</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsDirectorModalOpen(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddDirector} className="space-y-3.5">
+              <div>
+                <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                  পরিচালকের পূর্ণ নাম *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="উদাঃ প্রকৌশলী তানভীর আহমেদ"
+                  value={directorForm.name}
+                  onChange={(e) => setDirectorForm({ ...directorForm, name: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    বোর্ড পদবি / ভূমিকা *
+                  </label>
+                  <select
+                    value={directorForm.role}
+                    onChange={(e) => setDirectorForm({ ...directorForm, role: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  >
+                    <option value="পরিচালক">পরিচালক (Director)</option>
+                    <option value="পরিচালক (প্রকৌশল ও কারিগরি)">পরিচালক (প্রকৌশল ও কারিগরি)</option>
+                    <option value="পরিচালক (অর্থ ও নিরীক্ষা)">পরিচালক (অর্থ ও নিরীক্ষা)</option>
+                    <option value="পরিচালক (আইন ও কমপ্লায়েন্স)">পরিচালক (আইন ও কমপ্লায়েন্স)</option>
+                    <option value="পরিচালক (পরিকল্পনা ও উন্নয়ন)">পরিচালক (পরিকল্পনা ও উন্নয়ন)</option>
+                    <option value="উপ-ব্যবস্থাপনা পরিচালক">উপ-ব্যবস্থাপনা পরিচালক (DMD)</option>
+                    <option value="স্বতন্ত্র পরিচালক">স্বতন্ত্র পরিচালক (Independent Director)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    শেয়ার সার্টিফিকেট / ফোলিও নং
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="উদাঃ AEP-DIR-006"
+                    value={directorForm.folioNo}
+                    onChange={(e) => setDirectorForm({ ...directorForm, folioNo: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    বিনিয়োগকৃত মূলধন (টাকা) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    placeholder="উদাঃ 5000000"
+                    value={directorForm.investment}
+                    onChange={(e) => setDirectorForm({ ...directorForm, investment: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    শেয়ার শতাংশ (%) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    step="0.5"
+                    placeholder="উদাঃ 7.5"
+                    value={directorForm.sharePercentage}
+                    onChange={(e) => setDirectorForm({ ...directorForm, sharePercentage: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    মোবাইল নম্বর
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="017XXXXXXXX"
+                    value={directorForm.phone}
+                    onChange={(e) => setDirectorForm({ ...directorForm, phone: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    শিক্ষাগত যোগ্যতা
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="উদাঃ বিএসসি সিভিল, বুয়েট"
+                    value={directorForm.education}
+                    onChange={(e) => setDirectorForm({ ...directorForm, education: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                  বরাদ্দকৃত প্রকল্পসমূহ (কমা দিয়ে লিখুন)
+                </label>
+                <input
+                  type="text"
+                  placeholder="আল কুদস টাওয়ার, বারাকাহ টাওয়ার ০১"
+                  value={directorForm.allocatedProjects}
+                  onChange={(e) => setDirectorForm({ ...directorForm, allocatedProjects: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    নমিনির নাম
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="নমিনির নাম"
+                    value={directorForm.nomineeName}
+                    onChange={(e) => setDirectorForm({ ...directorForm, nomineeName: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                    সম্পর্ক
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="স্ত্রী / সন্তান / উত্তরসূরি"
+                    value={directorForm.nomineeRelation}
+                    onChange={(e) => setDirectorForm({ ...directorForm, nomineeRelation: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsDirectorModalOpen(false)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer text-center"
+                >
+                  বাতিল
+                </button>
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#006231]/25 hover:opacity-95 transition-all cursor-pointer text-center active:scale-95"
+                >
+                  সংরক্ষণ করুন
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL: FULL DIRECTOR PROFILE & SHARE CERTIFICATE DOSSIER  */}
+      {/* ========================================================= */}
+      {selectedDirectorForProfile && (() => {
+        const d = selectedDirectorForProfile;
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+            <div className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 relative divide-y divide-slate-100">
+              
+              {/* Header */}
+              <div className="p-5 sm:p-6 flex items-start justify-between bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-t-3xl relative">
+                <div className="flex items-center space-x-3.5 min-w-0">
+                  <div className="w-14 h-16 sm:w-16 sm:h-20 rounded-2xl overflow-hidden shrink-0 bg-slate-800 border-2 border-white/20 shadow-md">
+                    {d.image ? (
+                      <img src={d.image} alt={d.name} className="w-full h-full object-cover object-top" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-slate-800 text-white">
+                        <Award className="w-8 h-8 text-[#8EBF40]" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <h3 className="text-base sm:text-lg font-black text-white truncate">{d.name}</h3>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-[#8EBF40] border border-emerald-400/30 text-3xs font-bold shrink-0">
+                        {d.role}
+                      </span>
+                    </div>
+                    <div className="text-3xs text-slate-300 font-mono">
+                      ফোলিও নং: {d.folioNo} | আইডি: #{d.id}
+                    </div>
+                    {d.education && (
+                      <div className="text-3xs text-slate-400 font-medium truncate">
+                        {d.education}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedDirectorForProfile(null)}
+                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer shrink-0 ml-2"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="p-5 sm:p-6 space-y-5">
+                {/* Financial Summary */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100">
+                    <div className="text-3xs font-bold text-emerald-800 uppercase">মোট পরিশোধিত মূলধন</div>
+                    <div className="text-base font-black text-[#006231] mt-0.5">{formatBDT(d.investment)}</div>
+                    <div className="text-3xs text-emerald-600 font-medium">১০০% পরিশোধিত</div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-red-50/70 border border-red-100">
+                    <div className="text-3xs font-bold text-red-800 uppercase">শেয়ার মালিকানা</div>
+                    <div className="text-base font-black text-[#CE2028] mt-0.5">{d.sharePercentage}%</div>
+                    <div className="text-3xs text-red-600 font-medium">{d.totalShares?.toLocaleString('bn-BD')} টি শেয়ার</div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-100 col-span-2 sm:col-span-1">
+                    <div className="text-3xs font-bold text-purple-800 uppercase">অর্জিত মোট ডিভিডেন্ড</div>
+                    <div className="text-base font-black text-purple-800 mt-0.5">{formatBDT(d.dividendEarned)}</div>
+                    <div className="text-3xs text-purple-600 font-medium">পরিশোধিত হিসাব</div>
+                  </div>
+                </div>
+
+                {/* Corporate Details */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5 text-xs">
+                  <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
+                    <span className="text-slate-500">শেয়ারের অভিহিত মূল্য (Face Value):</span>
+                    <span className="font-bold text-slate-800">৳ ১,০০০ প্রতি শেয়ার</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
+                    <span className="text-slate-500">বোর্ড সদস্য হিসেবে অন্তর্ভুক্তি:</span>
+                    <span className="font-bold text-slate-800">{d.joiningDate}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
+                    <span className="text-slate-500">আইনানুগ মনোনীত নমিনি:</span>
+                    <span className="font-bold text-slate-800">{d.nomineeName || 'সংরক্ষিত'} ({d.nomineeRelation || 'উত্তরাধিকারী'})</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-slate-200/60">
+                    <span className="text-slate-500">অফিশিয়াল ইমেইল:</span>
+                    <span className="font-bold text-slate-800">{d.email}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-slate-500">যোগাযোগের মোবাইল:</span>
+                    <span className="font-bold text-slate-800 font-mono">{d.phone}</span>
+                  </div>
+                </div>
+
+                {/* Projects Allocated */}
+                {d.allocatedProjects && d.allocatedProjects.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-2xs font-bold text-slate-500 uppercase tracking-wider">
+                      বিনিয়োগ সংশ্লিষ্ট চলমান প্রকল্পসমূহ:
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {d.allocatedProjects.map((p, i) => (
+                        <div key={i} className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold">
+                          <Building2 className="w-3.5 h-3.5 text-[#006231]" />
+                          <span>{p}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="p-4 sm:p-5 flex items-center justify-between gap-2.5 bg-slate-50 rounded-b-3xl">
+                <a
+                  href={`tel:${d.phone}`}
+                  className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 shadow-2xs flex items-center space-x-1.5 transition-colors cursor-pointer"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#006231]" />
+                  <span>কল দিন</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedDirectorForProfile(null)}
+                  className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs transition-colors cursor-pointer"
+                >
+                  বন্ধ করুন
+                </button>
+              </div>
+
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ========================================================= */}
       {/* MODAL 1: ADD CLIENT                                       */}

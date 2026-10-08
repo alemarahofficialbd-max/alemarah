@@ -96,6 +96,123 @@ export const initialManagementData = {
       role: 'হেড অফ অ্যাকাউন্টস & ফাইন্যান্স',
       accessKey: 'admin123'
     }
+  ],
+  directors: [
+    {
+      id: 'DIR-01',
+      name: 'শেখ ফজলুল করিম মারুফ',
+      nameEn: 'Sheikh Fazlul Karim Maroof',
+      role: 'চেয়ারম্যান',
+      roleEn: 'Chairman',
+      folioNo: 'AEP-DIR-001',
+      image: '/images/chairman.webp',
+      investment: 25000000, // ৳ ২,৫০,০০,০০০
+      sharePercentage: 35, // 35%
+      totalShares: 35000,
+      shareFaceValue: 1000,
+      dividendEarned: 3650000, // ৳ ৩৬,৫০,০০০
+      education: 'স্নাতক, লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়',
+      phone: '01816233013',
+      email: 'chairman@alemarahproperties.com',
+      joiningDate: '১ জানুয়ারি, ২০২৪',
+      status: 'সক্রিয় (Active)',
+      allocatedProjects: ['আল কুদস টাওয়ার', 'বারাকাহ টাওয়ার ০১', 'আল ইমারাহ এগ্রো'],
+      nomineeName: 'পারিবারিক ট্রাস্ট / আইনানুগ উত্তরসূরি',
+      nomineeRelation: 'উত্তরাধিকারী',
+      theme: 'crimson'
+    },
+    {
+      id: 'DIR-02',
+      name: 'তালুকদার তারিক মাসউদ',
+      nameEn: 'Talukdar Tariq Masud',
+      role: 'ব্যবস্থাপনা পরিচালক',
+      roleEn: 'Managing Director',
+      folioNo: 'AEP-DIR-002',
+      image: '/images/managing_director.webp',
+      investment: 20000000, // ৳ ২,০০,০০,০০০
+      sharePercentage: 30, // 30%
+      totalShares: 30000,
+      shareFaceValue: 1000,
+      dividendEarned: 2920000, // ৳ ২৯,২০,০০০
+      education: 'BSS রাষ্ট্রবিজ্ঞান, সরকারি তিতুমীর কলেজ',
+      phone: '01918646575',
+      email: 'md@alemarahproperties.com',
+      joiningDate: '১ জানুয়ারি, ২০২৪',
+      status: 'সক্রিয় (Active)',
+      allocatedProjects: ['আল কুদস টাওয়ার', 'বারাকাহ টাওয়ার ০১', 'আল ইমারাহ শপিং মল'],
+      nomineeName: 'পারিবারিক ট্রাস্ট / আইনানুগ উত্তরসূরি',
+      nomineeRelation: 'উত্তরাধিকারী',
+      theme: 'emerald'
+    },
+    {
+      id: 'DIR-03',
+      name: 'ইঞ্জি. এম. এ. রহমান',
+      nameEn: 'Engr. M. A. Rahman',
+      role: 'পরিচালক (প্রকৌশল ও কারিগরি)',
+      roleEn: 'Director (Technical & Engineering)',
+      folioNo: 'AEP-DIR-003',
+      image: null,
+      investment: 10000000, // ৳ ১,০০,০০,০০০
+      sharePercentage: 15, // 15%
+      totalShares: 15000,
+      shareFaceValue: 1000,
+      dividendEarned: 1460000, // ৳ ১৪,৬০,০০০
+      education: 'বিএসসি ইন সিভিল ইঞ্জিনিয়ারিং, বুয়েট',
+      phone: '01743926926',
+      email: 'technical@alemarahproperties.com',
+      joiningDate: '১৫ মার্চ, ২০২৪',
+      status: 'সক্রিয় (Active)',
+      allocatedProjects: ['আল কুদস টাওয়ার'],
+      nomineeName: 'মোসা. ফারহানা রহমান',
+      nomineeRelation: 'স্ত্রী',
+      theme: 'blue'
+    },
+    {
+      id: 'DIR-04',
+      name: 'ব্যারিস্টার এস. এইচ. চৌধুরী',
+      nameEn: 'Barrister S. H. Chowdhury',
+      role: 'পরিচালক (আইন ও কমপ্লায়েন্স)',
+      roleEn: 'Director (Legal & Compliance)',
+      folioNo: 'AEP-DIR-004',
+      image: null,
+      investment: 7500000, // ৳ ৭৫,০০,০০০
+      sharePercentage: 10, // 10%
+      totalShares: 7500,
+      shareFaceValue: 1000,
+      dividendEarned: 1095000, // ৳ ১০,৯৫,০০০
+      education: 'এলএলবি (অনার্স), এলএলএম, ঢাকা বিশ্ববিদ্যালয়',
+      phone: '01914425073',
+      email: 'legal@alemarahproperties.com',
+      joiningDate: '১০ মে, ২০২৪',
+      status: 'সক্রিয় (Active)',
+      allocatedProjects: ['আল ইমারাহ শপিং মল'],
+      nomineeName: 'সাইফুল চৌধুরী',
+      nomineeRelation: 'পুত্র',
+      theme: 'amber'
+    },
+    {
+      id: 'DIR-05',
+      name: 'তানভীর হাসান, এফসিএ',
+      nameEn: 'Tanvir Hasan, FCA',
+      role: 'পরিচালক (অর্থ ও নিরীক্ষা)',
+      roleEn: 'Director (Finance & Audit)',
+      folioNo: 'AEP-DIR-005',
+      image: null,
+      investment: 7500000, // ৳ ৭৫,০০,০০০
+      sharePercentage: 10, // 10%
+      totalShares: 7500,
+      shareFaceValue: 1000,
+      dividendEarned: 1095000, // ৳ ১০,৯৫,০০০
+      education: 'চার্টার্ড অ্যাকাউন্ট্যান্ট (আইসিএবি)',
+      phone: '01833544548',
+      email: 'accounts@alemarahproperties.com',
+      joiningDate: '১ জুলাই, ২০২৪',
+      status: 'সক্রিয় (Active)',
+      allocatedProjects: ['আল কুদস টাওয়ার', 'বারাকাহ টাওয়ার ০১'],
+      nomineeName: 'নাজমিন হাসান',
+      nomineeRelation: 'স্ত্রী',
+      theme: 'purple'
+    }
   ]
 };
 
@@ -104,7 +221,11 @@ export const getManagementData = () => {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (data) {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (!parsed.directors || parsed.directors.length === 0) {
+        parsed.directors = initialManagementData.directors;
+      }
+      return parsed;
     }
   } catch (e) {
     console.error('Error loading management data from localStorage:', e);
