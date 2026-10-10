@@ -1374,9 +1374,12 @@ export default function ManagementDashboard({
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                     >
                       <option value="ব্যাংক ডিপোজিট">ব্যাংক ডিপোজিট</option>
+                      <option value="বিকাশ (bKash)">বিকাশ (bKash)</option>
+                      <option value="নগদ (Nagad)">নগদ (Nagad)</option>
+                      <option value="রকেট (Rocket)">রকেট (Rocket)</option>
                       <option value="ব্যাংক চেক">ব্যাংক চেক</option>
                       <option value="পে-অর্ডার">পে-অর্ডার</option>
-                      <option value="নগদ / ক্যাশ">নগদ / ক্যাশ</option>
+                      <option value="নগদ ক্যাশ">নগদ ক্যাশ</option>
                       <option value="অনলাইন ট্রান্সফার">অনলাইন ট্রান্সফার</option>
                     </select>
                   </div>
