@@ -684,7 +684,7 @@ export default function ManagementDashboard({
 
     const newDiv = {
       id: `DIV-${Date.now().toString().slice(-5)}`,
-      date: dividendForm.date || new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      date: dividendForm.date ? new Date(dividendForm.date).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       amount: amountNum,
       method: dividendForm.method,
       voucherNo: dividendForm.voucherNo || `VCH-${Math.floor(100 + Math.random() * 900)}`,
@@ -2186,8 +2186,9 @@ export default function ManagementDashboard({
                       <th className="py-3 px-4">ফোলিও নং</th>
                       <th className="py-3 px-4">বিনিয়োগকৃত টাকা (Investment)</th>
                       <th className="py-3 px-4">শেয়ার অংশীদারিত্ব (% Share)</th>
+                      <th className="py-3 px-4 text-right">গৃহীত লভ্যাংশ (ডিভিডেন্ড)</th>
                       <th className="py-3 px-4">মনোনীত নমিনি ও মোবাইল</th>
-                      <th className="py-3 px-4 text-right">কার্যক্রম ও সনদ</th>
+                      <th className="py-3 px-4 text-right">কার্যক্রম ও ডিভিডেন্ড পে</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -2229,6 +2230,14 @@ export default function ManagementDashboard({
                             <span>{dir.sharePercentage}%</span>
                           </div>
                         </td>
+                        <td className="py-3 px-4 text-right">
+                          <div className="font-black text-sm text-purple-900 font-mono">
+                            {formatBDT(dir.dividendEarned || 0)}
+                          </div>
+                          <div className="text-3xs text-purple-600 font-bold">
+                            {(dir.dividendHistory || []).length} টি কিস্তিতে গৃহীত
+                          </div>
+                        </td>
                         <td className="py-3 px-4">
                           <div className="font-semibold text-slate-800">{dir.nomineeName || 'সংরক্ষিত'} ({dir.nomineeRelation || 'উত্তরাধিকারী'})</div>
                           {dir.nomineePhone && (
@@ -2237,7 +2246,27 @@ export default function ManagementDashboard({
                         </td>
                         <td className="py-3 px-4 text-right">
                           <div className="inline-flex items-center space-x-1.5 justify-end">
-                            {/* 1. Share Certificate Button */}
+                            {/* 1. Quick Dividend Pay Button */}
+                            <button
+                              onClick={() => {
+                                setDividendTargetDirector(dir);
+                                setDividendForm({
+                                  amount: '',
+                                  date: new Date().toISOString().split('T')[0],
+                                  method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
+                                  voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
+                                  note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
+                                });
+                                setIsDividendModalOpen(true);
+                              }}
+                              title="লভ্যাংশ / ডিভিডেন্ড প্রদান করুন"
+                              className="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold text-2xs border border-purple-200 cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
+                            >
+                              <TrendingUp className="w-3.5 h-3.5 text-purple-600" />
+                              <span>লভ্যাংশ পে</span>
+                            </button>
+
+                            {/* 2. Share Certificate Button */}
                             <button
                               onClick={() => setSelectedDirectorForCertificate(dir)}
                               title="শেয়ার সনদপত্র দেখুন ও প্রিন্ট করুন"
@@ -2247,17 +2276,17 @@ export default function ManagementDashboard({
                               <span className="hidden sm:inline">শেয়ার সনদ</span>
                             </button>
 
-                            {/* 2. Full Profile & Ledgers Button */}
+                            {/* 3. Full Profile & Ledgers Button */}
                             <button
                               onClick={() => {
                                 setSelectedDirectorForProfile(dir);
-                                setDirectorProfileActiveTab('installments');
+                                setDirectorProfileActiveTab('dividends');
                               }}
-                              title="বিস্তারিত প্রোফাইল ও জমার রসিদ হিসাব"
+                              title="লভ্যাংশ ভাউচার ও বিস্তারিত প্রোফাইল হিসাব"
                               className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
                             >
                               <Eye className="w-3.5 h-3.5 text-white/80" />
-                              <span>প্রোফাইল</span>
+                              <span>হিসাব খাতা</span>
                             </button>
                           </div>
                         </td>
@@ -3236,10 +3265,10 @@ export default function ManagementDashboard({
                     বিতরণের তারিখ
                   </label>
                   <input
-                    type="text"
+                    type="date"
                     value={dividendForm.date}
                     onChange={(e) => setDividendForm({ ...dividendForm, date: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-purple-600"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-purple-600 cursor-pointer"
                   />
                 </div>
                 <div>
