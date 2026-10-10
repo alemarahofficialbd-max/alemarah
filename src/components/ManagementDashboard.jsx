@@ -132,7 +132,7 @@ export default function ManagementDashboard({
   const [paymentForm, setPaymentForm] = useState({
     clientId: data.clients[0]?.id || '',
     amount: '',
-    date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+    date: new Date().toISOString().split('T')[0],
     method: 'ব্যাংক ডিপোজিট',
     note: ''
   });
@@ -288,7 +288,7 @@ export default function ManagementDashboard({
 
     const newTrx = {
       id: `TRX-${Math.floor(100 + Math.random() * 900)}`,
-      date: paymentForm.date || new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      date: paymentForm.date ? new Date(paymentForm.date).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       amount: payAmount,
       method: paymentForm.method || 'ব্যাংক ডিপোজিট'
     };
@@ -310,6 +310,7 @@ export default function ManagementDashboard({
     setPaymentForm({
       ...paymentForm,
       amount: '',
+      date: new Date().toISOString().split('T')[0],
       note: ''
     });
     triggerAlert(`৳ ${payAmount.toLocaleString('bn-BD')} টাকা জমা এন্ট্রি সফল হয়েছে!`);
@@ -1356,10 +1357,10 @@ export default function ManagementDashboard({
                       জমার তারিখ
                     </label>
                     <input
-                      type="text"
+                      type="date"
                       value={paymentForm.date}
                       onChange={(e) => setPaymentForm({ ...paymentForm, date: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-[#CE2028]"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028] cursor-pointer"
                     />
                   </div>
 
