@@ -1039,73 +1039,157 @@ export default function ManagementDashboard({
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
               </button>
 
-              {/* Mobile Backdrop Overlay */}
+              {/* Fullscreen Mobile Drawer for Super Admin Profile & System Menu */}
               {isProfileOpen && (
-                <div 
-                  className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs"
-                  onClick={() => setIsProfileOpen(false)}
-                />
-              )}
+                <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center animate-fadeIn">
+                  {/* Backdrop Click */}
+                  <div 
+                    className="absolute inset-0"
+                    onClick={() => setIsProfileOpen(false)}
+                  />
 
-              {/* Manager Profile Popup Drawer / Dropdown */}
-              {isProfileOpen && (
-                <div className="fixed inset-x-4 top-16 max-w-sm mx-auto bg-white rounded-3xl shadow-2xl border border-slate-100 py-3 z-50 animate-fadeIn divide-y divide-slate-100">
-                  <div className="px-5 py-3">
-                    <div className="flex items-center space-x-1.5">
-                      <span className="text-sm font-black text-slate-900 truncate">
-                        {admin?.name || 'সুপার অ্যাডমিন'}
-                      </span>
-                      {isSuperAdmin && <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
-                    </div>
-                    <div className="text-xs text-[#006231] font-semibold mt-0.5">
-                      {isSuperAdmin ? (lang === 'bn' ? 'সুপার অ্যাডমিন' : 'Master Admin') : (admin?.role || (lang === 'bn' ? 'ম্যানেজমেন্ট টিম' : 'Management Team'))}
-                    </div>
-                    <div className="text-2xs text-slate-400 mt-0.5">
-                      {admin?.email || admin?.phone || 'alemarah.officialbd@gmail.com'}
-                    </div>
-                  </div>
+                  {/* Bottom Sheet on Mobile / Centered Card on larger */}
+                  <div className="relative z-10 w-full sm:max-w-md bg-white rounded-t-[2.5rem] sm:rounded-3xl shadow-2xl border-t sm:border border-slate-200 overflow-hidden animate-slideUp max-h-[90vh] flex flex-col">
+                    {/* Top Drag Indicator & Header */}
+                    <div className="p-5 pb-4 bg-gradient-to-b from-slate-50 to-white border-b border-slate-100">
+                      <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3.5 min-w-0">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm ring-2 shadow-sm shrink-0 ${
+                            isSuperAdmin 
+                              ? 'bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/50' 
+                              : 'bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white ring-[#CE2028]/30'
+                          }`}>
+                            {isSuperAdmin ? <Crown className="w-6 h-6 text-amber-100" /> : (admin?.name ? admin.name.slice(0, 2) : 'ম্যা')}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center space-x-1.5">
+                              <h3 className="text-base font-black text-slate-900 truncate">
+                                {admin?.name || 'সুপার অ্যাডমিন'}
+                              </h3>
+                              {isSuperAdmin && <Crown className="w-4 h-4 text-amber-500 shrink-0" />}
+                            </div>
+                            <p className="text-xs text-[#006231] font-bold">
+                              {isSuperAdmin ? (lang === 'bn' ? 'সুপার অ্যাডমিন' : 'Master Admin') : (admin?.role || (lang === 'bn' ? 'ম্যানেজমেন্ট টিম' : 'Management Team'))}
+                            </p>
+                            <p className="text-3xs text-slate-400 truncate">
+                              {admin?.email || admin?.phone || 'alemarah.officialbd@gmail.com'}
+                            </p>
+                          </div>
+                        </div>
 
-                  <div className="p-2 space-y-1 text-xs font-bold text-slate-700">
-                    <button
-                      onClick={() => {
-                        setIsProfileOpen(false);
-                        navigateToTab('settings');
-                      }}
-                      className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left cursor-pointer text-slate-800"
-                    >
-                      <Settings className="w-4 h-4 text-[#006231]" />
-                      <span>সিস্টেম সেটিংস ও পিন</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsProfileOpen(false);
-                        onNavigateHome();
-                      }}
-                      className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left cursor-pointer"
-                    >
-                      <Home className="w-4 h-4 text-[#CE2028]" />
-                      <span>ওয়েবসাইটে ফিরে যান</span>
-                    </button>
-                    <a
-                      href="tel:01918646575"
-                      className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left"
-                    >
-                      <Phone className="w-4 h-4 text-[#006231]" />
-                      <span>সাইট হটলাইনে কল করুন</span>
-                    </a>
-                  </div>
+                        <button
+                          type="button"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer shrink-0"
+                          title="বন্ধ করুন"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
 
-                  <div className="p-2">
-                    <button
-                      onClick={() => {
-                        setIsProfileOpen(false);
-                        onLogout();
-                      }}
-                      className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white transition-all text-xs font-bold text-left cursor-pointer active:scale-95"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>লগআউট</span>
-                    </button>
+                    {/* Menu Options List */}
+                    <div className="p-4 space-y-2 overflow-y-auto">
+                      <div className="text-3xs font-extrabold uppercase tracking-wider text-slate-400 px-3">
+                        কুইক অ্যাকশন ও ম্যানেজমেন্ট মেনু
+                      </div>
+
+                      {/* Settings Option */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          navigateToTab('settings');
+                        }}
+                        className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200/60 transition-all text-left cursor-pointer group"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#006231] text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Settings className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-bold text-slate-900 group-hover:text-[#006231]">
+                              সিস্টেম সেটিংস ও সিকিউরিটি পিন
+                            </div>
+                            <div className="text-3xs text-slate-500 font-medium">
+                              ভাষা পরিবর্তন ও ডিলিট মাস্টার পিন কনফিগারেশন
+                            </div>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
+                      </button>
+
+                      {/* All Dashboard Navigation Tabs for Fast Mobile Access */}
+                      <div className="pt-2">
+                        <div className="text-3xs font-extrabold uppercase tracking-wider text-slate-400 px-3 pb-1.5">
+                          সকল বিভাগ ও অপশন
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {managementNavItems.map(item => {
+                            const ItemIcon = item.icon;
+                            const isCur = activeTab === item.id;
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => {
+                                  setIsProfileOpen(false);
+                                  navigateToTab(item.id);
+                                }}
+                                className={`p-3 rounded-2xl flex items-center space-x-2.5 text-xs font-bold transition-all text-left cursor-pointer ${
+                                  isCur 
+                                    ? 'bg-[#CE2028] text-white shadow-md shadow-[#CE2028]/25' 
+                                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/60'
+                                }`}
+                              >
+                                <ItemIcon className={`w-4 h-4 shrink-0 ${isCur ? 'text-white' : 'text-slate-500'}`} />
+                                <span className="truncate">{item.shortLabel || item.label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Website & Hotline */}
+                      <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsProfileOpen(false);
+                            onNavigateHome();
+                          }}
+                          className="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors text-left cursor-pointer"
+                        >
+                          <Home className="w-4 h-4 text-[#CE2028]" />
+                          <span>মূল ওয়েবসাইটে ফিরে যান</span>
+                        </button>
+
+                        <a
+                          href="tel:01918646575"
+                          className="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors text-left"
+                        >
+                          <Phone className="w-4 h-4 text-[#006231]" />
+                          <span>সাইট হটলাইনে কল করুন (01918-646575)</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* Bottom Logout Button */}
+                    <div className="p-4 bg-slate-50 border-t border-slate-100">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          onLogout();
+                        }}
+                        className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-2xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white transition-all text-xs font-bold cursor-pointer active:scale-95"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>সিস্টেম থেকে লগআউট করুন</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
