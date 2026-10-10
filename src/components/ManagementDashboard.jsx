@@ -2587,9 +2587,9 @@ export default function ManagementDashboard({
                       {/* Compact Clean Header Row - Click to Toggle Expand */}
                       <div 
                         onClick={() => setExpandedDirectors(prev => ({ ...prev, [dir.id]: !prev[dir.id] }))}
-                        className="py-3 px-3.5 flex items-center justify-between gap-2.5 cursor-pointer hover:bg-slate-50 active:bg-slate-100 select-none"
+                        className="py-3 px-3.5 flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50 active:bg-slate-100 select-none"
                       >
-                        <div className="flex items-center space-x-2.5 min-w-0">
+                        <div className="flex items-center space-x-2.5 min-w-0 flex-1">
                           <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs">
                             {dir.image ? (
                               <img src={dir.image} alt={dir.name} className="w-full h-full object-cover object-top" />
@@ -2599,21 +2599,19 @@ export default function ManagementDashboard({
                               </div>
                             )}
                           </div>
-                          <div className="min-w-0">
-                            <div className="font-bold text-slate-900 text-xs sm:text-sm truncate leading-snug">{dir.name}</div>
-                            <div className="text-[11px] text-[#CE2028] font-semibold truncate mt-0.5">{dir.role}</div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-bold text-slate-900 text-sm truncate leading-snug">{dir.name}</div>
+                            <div className="text-xs text-[#CE2028] font-semibold truncate mt-0.5">{dir.role}</div>
                           </div>
                         </div>
 
-                        <div className="text-right shrink-0 flex items-center space-x-1.5">
-                          <div>
-                            <div className="font-black text-xs text-[#006231] font-mono leading-tight">
-                              {formatBDT(dir.investment)}
-                            </div>
-                            <span className="text-[10px] text-slate-400 block font-medium">{dir.sharePercentage}% শেয়ার</span>
-                          </div>
+                        {/* Right: Share % and Expand Arrow */}
+                        <div className="shrink-0 flex items-center space-x-2">
+                          <span className="font-mono text-xs px-2.5 py-1 rounded-lg bg-emerald-50 text-[#006231] font-bold border border-emerald-200 shadow-2xs">
+                            {dir.sharePercentage}%
+                          </span>
                           <div className={`p-1 rounded-lg bg-slate-100 text-slate-500 transition-transform duration-200 ${isExp ? 'rotate-180 text-[#006231] bg-emerald-50' : ''}`}>
-                            <ChevronDown className="w-3.5 h-3.5" />
+                            <ChevronDown className="w-4 h-4" />
                           </div>
                         </div>
                       </div>
@@ -2621,14 +2619,23 @@ export default function ManagementDashboard({
                       {/* Expandable Slide-Down Details on Mobile */}
                       {isExp && (
                         <div className="px-3.5 pb-3.5 pt-1 bg-slate-50/70 border-t border-slate-100 space-y-2.5 animate-fadeIn">
-                          {/* Folio & Share % Badges inside expand */}
-                          <div className="flex items-center space-x-2 pt-1">
-                            <span className="font-mono text-3xs text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md font-bold border border-emerald-200">
-                              ফোলিও: {dir.folioNo}
-                            </span>
-                            <span className="font-mono text-3xs px-2 py-0.5 rounded-md bg-red-50 text-[#CE2028] font-bold border border-red-200">
-                              শেয়ার বণ্টন: {dir.sharePercentage}%
-                            </span>
+                          {/* Investment & Folio Row */}
+                          <div className="grid grid-cols-2 gap-2 text-2xs pt-1">
+                            <div className="p-2.5 rounded-xl bg-white border border-slate-200/80">
+                              <span className="text-3xs text-slate-400 block font-bold uppercase">বিনিয়োগকৃত মূলধন</span>
+                              <strong className="text-[#006231] font-mono font-bold text-xs mt-0.5 block">
+                                {formatBDT(dir.investment)}
+                              </strong>
+                              <span className="text-3xs text-slate-500">{dir.sharePercentage}% মোট ইকুইটি শেয়ার</span>
+                            </div>
+
+                            <div className="p-2.5 rounded-xl bg-white border border-slate-200/80">
+                              <span className="text-3xs text-slate-400 block font-bold uppercase">শেয়ার ফোলিও ও সনদ</span>
+                              <strong className="text-slate-900 font-mono font-bold text-xs mt-0.5 block">
+                                {dir.folioNo}
+                              </strong>
+                              <span className="text-3xs text-slate-500">{dir.shareUnits?.toLocaleString('bn-BD') || '১,০০০'} টি ইউনিট</span>
+                            </div>
                           </div>
                           {/* Financial & Nominee Quick Info Grid */}
                           <div className="grid grid-cols-2 gap-2 text-2xs">
