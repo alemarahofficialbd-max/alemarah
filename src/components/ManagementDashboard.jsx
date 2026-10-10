@@ -142,6 +142,7 @@ export default function ManagementDashboard({
 
   // 3. New Project Form (with Smart Unit & Floor Generator)
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [expandedProjectUnits, setExpandedProjectUnits] = useState({});
   const [projectForm, setProjectForm] = useState({
     name: '',
     location: '',
@@ -382,6 +383,16 @@ export default function ManagementDashboard({
       customUnitsText: ''
     });
     triggerAlert(`নতুন প্রজেক্ট "${newProj.name}" (${generatedUnits.length}টি ইউনিট সহ) সফলভাবে যুক্ত হয়েছে!`);
+  };
+
+  const handleDeleteProject = (projId, projName) => {
+    if (window.confirm(`আপনি কি নিশ্চিতভাবে "${projName}" প্রজেক্টটি মুছে ফেলতে চান?`)) {
+      updateStore((prev) => ({
+        ...prev,
+        projects: prev.projects.filter(p => p.id !== projId)
+      }));
+      triggerAlert(`প্রজেক্ট "${projName}" সফলভাবে মুছে ফেলা হয়েছে!`);
+    }
   };
 
   const handleUpdateProjectProgress = (projId, newProgress) => {
@@ -1457,8 +1468,8 @@ export default function ManagementDashboard({
           <div className="space-y-4 animate-fadeIn">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
               <div>
-                <h3 className="text-base font-bold text-slate-900">চলমান ও আসন্ন প্রজেক্টসমূহ</h3>
-                <p className="text-xs text-slate-500">প্রজেক্টের তথ্য ও কাজের অগ্রগতি পরিচালনা করুন</p>
+                <h3 className="text-base font-bold text-slate-900">সকল প্রজেক্টসমূহ ও বিস্তারিত তথ্য</h3>
+                <p className="text-xs text-slate-500">প্রজেক্টের ফ্ল্যাট ও ইউনিট তালিকা, বরাদ্দ ও আর্থিক বিবরণী</p>
               </div>
               <button
                 onClick={() => setIsProjectModalOpen(true)}
@@ -1469,49 +1480,137 @@ export default function ManagementDashboard({
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {data.projects.map((proj) => {
                 const projClients = data.clients.filter(c => c.projectId === proj.id);
+                const totalUnitsCount = (proj.units || []).length;
+                const bookedUnitsCount = projClients.length;
+                const availableUnitsCount = Math.max(0, totalUnitsCount - bookedUnitsCount);
+                const projExpenses = (proj.expenses || []).reduce((acc, e) => acc + (e.amount || 0), 0);
+                const isUnitsExpanded = expandedProjectUnits[proj.id];
+
+                const typeLabels = {
+                  residential: 'আবাসিক ফ্ল্যাট',
+                  share: 'বিনিয়োগ শেয়ার',
+                  commercial: 'বাণিজ্যিক স্পেস',
+                  commercial_share: 'বাণিজ্যিক শেয়ার'
+                };
+
                 return (
-                  <div key={proj.id} className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                      <div>
-                        <h4 className="text-base sm:text-lg font-black text-slate-900">{proj.name}</h4>
-                        <p className="text-xs text-slate-500 flex items-center space-x-1">
-                          <MapPin className="w-3 h-3 text-[#CE2028]" />
-                          <span>{proj.location}</span>
-                        </p>
+                  <div key={proj.id} className="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden">
+                    <div className="p-5 sm:p-6 space-y-4">
+                      {/* Top Header */}
+                      <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3.5">
+                        <div className="space-y-1 min-w-0">
+                          <div className="flex items-center space-x-2">
+                            <span className="px-2 py-0.5 rounded-full bg-red-50 text-[#CE2028] text-3xs font-black border border-red-200/60 shrink-0">
+                              {typeLabels[proj.type] || 'আবাসিক'}
+                            </span>
+                            <span className="font-mono text-3xs text-slate-400 font-bold truncate">
+                              ID: {proj.id}
+                            </span>
+                          </div>
+                          <h4 className="text-lg font-black text-slate-900 truncate">{proj.name}</h4>
+                          <p className="text-xs text-slate-500 flex items-center space-x-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-[#CE2028] shrink-0" />
+                            <span className="truncate">{proj.location || 'ঢাকা'}</span>
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteProject(proj.id, proj.name)}
+                          className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+                          title="প্রজেক্ট মুছে ফেলুন"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                      <div className="text-right">
-                        <span className="text-xl font-black text-[#006231]">{proj.progress}%</span>
-                        <div className="text-3xs text-slate-400 font-bold">সম্পন্ন</div>
+
+                      {/* Specs Grid */}
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-0.5">
+                          <div className="text-3xs text-slate-400 font-bold uppercase tracking-wider">মোট বাজেট</div>
+                          <div className="font-black text-slate-900 text-sm truncate">{formatBDT(proj.budget)}</div>
+                        </div>
+
+                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-0.5">
+                          <div className="text-3xs text-slate-400 font-bold uppercase tracking-wider">মোট খরচ</div>
+                          <div className="font-black text-rose-700 text-sm truncate">{formatBDT(projExpenses)}</div>
+                        </div>
+
+                        <div className="p-3 rounded-2xl bg-emerald-50/50 border border-emerald-100 space-y-0.5">
+                          <div className="text-3xs text-emerald-800 font-bold uppercase tracking-wider">মোট ফ্ল্যাট / ইউনিট</div>
+                          <div className="font-black text-[#006231] text-sm">
+                            {totalUnitsCount} টি {proj.totalFloors ? `(${proj.totalFloors} তলা)` : ''}
+                          </div>
+                        </div>
+
+                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-0.5">
+                          <div className="text-3xs text-slate-400 font-bold uppercase tracking-wider">বুকিং স্ট্যাটাস</div>
+                          <div className="font-black text-slate-900 text-sm flex items-center justify-between">
+                            <span>{bookedUnitsCount} বুকড</span>
+                            <span className="text-3xs text-emerald-700 font-bold bg-emerald-100 px-1.5 py-0.5 rounded-md">
+                              {availableUnitsCount} খালি
+                            </span>
+                          </div>
+                        </div>
                       </div>
+
+                      {/* Units Inventory Collapsible List */}
+                      {totalUnitsCount > 0 && (
+                        <div className="pt-1">
+                          <button
+                            type="button"
+                            onClick={() => setExpandedProjectUnits(prev => ({ ...prev, [proj.id]: !prev[proj.id] }))}
+                            className="w-full py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-xs font-bold text-slate-700 flex items-center justify-between transition-colors cursor-pointer"
+                          >
+                            <span className="flex items-center space-x-1.5">
+                              <Building2 className="w-3.5 h-3.5 text-[#CE2028]" />
+                              <span>ইউনিট তালিকা দেখুন ({totalUnitsCount}টি)</span>
+                            </span>
+                            {isUnitsExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                          </button>
+
+                          {isUnitsExpanded && (
+                            <div className="mt-2 p-2.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 max-h-52 overflow-y-auto space-y-1.5 animate-fadeIn text-xs">
+                              {proj.units.map((unitName, uIdx) => {
+                                const matchedClient = projClients.find(c => c.flatNo === unitName);
+                                return (
+                                  <div key={uIdx} className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-100 shadow-2xs">
+                                    <span className="font-medium text-slate-800 text-2xs truncate">{unitName}</span>
+                                    {matchedClient ? (
+                                      <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-red-50 text-[#CE2028] border border-red-200 shrink-0">
+                                        বুকড ({matchedClient.name.slice(0, 10)})
+                                      </span>
+                                    ) : (
+                                      <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-[#006231] border border-emerald-200 shrink-0">
+                                        ✓ খালি
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-                        <span>কাজের অগ্রগতি স্লাইডার:</span>
-                        <span className="text-[#CE2028] font-black">{proj.progress}%</span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={proj.progress}
-                        onChange={(e) => handleUpdateProjectProgress(proj.id, e.target.value)}
-                        className="w-full accent-[#CE2028] cursor-pointer"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
-                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                        <div className="text-3xs text-slate-400 font-bold">মোট বাজেট</div>
-                        <div className="font-bold text-slate-900 mt-0.5 truncate">{formatBDT(proj.budget)}</div>
-                      </div>
-                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                        <div className="text-3xs text-slate-400 font-bold">নিবন্ধিত ক্রেতা</div>
-                        <div className="font-bold text-[#006231] mt-0.5">{projClients.length} জন</div>
-                      </div>
+                    {/* Card Footer */}
+                    <div className="p-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-2xs font-semibold text-slate-500">
+                      <span>{proj.unitsPerFloor ? `প্রতি তলায় ${proj.unitsPerFloor}টি ফ্ল্যাট` : 'কাস্টম ইউনিট স্পেস'}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setClientForm(prev => ({ ...prev, projectId: proj.id }));
+                          setIsClientModalOpen(true);
+                        }}
+                        className="text-[#006231] hover:text-[#0A4D27] font-bold flex items-center space-x-1 cursor-pointer"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>ক্রেতা যুক্ত করুন</span>
+                      </button>
                     </div>
                   </div>
                 );
