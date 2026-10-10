@@ -3,9 +3,11 @@
 @tailwind utilities;
 
 @layer base {
+  html, body, button, input, select, textarea {
+    font-family: 'Hind Siliguri', 'Inter', 'Outfit', sans-serif !important;
+  }
   html {
     scroll-behavior: smooth;
-    font-family: 'Hind Siliguri', 'Inter', 'Outfit', sans-serif;
   }
 }
 

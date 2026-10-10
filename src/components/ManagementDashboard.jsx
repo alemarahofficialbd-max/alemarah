@@ -181,7 +181,7 @@ export default function ManagementDashboard({
   const [isPaymentClientPickerOpen, setIsPaymentClientPickerOpen] = useState(false);
   const [showAllPayments, setShowAllPayments] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
-    clientId: data.clients[0]?.id || '',
+    clientId: '',
     amount: '',
     date: new Date().toISOString().split('T')[0],
     method: 'ব্যাংক ডিপোজিট',
@@ -234,6 +234,35 @@ export default function ManagementDashboard({
       })
     }));
     triggerAlert('কর্মকর্তার স্ট্যাটাস সফলভাবে পরিবর্তন হয়েছে!');
+  };
+
+  const handleToggleClientStatus = (clientId) => {
+    updateStore((prev) => {
+      const updatedClients = prev.clients.map(c => {
+        if (c.id === clientId) {
+          const isDeact = c.status === 'deactive' || c.status === 'নিষ্ক্রিয়';
+          return {
+            ...c,
+            status: isDeact ? 'active' : 'deactive'
+          };
+        }
+        return c;
+      });
+      return {
+        ...prev,
+        clients: updatedClients
+      };
+    });
+    // Also keep selectedClientForProfile updated
+    setSelectedClientForProfile(prev => {
+      if (!prev || prev.id !== clientId) return prev;
+      const isDeact = prev.status === 'deactive' || prev.status === 'নিষ্ক্রিয়';
+      return {
+        ...prev,
+        status: isDeact ? 'active' : 'deactive'
+      };
+    });
+    triggerAlert('গ্রাহকের অ্যাকাউন্ট স্ট্যাটাস সফলভাবে পরিবর্তন করা হয়েছে!');
   };
   const [teamForm, setTeamForm] = useState({
     name: '',
@@ -1539,8 +1568,8 @@ export default function ManagementDashboard({
                       const available = newProjId === 'all' 
                         ? data.clients 
                         : data.clients.filter(c => c.projectId === newProjId);
-                      if (available.length > 0 && !available.some(c => c.id === paymentForm.clientId)) {
-                        setPaymentForm(prev => ({ ...prev, clientId: available[0].id }));
+                      if (!available.some(c => c.id === paymentForm.clientId)) {
+                        setPaymentForm(prev => ({ ...prev, clientId: '' }));
                       }
                     }}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
@@ -1560,7 +1589,7 @@ export default function ManagementDashboard({
                 {/* Step 2: Visual Customer Selector With Photos and Sliding Picker */}
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    ২. কাস্টমার নির্বাচন করুন (ছবিসহ তালিকা) *
+                    ২. কাস্টমার নির্বাচন করুন *
                   </label>
 
                   {/* Selected Customer Active Card */}
@@ -1607,9 +1636,15 @@ export default function ManagementDashboard({
                     <button
                       type="button"
                       onClick={() => setIsPaymentClientPickerOpen(true)}
-                      className="w-full p-3 rounded-xl bg-slate-50 border border-dashed border-slate-300 text-slate-600 font-bold text-xs"
+                      className="w-full p-3.5 rounded-2xl bg-white border-2 border-dashed border-slate-300 hover:border-[#006231] text-slate-700 hover:text-[#006231] font-bold text-xs sm:text-sm transition-all flex items-center justify-between shadow-2xs group cursor-pointer"
                     >
-                      কাস্টমার নির্বাচন করতে ক্লিক করুন
+                      <div className="flex items-center space-x-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-emerald-50 text-slate-400 group-hover:text-[#006231] flex items-center justify-center transition-colors">
+                          <Users className="w-4 h-4" />
+                        </div>
+                        <span>কাস্টমার নির্বাচন করতে এখানে ক্লিক করুন</span>
+                      </div>
+                      <span className="text-xs text-[#006231] font-bold">তালিকা দেখুন ▼</span>
                     </button>
                   )}
 
@@ -2549,51 +2584,52 @@ export default function ManagementDashboard({
 
                   return (
                     <div key={dir.id} className="transition-colors">
-                      {/* Compact Header Row - Click to Toggle Expand */}
+                      {/* Compact Clean Header Row - Click to Toggle Expand */}
                       <div 
                         onClick={() => setExpandedDirectors(prev => ({ ...prev, [dir.id]: !prev[dir.id] }))}
-                        className="p-4 flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50 active:bg-slate-100 select-none"
+                        className="py-3 px-3.5 flex items-center justify-between gap-2.5 cursor-pointer hover:bg-slate-50 active:bg-slate-100 select-none"
                       >
-                        <div className="flex items-center space-x-3 min-w-0">
-                          <div className="w-12 h-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs">
+                        <div className="flex items-center space-x-2.5 min-w-0">
+                          <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs">
                             {dir.image ? (
                               <img src={dir.image} alt={dir.name} className="w-full h-full object-cover object-top" />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-base bg-slate-100">
+                              <div className="w-full h-full flex items-center justify-center text-slate-500 font-bold text-xs bg-slate-100">
                                 {dir.name.slice(0, 1)}
                               </div>
                             )}
                           </div>
                           <div className="min-w-0">
-                            <div className="font-bold text-slate-900 text-sm truncate">{dir.name}</div>
-                            <div className="text-3xs text-[#CE2028] font-bold mt-0.5">{dir.role}</div>
-                            <div className="flex items-center space-x-2 mt-1">
-                              <span className="font-mono text-3xs text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md font-bold border border-emerald-200">
-                                ফোলিও: {dir.folioNo}
-                              </span>
-                              <span className="font-mono text-3xs px-2 py-0.5 rounded-md bg-red-50 text-[#CE2028] font-bold border border-red-200">
-                                {dir.sharePercentage}% শেয়ার
-                              </span>
-                            </div>
+                            <div className="font-bold text-slate-900 text-xs sm:text-sm truncate leading-snug">{dir.name}</div>
+                            <div className="text-[11px] text-[#CE2028] font-semibold truncate mt-0.5">{dir.role}</div>
                           </div>
                         </div>
 
-                        <div className="text-right shrink-0 flex items-center space-x-2">
+                        <div className="text-right shrink-0 flex items-center space-x-1.5">
                           <div>
-                            <div className="font-black text-xs text-[#006231] font-mono">
+                            <div className="font-black text-xs text-[#006231] font-mono leading-tight">
                               {formatBDT(dir.investment)}
                             </div>
-                            <span className="text-3xs text-slate-400">বিনিয়োগ</span>
+                            <span className="text-[10px] text-slate-400 block font-medium">{dir.sharePercentage}% শেয়ার</span>
                           </div>
-                          <div className={`p-1.5 rounded-lg bg-slate-100 text-slate-500 transition-transform duration-200 ${isExp ? 'rotate-180 text-[#006231] bg-emerald-50' : ''}`}>
-                            <ChevronDown className="w-4 h-4" />
+                          <div className={`p-1 rounded-lg bg-slate-100 text-slate-500 transition-transform duration-200 ${isExp ? 'rotate-180 text-[#006231] bg-emerald-50' : ''}`}>
+                            <ChevronDown className="w-3.5 h-3.5" />
                           </div>
                         </div>
                       </div>
 
                       {/* Expandable Slide-Down Details on Mobile */}
                       {isExp && (
-                        <div className="px-4 pb-4 pt-1 bg-slate-50/70 border-t border-slate-100 space-y-3 animate-fadeIn">
+                        <div className="px-3.5 pb-3.5 pt-1 bg-slate-50/70 border-t border-slate-100 space-y-2.5 animate-fadeIn">
+                          {/* Folio & Share % Badges inside expand */}
+                          <div className="flex items-center space-x-2 pt-1">
+                            <span className="font-mono text-3xs text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md font-bold border border-emerald-200">
+                              ফোলিও: {dir.folioNo}
+                            </span>
+                            <span className="font-mono text-3xs px-2 py-0.5 rounded-md bg-red-50 text-[#CE2028] font-bold border border-red-200">
+                              শেয়ার বণ্টন: {dir.sharePercentage}%
+                            </span>
+                          </div>
                           {/* Financial & Nominee Quick Info Grid */}
                           <div className="grid grid-cols-2 gap-2 text-2xs">
                             <div className="p-2.5 rounded-xl bg-white border border-slate-200/80">
@@ -4423,7 +4459,7 @@ export default function ManagementDashboard({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      গ্রাহক ইউজারনেম (@alemarah.com নির্ধারিত) *
+                      গ্রাহক ইউজারনেম *
                     </label>
                     <div className="flex items-center rounded-xl bg-white border border-slate-200 overflow-hidden focus-within:border-[#CE2028]">
                       <input
@@ -4982,106 +5018,191 @@ export default function ManagementDashboard({
               
               {/* 1. Header Banner & Key Financial Cards */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                {/* Elegant Royal Emerald & Slate Client Profile Card (No solid black) */}
-                <div className="lg:col-span-5 bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#1E2E28] rounded-3xl p-6 sm:p-7 text-white border-2 border-emerald-500/30 shadow-2xl relative overflow-hidden flex flex-col justify-between">
-                  <div className="absolute top-0 right-0 w-80 h-80 bg-radial from-[#006231]/30 via-emerald-600/10 to-transparent rounded-full -mr-24 -mt-24 pointer-events-none"></div>
-                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-radial from-blue-600/10 to-transparent rounded-full -ml-20 -mb-20 pointer-events-none"></div>
-                  
-                  <div className="space-y-5 relative z-10">
-                    {/* Top Row: Status Pill & Client ID Badge */}
-                    <div className="flex items-center justify-between">
-                      <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 shadow-xs">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span className="text-3xs tracking-wider font-extrabold text-emerald-200">সক্রিয় বুকিং প্রোফাইল</span>
-                      </div>
-                      <span className="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-white/10 border border-white/15 text-slate-100 shadow-inner">
-                        {cl.id}
-                      </span>
-                    </div>
+                {/* Modern Crisp White & Emerald Client Profile Card */}
+                {(() => {
+                  const isDeactivated = cl.status === 'deactive' || cl.status === 'নিষ্ক্রিয়';
+                  const accountLoginId = cl.phone || cl.id;
+                  const accountPassword = cl.password || 'password123';
 
-                    {/* Client Name & Photo Header */}
-                    <div className="flex items-center space-x-4">
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-[#006231] via-[#0A4D27] to-[#8EBF40] text-white flex items-center justify-center font-black text-lg ring-3 ring-emerald-400/40 shadow-md shrink-0 overflow-hidden">
-                        {cl.image ? (
-                          <img src={cl.image} alt={cl.name} className="w-full h-full object-cover" />
-                        ) : (
-                          cl.name ? cl.name.slice(0, 2) : 'গ্রা'
-                        )}
+                  return (
+                    <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-7 text-slate-800 border border-slate-200/90 shadow-sm relative overflow-hidden flex flex-col justify-between">
+                      {/* Subtle Emerald Background Ambient Glow */}
+                      <div className="absolute top-0 right-0 w-80 h-80 bg-radial from-emerald-50 via-slate-50/50 to-transparent rounded-full -mr-24 -mt-24 pointer-events-none"></div>
+
+                      <div className="space-y-5 relative z-10">
+                        {/* Top Row: Status Pill (with Live Deactivation Status) & Client ID Badge */}
+                        <div className="flex items-center justify-between">
+                          <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full border shadow-2xs ${
+                            isDeactivated 
+                              ? 'bg-rose-50 border-rose-200 text-rose-700' 
+                              : 'bg-emerald-50 border-emerald-200 text-[#006231]'
+                          }`}>
+                            <span className={`w-2 h-2 rounded-full ${isDeactivated ? 'bg-rose-500' : 'bg-[#006231] animate-pulse'}`}></span>
+                            <span className="text-3xs tracking-wider font-extrabold">
+                              {isDeactivated ? 'নিষ্ক্রিয় (Deactivated)' : 'সক্রিয় বুকিং প্রোফাইল'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center space-x-1.5">
+                            <span className="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 shadow-2xs">
+                              {cl.id}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard?.writeText(cl.id);
+                                triggerAlert('কাস্টমার আইডি কপি হয়েছে!');
+                              }}
+                              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 border border-slate-200 cursor-pointer transition-colors"
+                              title="আইডি কপি করুন"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Client Name & Photo Header */}
+                        <div className="flex items-center space-x-4">
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-lg ring-4 ring-emerald-50 shadow-md shrink-0 overflow-hidden">
+                            {cl.image ? (
+                              <img src={cl.image} alt={cl.name} className="w-full h-full object-cover" />
+                            ) : (
+                              cl.name ? cl.name.slice(0, 2) : 'গ্রা'
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug break-words">
+                              {cl.name}
+                            </h2>
+                            <div className="flex items-center space-x-2 text-xs sm:text-sm text-slate-600 mt-1 font-medium">
+                              <Phone className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                              <span className="font-mono text-slate-800 font-bold">{cl.phone}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Assigned Property Highlights Panel */}
+                        <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2.5 shadow-2xs">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-slate-500 flex items-center space-x-2">
+                              <Building2 className="w-4 h-4 text-[#006231]" />
+                              <span>প্রকল্প:</span>
+                            </span>
+                            <strong className="text-slate-900 font-bold text-xs sm:text-sm">{cl.projectName}</strong>
+                          </div>
+                          <div className="flex items-center justify-between text-xs pt-1.5 border-t border-slate-200/60">
+                            <span className="text-slate-500 flex items-center space-x-2">
+                              <Home className="w-4 h-4 text-[#006231]" />
+                              <span>ফ্ল্যাট / ইউনিট নম্বর:</span>
+                            </span>
+                            <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-[#006231] font-bold text-xs border border-emerald-200">
+                              {cl.flatNo}
+                            </span>
+                          </div>
+                          {project?.location && (
+                            <div className="flex items-center justify-between text-xs pt-1.5 border-t border-slate-200/60">
+                              <span className="text-slate-500 flex items-center space-x-2">
+                                <MapPin className="w-4 h-4 text-rose-500" />
+                                <span>অবস্থান:</span>
+                              </span>
+                              <span className="text-slate-700 font-medium truncate max-w-[200px]">{project.location}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight truncate drop-shadow-xs">{cl.name}</h2>
-                        <div className="flex items-center space-x-2 text-sm text-emerald-200 mt-1 font-medium">
-                          <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
-                          <span className="font-mono text-emerald-300 font-bold">{cl.phone}</span>
+
+                      {/* Portal Credentials Drawer: Both Account ID & Password Copyable + Deactivation Toggle */}
+                      <div className="mt-6 pt-5 border-t border-slate-200/80 space-y-3 relative z-10">
+                        <div className="flex items-center justify-between">
+                          <span className="text-3xs text-slate-500 font-extrabold uppercase tracking-wider">
+                            গ্রাহক পোর্টাল অ্যাকাউন্ট ও পাসওয়ার্ড
+                          </span>
+                          <span className="text-3xs text-emerald-700 bg-emerald-50 border border-emerald-200 font-bold px-2 py-0.5 rounded-full">
+                            সিস্টেম লগইন
+                          </span>
+                        </div>
+
+                        {/* Dual Credentials Pill (Account ID + Password) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                          {/* Account ID / Mobile */}
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <span className="text-[10px] text-slate-400 block font-semibold">লগইন আইডি/মোবাইল</span>
+                              <strong className="text-slate-900 font-mono text-xs font-bold truncate block">
+                                {accountLoginId}
+                              </strong>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard?.writeText(accountLoginId);
+                                triggerAlert('লগইন অ্যাকাউন্ট আইডি কপি হয়েছে!');
+                              }}
+                              className="p-1.5 rounded-lg bg-white hover:bg-emerald-50 text-slate-600 hover:text-[#006231] border border-slate-200 text-3xs font-bold inline-flex items-center space-x-1 cursor-pointer transition-colors shrink-0"
+                              title="অ্যাকাউন্ট আইডি কপি করুন"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>কপি</span>
+                            </button>
+                          </div>
+
+                          {/* Password */}
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <span className="text-[10px] text-slate-400 block font-semibold">পাসওয়ার্ড</span>
+                              <strong className="text-amber-700 font-mono text-xs font-bold truncate block">
+                                {accountPassword}
+                              </strong>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard?.writeText(accountPassword);
+                                triggerAlert('পাসওয়ার্ড কপি হয়েছে!');
+                              }}
+                              className="p-1.5 rounded-lg bg-white hover:bg-emerald-50 text-slate-600 hover:text-[#006231] border border-slate-200 text-3xs font-bold inline-flex items-center space-x-1 cursor-pointer transition-colors shrink-0"
+                              title="পাসওয়ার্ড কপি করুন"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>কপি</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Account Actions: Deactivate / Activate Button & Booking Status */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleClientStatus(cl.id)}
+                            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs ${
+                              isDeactivated
+                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
+                            }`}
+                          >
+                            {isDeactivated ? (
+                              <>
+                                <UserCheck className="w-3.5 h-3.5" />
+                                <span>অ্যাকাউন্ট সক্রিয় করুন (Activate)</span>
+                              </>
+                            ) : (
+                              <>
+                                <UserX className="w-3.5 h-3.5 text-rose-600" />
+                                <span>অ্যাকাউন্ট ডিঅ্যাক্টিভ করুন (Deactivate)</span>
+                              </>
+                            )}
+                          </button>
+
+                          <div className="text-left sm:text-right">
+                            <span className="inline-block text-2xs font-bold text-[#006231] bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+                              অনুমোদিত ও কনফার্মড
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-
-                    {/* Assigned Property Highlights Panel */}
-                    <div className="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-2.5 shadow-sm backdrop-blur-md">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-300 flex items-center space-x-2">
-                          <Building2 className="w-4 h-4 text-[#8EBF40]" />
-                          <span>প্রকল্প:</span>
-                        </span>
-                        <strong className="text-white font-bold text-sm">{cl.projectName}</strong>
-                      </div>
-                      <div className="flex items-center justify-between text-xs pt-1 border-t border-white/10">
-                        <span className="text-slate-300 flex items-center space-x-2">
-                          <Home className="w-4 h-4 text-[#8EBF40]" />
-                          <span>ফ্ল্যাট / ইউনিট নম্বর:</span>
-                        </span>
-                        <span className="px-3 py-1 rounded-lg bg-[#006231] text-emerald-50 font-black text-xs font-mono shadow-xs border border-emerald-400/30">
-                          {cl.flatNo}
-                        </span>
-                      </div>
-                      {project?.location && (
-                        <div className="flex items-center justify-between text-xs pt-1 border-t border-white/10">
-                          <span className="text-slate-300 flex items-center space-x-2">
-                            <MapPin className="w-4 h-4 text-rose-400" />
-                            <span>অবস্থান:</span>
-                          </span>
-                          <span className="text-slate-200 font-medium truncate max-w-[220px]">{project.location}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Portal Credentials Drawer with Copy Option & Booking Status */}
-                  <div className="mt-6 pt-5 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
-                    <div className="space-y-1.5">
-                      <span className="text-3xs text-slate-300 block font-bold uppercase tracking-wider">গ্রাহক পোর্টাল অ্যাকাউন্ট ও পাসওয়ার্ড</span>
-                      <div className="flex flex-wrap items-center gap-2">
-                        {cl.email && (
-                          <span className="text-3xs font-mono px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-emerald-200 font-bold">
-                            {cl.email}
-                          </span>
-                        )}
-                        <code className="text-amber-300 font-mono font-bold text-xs bg-slate-900/80 px-2.5 py-1 rounded-lg border border-amber-400/30">
-                          {cl.password || 'password123'}
-                        </code>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            navigator.clipboard?.writeText(cl.password || 'password123');
-                            triggerAlert('পাসওয়ার্ড কপি হয়েছে!');
-                          }}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-400/30 text-emerald-200 text-3xs font-bold inline-flex items-center space-x-1 cursor-pointer transition-colors"
-                          title="পাসওয়ার্ড কপি করুন"
-                        >
-                          <Copy className="w-3 h-3" />
-                          <span>কপি</span>
-                        </button>
-                      </div>
-                    </div>
-                    <div className="text-left sm:text-right">
-                      <span className="text-3xs text-slate-300 block font-bold uppercase tracking-wider">বুকিং স্ট্যাটাস</span>
-                      <span className="inline-block mt-1 text-2xs font-extrabold text-[#8EBF40] bg-emerald-950/80 border border-emerald-500/40 px-3 py-1 rounded-full shadow-xs">
-                        অনুমোদিত ও কনফার্মড
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* 3 Quick Financial Metric Cards */}
                 <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
