@@ -177,6 +177,8 @@ export default function ManagementDashboard({
   });
 
   // 2. Receive Payment Form
+  const [paymentSelectedProjectId, setPaymentSelectedProjectId] = useState('all');
+  const [isPaymentClientPickerOpen, setIsPaymentClientPickerOpen] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
     clientId: data.clients[0]?.id || '',
     amount: '',
@@ -874,6 +876,22 @@ export default function ManagementDashboard({
     return perms.includes(item.id) || perms.includes('all');
   });
 
+  // Centralized Tab Navigation: automatically dismisses all open modals/profile views
+  const navigateToTab = (tabId) => {
+    setSelectedClientForProfile(null);
+    setSelectedReceiptForPrint(null);
+    setSelectedDirectorForProfile(null);
+    setSelectedDirectorForCertificate(null);
+    setIsClientModalOpen(false);
+    setIsProjectModalOpen(false);
+    setIsTeamModalOpen(false);
+    setIsDirectorModalOpen(false);
+    setIsCapitalDepositModalOpen(false);
+    setIsDividendModalOpen(false);
+    setEditingTeamMember(null);
+    setActiveTab(tabId);
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row font-sans animate-fadeIn">
       
@@ -933,7 +951,7 @@ export default function ManagementDashboard({
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => navigateToTab(item.id)}
                   title={item.label}
                   className={`w-full flex items-center rounded-2xl transition-all font-bold cursor-pointer relative group ${
                     isSidebarCollapsed 
@@ -1051,7 +1069,7 @@ export default function ManagementDashboard({
                     <button
                       onClick={() => {
                         setIsProfileOpen(false);
-                        setActiveTab('settings');
+                        navigateToTab('settings');
                       }}
                       className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left cursor-pointer text-slate-800"
                     >
@@ -1420,30 +1438,166 @@ export default function ManagementDashboard({
               </div>
 
               <form onSubmit={handleReceivePayment} className="space-y-4">
+                {/* Step 1: Filter By Project */}
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    কাস্টমার নির্বাচন করুন *
+                    ১. প্রজেক্ট নির্বাচন করুন (ফিল্টার)
                   </label>
                   <select
-                    value={paymentForm.clientId}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, clientId: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
+                    value={paymentSelectedProjectId}
+                    onChange={(e) => {
+                      const newProjId = e.target.value;
+                      setPaymentSelectedProjectId(newProjId);
+                      const available = newProjId === 'all' 
+                        ? data.clients 
+                        : data.clients.filter(c => c.projectId === newProjId);
+                      if (available.length > 0 && !available.some(c => c.id === paymentForm.clientId)) {
+                        setPaymentForm(prev => ({ ...prev, clientId: available[0].id }));
+                      }
+                    }}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
                   >
-                    {data.clients.map(c => {
-                      const due = (c.totalPrice || 0) - (c.totalPaid || 0);
+                    <option value="all">সকল প্রজেক্টের কাস্টমার ({data.clients.length} জন)</option>
+                    {data.projects.map(p => {
+                      const pClientsCount = data.clients.filter(c => c.projectId === p.id).length;
                       return (
-                        <option key={c.id} value={c.id}>
-                          {c.name} — {c.projectName} (বাকি: {formatBDT(due)})
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({pClientsCount} জন কাস্টমার)
                         </option>
                       );
                     })}
                   </select>
-                  {targetClientForCalc && (
-                    <div className="mt-1 text-2xs text-slate-500 flex justify-between">
-                      <span>মোট মূল্য: {formatBDT(targetClientForCalc.totalPrice)}</span>
-                      <span className="font-bold text-amber-700">বর্তমান বকেয়া: {formatBDT(targetClientDue)}</span>
+                </div>
+
+                {/* Step 2: Visual Customer Selector With Photos and Sliding Picker */}
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    ২. কাস্টমার নির্বাচন করুন (ছবিসহ তালিকা) *
+                  </label>
+
+                  {/* Selected Customer Active Card */}
+                  {targetClientForCalc ? (
+                    <div 
+                      onClick={() => setIsPaymentClientPickerOpen(!isPaymentClientPickerOpen)}
+                      className="p-3 rounded-2xl bg-gradient-to-r from-emerald-50/80 via-white to-emerald-50/30 border-2 border-[#006231]/30 hover:border-[#006231] cursor-pointer transition-all shadow-xs flex items-center justify-between gap-3 group"
+                    >
+                      <div className="flex items-center space-x-3 min-w-0">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden ring-2 ring-emerald-500/30 shadow-xs">
+                          {targetClientForCalc.image ? (
+                            <img src={targetClientForCalc.image} alt={targetClientForCalc.name} className="w-full h-full object-cover" />
+                          ) : (
+                            targetClientForCalc.name ? targetClientForCalc.name.slice(0, 2) : 'গ্রা'
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-bold text-slate-900 text-sm truncate flex items-center space-x-1.5">
+                            <span>{targetClientForCalc.name}</span>
+                            <span className="font-mono text-3xs px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-normal">
+                              {targetClientForCalc.id}
+                            </span>
+                          </div>
+                          <div className="text-2xs text-[#006231] font-semibold truncate">
+                            {targetClientForCalc.projectName} • {targetClientForCalc.flatNo}
+                          </div>
+                          <div className="text-3xs text-slate-500 font-medium">
+                            মোবাইল: <strong className="text-slate-700 font-mono">{targetClientForCalc.phone}</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span className="text-3xs text-slate-400 block uppercase font-bold">বর্তমান বকেয়া</span>
+                        <span className="text-xs sm:text-sm font-black text-amber-700">
+                          {formatBDT(targetClientDue)}
+                        </span>
+                        <div className="text-3xs text-[#006231] font-bold group-hover:underline">
+                          {isPaymentClientPickerOpen ? 'তালিকা লুকান ▲' : 'পরিবর্তন করুন ▼'}
+                        </div>
+                      </div>
                     </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsPaymentClientPickerOpen(true)}
+                      className="w-full p-3 rounded-xl bg-slate-50 border border-dashed border-slate-300 text-slate-600 font-bold text-xs"
+                    >
+                      কাস্টমার নির্বাচন করতে ক্লিক করুন
+                    </button>
                   )}
+
+                  {/* Dropdown / Grid List of all matching customers with avatars */}
+                  {isPaymentClientPickerOpen && (() => {
+                    const filteredList = paymentSelectedProjectId === 'all'
+                      ? data.clients
+                      : data.clients.filter(c => c.projectId === paymentSelectedProjectId);
+
+                    return (
+                      <div className="mt-2 p-2 rounded-2xl bg-white border border-slate-200 shadow-xl max-h-72 overflow-y-auto space-y-1.5 animate-fadeIn">
+                        <div className="px-2 py-1 text-3xs font-extrabold uppercase text-slate-400 tracking-wider flex justify-between">
+                          <span>উপলব্ধ কাস্টমার তালিকা ({filteredList.length} জন)</span>
+                          <button 
+                            type="button" 
+                            onClick={() => setIsPaymentClientPickerOpen(false)}
+                            className="text-[#CE2028] hover:underline"
+                          >
+                            বন্ধ করুন ✕
+                          </button>
+                        </div>
+
+                        {filteredList.length === 0 ? (
+                          <div className="p-4 text-center text-xs text-slate-400">
+                            এই প্রজেক্টে কোনো কাস্টমার নিবন্ধিত নেই।
+                          </div>
+                        ) : (
+                          filteredList.map(c => {
+                            const cDue = (c.totalPrice || 0) - (c.totalPaid || 0);
+                            const isCurrent = c.id === paymentForm.clientId;
+
+                            return (
+                              <div
+                                key={c.id}
+                                onClick={() => {
+                                  setPaymentForm({ ...paymentForm, clientId: c.id });
+                                  setIsPaymentClientPickerOpen(false);
+                                }}
+                                className={`p-2.5 rounded-xl flex items-center justify-between gap-3 cursor-pointer transition-colors ${
+                                  isCurrent
+                                    ? 'bg-emerald-50 border border-emerald-300 ring-1 ring-emerald-400'
+                                    : 'hover:bg-slate-50 border border-transparent'
+                                }`}
+                              >
+                                <div className="flex items-center space-x-2.5 min-w-0">
+                                  <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden shadow-2xs">
+                                    {c.image ? (
+                                      <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                      c.name ? c.name.slice(0, 2) : 'গ্রা'
+                                    )}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="text-xs font-bold text-slate-900 truncate flex items-center space-x-1">
+                                      <span>{c.name}</span>
+                                      <span className="text-3xs text-slate-400 font-mono">({c.id})</span>
+                                    </div>
+                                    <div className="text-3xs text-slate-500 truncate">
+                                      {c.projectName} • {c.flatNo}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="text-right shrink-0">
+                                  <div className="text-xs font-bold text-amber-700 font-mono">
+                                    {formatBDT(cDue)}
+                                  </div>
+                                  <span className="text-3xs text-slate-400">বকেয়া</span>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 <div>
@@ -2632,7 +2786,7 @@ export default function ManagementDashboard({
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => navigateToTab(item.id)}
                 aria-label={item.shortLabel || item.label}
                 title={item.label}
                 className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
@@ -4547,25 +4701,26 @@ export default function ManagementDashboard({
               
               {/* 1. Header Banner & Key Financial Cards */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                {/* Modernized Client Profile Card */}
-                <div className="lg:col-span-5 bg-[#0B111E] rounded-3xl p-6 sm:p-7 text-white border border-slate-800/90 shadow-2xl relative overflow-hidden flex flex-col justify-between">
-                  <div className="absolute top-0 right-0 w-80 h-80 bg-radial from-emerald-500/10 via-transparent to-transparent rounded-full -mr-24 -mt-24 pointer-events-none"></div>
+                {/* Elegant Royal Emerald & Slate Client Profile Card (No solid black) */}
+                <div className="lg:col-span-5 bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#1E2E28] rounded-3xl p-6 sm:p-7 text-white border-2 border-emerald-500/30 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                  <div className="absolute top-0 right-0 w-80 h-80 bg-radial from-[#006231]/30 via-emerald-600/10 to-transparent rounded-full -mr-24 -mt-24 pointer-events-none"></div>
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-radial from-blue-600/10 to-transparent rounded-full -ml-20 -mb-20 pointer-events-none"></div>
                   
                   <div className="space-y-5 relative z-10">
                     {/* Top Row: Status Pill & Client ID Badge */}
                     <div className="flex items-center justify-between">
-                      <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/30">
+                      <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 shadow-xs">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span className="text-3xs tracking-wider font-extrabold text-emerald-300">সক্রিয় বুকিং প্রোফাইল</span>
+                        <span className="text-3xs tracking-wider font-extrabold text-emerald-200">সক্রিয় বুকিং প্রোফাইল</span>
                       </div>
-                      <span className="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-slate-800/80 border border-slate-700/80 text-slate-200 shadow-inner">
+                      <span className="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-white/10 border border-white/15 text-slate-100 shadow-inner">
                         {cl.id}
                       </span>
                     </div>
 
                     {/* Client Name & Photo Header */}
                     <div className="flex items-center space-x-4">
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-[#006231] via-[#0A4D27] to-[#8EBF40] text-white flex items-center justify-center font-black text-lg ring-2 ring-emerald-500/40 shadow-md shrink-0 overflow-hidden">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-[#006231] via-[#0A4D27] to-[#8EBF40] text-white flex items-center justify-center font-black text-lg ring-3 ring-emerald-400/40 shadow-md shrink-0 overflow-hidden">
                         {cl.image ? (
                           <img src={cl.image} alt={cl.name} className="w-full h-full object-cover" />
                         ) : (
@@ -4573,8 +4728,8 @@ export default function ManagementDashboard({
                         )}
                       </div>
                       <div className="min-w-0">
-                        <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight truncate">{cl.name}</h2>
-                        <div className="flex items-center space-x-2 text-sm text-slate-300 mt-1 font-medium">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight truncate drop-shadow-xs">{cl.name}</h2>
+                        <div className="flex items-center space-x-2 text-sm text-emerald-200 mt-1 font-medium">
                           <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
                           <span className="font-mono text-emerald-300 font-bold">{cl.phone}</span>
                         </div>
@@ -4582,46 +4737,46 @@ export default function ManagementDashboard({
                     </div>
 
                     {/* Assigned Property Highlights Panel */}
-                    <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2.5 shadow-sm">
+                    <div className="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-2.5 shadow-sm backdrop-blur-md">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-400 flex items-center space-x-2">
+                        <span className="text-slate-300 flex items-center space-x-2">
                           <Building2 className="w-4 h-4 text-[#8EBF40]" />
                           <span>প্রকল্প:</span>
                         </span>
                         <strong className="text-white font-bold text-sm">{cl.projectName}</strong>
                       </div>
-                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-800/60">
-                        <span className="text-slate-400 flex items-center space-x-2">
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-white/10">
+                        <span className="text-slate-300 flex items-center space-x-2">
                           <Home className="w-4 h-4 text-[#8EBF40]" />
                           <span>ফ্ল্যাট / ইউনিট নম্বর:</span>
                         </span>
-                        <span className="px-3 py-1 rounded-lg bg-[#006231] text-emerald-100 font-black text-xs font-mono shadow-xs">
+                        <span className="px-3 py-1 rounded-lg bg-[#006231] text-emerald-50 font-black text-xs font-mono shadow-xs border border-emerald-400/30">
                           {cl.flatNo}
                         </span>
                       </div>
                       {project?.location && (
-                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-800/60">
-                          <span className="text-slate-400 flex items-center space-x-2">
+                        <div className="flex items-center justify-between text-xs pt-1 border-t border-white/10">
+                          <span className="text-slate-300 flex items-center space-x-2">
                             <MapPin className="w-4 h-4 text-rose-400" />
                             <span>অবস্থান:</span>
                           </span>
-                          <span className="text-slate-300 font-medium truncate max-w-[220px]">{project.location}</span>
+                          <span className="text-slate-200 font-medium truncate max-w-[220px]">{project.location}</span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   {/* Portal Credentials Drawer with Copy Option & Booking Status */}
-                  <div className="mt-6 pt-5 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+                  <div className="mt-6 pt-5 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
                     <div className="space-y-1.5">
-                      <span className="text-3xs text-slate-400 block font-bold uppercase tracking-wider">গ্রাহক পোর্টাল অ্যাকাউন্ট ও পাসওয়ার্ড</span>
+                      <span className="text-3xs text-slate-300 block font-bold uppercase tracking-wider">গ্রাহক পোর্টাল অ্যাকাউন্ট ও পাসওয়ার্ড</span>
                       <div className="flex flex-wrap items-center gap-2">
                         {cl.email && (
-                          <span className="text-3xs font-mono px-2.5 py-1 rounded-lg bg-slate-800/90 border border-slate-700/80 text-emerald-300 font-bold">
+                          <span className="text-3xs font-mono px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-emerald-200 font-bold">
                             {cl.email}
                           </span>
                         )}
-                        <code className="text-amber-300 font-mono font-bold text-xs bg-black/60 px-2.5 py-1 rounded-lg border border-amber-500/20">
+                        <code className="text-amber-300 font-mono font-bold text-xs bg-slate-900/80 px-2.5 py-1 rounded-lg border border-amber-400/30">
                           {cl.password || 'password123'}
                         </code>
                         <button
@@ -4630,7 +4785,7 @@ export default function ManagementDashboard({
                             navigator.clipboard?.writeText(cl.password || 'password123');
                             triggerAlert('পাসওয়ার্ড কপি হয়েছে!');
                           }}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-emerald-200 text-3xs font-bold inline-flex items-center space-x-1 cursor-pointer transition-colors"
+                          className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-400/30 text-emerald-200 text-3xs font-bold inline-flex items-center space-x-1 cursor-pointer transition-colors"
                           title="পাসওয়ার্ড কপি করুন"
                         >
                           <Copy className="w-3 h-3" />
@@ -4639,7 +4794,7 @@ export default function ManagementDashboard({
                       </div>
                     </div>
                     <div className="text-left sm:text-right">
-                      <span className="text-3xs text-slate-400 block font-bold uppercase tracking-wider">বুকিং স্ট্যাটাস</span>
+                      <span className="text-3xs text-slate-300 block font-bold uppercase tracking-wider">বুকিং স্ট্যাটাস</span>
                       <span className="inline-block mt-1 text-2xs font-extrabold text-[#8EBF40] bg-emerald-950/80 border border-emerald-500/40 px-3 py-1 rounded-full shadow-xs">
                         অনুমোদিত ও কনফার্মড
                       </span>
