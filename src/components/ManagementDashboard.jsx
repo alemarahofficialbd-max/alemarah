@@ -179,6 +179,7 @@ export default function ManagementDashboard({
   // 2. Receive Payment Form
   const [paymentSelectedProjectId, setPaymentSelectedProjectId] = useState('all');
   const [isPaymentClientPickerOpen, setIsPaymentClientPickerOpen] = useState(false);
+  const [showAllPayments, setShowAllPayments] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
     clientId: data.clients[0]?.id || '',
     amount: '',
@@ -1767,59 +1768,123 @@ export default function ManagementDashboard({
               </form>
             </div>
 
-            {/* Recent Collections Feed (7 cols) */}
-            <div className="lg:col-span-7 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-              <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+            {/* Recent Collections Feed (Clean Seamless List on Mobile, Box Card on Desktop) */}
+            <div className="lg:col-span-7 bg-transparent sm:bg-white p-0 sm:p-6 rounded-none sm:rounded-3xl border-0 sm:border sm:border-slate-200/80 sm:shadow-xs space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 sm:pb-3 border-b border-slate-200/70 sm:border-slate-100">
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">সাম্প্রতিক সংগৃহীত পেমেন্টের তালিকা</h3>
-                  <p className="text-2xs text-slate-500 mt-0.5">সকল কাস্টমার থেকে সংগৃহীত এন্ট্রিসমূহ</p>
+                  <h3 className="text-sm sm:text-base font-extrabold text-slate-900 flex items-center space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#006231]" />
+                    <span>সাম্প্রতিক সংগৃহীত পেমেন্টের তালিকা</span>
+                  </h3>
+                  <p className="text-3xs sm:text-2xs text-slate-500 mt-0.5">
+                    সকল কাস্টমার থেকে সরাসরি সংগৃহীত জমার তালিকা
+                  </p>
                 </div>
-                <span className="text-xs font-bold text-[#006231] bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
-                  সর্বমোট: {formatBDT(totalCollections)}
-                </span>
+                <div className="flex items-center space-x-2 self-start sm:self-auto">
+                  <span className="text-3xs sm:text-xs font-bold text-[#006231] bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/70">
+                    সর্বমোট সংগৃহীত: {formatBDT(totalCollections)}
+                  </span>
+                </div>
               </div>
 
-              <div className="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
-                {data.clients.flatMap(c => (c.paymentHistory || []).map(p => ({ ...p, clientName: c.name, projectName: c.projectName, clientId: c.id })))
-                  .sort((a, b) => (b.id > a.id ? 1 : -1))
-                  .map((trx, idx) => (
-                    <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
-                      <div className="space-y-0.5">
-                        <div className="font-bold text-slate-900 flex items-center space-x-1.5">
-                          <span>{trx.clientName}</span>
-                          <span className="text-3xs text-slate-400 font-normal">({trx.projectName})</span>
-                        </div>
-                        <div className="text-2xs text-slate-500">
-                          {trx.date} • {trx.method} • রসিদ: {trx.id}
-                        </div>
-                      </div>
-                      <div className="text-right flex items-center space-x-2 shrink-0">
-                        <div>
-                          <div className="font-black text-sm text-[#006231]">
-                            +{formatBDT(trx.amount)}
-                          </div>
-                          <span className="text-3xs px-2 py-0.5 rounded-full bg-emerald-100 text-[#006231] font-bold">
-                            অনুমোদিত
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const cl = data.clients.find(c => c.id === trx.clientId);
-                            setSelectedReceiptForPrint({
-                              trx,
-                              client: cl || { name: trx.clientName, phone: '', projectName: trx.projectName, flatNo: '' }
-                            });
-                          }}
-                          title="মানি রিসিট দেখুন ও প্রিন্ট করুন"
-                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
-                        >
-                          <Printer className="w-4 h-4 text-[#006231]" />
-                        </button>
-                      </div>
+              {(() => {
+                const allTrxList = data.clients.flatMap(c => 
+                  (c.paymentHistory || []).map(p => ({ 
+                    ...p, 
+                    clientName: c.name, 
+                    clientImage: c.image, 
+                    projectName: c.projectName, 
+                    clientId: c.id 
+                  }))
+                ).sort((a, b) => (b.id > a.id ? 1 : -1));
+
+                if (allTrxList.length === 0) {
+                  return (
+                    <div className="p-8 text-center text-xs text-slate-400 bg-white sm:bg-slate-50 rounded-2xl border border-slate-200/60">
+                      এখনো কোনো পেমেন্ট রেকর্ড নেই।
                     </div>
-                  ))}
-              </div>
+                  );
+                }
+
+                // Show top 5 recent payments initially on mobile, with show-more option
+                const visibleTrxList = showAllPayments ? allTrxList : allTrxList.slice(0, 5);
+
+                return (
+                  <div className="space-y-2">
+                    <div className="divide-y divide-slate-100 sm:divide-y-0 sm:space-y-2.5 sm:max-h-[500px] sm:overflow-y-auto sm:pr-1">
+                      {visibleTrxList.map((trx, idx) => (
+                        <div 
+                          key={idx} 
+                          className="py-3 px-2 sm:p-3.5 bg-white sm:bg-slate-50/90 rounded-2xl sm:border sm:border-slate-100 flex items-center justify-between text-xs hover:bg-slate-50 transition-colors shadow-2xs sm:shadow-none"
+                        >
+                          <div className="flex items-center space-x-3 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden ring-1 ring-emerald-500/20 shadow-2xs">
+                              {trx.clientImage ? (
+                                <img src={trx.clientImage} alt={trx.clientName} className="w-full h-full object-cover" />
+                              ) : (
+                                trx.clientName ? trx.clientName.slice(0, 2) : 'গ্রা'
+                              )}
+                            </div>
+                            <div className="min-w-0 space-y-0.5">
+                              <div className="font-bold text-slate-900 truncate flex items-center space-x-1.5">
+                                <span className="truncate">{trx.clientName}</span>
+                                <span className="text-3xs text-slate-400 font-normal shrink-0">({trx.projectName})</span>
+                              </div>
+                              <div className="text-3xs text-slate-500 truncate flex items-center space-x-1.5">
+                                <span className="font-medium text-slate-600">{trx.date}</span>
+                                <span>•</span>
+                                <span className="text-slate-600">{trx.method}</span>
+                                <span className="hidden sm:inline text-slate-400 font-mono">({trx.id})</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="text-right flex items-center space-x-2.5 shrink-0 pl-2">
+                            <div>
+                              <div className="font-black text-xs sm:text-sm text-[#006231]">
+                                +{formatBDT(trx.amount)}
+                              </div>
+                              <span className="text-[10px] px-2 py-0.2 rounded-full bg-emerald-100 text-[#006231] font-bold inline-block">
+                                অনুমোদিত
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const cl = data.clients.find(c => c.id === trx.clientId);
+                                setSelectedReceiptForPrint({
+                                  trx,
+                                  client: cl || { name: trx.clientName, phone: '', projectName: trx.projectName, flatNo: '' }
+                                });
+                              }}
+                              title="মানি রিসিট দেখুন ও প্রিন্ট করুন"
+                              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                            >
+                              <Printer className="w-4 h-4 text-[#006231]" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* View All / Collapse Button for Mobile and Long Lists */}
+                    {allTrxList.length > 5 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllPayments(!showAllPayments)}
+                        className="w-full py-2.5 px-4 rounded-xl bg-white sm:bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-xs font-bold text-slate-700 hover:text-[#006231] transition-all cursor-pointer flex items-center justify-center space-x-1.5 shadow-2xs"
+                      >
+                        <span>
+                          {showAllPayments 
+                            ? 'সংক্ষিপ্ত তালিকা দেখুন (প্রথম ৫টি)' 
+                            : `সম্পূর্ণ তালিকা দেখুন (সর্বমোট ${allTrxList.length}টি পেমেন্ট)`}
+                        </span>
+                        <ChevronDown className={`w-4 h-4 transition-transform ${showAllPayments ? 'rotate-180' : ''}`} />
+                      </button>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
