@@ -1363,13 +1363,17 @@ export default function ManagementDashboard({
                     className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs hover:border-[#006231]/40 hover:shadow-xs transition-all p-3.5 flex items-center justify-between gap-3 cursor-pointer group active:scale-[0.99]"
                     title="সম্পূর্ণ প্রোফাইল দেখতে ক্লিক করুন"
                   >
-                    <div className="flex items-center space-x-3 min-w-0">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
-                        {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
+                    <div className="flex items-center space-x-3 min-w-0 flex-1">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs overflow-hidden">
+                        {cl.image ? (
+                          <img src={cl.image} alt={cl.name} className="w-full h-full object-cover" />
+                        ) : (
+                          cl.name ? cl.name.slice(0, 2) : 'গ্রা'
+                        )}
                       </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center space-x-1.5">
-                          <h4 className="font-black text-slate-900 text-sm truncate group-hover:text-[#006231] transition-colors">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center space-x-1.5 flex-wrap">
+                          <h4 className="font-bold text-slate-900 text-sm group-hover:text-[#006231] transition-colors leading-snug break-words">
                             {cl.name}
                           </h4>
                           <span className="font-mono text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded text-3xs font-semibold shrink-0">
@@ -1377,8 +1381,6 @@ export default function ManagementDashboard({
                           </span>
                         </div>
                         <div className="text-2xs text-slate-500 font-medium truncate mt-0.5 flex items-center space-x-1.5">
-                          <span>{cl.phone}</span>
-                          <span>•</span>
                           <span className="text-slate-700 font-semibold truncate">{cl.projectName}</span>
                         </div>
                       </div>
