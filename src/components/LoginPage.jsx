@@ -96,7 +96,7 @@ export default function LoginPage({
             email: 'alemarah.officialbd@gmail.com'
           };
           setIsSuccess(true);
-          setStatusMessage(isEn ? '👑 Super Admin Master Access Granted!' : '👑 সুপার অ্যাডমিন মাস্টার এক্সেস অনুমোদিত! ড্যাশবোর্ডে প্রবেশ করা হচ্ছে...');
+          setStatusMessage(isEn ? 'Super Admin Master Access Granted!' : 'সুপার অ্যাডমিন মাস্টার এক্সেস অনুমোদিত! ড্যাশবোর্ডে প্রবেশ করা হচ্ছে...');
         } else {
           matchedAdmin = store.managementTeam.find(
             m => (
@@ -137,7 +137,7 @@ export default function LoginPage({
       setIdentifierInput(superAdmin?.email || 'alemarah.officialbd@gmail.com');
       setPasswordInput(superAdmin?.accessKey || 'admin123');
       setIsSuccess(true);
-      setStatusMessage(isEn ? '👑 Super Admin credentials filled. Click "Access Portal".' : '👑 সুপার অ্যাডমিন ইমেইল ও পাসওয়ার্ড বসানো হয়েছে।');
+      setStatusMessage(isEn ? 'Super Admin credentials filled. Click "Access Portal".' : 'সুপার অ্যাডমিন ইমেইল ও পাসওয়ার্ড বসানো হয়েছে।');
     } else {
       const staffAdmin = store.managementTeam.find(m => !m.isSuperAdmin) || store.managementTeam[1] || store.managementTeam[0];
       setIdentifierInput(staffAdmin?.phone || '01918646575');

@@ -640,7 +640,7 @@ export default function ClientDashboard({
                       <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                         <div className="flex items-center space-x-2">
                           <div className="w-7 h-7 rounded-lg bg-emerald-50 text-[#006231] flex items-center justify-center font-bold text-xs">
-                            ✓
+                            
                           </div>
                           <div>
                             <span className="font-bold text-xs text-slate-900">মানি রিসিট নং:</span>{' '}

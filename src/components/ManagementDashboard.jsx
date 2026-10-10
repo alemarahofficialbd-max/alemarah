@@ -1034,7 +1034,7 @@ export default function ManagementDashboard({
                       {isSuperAdmin && <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
                     </div>
                     <div className="text-xs text-[#006231] font-semibold mt-0.5">
-                      {isSuperAdmin ? '👑 সুপার অ্যাডমিন (Master Admin)' : (admin?.role || 'ম্যানেজমেন্ট টিম')}
+                      {isSuperAdmin ? 'সুপার অ্যাডমিন (Master Admin)' : (admin?.role || 'ম্যানেজমেন্ট টিম')}
                     </div>
                     <div className="text-2xs text-slate-400 mt-0.5">
                       {admin?.email || admin?.phone || 'alemarah.officialbd@gmail.com'}
@@ -1687,7 +1687,7 @@ export default function ManagementDashboard({
                                       </span>
                                     ) : (
                                       <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-[#006231] border border-emerald-200 shrink-0">
-                                        ✓ খালি
+                                        খালি
                                       </span>
                                     )}
                                   </div>
@@ -2419,7 +2419,7 @@ export default function ManagementDashboard({
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold">🇧🇩 বাংলা</span>
+                      <span className="text-xl font-bold">বাংলা</span>
                       {lang === 'bn' && <CheckCircle2 className="w-5 h-5 text-[#006231]" />}
                     </div>
                     <div className="mt-3">
@@ -2441,7 +2441,7 @@ export default function ManagementDashboard({
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold">🇬🇧 English</span>
+                      <span className="text-xl font-bold">English</span>
                       {lang === 'en' && <CheckCircle2 className="w-5 h-5 text-[#006231]" />}
                     </div>
                     <div className="mt-3">
@@ -2800,7 +2800,7 @@ export default function ManagementDashboard({
                       </label>
                       {directorForm.image && (
                         <span className="text-3xs font-bold text-[#006231] bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200">
-                          ✓ ছবি সফলভাবে সংযুক্ত হয়েছে
+                          ছবি সফলভাবে সংযুক্ত হয়েছে
                         </span>
                       )}
                     </div>
@@ -3410,10 +3410,10 @@ export default function ManagementDashboard({
                 <div className="absolute inset-5 sm:inset-7 border border-[#B8860B]/30 rounded-2xl pointer-events-none"></div>
 
                 {/* Corner Guilloche Embellishments */}
-                <div className="absolute top-5 left-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">⚜</div>
-                <div className="absolute top-5 right-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">⚜</div>
-                <div className="absolute bottom-5 left-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">⚜</div>
-                <div className="absolute bottom-5 right-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">⚜</div>
+                <div className="absolute top-5 left-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">•</div>
+                <div className="absolute top-5 right-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">•</div>
+                <div className="absolute bottom-5 left-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">•</div>
+                <div className="absolute bottom-5 right-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">•</div>
 
                 {/* Background Watermark Crest */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-[0.035] pointer-events-none select-none">
@@ -4044,11 +4044,11 @@ export default function ManagementDashboard({
                             const isSold = soldUnits.includes(u);
                             return (
                               <option key={uIdx} value={u} disabled={isSold}>
-                                {u} {isSold ? '(বিক্রিত / বুকড)' : '✓ খালি'}
+                                {u} {isSold ? '(বিক্রিত / বুকড)' : 'খালি'}
                               </option>
                             );
                           })}
-                          <option value="custom_manual">➕ তালিকায় নেই (ম্যানুয়ালি লিখুন)</option>
+                          <option value="custom_manual">তালিকায় নেই (ম্যানুয়ালি লিখুন)</option>
                         </select>
 
                         {clientForm.flatNo === 'custom_manual' && (
@@ -4219,7 +4219,7 @@ export default function ManagementDashboard({
               {projectForm.projectType === 'residential' && (
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2.5">
                   <span className="text-3xs font-bold text-slate-500 uppercase tracking-wider flex items-center space-x-1">
-                    <span>🏢 অটো ফ্ল্যাট ইনভেন্টরি কনফিগারেশন</span>
+                    <span>অটো ফ্ল্যাট ইনভেন্টরি কনফিগারেশন</span>
                   </span>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -4667,7 +4667,7 @@ export default function ManagementDashboard({
                     <div className="text-3xs text-slate-500 font-medium pt-3 border-t border-red-50 flex items-center justify-between">
                       <span>বাকি: {100 - Math.min(100, percent)}%</span>
                       {due === 0 ? (
-                        <span className="text-emerald-600 font-bold">পরিশোধিত ✓</span>
+                        <span className="text-emerald-600 font-bold">পরিশোধিত </span>
                       ) : (
                         <span className="text-amber-600 font-bold">চলমান</span>
                       )}
