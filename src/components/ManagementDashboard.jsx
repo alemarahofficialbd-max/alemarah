@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Award,
+  Settings,
+  Globe,
+  Lock,
+  ShieldAlert,
   Camera,
   Upload,
   PieChart,
@@ -57,6 +61,7 @@ import {
 export default function ManagementDashboard({ 
   admin, 
   lang = 'bn', 
+  setLang,
   t, 
   onLogout, 
   onNavigateHome 
@@ -69,6 +74,42 @@ export default function ManagementDashboard({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [successAlert, setSuccessAlert] = useState('');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Master Security PIN for high-privilege operations (default: 7788)
+  const [masterPin, setMasterPin] = useState(() => {
+    try {
+      return localStorage.getItem('alemarah_master_pin') || '7788';
+    } catch {
+      return '7788';
+    }
+  });
+  const [pinChangeForm, setPinChangeForm] = useState({ oldPin: '', newPin: '', confirmPin: '' });
+  const [pinChangeMsg, setPinChangeMsg] = useState('');
+
+  // Delete Confirmation Modal with PIN Verification
+  const [deletePendingAction, setDeletePendingAction] = useState(null); // { title: '', desc: '', onConfirm: () => {} }
+  const [inputtedPin, setInputtedPin] = useState('');
+  const [pinError, setPinError] = useState('');
+
+  const requestProtectedDelete = (title, desc, onConfirm) => {
+    setDeletePendingAction({ title, desc, onConfirm });
+    setInputtedPin('');
+    setPinError('');
+  };
+
+  const handleVerifyAndExecuteDelete = (e) => {
+    e.preventDefault();
+    if (inputtedPin.trim() === masterPin.trim()) {
+      if (deletePendingAction?.onConfirm) {
+        deletePendingAction.onConfirm();
+      }
+      setDeletePendingAction(null);
+      setInputtedPin('');
+      setPinError('');
+    } else {
+      setPinError('ভুল মাস্টার পিন! মুছে ফেলার অনুমতি দেওয়া সম্ভব নয়।');
+    }
+  };
 
   // Check if current logged-in account has Super Admin privileges
   const isSuperAdmin = admin?.isSuperAdmin || 
@@ -390,13 +431,17 @@ export default function ManagementDashboard({
   };
 
   const handleDeleteProject = (projId, projName) => {
-    if (window.confirm(`আপনি কি নিশ্চিতভাবে "${projName}" প্রজেক্টটি মুছে ফেলতে চান?`)) {
-      updateStore((prev) => ({
-        ...prev,
-        projects: prev.projects.filter(p => p.id !== projId)
-      }));
-      triggerAlert(`প্রজেক্ট "${projName}" সফলভাবে মুছে ফেলা হয়েছে!`);
-    }
+    requestProtectedDelete(
+      `প্রজেক্ট "${projName}" মুছে ফেলা`,
+      `আপনি কি নিশ্চিতভাবে "${projName}" প্রজেক্টটি এবং এর সকল ডাটা মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
+      () => {
+        updateStore((prev) => ({
+          ...prev,
+          projects: prev.projects.filter(p => p.id !== projId)
+        }));
+        triggerAlert(`প্রজেক্ট "${projName}" সফলভাবে মুছে ফেলা হয়েছে!`);
+      }
+    );
   };
 
   const handleUpdateProjectProgress = (projId, newProgress) => {
@@ -546,13 +591,17 @@ export default function ManagementDashboard({
   };
 
   const handleDeleteTeam = (id, name) => {
-    if (window.confirm(`আপনি কি নিশ্চিতভাবে ${name}-কে অ্যাডমিন তালিকা থেকে অপসারণ করতে চান?`)) {
-      updateStore((prev) => ({
-        ...prev,
-        managementTeam: prev.managementTeam.filter(m => m.id !== id)
-      }));
-      triggerAlert(`${name}-কে সফলভাবে অপসারণ করা হয়েছে।`);
-    }
+    requestProtectedDelete(
+      `অ্যাডমিন/কর্মকর্তা "${name}" অপসারণ`,
+      `আপনি কি নিশ্চিতভাবে "${name}"-কে অপসারণ করতে চান? অনুমতি দিতে মাস্টার পিন লিখুন।`,
+      () => {
+        updateStore((prev) => ({
+          ...prev,
+          managementTeam: prev.managementTeam.filter(m => m.id !== id)
+        }));
+        triggerAlert(`${name}-কে সফলভাবে অপসারণ করা হয়েছে।`);
+      }
+    );
   };
 
   const handleAddDirector = (e) => {
@@ -777,7 +826,8 @@ export default function ManagementDashboard({
     { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল', shortLabel: 'প্রজেক্ট', icon: Building2 },
     { id: 'expenses', label: '৪. প্রজেক্ট বাজেট ও খরচ', shortLabel: 'বাজেট ও খরচ', icon: Wallet },
     { id: 'team', label: '৫. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
-    { id: 'directors', label: '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', shortLabel: 'ডিরেক্টরস', icon: Award }
+    { id: 'directors', label: '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', shortLabel: 'ডিরেক্টরস', icon: Award },
+    { id: 'settings', label: '৭. সেটিংস, ভাষা ও সিকিউরিটি পিন', shortLabel: 'সেটিংস', icon: Settings }
   ];
 
   return (
@@ -2184,6 +2234,235 @@ export default function ManagementDashboard({
           </div>
         )}
 
+        {/* ========================================================= */}
+        {/* TAB 7: সিস্টেম সেটিংস, ভাষা ও মাস্টার সিকিউরিটি পিন      */}
+        {/* ========================================================= */}
+        {activeTab === 'settings' && (
+          <div className="space-y-6 animate-fadeIn select-none">
+            {/* Header Action Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#006231] animate-pulse"></span>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900">
+                    সিস্টেম সেটিংস ও সিকিউরিটি কন্ট্রোল
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  ড্যাশবোর্ডের ভাষা পরিবর্তন, সিস্টেম মাস্টার পিন এবং নিরাপদ সুরক্ষা কনফিগারেশন
+                </p>
+              </div>
+
+              <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-50 text-[#006231] text-xs font-bold border border-emerald-200 self-start sm:self-auto">
+                <ShieldCheck className="w-4 h-4 text-[#006231]" />
+                <span>মাস্টার প্রোটেকশন সক্রিয়</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* 1. Language Preference Card */}
+              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-5">
+                <div className="flex items-center space-x-3">
+                  <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-[#006231] flex items-center justify-center font-bold">
+                    <Globe className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base text-slate-900">ভাষা নির্বাচন (Language Preference)</h4>
+                    <p className="text-2xs text-slate-500">আপনার পছন্দ অনুযায়ী বাংলা অথবা ইংরেজি ভাষা নির্ধারণ করুন</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (setLang) setLang('bn');
+                      triggerAlert('সিস্টেম ভাষা সফলভাবে বাংলায় সেট করা হয়েছে!');
+                    }}
+                    className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between ${
+                      lang === 'bn'
+                        ? 'border-[#006231] bg-emerald-50/60 shadow-sm'
+                        : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100/60 text-slate-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold">🇧🇩 বাংলা</span>
+                      {lang === 'bn' && <CheckCircle2 className="w-5 h-5 text-[#006231]" />}
+                    </div>
+                    <div className="mt-3">
+                      <div className="font-bold text-xs text-slate-900">বাংলা ভাষা (ডিফল্ট)</div>
+                      <div className="text-3xs text-slate-500 mt-0.5">সব হিসাব ও ইন্টারফেস বাংলায়</div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (setLang) setLang('en');
+                      triggerAlert('System language set to English!');
+                    }}
+                    className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between ${
+                      lang === 'en'
+                        ? 'border-[#006231] bg-emerald-50/60 shadow-sm'
+                        : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100/60 text-slate-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold">🇬🇧 English</span>
+                      {lang === 'en' && <CheckCircle2 className="w-5 h-5 text-[#006231]" />}
+                    </div>
+                    <div className="mt-3">
+                      <div className="font-bold text-xs text-slate-900">English Language</div>
+                      <div className="text-3xs text-slate-500 mt-0.5">Global ERP interface</div>
+                    </div>
+                  </button>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-2xs text-slate-600 flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-[#006231] shrink-0" />
+                  <span>বর্তমান সক্রিয় ভাষা: <strong className="text-slate-900 font-bold">{lang === 'bn' ? 'বাংলা (Bangla)' : 'English'}</strong></span>
+                </div>
+              </div>
+
+              {/* 2. Master PIN Configuration Card */}
+              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-5">
+                <div className="flex items-center space-x-3">
+                  <div className="w-11 h-11 rounded-2xl bg-red-50 text-[#CE2028] flex items-center justify-center font-bold">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base text-slate-900">মাস্টার সিকিউরিটি পিন (Master PIN)</h4>
+                    <p className="text-2xs text-slate-500">প্রজেক্ট বা কোনো গুরুত্বপূর্ণ ডাটা মুছে ফেলতে এই পিন লাগবে</p>
+                  </div>
+                </div>
+
+                {/* Current PIN status */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+                  <div>
+                    <span className="text-3xs text-slate-400 font-bold uppercase tracking-wider block">বর্তমান মাস্টার পিন</span>
+                    <span className="font-mono font-black text-sm text-slate-800 tracking-widest">
+                      •••• (ডিফল্ট: 7788)
+                    </span>
+                  </div>
+                  <span className="text-3xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-50 text-[#006231] border border-emerald-200 flex items-center space-x-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>সুরক্ষিত</span>
+                  </span>
+                </div>
+
+                {/* Change PIN Form */}
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (pinChangeForm.oldPin.trim() !== masterPin.trim()) {
+                      setPinChangeMsg('বর্তমান পিনটি সঠিক নয়!');
+                      return;
+                    }
+                    if (!pinChangeForm.newPin || pinChangeForm.newPin.length < 4) {
+                      setPinChangeMsg('নতুন পিন কমপক্ষে ৪ সংখ্যার হতে হবে!');
+                      return;
+                    }
+                    if (pinChangeForm.newPin !== pinChangeForm.confirmPin) {
+                      setPinChangeMsg('নতুন পিন এবং নিশ্চিতকরণ পিন মিলছে না!');
+                      return;
+                    }
+                    try {
+                      localStorage.setItem('alemarah_master_pin', pinChangeForm.newPin);
+                    } catch {}
+                    setMasterPin(pinChangeForm.newPin);
+                    setPinChangeForm({ oldPin: '', newPin: '', confirmPin: '' });
+                    setPinChangeMsg('মাস্টার পিন সফলভাবে পরিবর্তন করা হয়েছে!');
+                    triggerAlert('মাস্টার পিন সফলভাবে আপডেট হয়েছে!');
+                  }}
+                  className="space-y-3 pt-1"
+                >
+                  <div>
+                    <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                      বর্তমান পিন লিখুন
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="যেমন: 7788"
+                      value={pinChangeForm.oldPin}
+                      onChange={(e) => {
+                        setPinChangeForm({ ...pinChangeForm, oldPin: e.target.value });
+                        setPinChangeMsg('');
+                      }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-mono font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                        নতুন পিন (কমপক্ষে ৪ সংখ্যা)
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        placeholder="নতুন পিন দিন"
+                        value={pinChangeForm.newPin}
+                        onChange={(e) => {
+                          setPinChangeForm({ ...pinChangeForm, newPin: e.target.value });
+                          setPinChangeMsg('');
+                        }}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-mono font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+                        নতুন পিন নিশ্চিত করুন
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        placeholder="পুনরায় লিখুন"
+                        value={pinChangeForm.confirmPin}
+                        onChange={(e) => {
+                          setPinChangeForm({ ...pinChangeForm, confirmPin: e.target.value });
+                          setPinChangeMsg('');
+                        }}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-mono font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                      />
+                    </div>
+                  </div>
+
+                  {pinChangeMsg && (
+                    <div className={`p-2.5 rounded-xl text-xs font-bold ${
+                      pinChangeMsg.includes('সফলভাবে') ? 'bg-emerald-50 text-[#006231]' : 'bg-red-50 text-[#CE2028]'
+                    }`}>
+                      {pinChangeMsg}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs shadow-md transition-all cursor-pointer active:scale-95 flex items-center justify-center space-x-1.5"
+                  >
+                    <Key className="w-3.5 h-3.5" />
+                    <span>নতুন মাস্টার পিন সংরক্ষণ করুন</span>
+                  </button>
+                </form>
+              </div>
+
+            </div>
+
+            {/* Quick Policy Notice */}
+            <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 flex items-start space-x-3 text-xs text-amber-900">
+              <ShieldAlert className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-bold block">নিরাপত্তা ও মোছার প্রটোকল:</strong>
+                <span>
+                  কোনো প্রজেক্ট বা কর্মকর্তা তালিকা থেকে মুছে ফেলতে চাইলে সিস্টেমে স্বয়ংক্রিয়ভাবে পপআপ আসবে এবং মাস্টার পিন দিতে হবে। ডিফল্ট মাস্টার পিন হচ্ছে <strong className="font-mono bg-white px-1.5 py-0.5 rounded border border-amber-300">7788</strong>। আপনি চাইলে যেকোনো সময় উপরের ফর্ম থেকে আপনার নিজস্ব পিন সেট করে নিতে পারবেন।
+                </span>
+              </div>
+            </div>
+
+          </div>
+        )}
+
       </main>
       </div>
 
@@ -2216,6 +2495,78 @@ export default function ManagementDashboard({
           })}
         </div>
       </nav>
+
+      {/* ========================================================= */}
+      {/* MASTER PIN DELETE CONFIRMATION MODAL                      */}
+      {/* ========================================================= */}
+      {deletePendingAction && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn select-none">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200 space-y-4 animate-scaleUp">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#CE2028] flex items-center justify-center shrink-0">
+                <ShieldAlert className="w-6 h-6 text-[#CE2028]" />
+              </div>
+              <div>
+                <h3 className="font-black text-base text-slate-900">
+                  {deletePendingAction.title || 'ডাটা মুছে ফেলার নিশ্চিতকরণ'}
+                </h3>
+                <p className="text-3xs text-slate-500">অনুমোদনের জন্য মাস্টার সিকিউরিটি পিন প্রয়োজন</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+              {deletePendingAction.desc}
+            </p>
+
+            <form onSubmit={handleVerifyAndExecuteDelete} className="space-y-3.5">
+              <div>
+                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  মাস্টার পিন দিন (ডিফল্ট: 7788) *
+                </label>
+                <input
+                  type="password"
+                  autoFocus
+                  required
+                  placeholder="৪ সংখ্যার পিন লিখুন"
+                  value={inputtedPin}
+                  onChange={(e) => {
+                    setInputtedPin(e.target.value);
+                    setPinError('');
+                  }}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-center text-sm font-mono font-black tracking-widest text-slate-900 outline-none focus:border-[#CE2028]"
+                />
+              </div>
+
+              {pinError && (
+                <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-[#CE2028] text-center">
+                  {pinError}
+                </div>
+              )}
+
+              <div className="flex items-center justify-end space-x-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeletePendingAction(null);
+                    setInputtedPin('');
+                    setPinError('');
+                  }}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  বাতিল করুন
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all cursor-pointer active:scale-95 flex items-center space-x-1.5"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>নিশ্চিত ও ডিলিট করুন</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ========================================================= */}
       {/* MODAL: ADD DIRECTOR                                       */}

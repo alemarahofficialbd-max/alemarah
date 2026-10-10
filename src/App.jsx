@@ -994,6 +994,7 @@ export default function App() {
           <ManagementDashboard
             admin={currentAdmin}
             lang={lang}
+            setLang={setLang}
             onLogout={handleLogout}
             onNavigateHome={() => navigateTo('home')}
           />
