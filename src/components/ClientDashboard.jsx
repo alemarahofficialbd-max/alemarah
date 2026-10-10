@@ -17,6 +17,7 @@ import {
   Check,
   CreditCard,
   ChevronRight,
+  ChevronLeft,
   Copy,
   Printer,
   Calendar,
@@ -887,66 +888,100 @@ export default function ClientDashboard({
       </nav>
 
       {/* ========================================================= */}
-      {/* 4. OFFICIAL MONEY RECEIPT MODAL                           */}
+      {/* 4. FULL SCREEN VIEW: OFFICIAL MONEY RECEIPT               */}
       {/* ========================================================= */}
       {selectedReceipt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 relative space-y-4">
-            <button
-              onClick={() => setSelectedReceipt(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="text-center space-y-1">
-              <img src="/alemarah_logo_header.svg" alt="Al-Emarah" className="h-7 mx-auto mb-2" />
-              <div className="text-3xs uppercase tracking-widest text-[#006231] font-black">অফিসিয়াল মানি রিসিট</div>
-              <h3 className="text-sm font-bold text-slate-800">আল-ইমারাহ প্রোপার্টিজ লিমিটেড</h3>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-slate-400 text-2xs">রসিদ নম্বর:</span>
-                <span className="font-mono font-bold text-[#CE2028]">{selectedReceipt.id}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 text-2xs">তারিখ:</span>
-                <span className="font-semibold text-slate-800">{selectedReceipt.date}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 text-2xs">গ্রাহকের নাম:</span>
-                <span className="font-bold text-slate-800">{client?.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 text-2xs">প্রকল্প ও ফ্ল্যাট:</span>
-                <span className="text-slate-700">{client?.projectName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 text-2xs">পেমেন্ট মাধ্যম:</span>
-                <span className="text-slate-700">{selectedReceipt.method}</span>
-              </div>
-              <div className="flex justify-between pt-2 border-t border-slate-200 text-sm font-black">
-                <span className="text-slate-800">পরিশোধিত টাকা:</span>
-                <span className="text-[#006231]">{formatBDT(selectedReceipt.amount)}</span>
+        <div className="fixed inset-0 z-50 bg-[#F1F5F9] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          {/* Top Sticky Header */}
+          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={() => setSelectedReceipt(null)}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1"
+                title="ফিরে যান"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
+              </button>
+              <div className="flex items-center space-x-2">
+                <CheckCircle2 className="w-5 h-5 text-[#006231]" />
+                <span className="font-bold text-sm text-slate-800">অফিসিয়াল মানি রিসিট</span>
               </div>
             </div>
-
-            <div className="text-center text-3xs text-emerald-700 font-bold bg-emerald-50 py-1.5 rounded-xl border border-emerald-100 flex items-center justify-center space-x-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>ডিজিটাল অডিট ও অফিস কর্তৃক ভেরিফায়েড</span>
+            <div className="flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={() => {
+                  window.print();
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-sm active:scale-95 transition-all"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>প্রিন্ট করুন</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedReceipt(null)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+                title="বন্ধ করুন"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
+          </div>
 
-            <button
-              onClick={() => {
-                alert('মানি রিসিট প্রিন্ট প্রক্রিয়া শুরু হচ্ছে...');
-                setSelectedReceipt(null);
-              }}
-              className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>রসিদ প্রিন্ট বা ডাউনলোড করুন</span>
-            </button>
+          {/* Full Screen Body */}
+          <div className="flex-1 py-6 sm:py-10 px-4 sm:px-6 flex justify-center items-start">
+            <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-5">
+              <div className="text-center space-y-1">
+                <img src="/alemarah_logo_header.svg" alt="Al-Emarah" className="h-8 mx-auto mb-2" />
+                <div className="text-3xs uppercase tracking-widest text-[#006231] font-black">অফিসিয়াল মানি রিসিট</div>
+                <h3 className="text-sm font-bold text-slate-800">আল-ইমারাহ প্রোপার্টিজ লিমিটেড</h3>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2.5 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-slate-400 text-2xs">রসিদ নম্বর:</span>
+                  <span className="font-mono font-bold text-[#CE2028]">{selectedReceipt.id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 text-2xs">তারিখ:</span>
+                  <span className="font-semibold text-slate-800">{selectedReceipt.date}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 text-2xs">গ্রাহকের নাম:</span>
+                  <span className="font-bold text-slate-800">{client?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 text-2xs">প্রকল্প ও ফ্ল্যাট:</span>
+                  <span className="text-slate-700 font-medium">{client?.projectName} ({client?.flatNo})</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 text-2xs">পেমেন্ট মাধ্যম:</span>
+                  <span className="text-slate-700 font-medium">{selectedReceipt.method}</span>
+                </div>
+                <div className="flex justify-between pt-2.5 border-t border-slate-200 text-base font-black">
+                  <span className="text-slate-800">পরিশোধিত টাকা:</span>
+                  <span className="text-[#006231]">{formatBDT(selectedReceipt.amount)}</span>
+                </div>
+              </div>
+
+              <div className="text-center text-3xs text-emerald-700 font-bold bg-emerald-50 py-2 rounded-xl border border-emerald-100 flex items-center justify-center space-x-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span>ডিজিটাল অডিট ও অফিস কর্তৃক ভেরিফায়েড ভাউচার</span>
+              </div>
+
+              <button
+                onClick={() => {
+                  window.print();
+                }}
+                className="w-full py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>রসিদ প্রিন্ট করুন</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -146,7 +146,6 @@ export default function ManagementDashboard({
     name: '',
     location: '',
     progress: 10,
-    currentStage: 'পাইলিং ও সাইট প্রিপারেশন',
     budget: '',
     projectType: 'residential', // 'residential' | 'share' | 'commercial'
     totalFloors: 10,
@@ -358,7 +357,6 @@ export default function ManagementDashboard({
       name: projectForm.name,
       location: projectForm.location || 'ঢাকা',
       progress: Number(projectForm.progress) || 10,
-      currentStage: projectForm.currentStage || 'পাইলিং ও সাইট প্রিপারেশন',
       budget: Number(projectForm.budget) || 0,
       type: projectForm.projectType || 'residential',
       totalFloors: Number(projectForm.totalFloors) || 10,
@@ -377,7 +375,6 @@ export default function ManagementDashboard({
       name: '',
       location: '',
       progress: 10,
-      currentStage: 'পাইলিং ও সাইট প্রিপারেশন',
       budget: '',
       projectType: 'residential',
       totalFloors: 10,
@@ -387,15 +384,14 @@ export default function ManagementDashboard({
     triggerAlert(`নতুন প্রজেক্ট "${newProj.name}" (${generatedUnits.length}টি ইউনিট সহ) সফলভাবে যুক্ত হয়েছে!`);
   };
 
-  const handleUpdateProjectProgress = (projId, newProgress, newStage) => {
+  const handleUpdateProjectProgress = (projId, newProgress) => {
     updateStore((prev) => ({
       ...prev,
       projects: prev.projects.map(p => {
         if (p.id === projId) {
           return {
             ...p,
-            progress: Number(newProgress),
-            currentStage: newStage !== undefined ? newStage : p.currentStage
+            progress: Number(newProgress)
           };
         }
         return p;
@@ -762,7 +758,7 @@ export default function ManagementDashboard({
   const managementNavItems = [
     { id: 'clients', label: '১. ক্লায়েন্ট তালিকা ও নতুন এন্ট্রি', shortLabel: 'ক্লায়েন্ট', icon: Users },
     { id: 'payments', label: '২. কিস্তি ও জমা এন্ট্রি', shortLabel: 'জমা এন্ট্রি', icon: DollarSign },
-    { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল ও স্টেজ', shortLabel: 'প্রজেক্ট', icon: Building2 },
+    { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল', shortLabel: 'প্রজেক্ট', icon: Building2 },
     { id: 'expenses', label: '৪. প্রজেক্ট বাজেট ও খরচ', shortLabel: 'বাজেট ও খরচ', icon: Wallet },
     { id: 'team', label: '৫. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
     { id: 'directors', label: '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', shortLabel: 'ডিরেক্টরস', icon: Award }
@@ -1014,9 +1010,9 @@ export default function ManagementDashboard({
         )}
 
       {/* ========================================================= */}
-      {/* 2. STATS OVERVIEW CARDS (PHONE OPTIMIZED)                 */}
+      {/* 2. STATS OVERVIEW CARDS (FULL WIDTH WORKSPACE)            */}
       {/* ========================================================= */}
-      <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 pt-5">
+      <div className="w-full px-4 sm:px-6 lg:px-8 pt-5">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-1">
             <div className="flex items-center justify-between text-slate-500 text-3xs sm:text-2xs font-medium tracking-wide">
@@ -1067,7 +1063,7 @@ export default function ManagementDashboard({
       {/* ========================================================= */}
       {/* 3. MAIN WORKSPACE (SWITCHED VIA FOOTER NAVBAR)            */}
       {/* ========================================================= */}
-      <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 space-y-5 flex-1">
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-5 space-y-5 flex-1">
         
         {/* ------------------------------------------------------- */}
         {/* TAB 1: CLIENT MANAGEMENT                                */}
@@ -1462,7 +1458,7 @@ export default function ManagementDashboard({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
               <div>
                 <h3 className="text-base font-bold text-slate-900">চলমান ও আসন্ন প্রজেক্টসমূহ</h3>
-                <p className="text-xs text-slate-500">প্রজেক্টের কাজের শতাংশ ও চলমান তলার কাজ আপডেট করুন</p>
+                <p className="text-xs text-slate-500">প্রজেক্টের তথ্য ও কাজের অগ্রগতি পরিচালনা করুন</p>
               </div>
               <button
                 onClick={() => setIsProjectModalOpen(true)}
@@ -1504,18 +1500,6 @@ export default function ManagementDashboard({
                         value={proj.progress}
                         onChange={(e) => handleUpdateProjectProgress(proj.id, e.target.value)}
                         className="w-full accent-[#CE2028] cursor-pointer"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                        বর্তমান চলমান কাজের বিবরণ (ফ্লোর/ফেজ)
-                      </label>
-                      <input
-                        type="text"
-                        defaultValue={proj.currentStage}
-                        onBlur={(e) => handleUpdateProjectProgress(proj.id, proj.progress, e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                       />
                     </div>
 
@@ -2220,9 +2204,19 @@ export default function ManagementDashboard({
       {/* MODAL: ADD DIRECTOR                                       */}
       {/* ========================================================= */}
       {isDirectorModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          {/* Top Sticky Header */}
+          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={() => setIsDirectorModalOpen(false)}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1"
+                title="ফিরে যান"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
+              </button>
               <div className="flex items-center space-x-2">
                 <div className="w-9 h-9 rounded-xl bg-red-50 text-[#CE2028] flex items-center justify-center">
                   <Award className="w-5 h-5" />
@@ -2232,17 +2226,21 @@ export default function ManagementDashboard({
                   <p className="text-3xs text-slate-500">বোর্ড অব ডিরেক্টরস তালিকায় নতুন শেয়ারহোল্ডার যুক্ত করুন</p>
                 </div>
               </div>
-              <button
-                onClick={() => setIsDirectorModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
             </div>
+            <button
+              onClick={() => setIsDirectorModalOpen(false)}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-            <form onSubmit={handleAddDirector} className="space-y-3.5">
-              <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
+          {/* Full Screen Body */}
+          <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 flex justify-center items-start">
+            <div className="w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
+              <form onSubmit={handleAddDirector} className="space-y-4">
+                <div>
+                  <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
                   পরিচালকের পূর্ণ নাম *
                 </label>
                 <input
@@ -2408,7 +2406,8 @@ export default function ManagementDashboard({
             </form>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* ========================================================= */}
       {/* FULL SCREEN VIEW 1: DIRECTOR PROFILE & PAYMENT RECEIPTS   */}
@@ -2526,7 +2525,7 @@ export default function ManagementDashboard({
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-8 space-y-6">
+            <div className="flex-1 w-full p-4 sm:p-8 lg:p-10 space-y-6">
               
               {/* Quick Summary Cards (Always Visible in Profile) */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
@@ -2931,12 +2930,25 @@ export default function ManagementDashboard({
       })()}
 
       {/* ========================================================= */}
-      {/* MODAL: CAPITAL INSTALLMENT DEPOSIT ENTRY                  */}
+      {/* FULL SCREEN VIEW: CAPITAL INSTALLMENT DEPOSIT ENTRY       */}
       {/* ========================================================= */}
       {isCapitalDepositModalOpen && capitalDepositTargetDirector && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          {/* Top Sticky Header */}
+          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCapitalDepositModalOpen(false);
+                  setCapitalDepositTargetDirector(null);
+                }}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1"
+                title="ফিরে যান"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
+              </button>
               <div className="flex items-center space-x-2">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center font-bold">
                   <DollarSign className="w-5 h-5" />
@@ -2946,19 +2958,23 @@ export default function ManagementDashboard({
                   <p className="text-3xs text-slate-500">{capitalDepositTargetDirector.name} ({capitalDepositTargetDirector.folioNo})</p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsCapitalDepositModalOpen(false);
-                  setCapitalDepositTargetDirector(null);
-                }}
-                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsCapitalDepositModalOpen(false);
+                setCapitalDepositTargetDirector(null);
+              }}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-            <form onSubmit={handleAddCapitalInstallment} className="space-y-3.5">
+          {/* Full Screen Body */}
+          <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 flex justify-center items-start">
+            <div className="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
+              <form onSubmit={handleAddCapitalInstallment} className="space-y-4">
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
                   জমার পরিমাণ (BDT) *
@@ -3048,15 +3064,29 @@ export default function ManagementDashboard({
             </form>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* ========================================================= */}
-      {/* MODAL: DIVIDEND PAYOUT ENTRY                              */}
+      {/* FULL SCREEN VIEW: DIVIDEND PAYOUT ENTRY                   */}
       {/* ========================================================= */}
       {isDividendModalOpen && dividendTargetDirector && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          {/* Top Sticky Header */}
+          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDividendModalOpen(false);
+                  setDividendTargetDirector(null);
+                }}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1"
+                title="ফিরে যান"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
+              </button>
               <div className="flex items-center space-x-2">
                 <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center font-bold">
                   <TrendingUp className="w-5 h-5" />
@@ -3066,19 +3096,23 @@ export default function ManagementDashboard({
                   <p className="text-3xs text-slate-500">{dividendTargetDirector.name} ({dividendTargetDirector.sharePercentage}% শেয়ার)</p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsDividendModalOpen(false);
-                  setDividendTargetDirector(null);
-                }}
-                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsDividendModalOpen(false);
+                setDividendTargetDirector(null);
+              }}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-            <form onSubmit={handleAddDividendPayout} className="space-y-3.5">
+          {/* Full Screen Body */}
+          <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 flex justify-center items-start">
+            <div className="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
+              <form onSubmit={handleAddDividendPayout} className="space-y-4">
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
                   প্রদেয় লভ্যাংশের পরিমাণ (BDT) *
@@ -3167,27 +3201,49 @@ export default function ManagementDashboard({
             </form>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* ========================================================= */}
-      {/* MODAL 1: ADD CLIENT                                       */}
+      {/* FULL SCREEN VIEW: ADD CLIENT                              */}
       {/* ========================================================= */}
       {isClientModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                নতুন ক্লায়েন্ট / ফ্ল্যাট ক্রেতা নিবন্ধন
-              </h3>
-              <button 
+        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          {/* Top Sticky Header */}
+          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
                 onClick={() => setIsClientModalOpen(false)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1"
+                title="ফিরে যান"
               >
-                <X className="w-4 h-4" />
+                <ChevronLeft className="w-5 h-5" />
+                <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
               </button>
+              <div className="flex items-center space-x-2">
+                <div className="w-9 h-9 rounded-xl bg-red-50 text-[#CE2028] flex items-center justify-center font-bold">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-slate-900">নতুন ক্লায়েন্ট / ফ্ল্যাট ক্রেতা নিবন্ধন</h3>
+                  <p className="text-3xs text-slate-500">গ্রাহকের বুকিং, ফ্ল্যাট ও কিস্তির তথ্য এন্ট্রি করুন</p>
+                </div>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsClientModalOpen(false)}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-            <form onSubmit={handleAddClient} className="space-y-3.5">
+          {/* Full Screen Body */}
+          <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 flex justify-center items-start">
+            <div className="w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
+              <form onSubmit={handleAddClient} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
@@ -3356,27 +3412,49 @@ export default function ManagementDashboard({
             </form>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* ========================================================= */}
-      {/* MODAL 2: ADD PROJECT                                      */}
+      {/* FULL SCREEN VIEW: ADD PROJECT                             */}
       {/* ========================================================= */}
       {isProjectModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                নতুন প্রজেক্ট যোগ করুন
-              </h3>
-              <button 
+        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          {/* Top Sticky Header */}
+          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
                 onClick={() => setIsProjectModalOpen(false)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1"
+                title="ফিরে যান"
               >
-                <X className="w-4 h-4" />
+                <ChevronLeft className="w-5 h-5" />
+                <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
               </button>
+              <div className="flex items-center space-x-2">
+                <div className="w-9 h-9 rounded-xl bg-red-50 text-[#CE2028] flex items-center justify-center font-bold">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-slate-900">নতুন প্রজেক্ট যোগ করুন</h3>
+                  <p className="text-3xs text-slate-500">প্রজেক্টের নাম, অবস্থান, বাজেট ও ইউনিট কনফিগারেশন</p>
+                </div>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsProjectModalOpen(false)}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-            <form onSubmit={handleAddProject} className="space-y-3.5">
+          {/* Full Screen Body */}
+          <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 flex justify-center items-start">
+            <div className="w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
+              <form onSubmit={handleAddProject} className="space-y-4">
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   প্রজেক্টের নাম *
@@ -3517,37 +3595,55 @@ export default function ManagementDashboard({
             </form>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* ========================================================= */}
-      {/* MODAL 3: ADD / EDIT TEAM MEMBER & PERMISSIONS             */}
+      {/* FULL SCREEN VIEW: ADD / EDIT TEAM MEMBER & PERMISSIONS    */}
       {/* ========================================================= */}
       {isTeamModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          {/* Top Sticky Header */}
+          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={() => setIsTeamModalOpen(false)}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1"
+                title="ফিরে যান"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
+              </button>
               <div className="flex items-center space-x-2">
                 {editingTeamMember?.isSuperAdmin ? (
                   <Crown className="w-5 h-5 text-amber-500" />
                 ) : (
                   <ShieldCheck className="w-5 h-5 text-[#006231]" />
                 )}
-                <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                  {editingTeamMember 
-                    ? (editingTeamMember.isSuperAdmin ? 'সুপার অ্যাডমিন তথ্য ও পাসওয়ার্ড সম্পাদনা' : 'কর্মকর্তার তথ্য ও পারমিশন সম্পাদনা') 
-                    : 'নতুন কর্মকর্তা / সাব-অ্যাডমিন যুক্ত করুন'}
-                </h3>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {editingTeamMember 
+                      ? (editingTeamMember.isSuperAdmin ? 'সুপার অ্যাডমিন তথ্য ও পাসওয়ার্ড সম্পাদনা' : 'কর্মকর্তার তথ্য ও পারমিশন সম্পাদনা') 
+                      : 'নতুন কর্মকর্তা / সাব-অ্যাডমিন যুক্ত করুন'}
+                  </h3>
+                  <p className="text-3xs text-slate-500">টিম মেম্বার রোল ও অ্যাক্সেস কন্ট্রোল</p>
+                </div>
               </div>
-              <button 
-                type="button"
-                onClick={() => setIsTeamModalOpen(false)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
+            <button 
+              type="button"
+              onClick={() => setIsTeamModalOpen(false)}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-            <form onSubmit={handleSaveTeam} className="space-y-3.5">
+          {/* Full Screen Body */}
+          <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 flex justify-center items-start">
+            <div className="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
+              <form onSubmit={handleSaveTeam} className="space-y-4">
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   কর্মকর্তার নাম *
@@ -3676,10 +3772,11 @@ export default function ManagementDashboard({
             </form>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* ========================================================= */}
-      {/* MODAL 4: FULL CLIENT PROFILE DETAILS                      */}
+      {/* FULL SCREEN VIEW: CLIENT PROFILE DETAILS                  */}
       {/* ========================================================= */}
       {selectedClientForProfile && (() => {
         const cl = selectedClientForProfile;
@@ -3688,40 +3785,50 @@ export default function ManagementDashboard({
         const percent = cl.totalPrice ? Math.round((cl.totalPaid / cl.totalPrice) * 100) : 0;
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-            <div className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 relative divide-y divide-slate-100">
-              
-              {/* Profile Header Banner */}
-              <div className="p-5 sm:p-6 flex items-start justify-between bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-t-3xl relative">
-                <div className="flex items-center space-x-3.5 min-w-0">
-                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-lg ring-4 ring-white/10 shadow-md shrink-0">
+          <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+            {/* Top Fullscreen Header Navbar */}
+            <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md">
+              <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
+                <button
+                  type="button"
+                  onClick={() => setSelectedClientForProfile(null)}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center space-x-1"
+                  title="ফিরে যান"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                  <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
+                </button>
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-sm ring-2 ring-white/20 shadow-md shrink-0">
                     {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center space-x-2">
-                      <h3 className="text-base sm:text-lg font-black text-white truncate">{cl.name}</h3>
+                      <h3 className="text-sm sm:text-base font-bold text-white truncate">{cl.name}</h3>
                       <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-[#8EBF40] border border-emerald-400/30 text-3xs font-bold shrink-0">
                         অনুমোদিত ক্লায়েন্ট
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 font-medium mt-0.5 truncate">
+                    <p className="text-3xs text-slate-300 font-medium mt-0.5 truncate">
                       মোবাইল: <strong className="text-white font-mono">{cl.phone}</strong> • আইডি: <span className="font-mono text-emerald-400 font-bold">{cl.id}</span>
                     </p>
                   </div>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedClientForProfile(null)}
-                  className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
-                  title="বন্ধ করুন"
-                >
-                  <X className="w-5 h-5" />
-                </button>
               </div>
 
-              {/* Profile Body */}
-              <div className="p-5 sm:p-6 space-y-4 text-slate-800">
+              <button
+                type="button"
+                onClick={() => setSelectedClientForProfile(null)}
+                className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
+                title="বন্ধ করুন"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Profile Body */}
+            <div className="flex-1 p-4 sm:p-8 lg:p-10 w-full space-y-6 text-slate-800">
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
                 
                 {/* 1. Property Specs */}
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/70 space-y-2">
@@ -3743,9 +3850,9 @@ export default function ManagementDashboard({
                     <div>
                       <span className="text-slate-400 text-3xs block">ফ্ল্যাট নম্বর ও সাইজ</span>
                       <strong className="text-[#006231] font-bold">{cl.flatNo}</strong>
-                      {project?.currentStage && (
+                      {project && (
                         <p className="text-2xs text-slate-600 mt-0.5">
-                          চলমান কাজ: {project.currentStage} ({project.progress}%)
+                          কাজের অগ্রগতি: {project.progress}% সম্পন্ন
                         </p>
                       )}
                     </div>
@@ -3910,42 +4017,53 @@ export default function ManagementDashboard({
       })()}
 
       {/* ========================================================= */}
-      {/* MODAL: OFFICIAL MONEY RECEIPT PREVIEW & PRINT             */}
+      {/* FULL SCREEN VIEW: OFFICIAL MONEY RECEIPT PREVIEW & PRINT  */}
       {/* ========================================================= */}
       {selectedReceiptForPrint && (() => {
         const { trx, client } = selectedReceiptForPrint;
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs animate-fadeIn select-none">
-            <div className="bg-white rounded-3xl max-w-xl w-full max-h-[95vh] overflow-y-auto shadow-2xl border border-slate-100 relative">
-              
-              {/* Top Controls */}
-              <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 rounded-t-3xl">
+          <div className="fixed inset-0 z-50 bg-[#F1F5F9] flex flex-col overflow-y-auto animate-fadeIn select-none">
+            {/* Top Controls Header */}
+            <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+              <div className="flex items-center space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedReceiptForPrint(null)}
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1"
+                  title="ফিরে যান"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                  <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
+                </button>
                 <div className="flex items-center space-x-2">
                   <CheckCircle2 className="w-5 h-5 text-[#006231]" />
                   <span className="font-bold text-sm text-slate-800">অফিশিয়াল মানি রিসিট ভাউচার</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs flex items-center space-x-1.5 cursor-pointer shadow-sm active:scale-95 transition-all"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    <span>প্রিন্ট করুন</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedReceiptForPrint(null)}
-                    className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
               </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-sm active:scale-95 transition-all"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>প্রিন্ট করুন</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedReceiptForPrint(null)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+                  title="বন্ধ করুন"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
 
-              {/* Printable Money Receipt Document */}
-              <div className="p-6 sm:p-8 bg-slate-50/50">
+            {/* Printable Document Sheet in Fullscreen Center */}
+            <div className="flex-1 py-6 sm:py-10 px-4 sm:px-6 flex justify-center items-start">
+              <div className="w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-sm space-y-6">
                 <div className="p-6 sm:p-8 bg-white rounded-2xl border border-slate-200/90 shadow-sm space-y-6">
                   
                   {/* Header with Logo */}
@@ -4038,17 +4156,6 @@ export default function ManagementDashboard({
                   </div>
 
                 </div>
-              </div>
-
-              {/* Modal Bottom Bar */}
-              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end rounded-b-3xl">
-                <button
-                  type="button"
-                  onClick={() => setSelectedReceiptForPrint(null)}
-                  className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs cursor-pointer"
-                >
-                  বন্ধ করুন
-                </button>
               </div>
 
             </div>
