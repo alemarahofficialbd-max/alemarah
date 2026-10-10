@@ -224,7 +224,7 @@ export default function ManagementDashboard({
           const isAct = m.status?.includes('সক্রিয়');
           return {
             ...m,
-            status: isAct ? 'নিষ্ক্রিয় (Deactive)' : 'সক্রিয় (Active)'
+            status: isAct ? (lang === 'bn' ? 'নিষ্ক্রিয়' : 'Deactive') : (lang === 'bn' ? 'সক্রিয়' : 'Active')
           };
         }
         return m;
@@ -361,6 +361,12 @@ export default function ManagementDashboard({
       return;
     }
 
+    const currentDue = (targetClient.totalPrice || 0) - (targetClient.totalPaid || 0);
+    if (payAmount > currentDue) {
+      alert(`সতর্কবার্তা: জমার পরিমাণ বর্তমান মোট বকেয়া (${formatBDT(currentDue)})-এর চেয়ে বেশি হতে পারবে না! আপনি লিখছেন: ${formatBDT(payAmount)}`);
+      return;
+    }
+
     const newTrx = {
       id: `TRX-${Math.floor(100 + Math.random() * 900)}`,
       date: paymentForm.date ? new Date(paymentForm.date).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
@@ -403,7 +409,7 @@ export default function ManagementDashboard({
     if (projectForm.projectType === 'residential') {
       const floorsCount = Math.max(1, Number(projectForm.totalFloors) || 10);
       const unitsPerFloorCount = Math.max(1, Number(projectForm.unitsPerFloor) || 2);
-      const unitLetters = ['এ (A)', 'বি (B)', 'সি (C)', 'ডি (D)', 'ই (E)', 'এফ (F)'];
+      const unitLetters = lang === 'bn' ? ['ইউনিট-এ', 'ইউনিট-বি', 'ইউনিট-সি', 'ইউনিট-ডি', 'ইউনিট-ই', 'ইউনিট-এফ'] : ['Unit-A', 'Unit-B', 'Unit-C', 'Unit-D', 'Unit-E', 'Unit-F'];
       const bnFloorNames = ['', '১ম তলা', '২য় তলা', '৩য় তলা', '৪র্থ তলা', '৫ম তলা', '৬ষ্ঠ তলা', '৭ম তলা', '৮ম তলা', '৯ম তলা', '১০ম তলা', '১১তম তলা', '১২তম তলা', '১৩তম তলা', '১৪তম তলা', '১৫তম তলা'];
 
       for (let fl = 2; fl <= floorsCount; fl++) {
@@ -606,7 +612,7 @@ export default function ManagementDashboard({
         accessKey: teamForm.accessKey || 'admin123',
         isSuperAdmin: false,
         permissions: teamForm.permissions || ['projects', 'expenses'],
-        status: 'সক্রিয় (Active)'
+        status: lang === 'bn' ? 'সক্রিয়' : 'Active'
       };
 
       updateStore((prev) => ({
@@ -909,7 +915,7 @@ export default function ManagementDashboard({
               className={`p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer ${
                 isSidebarCollapsed ? 'w-9 h-9 flex items-center justify-center bg-slate-50' : ''
               }`}
-              title={isSidebarCollapsed ? "প্যানেল বড় করুন (Expand)" : "প্যানেল ছোট করুন (Collapse)"}
+              title={isSidebarCollapsed ? (lang === 'bn' ? 'প্যানেল বড় করুন' : 'Expand Sidebar') : (lang === 'bn' ? 'প্যানেল ছোট করুন' : 'Collapse Sidebar')}
             >
               {isSidebarCollapsed ? (
                 <PanelLeftOpen className="w-5 h-5 text-[#CE2028]" />
@@ -1034,7 +1040,7 @@ export default function ManagementDashboard({
                       {isSuperAdmin && <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
                     </div>
                     <div className="text-xs text-[#006231] font-semibold mt-0.5">
-                      {isSuperAdmin ? 'সুপার অ্যাডমিন (Master Admin)' : (admin?.role || 'ম্যানেজমেন্ট টিম')}
+                      {isSuperAdmin ? (lang === 'bn' ? 'সুপার অ্যাডমিন' : 'Master Admin') : (admin?.role || (lang === 'bn' ? 'ম্যানেজমেন্ট টিম' : 'Management Team'))}
                     </div>
                     <div className="text-2xs text-slate-400 mt-0.5">
                       {admin?.email || admin?.phone || 'alemarah.officialbd@gmail.com'}
@@ -1042,6 +1048,16 @@ export default function ManagementDashboard({
                   </div>
 
                   <div className="p-2 space-y-1 text-xs font-bold text-slate-700">
+                    <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        setActiveTab('settings');
+                      }}
+                      className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors text-left cursor-pointer text-slate-800"
+                    >
+                      <Settings className="w-4 h-4 text-[#006231]" />
+                      <span>সিস্টেম সেটিংস ও পিন</span>
+                    </button>
                     <button
                       onClick={() => {
                         setIsProfileOpen(false);
@@ -1432,7 +1448,7 @@ export default function ManagementDashboard({
 
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    জমার টাকার পরিমাণ (BDT) *
+                    জমার টাকার পরিমাণ *
                   </label>
                   <input
                     type="number"
@@ -1442,10 +1458,17 @@ export default function ManagementDashboard({
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-black text-slate-900 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
                     required
                   />
-                  {paymentForm.amount && targetClientDue > 0 && (
-                    <div className="mt-1 text-2xs text-[#006231] font-semibold">
-                      জমা প্রদানের পর অবশিষ্ট বকেয়া থাকবে: {formatBDT(Math.max(0, targetClientDue - Number(paymentForm.amount)))}
-                    </div>
+                  {paymentForm.amount && (
+                    Number(paymentForm.amount) > targetClientDue ? (
+                      <div className="mt-1.5 p-2 rounded-xl bg-red-50 border border-red-200 text-xs text-[#CE2028] font-bold flex items-center space-x-1.5">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <span>সতর্কতা: বর্তমান বকেয়া {formatBDT(targetClientDue)}-এর চেয়ে বেশি টাকা দেওয়া হচ্ছে!</span>
+                      </div>
+                    ) : (
+                      <div className="mt-1 text-2xs text-[#006231] font-semibold">
+                        জমা প্রদানের পর অবশিষ্ট বকেয়া থাকবে: {formatBDT(Math.max(0, targetClientDue - Number(paymentForm.amount)))}
+                      </div>
+                    )
                   )}
                 </div>
 
@@ -1472,9 +1495,9 @@ export default function ManagementDashboard({
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                     >
                       <option value="ব্যাংক ডিপোজিট">ব্যাংক ডিপোজিট</option>
-                      <option value="বিকাশ (bKash)">বিকাশ (bKash)</option>
-                      <option value="নগদ (Nagad)">নগদ (Nagad)</option>
-                      <option value="রকেট (Rocket)">রকেট (Rocket)</option>
+                      <option value="বিকাশ">বিকাশ</option>
+                      <option value="নগদ">নগদ</option>
+                      <option value="রকেট">রকেট</option>
                       <option value="ব্যাংক চেক">ব্যাংক চেক</option>
                       <option value="পে-অর্ডার">পে-অর্ডার</option>
                       <option value="নগদ ক্যাশ">নগদ ক্যাশ</option>
@@ -1784,7 +1807,7 @@ export default function ManagementDashboard({
 
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    খরচের পরিমাণ (BDT) *
+                    খরচের পরিমাণ *
                   </label>
                   <input
                     type="number"
@@ -1895,7 +1918,7 @@ export default function ManagementDashboard({
             name: 'প্রধান নির্বাহী ও সুপার অ্যাডমিন',
             email: 'alemarah.officialbd@gmail.com',
             phone: '01816233013',
-            role: 'সুপার অ্যাডমিন (Super Admin)',
+            role: lang === 'bn' ? 'সুপার অ্যাডমিন' : 'Super Admin',
             accessKey: 'admin123',
             isSuperAdmin: true
           };
@@ -2073,7 +2096,7 @@ export default function ManagementDashboard({
                                     }`}
                                   >
                                     {isActive ? <UserX className="w-3.5 h-3.5 text-amber-700" /> : <UserCheck className="w-3.5 h-3.5 text-[#006231]" />}
-                                    <span>{isActive ? 'অ্যাকাউন্ট নিষ্ক্রিয় করুন (Deactivate)' : 'সক্রিয় করুন (Activate)'}</span>
+                                    <span>{isActive ? (lang === 'bn' ? 'অ্যাকাউন্ট নিষ্ক্রিয় করুন' : 'Deactivate Account') : (lang === 'bn' ? 'অ্যাকাউন্ট সক্রিয় করুন' : 'Activate Account')}</span>
                                   </button>
 
                                   <a
@@ -2231,7 +2254,7 @@ export default function ManagementDashboard({
                     <tr>
                       <th className="py-3 px-4">পরিচালকের নাম ও পদবি</th>
                       <th className="py-3 px-4">ফোলিও নং</th>
-                      <th className="py-3 px-4">বিনিয়োগকৃত টাকা (Investment)</th>
+                      <th className="py-3 px-4">বিনিয়োগকৃত টাকা</th>
                       <th className="py-3 px-4">শেয়ার অংশীদারিত্ব (% Share)</th>
                       <th className="py-3 px-4 text-right">গৃহীত লভ্যাংশ (ডিভিডেন্ড)</th>
                       <th className="py-3 px-4">মনোনীত নমিনি ও মোবাইল</th>
@@ -2400,7 +2423,7 @@ export default function ManagementDashboard({
                     <Globe className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-base text-slate-900">ভাষা নির্বাচন (Language Preference)</h4>
+                    <h4 className="font-bold text-base text-slate-900">ভাষা নির্বাচন</h4>
                     <p className="text-2xs text-slate-500">আপনার পছন্দ অনুযায়ী বাংলা অথবা ইংরেজি ভাষা নির্ধারণ করুন</p>
                   </div>
                 </div>
@@ -2464,7 +2487,7 @@ export default function ManagementDashboard({
                     <Lock className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-base text-slate-900">মাস্টার সিকিউরিটি পিন (Master PIN)</h4>
+                    <h4 className="font-bold text-base text-slate-900">মাস্টার সিকিউরিটি পিন</h4>
                     <p className="text-2xs text-slate-500">প্রজেক্ট বা কোনো গুরুত্বপূর্ণ ডাটা মুছে ফেলতে এই পিন লাগবে</p>
                   </div>
                 </div>
@@ -2603,7 +2626,7 @@ export default function ManagementDashboard({
       {/* ========================================================= */}
       <nav className="md:hidden fixed bottom-3 left-4 right-4 z-50 max-w-sm sm:max-w-md mx-auto">
         <div className="bg-white/95 backdrop-blur-2xl border border-slate-200 shadow-2xl rounded-full py-1.5 px-3 flex items-center justify-around ring-1 ring-black/5">
-          {managementNavItems.map((item) => {
+          {managementNavItems.filter(item => item.id !== 'settings').map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             return (
@@ -2770,7 +2793,7 @@ export default function ManagementDashboard({
 
                   <div className="flex-1 space-y-1.5 text-center sm:text-left">
                     <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider">
-                      পরিচালকের অফিসিয়াল ছবি (Profile Photo)
+                      পরিচালকের অফিসিয়াল ছবি
                     </label>
                     <p className="text-3xs text-slate-500">
                       শেয়ার সনদপত্র ও ডিরেক্টর প্রোফাইলে প্রদর্শনের জন্য পাসপোর্ট সাইজ ছবি আপলোড করুন (JPG, PNG)
@@ -2831,13 +2854,13 @@ export default function ManagementDashboard({
                     onChange={(e) => setDirectorForm({ ...directorForm, role: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                   >
-                    <option value="পরিচালক">পরিচালক (Director)</option>
+                    <option value="পরিচালক">পরিচালক</option>
                     <option value="পরিচালক (প্রকৌশল ও কারিগরি)">পরিচালক (প্রকৌশল ও কারিগরি)</option>
                     <option value="পরিচালক (অর্থ ও নিরীক্ষা)">পরিচালক (অর্থ ও নিরীক্ষা)</option>
                     <option value="পরিচালক (আইন ও কমপ্লায়েন্স)">পরিচালক (আইন ও কমপ্লায়েন্স)</option>
                     <option value="পরিচালক (পরিকল্পনা ও উন্নয়ন)">পরিচালক (পরিকল্পনা ও উন্নয়ন)</option>
-                    <option value="উপ-ব্যবস্থাপনা পরিচালক">উপ-ব্যবস্থাপনা পরিচালক (DMD)</option>
-                    <option value="স্বতন্ত্র পরিচালক">স্বতন্ত্র পরিচালক (Independent Director)</option>
+                    <option value="উপ-ব্যবস্থাপনা পরিচালক">উপ-ব্যবস্থাপনা পরিচালক</option>
+                    <option value="স্বতন্ত্র পরিচালক">স্বতন্ত্র পরিচালক</option>
                   </select>
                 </div>
 
@@ -2852,7 +2875,7 @@ export default function ManagementDashboard({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                    বিনিয়োগকৃত টাকা (BDT) *
+                    বিনিয়োগকৃত মূলধন *
                   </label>
                   <input
                     type="number"
@@ -3593,7 +3616,7 @@ export default function ManagementDashboard({
               <form onSubmit={handleAddCapitalInstallment} className="space-y-4">
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                  জমার পরিমাণ (BDT) *
+                  জমার টাকার পরিমাণ *
                 </label>
                 <input
                   type="number"
@@ -3619,7 +3642,7 @@ export default function ManagementDashboard({
                 </div>
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                    রসিদ নম্বর (Receipt No)
+                    রসিদ নম্বর
                   </label>
                   <input
                     type="text"
@@ -3639,9 +3662,9 @@ export default function ManagementDashboard({
                   onChange={(e) => setCapitalDepositForm({ ...capitalDepositForm, method: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#006231]"
                 >
-                  <option value="ব্যাংক চেক">ব্যাংক চেক (Cheque)</option>
-                  <option value="ব্যাংক ট্রান্সফার">ব্যাংক ট্রান্সফার (NPSB / BEFTN / RTGS)</option>
-                  <option value="পে-অর্ডার">পে-অর্ডার (Pay Order)</option>
+                  <option value="ব্যাংক চেক">ব্যাংক চেক</option>
+                  <option value="ব্যাংক ট্রান্সফার">ব্যাংক ট্রান্সফার</option>
+                  <option value="পে-অর্ডার">পে-অর্ডার</option>
                   <option value="নগদ জমা">নগদ ক্যাশ রসিদ</option>
                 </select>
               </div>
@@ -3731,7 +3754,7 @@ export default function ManagementDashboard({
               <form onSubmit={handleAddDividendPayout} className="space-y-4">
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                  প্রদেয় লভ্যাংশের পরিমাণ (BDT) *
+                  প্রদেয় লভ্যাংশের পরিমাণ *
                 </label>
                 <input
                   type="number"
@@ -3757,7 +3780,7 @@ export default function ManagementDashboard({
                 </div>
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
-                    ভাউচার নম্বর (Voucher No)
+                    ভাউচার নম্বর
                   </label>
                   <input
                     type="text"
@@ -3965,7 +3988,7 @@ export default function ManagementDashboard({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      গ্রাহক ইউজারনেম / ইমেইল (@alemarah.com ফিক্সড) *
+                      গ্রাহক ইউজারনেম (@alemarah.com নির্ধারিত) *
                     </label>
                     <div className="flex items-center rounded-xl bg-white border border-slate-200 overflow-hidden focus-within:border-[#CE2028]">
                       <input
@@ -3986,7 +4009,7 @@ export default function ManagementDashboard({
 
                   <div>
                     <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      লগইন পাসওয়ার্ড (Password) *
+                      লগইন পাসওয়ার্ড *
                     </label>
                     <input
                       type="text"
@@ -4070,7 +4093,7 @@ export default function ManagementDashboard({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    মোট চুক্তি মূল্য (BDT) *
+                    মোট চুক্তি মূল্য *
                   </label>
                   <input
                     type="number"
@@ -4084,7 +4107,7 @@ export default function ManagementDashboard({
 
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    বুকিং মানি / প্রাথমিক জমা (BDT)
+                    বুকিং মানি / প্রাথমিক জমা
                   </label>
                   <input
                     type="number"
@@ -4188,7 +4211,7 @@ export default function ManagementDashboard({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    মোট আনুমানিক বাজেট (BDT) *
+                    মোট আনুমানিক বাজেট *
                   </label>
                   <input
                     type="number"
@@ -4209,9 +4232,9 @@ export default function ManagementDashboard({
                     onChange={(e) => setProjectForm({ ...projectForm, projectType: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                   >
-                    <option value="residential">আবাসিক ফ্ল্যাট (Residential Flats)</option>
-                    <option value="share">বিনিয়োগ শেয়ার (Investment Shares)</option>
-                    <option value="commercial">বাণিজ্যিক স্পেস / শপ (Commercial)</option>
+                    <option value="residential">আবাসিক ফ্ল্যাট</option>
+                    <option value="share">বিনিয়োগ শেয়ার</option>
+                    <option value="commercial">বাণিজ্যিক স্পেস / শপ</option>
                   </select>
                 </div>
               </div>
@@ -4899,13 +4922,14 @@ export default function ManagementDashboard({
                         alt="Al-Emarah Properties" 
                         className="h-10 w-auto object-contain"
                       />
-                      <p className="text-[10px] text-slate-500 font-medium mt-1">
-                        ৩/১, স্কাই ভিউ হেনোলাক্স সেন্টার, পুরানা পল্টন, ঢাকা
-                      </p>
+                      <div className="text-[11px] text-slate-600 font-medium mt-1 leading-tight">
+                        <p>৩/১, স্কাই ভিউ হেনোলাক্স সেন্টার</p>
+                        <p className="text-slate-500 text-[10px]">পুরানা পল্টন, ঢাকা</p>
+                      </div>
                     </div>
                     <div className="text-left sm:text-right">
                       <span className="inline-block px-3 py-1 rounded-full bg-emerald-50 text-[#006231] font-bold text-xs border border-emerald-200">
-                        মানি রিসিট (Money Receipt)
+                        মানি রিসিট
                       </span>
                       <div className="text-2xs font-mono font-bold text-slate-600 mt-1">
                         রসিদ নং: <strong className="text-slate-900">{trx.id}</strong>
