@@ -894,7 +894,7 @@ export default function ManagementDashboard({
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row font-sans animate-fadeIn">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row font-bengali tracking-normal antialiased animate-fadeIn">
       
       {/* ========================================================= */}
       {/* 1. WEB VIEW: COLLAPSIBLE LEFT SIDEBAR NAVIGATION          */}

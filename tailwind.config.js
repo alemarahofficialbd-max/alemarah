@@ -22,8 +22,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'Outfit', 'Hind Siliguri', 'sans-serif'],
-        bengali: ['Hind Siliguri', 'sans-serif'],
+        sans: ['"Hind Siliguri"', 'Inter', 'Outfit', 'sans-serif'],
+        bengali: ['"Hind Siliguri"', 'sans-serif'],
         serif: ['"Cormorant Garamond"', '"Tiro Bangla"', 'Georgia', 'serif'],
         cinzel: ['"Cinzel"', 'serif'],
         tiro: ['"Tiro Bangla"', 'serif']
