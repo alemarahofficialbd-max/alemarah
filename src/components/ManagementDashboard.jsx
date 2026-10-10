@@ -3863,7 +3863,7 @@ export default function ManagementDashboard({
 
         return (
           <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
-            {/* Top Fullscreen Header Navbar */}
+            {/* Top Premium Navbar */}
             <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md">
               <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
                 <button
@@ -3876,216 +3876,363 @@ export default function ManagementDashboard({
                   <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
                 </button>
                 <div className="flex items-center space-x-3 min-w-0">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-sm ring-2 ring-white/20 shadow-md shrink-0">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#006231] via-[#0A4D27] to-[#8EBF40] text-white flex items-center justify-center font-black text-sm ring-2 ring-emerald-500/30 shadow-md shrink-0">
                     {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center space-x-2">
-                      <h3 className="text-sm sm:text-base font-bold text-white truncate">{cl.name}</h3>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-[#8EBF40] border border-emerald-400/30 text-3xs font-bold shrink-0">
-                        অনুমোদিত ক্লায়েন্ট
+                      <h3 className="text-sm sm:text-base font-black text-white tracking-wide truncate">{cl.name}</h3>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-[#8EBF40] border border-emerald-400/30 text-3xs font-extrabold shrink-0 flex items-center space-x-1">
+                        <ShieldCheck className="w-3 h-3 inline" />
+                        <span>ভেরিফাইড গ্রাহক</span>
                       </span>
                     </div>
-                    <p className="text-3xs text-slate-300 font-medium mt-0.5 truncate">
-                      মোবাইল: <strong className="text-white font-mono">{cl.phone}</strong> • আইডি: <span className="font-mono text-emerald-400 font-bold">{cl.id}</span>
+                    <p className="text-3xs text-slate-300 font-medium mt-0.5 truncate flex items-center space-x-2">
+                      <span>মোবাইল: <strong className="text-white font-mono">{cl.phone}</strong></span>
+                      <span className="text-slate-600">•</span>
+                      <span>আইডি: <span className="font-mono text-emerald-400 font-bold">{cl.id}</span></span>
                     </p>
                   </div>
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setSelectedClientForProfile(null)}
-                className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
-                title="বন্ধ করুন"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center space-x-2">
+                <a
+                  href={`tel:${cl.phone}`}
+                  className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors"
+                >
+                  <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>কল দিন</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setSelectedClientForProfile(null)}
+                  className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer shrink-0"
+                  title="বন্ধ করুন"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
-            {/* Profile Body */}
-            <div className="flex-1 p-4 sm:p-8 lg:p-10 w-full space-y-6 text-slate-800">
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-                
-                {/* 1. Property Specs */}
-                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/70 space-y-2">
-                  <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
-                    <Building2 className="w-3.5 h-3.5 text-[#006231]" />
-                    <span>বরাদ্দকৃত ফ্ল্যাট ও প্রজেক্ট তথ্য</span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            {/* Profile Content Container */}
+            <div className="flex-1 p-4 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto space-y-6">
+              
+              {/* 1. Header Banner & Key Financial Cards */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                {/* Client Profile Card */}
+                <div className="lg:col-span-5 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 rounded-3xl p-6 text-white border border-slate-800 shadow-xl relative overflow-hidden flex flex-col justify-between">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-radial from-emerald-500/10 to-transparent rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+                  
+                  <div className="space-y-4 relative z-10">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span className="text-3xs uppercase tracking-widest font-extrabold text-emerald-400">সক্রিয় বুকিং প্রোফাইল</span>
+                      </div>
+                      <span className="text-3xs font-mono px-2 py-0.5 rounded-lg bg-white/10 text-slate-300">
+                        {cl.id}
+                      </span>
+                    </div>
+
                     <div>
-                      <span className="text-slate-400 text-3xs block">প্রকল্প ও লোকেশন</span>
-                      <strong className="text-slate-800 font-bold">{cl.projectName}</strong>
-                      {project?.location && (
-                        <p className="text-2xs text-slate-500 flex items-center space-x-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-[#CE2028] shrink-0" />
-                          <span>{project.location}</span>
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <span className="text-slate-400 text-3xs block">ফ্ল্যাট নম্বর ও সাইজ</span>
-                      <strong className="text-[#006231] font-bold">{cl.flatNo}</strong>
-                      {project && (
-                        <p className="text-2xs text-slate-600 mt-0.5">
-                          কাজের অগ্রগতি: {project.progress}% সম্পন্ন
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. Financial Overview */}
-                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/70 space-y-3">
-                  <div className="flex items-center justify-between text-2xs font-bold">
-                    <span className="text-emerald-700 flex items-center space-x-1">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>পরিশোধিত: {percent}%</span>
-                    </span>
-                    <span className="text-amber-800">বকেয়া বাকি: {formatBDT(due)}</span>
-                  </div>
-
-                  <div className="w-full bg-slate-200/80 rounded-full h-2.5 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-[#006231] to-[#8EBF40] h-full rounded-full transition-all duration-500" 
-                      style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 text-center pt-1">
-                    <div className="bg-white p-2.5 rounded-xl border border-slate-100 shadow-2xs">
-                      <div className="text-3xs text-slate-400 font-bold uppercase">মোট চুক্তি</div>
-                      <div className="text-xs sm:text-sm font-black text-slate-900 mt-0.5">{formatBDT(cl.totalPrice)}</div>
-                    </div>
-                    <div className="bg-white p-2.5 rounded-xl border border-emerald-100 shadow-2xs">
-                      <div className="text-3xs text-[#006231] font-bold uppercase">পরিশোধিত</div>
-                      <div className="text-xs sm:text-sm font-black text-[#006231] mt-0.5">{formatBDT(cl.totalPaid)}</div>
-                    </div>
-                    <div className="bg-white p-2.5 rounded-xl border border-amber-100 shadow-2xs">
-                      <div className="text-3xs text-amber-800 font-bold uppercase">বাকি টাকা</div>
-                      <div className="text-xs sm:text-sm font-black text-amber-700 mt-0.5">{formatBDT(due)}</div>
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4 text-slate-400" />
-                      <div>
-                        <div className="text-3xs text-slate-400 font-bold uppercase">পরবর্তী কিস্তির তারিখ</div>
-                        <div className="text-xs font-bold text-slate-800">{cl.nextDueDate}</div>
+                      <h2 className="text-xl sm:text-2xl font-black text-white">{cl.name}</h2>
+                      <div className="flex items-center space-x-2 text-xs text-slate-400 mt-1">
+                        <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="font-mono text-slate-200">{cl.phone}</span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-3xs text-slate-400 font-bold uppercase">প্রদেয় টাকা</div>
-                      <div className="text-xs sm:text-sm font-black text-[#CE2028]">{formatBDT(cl.nextDueAmount)}</div>
-                    </div>
-                  </div>
-                </div>
 
-                {/* 3. Login Credentials for Manager Support */}
-                <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/70 text-xs space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-3xs font-bold text-amber-800 uppercase tracking-wider flex items-center space-x-1">
-                      <Key className="w-3.5 h-3.5 text-amber-700" />
-                      <span>গ্রাহক পোর্টাল লগইন তথ্য</span>
-                    </span>
-                    <span className="text-3xs text-amber-700">কাস্টমারকে সহায়তা দিন</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 bg-white/90 p-2.5 rounded-xl border border-amber-100 text-center">
-                    <div>
-                      <span className="text-3xs text-slate-400 block font-bold">লগইন ফোন</span>
-                      <span className="font-bold text-slate-800 font-mono text-2xs truncate block">{cl.phone}</span>
-                    </div>
-                    <div>
-                      <span className="text-3xs text-slate-400 block font-bold">আইডি</span>
-                      <span className="font-bold text-slate-800 font-mono text-2xs truncate block">{cl.id}</span>
-                    </div>
-                    <div>
-                      <span className="text-3xs text-slate-400 block font-bold">পাসওয়ার্ড</span>
-                      <span className="font-bold text-[#CE2028] font-mono text-2xs truncate block">{cl.password || 'password123'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 4. Payment History Statement */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-2xs font-bold text-slate-700 px-1">
-                    <span className="flex items-center space-x-1.5">
-                      <FileText className="w-3.5 h-3.5 text-[#006231]" />
-                      <span>পরিশোধিত কিস্তির রেকর্ড ({cl.paymentHistory?.length || 0}টি)</span>
-                    </span>
-                    <span className="text-3xs text-slate-400">অনুমোদিত রসিদসমূহ</span>
-                  </div>
-
-                  {cl.paymentHistory && cl.paymentHistory.length > 0 ? (
-                    <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
-                      {cl.paymentHistory.map((trx, tIdx) => (
-                        <div key={tIdx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-2xs">
-                          <div className="space-y-0.5">
-                            <div className="font-bold text-slate-800 flex items-center space-x-1.5">
-                              <span>{trx.method}</span>
-                              <span className="font-mono text-3xs text-slate-400">({trx.id})</span>
-                            </div>
-                            <div className="text-3xs text-slate-500 font-medium">
-                              {trx.date}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <span className="font-black text-xs text-[#006231]">
-                              +{formatBDT(trx.amount)}
-                            </span>
-                            <div className="text-3xs text-emerald-600 font-bold">অনুমোদিত</div>
-                          </div>
+                    {/* Assigned Property Highlights */}
+                    <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs space-y-2">
+                      <div className="flex items-center justify-between text-2xs">
+                        <span className="text-slate-400 flex items-center space-x-1">
+                          <Building2 className="w-3.5 h-3.5 text-[#8EBF40]" />
+                          <span>প্রকল্প:</span>
+                        </span>
+                        <strong className="text-white font-bold">{cl.projectName}</strong>
+                      </div>
+                      <div className="flex items-center justify-between text-2xs">
+                        <span className="text-slate-400 flex items-center space-x-1">
+                          <Home className="w-3.5 h-3.5 text-[#8EBF40]" />
+                          <span>ফ্ল্যাট / ইউনিট নম্বর:</span>
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-lg bg-[#006231] text-white font-black text-xs font-mono">
+                          {cl.flatNo}
+                        </span>
+                      </div>
+                      {project?.location && (
+                        <div className="flex items-center justify-between text-2xs pt-1 border-t border-white/5">
+                          <span className="text-slate-400 flex items-center space-x-1">
+                            <MapPin className="w-3.5 h-3.5 text-red-400" />
+                            <span>অবস্থান:</span>
+                          </span>
+                          <span className="text-slate-300 truncate max-w-[200px]">{project.location}</span>
                         </div>
-                      ))}
+                      )}
                     </div>
-                  ) : (
-                    <div className="p-3 text-center text-3xs text-slate-400 bg-slate-50 rounded-xl border border-slate-100">
-                      এখনো কোনো পূর্ববর্তী জমার রেকর্ড যুক্ত করা হয়নি।
+                  </div>
+
+                  {/* Portal Credentials Drawer */}
+                  <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between text-2xs">
+                    <div>
+                      <span className="text-3xs text-slate-400 block font-bold uppercase tracking-wider">গ্রাহক পোর্টাল পাসওয়ার্ড</span>
+                      <code className="text-emerald-400 font-mono font-bold text-xs">{cl.password || 'password123'}</code>
                     </div>
-                  )}
+                    <div className="text-right">
+                      <span className="text-3xs text-slate-400 block font-bold uppercase tracking-wider">বুকিং স্ট্যাটাস</span>
+                      <span className="text-3xs font-extrabold text-[#8EBF40] bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                        অনুমোদিত ও কনফার্মড
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
+                {/* 3 Quick Financial Metric Cards */}
+                <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Total Contract */}
+                  <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                    <div className="space-y-1">
+                      <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <CreditCard className="w-5 h-5" />
+                      </div>
+                      <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider pt-2">মোট ফ্ল্যাট চুক্তি মূল্য</div>
+                      <div className="text-lg sm:text-xl font-black text-slate-900">{formatBDT(cl.totalPrice)}</div>
+                    </div>
+                    <div className="text-3xs text-slate-400 font-medium pt-3 border-t border-slate-100 flex items-center space-x-1">
+                      <span>ফ্ল্যাট বরাদ্দকৃত চুক্তিপত্র অনুযায়ী</span>
+                    </div>
+                  </div>
+
+                  {/* Total Paid */}
+                  <div className="bg-white rounded-3xl p-5 border border-emerald-200/80 shadow-xs flex flex-col justify-between">
+                    <div className="space-y-1">
+                      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-[#006231] flex items-center justify-center">
+                        <CheckCircle2 className="w-5 h-5" />
+                      </div>
+                      <div className="text-3xs font-bold text-emerald-700 uppercase tracking-wider pt-2">পরিশোধিত মোট জমা</div>
+                      <div className="text-lg sm:text-xl font-black text-[#006231]">{formatBDT(cl.totalPaid)}</div>
+                    </div>
+                    <div className="text-3xs text-emerald-600 font-bold pt-3 border-t border-emerald-50 flex items-center space-x-1">
+                      <Sparkles className="w-3 h-3 text-[#006231]" />
+                      <span>মোট {percent}% পরিশোধ সম্পন্ন</span>
+                    </div>
+                  </div>
+
+                  {/* Due Balance */}
+                  <div className="bg-white rounded-3xl p-5 border border-red-200/80 shadow-xs flex flex-col justify-between">
+                    <div className="space-y-1">
+                      <div className="w-10 h-10 rounded-2xl bg-red-50 text-[#CE2028] flex items-center justify-center">
+                        <Wallet className="w-5 h-5" />
+                      </div>
+                      <div className="text-3xs font-bold text-[#CE2028] uppercase tracking-wider pt-2">অবশিষ্ট বকেয়া ব্যালেন্স</div>
+                      <div className="text-lg sm:text-xl font-black text-[#CE2028]">{formatBDT(due)}</div>
+                    </div>
+                    <div className="text-3xs text-slate-500 font-medium pt-3 border-t border-red-50 flex items-center justify-between">
+                      <span>বাকি: {100 - Math.min(100, percent)}%</span>
+                      {due === 0 ? (
+                        <span className="text-emerald-600 font-bold">পরিশোধিত ✓</span>
+                      ) : (
+                        <span className="text-amber-600 font-bold">চলমান</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Progress Bar span-full */}
+                  <div className="sm:col-span-3 bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-3">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-slate-700 flex items-center space-x-1.5">
+                        <TrendingUp className="w-4 h-4 text-[#006231]" />
+                        <span>কিস্তি ও মূল্য পরিশোধের সার্বিক অগ্রগতি</span>
+                      </span>
+                      <span className="text-[#006231] font-black">{percent}% সম্পন্ন</span>
+                    </div>
+
+                    <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden p-0.5 border border-slate-200/60">
+                      <div
+                        className="bg-gradient-to-r from-[#006231] via-[#0A4D27] to-[#8EBF40] h-full rounded-full transition-all duration-700 ease-out shadow-xs"
+                        style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-3xs font-bold text-slate-400">
+                      <span>প্রাথমিক জমা (বুকিং)</span>
+                      <span>চলমান কিস্তিসমূহ</span>
+                      <span>হস্তান্তর ও রেজিস্ট্রি</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Modal Footer Actions */}
-              <div className="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-2.5 bg-slate-50 rounded-b-3xl">
+              {/* 2. Next Installment Alert Banner (If Applicable) */}
+              {cl.nextDueDate && due > 0 && (
+                <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-50 via-white to-amber-50/50 border border-amber-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-11 h-11 rounded-2xl bg-amber-100/80 text-amber-800 flex items-center justify-center shrink-0">
+                      <Clock className="w-5 h-5 text-amber-700" />
+                    </div>
+                    <div>
+                      <div className="text-3xs uppercase tracking-wider font-extrabold text-amber-800">পরবর্তী নির্ধারিত কিস্তি নোটিশ</div>
+                      <div className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5">
+                        তারিখ: <span className="text-amber-900 font-extrabold">{cl.nextDueDate}</span> • প্রদেয় পরিমাণ: <span className="text-[#CE2028] font-black">{formatBDT(cl.nextDueAmount)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const targetId = cl.id;
+                      const nextAmt = cl.nextDueAmount || '';
+                      setSelectedClientForProfile(null);
+                      setPaymentForm({
+                        ...paymentForm,
+                        clientId: targetId,
+                        amount: nextAmt
+                      });
+                      setActiveTab('payments');
+                    }}
+                    className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#006231] to-[#0A4D27] hover:opacity-95 text-white font-bold text-xs shadow-md shadow-[#006231]/20 flex items-center justify-center space-x-1.5 transition-all cursor-pointer shrink-0 active:scale-95"
+                  >
+                    <DollarSign className="w-4 h-4" />
+                    <span>এই কিস্তি এখনই জমা এন্ট্রি করুন</span>
+                  </button>
+                </div>
+              )}
+
+              {/* 3. Detailed Payment History & Receipts Table */}
+              <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                  <div>
+                    <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+                      <FileSpreadsheet className="w-4 h-4 text-[#006231]" />
+                      <span>পরিশোধিত কিস্তির পূর্ণাঙ্গ হিস্টোরি ও রসিদ রেকর্ড</span>
+                    </h4>
+                    <p className="text-3xs text-slate-500 mt-0.5">
+                      এখন পর্যন্ত মোট {cl.paymentHistory?.length || 0}টি পেমেন্ট সফলভাবে এন্ট্রি ও অনুমোদিত হয়েছে
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const targetId = cl.id;
+                      setSelectedClientForProfile(null);
+                      setPaymentForm({
+                        ...paymentForm,
+                        clientId: targetId,
+                        amount: ''
+                      });
+                      setActiveTab('payments');
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-[#006231] flex items-center space-x-1.5 transition-colors cursor-pointer self-start sm:self-auto"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>নতুন জমা যুক্ত করুন</span>
+                  </button>
+                </div>
+
+                {cl.paymentHistory && cl.paymentHistory.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-slate-100 bg-slate-50/70 text-3xs font-extrabold uppercase tracking-wider text-slate-400">
+                          <th className="py-3 px-4 rounded-l-xl">ট্রানজাকশন / রসিদ আইডি</th>
+                          <th className="py-3 px-4">জমার তারিখ</th>
+                          <th className="py-3 px-4">পেমেন্ট মাধ্যম</th>
+                          <th className="py-3 px-4 text-right">জমার পরিমাণ</th>
+                          <th className="py-3 px-4 text-center">স্ট্যাটাস</th>
+                          <th className="py-3 px-4 text-right rounded-r-xl">অ্যাকশন</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {cl.paymentHistory.map((trx, tIdx) => (
+                          <tr key={tIdx} className="hover:bg-slate-50/80 transition-colors">
+                            <td className="py-3.5 px-4 font-mono font-bold text-slate-800 text-2xs">
+                              <span className="p-1 px-2 rounded-lg bg-slate-100 border border-slate-200/60">
+                                {trx.id}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 font-medium text-slate-700 text-2xs">
+                              {trx.date}
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-semibold text-3xs border border-slate-200/80">
+                                {trx.method}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-right font-black text-xs text-[#006231]">
+                              +{formatBDT(trx.amount)}
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-50 text-[#006231] font-bold text-3xs border border-emerald-200">
+                                <CheckCircle2 className="w-3 h-3 text-[#006231]" />
+                                <span>অনুমোদিত</span>
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-right">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedReceiptForPrint({ trx, client: cl })}
+                                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#CE2028] hover:text-white text-slate-700 font-bold text-3xs border border-slate-200 hover:border-[#CE2028] transition-all cursor-pointer inline-flex items-center space-x-1"
+                                title="মানি রসিদ প্রিন্ট করুন"
+                              >
+                                <Printer className="w-3 h-3" />
+                                <span>রসিদ প্রিন্ট</span>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="py-12 text-center text-slate-400 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                    <FileText className="w-10 h-10 mx-auto text-slate-300" />
+                    <p className="text-xs font-semibold text-slate-600">এখনো কোনো পূর্ববর্তী জমার রেকর্ড যুক্ত করা হয়নি</p>
+                    <p className="text-3xs text-slate-400">নতুন কিস্তি জমার মাধ্যমে ক্লায়েন্টের পেমেন্ট হিস্টোরি তৈরি করুন</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Bottom Sticky Action Bar */}
+              <div className="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center space-x-2">
                   <a
                     href={`tel:${cl.phone}`}
-                    className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 shadow-2xs flex items-center space-x-1.5 transition-colors cursor-pointer"
+                    className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center space-x-1.5 transition-colors cursor-pointer"
                   >
                     <Phone className="w-3.5 h-3.5 text-[#006231]" />
-                    <span>কল দিন</span>
+                    <span>কল দিন ({cl.phone})</span>
                   </a>
                   <button
                     type="button"
                     onClick={() => setSelectedClientForProfile(null)}
-                    className="px-4 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 font-bold text-xs transition-colors cursor-pointer"
+                    className="px-4 py-2.5 rounded-2xl text-slate-600 hover:text-slate-900 font-bold text-xs transition-colors cursor-pointer"
                   >
-                    বন্ধ করুন
+                    ফিরে যান
                   </button>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    const targetId = cl.id;
-                    const nextAmt = cl.nextDueAmount || '';
-                    setSelectedClientForProfile(null);
-                    setPaymentForm({
-                      ...paymentForm,
-                      clientId: targetId,
-                      amount: nextAmt
-                    });
-                    setActiveTab('payments');
-                  }}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white hover:opacity-95 font-bold text-xs shadow-md shadow-[#006231]/20 flex items-center space-x-1.5 transition-all cursor-pointer active:scale-95"
-                >
-                  <DollarSign className="w-3.5 h-3.5" />
-                  <span>+ কিস্তি জমা এন্ট্রি</span>
-                </button>
+                <div className="flex items-center space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const targetId = cl.id;
+                      setSelectedClientForProfile(null);
+                      setPaymentForm({
+                        ...paymentForm,
+                        clientId: targetId,
+                        amount: cl.nextDueAmount || ''
+                      });
+                      setActiveTab('payments');
+                    }}
+                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-[#006231] to-[#0A4D27] hover:opacity-95 text-white font-bold text-xs shadow-md shadow-[#006231]/20 flex items-center space-x-1.5 transition-all cursor-pointer active:scale-95"
+                  >
+                    <DollarSign className="w-4 h-4" />
+                    <span>+ কিস্তি বা টাকা জমা এন্ট্রি</span>
+                  </button>
+                </div>
               </div>
 
             </div>
@@ -4093,7 +4240,6 @@ export default function ManagementDashboard({
         );
       })()}
 
-      {/* ========================================================= */}
       {/* FULL SCREEN VIEW: OFFICIAL MONEY RECEIPT PREVIEW & PRINT  */}
       {/* ========================================================= */}
       {selectedReceiptForPrint && (() => {
