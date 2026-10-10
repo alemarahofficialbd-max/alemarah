@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Award,
+  Camera,
+  Upload,
   PieChart,
   GraduationCap,
   Briefcase,
@@ -206,6 +208,7 @@ export default function ManagementDashboard({
 
   const [directorForm, setDirectorForm] = useState({
     name: '',
+    image: null,
     role: 'পরিচালক',
     investment: '',
     sharePercentage: '',
@@ -570,7 +573,7 @@ export default function ManagementDashboard({
       name: directorForm.name,
       role: directorForm.role || 'পরিচালক',
       folioNo: autoFolioNo,
-      image: null,
+      image: directorForm.image || null,
       investment: invAmt,
       sharePercentage: sharePct,
       dividendEarned: 0,
@@ -603,6 +606,7 @@ export default function ManagementDashboard({
     setIsDirectorModalOpen(false);
     setDirectorForm({
       name: '',
+      image: null,
       role: 'পরিচালক',
       investment: '',
       sharePercentage: '',
@@ -2252,6 +2256,74 @@ export default function ManagementDashboard({
           <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 flex justify-center items-start">
             <div className="w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
               <form onSubmit={handleAddDirector} className="space-y-4">
+                {/* Director Profile Photo Upload */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center gap-4">
+                  <div className="relative group shrink-0">
+                    <div className="w-20 h-24 rounded-2xl overflow-hidden bg-slate-200 border-2 border-dashed border-slate-300 flex items-center justify-center shadow-xs">
+                      {directorForm.image ? (
+                        <img 
+                          src={directorForm.image} 
+                          alt="Director Preview" 
+                          className="w-full h-full object-cover object-top"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-slate-400 p-2 text-center">
+                          <Camera className="w-6 h-6 mb-1 text-slate-400" />
+                          <span className="text-3xs font-bold">ছবি যুক্ত নেই</span>
+                        </div>
+                      )}
+                    </div>
+                    {directorForm.image && (
+                      <button
+                        type="button"
+                        onClick={() => setDirectorForm({ ...directorForm, image: null })}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center shadow-md hover:bg-red-700 cursor-pointer"
+                        title="ছবি মুছে ফেলুন"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex-1 space-y-1.5 text-center sm:text-left">
+                    <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider">
+                      পরিচালকের অফিসিয়াল ছবি (Profile Photo)
+                    </label>
+                    <p className="text-3xs text-slate-500">
+                      শেয়ার সনদপত্র ও ডিরেক্টর প্রোফাইলে প্রদর্শনের জন্য পাসপোর্ট সাইজ ছবি আপলোড করুন (JPG, PNG)
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                      <label className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-xs flex items-center space-x-1.5 cursor-pointer transition-all active:scale-95">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>ছবি আপলোড করুন</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            if (file.size > 5 * 1024 * 1024) {
+                              alert('ছবির সাইজ সর্বোচ্চ ৫ মেগাবাইট হতে হবে।');
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                              setDirectorForm(prev => ({ ...prev, image: event.target.result }));
+                            };
+                            reader.readAsDataURL(file);
+                          }}
+                        />
+                      </label>
+                      {directorForm.image && (
+                        <span className="text-3xs font-bold text-[#006231] bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200">
+                          ✓ ছবি সফলভাবে সংযুক্ত হয়েছে
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase mb-1">
                   পরিচালকের পূর্ণ নাম *
