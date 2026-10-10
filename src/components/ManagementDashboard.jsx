@@ -782,7 +782,7 @@ export default function ManagementDashboard({
       {/* 1. WEB VIEW: COLLAPSIBLE LEFT SIDEBAR NAVIGATION          */}
       {/* ========================================================= */}
       <aside 
-        className={`hidden md:flex flex-col bg-white border-r border-slate-200/80 h-screen sticky top-0 shrink-0 z-30 justify-between select-none transition-all duration-300 ease-in-out ${
+        className={`hidden md:flex flex-col bg-white border-r border-slate-200/80 h-screen sticky top-0 shrink-0 z-50 justify-between select-none transition-all duration-300 ease-in-out ${
           isSidebarCollapsed ? 'w-20 p-3' : 'w-64 lg:w-72 p-5'
         }`}
       >
@@ -2303,7 +2303,7 @@ export default function ManagementDashboard({
       {/* MODAL: ADD DIRECTOR                                       */}
       {/* ========================================================= */}
       {isDirectorModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -2517,7 +2517,7 @@ export default function ManagementDashboard({
         const totalDividendsReceived = (d.dividendHistory || []).reduce((acc, div) => acc + (div.amount || 0), 0) || d.dividendEarned;
 
         return (
-          <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
             {/* Top Fullscreen Header Navbar */}
             <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md">
               <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
@@ -2878,7 +2878,7 @@ export default function ManagementDashboard({
         const certDir = selectedDirectorForCertificate;
 
         return (
-          <div className="fixed inset-0 z-50 bg-[#F4F1EA] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F4F1EA] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
             {/* Top Fullscreen Header Navigation */}
             <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md">
               <div className="flex items-center space-x-3 sm:space-x-4">
@@ -3032,7 +3032,7 @@ export default function ManagementDashboard({
       {/* FULL SCREEN VIEW: CAPITAL INSTALLMENT DEPOSIT ENTRY       */}
       {/* ========================================================= */}
       {isCapitalDepositModalOpen && capitalDepositTargetDirector && (
-        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -3170,7 +3170,7 @@ export default function ManagementDashboard({
       {/* FULL SCREEN VIEW: DIVIDEND PAYOUT ENTRY                   */}
       {/* ========================================================= */}
       {isDividendModalOpen && dividendTargetDirector && (
-        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -3307,7 +3307,7 @@ export default function ManagementDashboard({
       {/* FULL SCREEN VIEW: ADD CLIENT                              */}
       {/* ========================================================= */}
       {isClientModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -3466,32 +3466,6 @@ export default function ManagementDashboard({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    পরবর্তী কিস্তির তারিখ
-                  </label>
-                  <input
-                    type="text"
-                    value={clientForm.nextDueDate}
-                    onChange={(e) => setClientForm({ ...clientForm, nextDueDate: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-[#CE2028]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    পরবর্তী কিস্তির পরিমাণ (BDT)
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="যেমন: 600000"
-                    value={clientForm.nextDueAmount}
-                    onChange={(e) => setClientForm({ ...clientForm, nextDueAmount: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:border-[#CE2028]"
-                  />
-                </div>
-              </div>
 
               <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
@@ -3518,7 +3492,7 @@ export default function ManagementDashboard({
       {/* FULL SCREEN VIEW: ADD PROJECT                             */}
       {/* ========================================================= */}
       {isProjectModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -3701,7 +3675,7 @@ export default function ManagementDashboard({
       {/* FULL SCREEN VIEW: ADD / EDIT TEAM MEMBER & PERMISSIONS    */}
       {/* ========================================================= */}
       {isTeamModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -3884,7 +3858,7 @@ export default function ManagementDashboard({
         const percent = cl.totalPrice ? Math.round((cl.totalPaid / cl.totalPrice) * 100) : 0;
 
         return (
-          <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
             {/* Top Fullscreen Header Navbar */}
             <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md">
               <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
@@ -4122,7 +4096,7 @@ export default function ManagementDashboard({
         const { trx, client } = selectedReceiptForPrint;
 
         return (
-          <div className="fixed inset-0 z-50 bg-[#F1F5F9] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F1F5F9] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
             {/* Top Controls Header */}
             <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
               <div className="flex items-center space-x-3">
