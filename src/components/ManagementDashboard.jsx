@@ -164,6 +164,7 @@ export default function ManagementDashboard({
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [clientForm, setClientForm] = useState({
     name: '',
+    image: '',
     emailPrefix: '',
     phone: '',
     password: 'password123',
@@ -303,6 +304,7 @@ export default function ManagementDashboard({
     const newClient = {
       id: newId,
       name: clientForm.name,
+      image: clientForm.image || '',
       email: generatedEmail,
       phone: clientForm.phone,
       password: clientForm.password || 'password123',
@@ -331,6 +333,7 @@ export default function ManagementDashboard({
     setIsClientModalOpen(false);
     setClientForm({
       name: '',
+      image: '',
       emailPrefix: '',
       phone: '',
       password: 'password123',
@@ -1306,8 +1309,12 @@ export default function ManagementDashboard({
                         >
                           <td className="py-4 px-6">
                             <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                                {cl.name ? cl.name.slice(0, 2) : 'গ্রা'}
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs overflow-hidden">
+                                {cl.image ? (
+                                  <img src={cl.image} alt={cl.name} className="w-full h-full object-cover" />
+                                ) : (
+                                  cl.name ? cl.name.slice(0, 2) : 'গ্রা'
+                                )}
                               </div>
                               <div>
                                 <div className="font-bold text-slate-900 group-hover:text-[#006231] transition-colors flex items-center space-x-1.5">
@@ -3342,7 +3349,7 @@ export default function ManagementDashboard({
         return (
           <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F4F1EA] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
             {/* Top Fullscreen Header Navigation */}
-            <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md">
+            <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md no-print">
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <button
                   type="button"
@@ -3396,7 +3403,7 @@ export default function ManagementDashboard({
 
             {/* Certificate Canvas Container */}
             <div className="flex-1 flex items-center justify-center p-3 sm:p-8 lg:p-12">
-              <div className="max-w-4xl w-full relative p-6 sm:p-12 lg:p-16 rounded-[2.5rem] bg-gradient-to-b from-[#FFFDF9] via-[#FAF6ED] to-[#F5EFE0] shadow-2xl text-center space-y-6 sm:space-y-8 border-[12px] border-[#D4AF37]/50 ring-2 ring-[#8C6D23]/40 overflow-hidden">
+              <div className="max-w-4xl w-full relative p-6 sm:p-12 lg:p-16 rounded-[2.5rem] bg-gradient-to-b from-[#FFFDF9] via-[#FAF6ED] to-[#F5EFE0] shadow-2xl text-center space-y-6 sm:space-y-8 border-[12px] border-[#D4AF37]/50 ring-2 ring-[#8C6D23]/40 overflow-hidden printable-document">
                 
                 {/* Ornate Inner Double Border */}
                 <div className="absolute inset-3 sm:inset-5 border-2 border-dashed border-[#B8860B]/60 rounded-3xl pointer-events-none"></div>
@@ -3853,6 +3860,58 @@ export default function ManagementDashboard({
           <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 flex justify-center items-start">
             <div className="w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
               <form onSubmit={handleAddClient} className="space-y-4">
+              {/* Client Profile Photo Upload Option */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center space-x-3.5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold overflow-hidden ring-2 ring-emerald-500/20 shadow-xs shrink-0">
+                    {clientForm.image ? (
+                      <img src={clientForm.image} alt="Client Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <Users className="w-7 h-7 text-white/90" />
+                    )}
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-800 block">কাস্টমারের ছবি (ঐচ্ছিক)</span>
+                    <span className="text-3xs text-slate-500">প্রোফাইল ও মানি রিসিটে ব্যবহারের জন্য পাসপোর্ট ছবি আপলোড করুন</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2 shrink-0">
+                  <label className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer shadow-2xs transition-colors flex items-center space-x-1.5">
+                    <Upload className="w-3.5 h-3.5 text-[#006231]" />
+                    <span>{clientForm.image ? 'ছবি পরিবর্তন করুন' : 'ছবি আপলোড করুন'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (file.size > 5 * 1024 * 1024) {
+                          alert('ছবির সাইজ সর্বোচ্চ ৫ মেগাবাইট হতে হবে।');
+                          return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          setClientForm(prev => ({ ...prev, image: event.target.result }));
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+                  </label>
+                  {clientForm.image && (
+                    <button
+                      type="button"
+                      onClick={() => setClientForm(prev => ({ ...prev, image: '' }))}
+                      className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer"
+                      title="ছবি বাদ দিন"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
@@ -4481,12 +4540,21 @@ export default function ManagementDashboard({
                       </span>
                     </div>
 
-                    {/* Client Name & Phone */}
-                    <div>
-                      <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{cl.name}</h2>
-                      <div className="flex items-center space-x-2 text-sm text-slate-300 mt-1.5 font-medium">
-                        <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span className="font-mono text-emerald-300 font-bold">{cl.phone}</span>
+                    {/* Client Name & Photo Header */}
+                    <div className="flex items-center space-x-4">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-[#006231] via-[#0A4D27] to-[#8EBF40] text-white flex items-center justify-center font-black text-lg ring-2 ring-emerald-500/40 shadow-md shrink-0 overflow-hidden">
+                        {cl.image ? (
+                          <img src={cl.image} alt={cl.name} className="w-full h-full object-cover" />
+                        ) : (
+                          cl.name ? cl.name.slice(0, 2) : 'গ্রা'
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight truncate">{cl.name}</h2>
+                        <div className="flex items-center space-x-2 text-sm text-slate-300 mt-1 font-medium">
+                          <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <span className="font-mono text-emerald-300 font-bold">{cl.phone}</span>
+                        </div>
                       </div>
                     </div>
 
@@ -4782,7 +4850,7 @@ export default function ManagementDashboard({
         return (
           <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F1F5F9] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
             {/* Top Controls Header */}
-            <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+            <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs no-print">
               <div className="flex items-center space-x-3">
                 <button
                   type="button"
@@ -4820,7 +4888,7 @@ export default function ManagementDashboard({
 
             {/* Printable Document Sheet in Fullscreen Center */}
             <div className="flex-1 py-6 sm:py-10 px-4 sm:px-6 flex justify-center items-start">
-              <div className="w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-sm space-y-6">
+              <div className="w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-sm space-y-6 printable-document">
                 <div className="p-6 sm:p-8 bg-white rounded-2xl border border-slate-200/90 shadow-sm space-y-6">
                   
                   {/* Header with Logo */}
@@ -4850,10 +4918,17 @@ export default function ManagementDashboard({
 
                   {/* Customer & Unit Details Grid */}
                   <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 text-xs">
-                    <div>
-                      <span className="text-3xs text-slate-400 block font-bold uppercase">গ্রাহকের নাম</span>
-                      <strong className="text-slate-900 text-sm">{client.name}</strong>
-                      {client.phone && <div className="text-slate-500 text-2xs font-mono">{client.phone}</div>}
+                    <div className="flex items-center space-x-3">
+                      {client.image && (
+                        <div className="w-10 h-10 rounded-xl overflow-hidden ring-1 ring-slate-300 shrink-0">
+                          <img src={client.image} alt={client.name} className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-3xs text-slate-400 block font-bold uppercase">গ্রাহকের নাম</span>
+                        <strong className="text-slate-900 text-sm">{client.name}</strong>
+                        {client.phone && <div className="text-slate-500 text-2xs font-mono">{client.phone}</div>}
+                      </div>
                     </div>
 
                     <div>

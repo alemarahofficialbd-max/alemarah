@@ -5,7 +5,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    font-family: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+    font-family: 'Inter', 'Outfit', 'Hind Siliguri', sans-serif;
   }
 }
 
@@ -55,3 +55,44 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ========================================================= */
+/* PRINT SPECIFIC STYLES: ISOLATE RECEIPT / CERTIFICATE ONLY  */
+/* ========================================================= */
+@media print {
+  /* Hide standard web page elements: header, sidebar, footer, buttons, navbars */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Only make print-target-container and its descendants visible */
+  .printable-document,
+  .printable-document * {
+    visibility: visible !important;
+  }
+
+  /* Reset positioning so the document prints cleanly on page 1 */
+  .printable-document {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    background: white !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Hide print header bar and action buttons */
+  .no-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  @page {
+    margin: 10mm;
+    size: auto;
+  }
+}
+

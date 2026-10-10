@@ -22,7 +22,7 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Hind Siliguri', 'sans-serif'],
+        sans: ['Inter', 'Outfit', 'Hind Siliguri', 'sans-serif'],
         bengali: ['Hind Siliguri', 'sans-serif'],
         serif: ['"Cormorant Garamond"', '"Tiro Bangla"', 'Georgia', 'serif'],
         cinzel: ['"Cinzel"', 'serif'],
