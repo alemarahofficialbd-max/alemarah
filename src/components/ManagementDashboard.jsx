@@ -10,6 +10,9 @@ import {
   PieChart,
   GraduationCap,
   Briefcase,
+  Copy,
+  UserCheck,
+  UserX,
   PanelLeftClose,
   PanelLeftOpen,
   ChevronLeft,
@@ -161,6 +164,7 @@ export default function ManagementDashboard({
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [clientForm, setClientForm] = useState({
     name: '',
+    emailPrefix: '',
     phone: '',
     password: 'password123',
     projectId: data.projects[0]?.id || '',
@@ -209,6 +213,24 @@ export default function ManagementDashboard({
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [editingTeamMember, setEditingTeamMember] = useState(null);
   const [showAccessKeys, setShowAccessKeys] = useState({});
+  const [expandedOfficers, setExpandedOfficers] = useState({});
+
+  const handleToggleOfficerStatus = (officerId) => {
+    updateStore((prev) => ({
+      ...prev,
+      managementTeam: prev.managementTeam.map(m => {
+        if (m.id === officerId) {
+          const isAct = m.status?.includes('সক্রিয়');
+          return {
+            ...m,
+            status: isAct ? 'নিষ্ক্রিয় (Deactive)' : 'সক্রিয় (Active)'
+          };
+        }
+        return m;
+      })
+    }));
+    triggerAlert('কর্মকর্তার স্ট্যাটাস সফলভাবে পরিবর্তন হয়েছে!');
+  };
   const [teamForm, setTeamForm] = useState({
     name: '',
     phone: '',
@@ -274,9 +296,14 @@ export default function ManagementDashboard({
     const initialPaidNum = Number(clientForm.initialPaid) || 0;
     const newId = `CLI-${Math.floor(10000 + Math.random() * 90000)}`;
 
+    const generatedEmail = clientForm.emailPrefix 
+      ? `${clientForm.emailPrefix.trim()}@alemarah.com`
+      : `${clientForm.name.toLowerCase().replace(/[^a-z0-9]/g, '') || 'client'}${Math.floor(100 + Math.random() * 900)}@alemarah.com`;
+
     const newClient = {
       id: newId,
       name: clientForm.name,
+      email: generatedEmail,
       phone: clientForm.phone,
       password: clientForm.password || 'password123',
       projectId: selectedProj.id,
@@ -304,6 +331,7 @@ export default function ManagementDashboard({
     setIsClientModalOpen(false);
     setClientForm({
       name: '',
+      emailPrefix: '',
       phone: '',
       password: 'password123',
       projectId: data.projects[0]?.id || '',
@@ -819,8 +847,8 @@ export default function ManagementDashboard({
   const totalDirectorShares = directorsList.reduce((acc, d) => acc + (d.sharePercentage || 0), 0);
   const totalDirectorDividends = directorsList.reduce((acc, d) => acc + (d.dividendEarned || 0), 0);
 
-  // Management Footer Navbar items (6 icons including Directors)
-  const managementNavItems = [
+  // Management Footer Navbar items with Role-Based Permission Control
+  const allNavItems = [
     { id: 'clients', label: '১. ক্লায়েন্ট তালিকা ও নতুন এন্ট্রি', shortLabel: 'ক্লায়েন্ট', icon: Users },
     { id: 'payments', label: '২. কিস্তি ও জমা এন্ট্রি', shortLabel: 'জমা এন্ট্রি', icon: DollarSign },
     { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল', shortLabel: 'প্রজেক্ট', icon: Building2 },
@@ -829,6 +857,13 @@ export default function ManagementDashboard({
     { id: 'directors', label: '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', shortLabel: 'ডিরেক্টরস', icon: Award },
     { id: 'settings', label: '৭. সেটিংস, ভাষা ও সিকিউরিটি পিন', shortLabel: 'সেটিংস', icon: Settings }
   ];
+
+  const managementNavItems = allNavItems.filter(item => {
+    if (isSuperAdmin) return true; // Super admin has 100% full master access
+    if (item.id === 'settings') return true;
+    const perms = admin?.permissions || [];
+    return perms.includes(item.id) || perms.includes('all');
+  });
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row font-sans animate-fadeIn">
@@ -1905,98 +1940,166 @@ export default function ManagementDashboard({
                     <p className="text-2xs text-slate-400 mt-0.5">নতুন কর্মকর্তা যুক্ত করতে উপরের বাটনে ক্লিক করুন</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                  <div className="space-y-3">
                     {officerTeam.map((mem) => {
+                      const isExpanded = Boolean(expandedOfficers[mem.id]);
                       const isMemKeyVisible = Boolean(showAccessKeys[mem.id]);
+                      const isActive = !mem.status?.includes('নিষ্ক্রিয়');
+
                       return (
-                        <div key={mem.id} className="bg-white p-5 rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3.5">
-                          <div className="space-y-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-11 h-11 rounded-2xl bg-red-50 text-[#CE2028] flex items-center justify-center font-black text-base border border-red-100">
-                                  <HardHat className="w-5 h-5" />
-                                </div>
-                                <div className="min-w-0">
-                                  <h4 className="text-sm font-black text-slate-900 truncate">{mem.name}</h4>
-                                  <span className="inline-block px-2 py-0.5 rounded-full text-3xs font-black bg-emerald-50 text-[#006231] border border-emerald-200 mt-0.5">
-                                    {mem.role}
+                        <div 
+                          key={mem.id} 
+                          className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden transition-all duration-200"
+                        >
+                          {/* List Row Header - Clickable to Slide Down */}
+                          <div 
+                            onClick={() => setExpandedOfficers(prev => ({ ...prev, [mem.id]: !prev[mem.id] }))}
+                            className="p-4 flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50/70 select-none transition-colors"
+                          >
+                            <div className="flex items-center space-x-3.5 min-w-0">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${
+                                isActive ? 'bg-red-50 text-[#CE2028] border border-red-100' : 'bg-slate-100 text-slate-400 border border-slate-200'
+                              }`}>
+                                <HardHat className="w-5 h-5" />
+                              </div>
+
+                              <div className="min-w-0">
+                                <div className="flex items-center space-x-2">
+                                  <h4 className="font-bold text-slate-900 text-sm truncate">{mem.name}</h4>
+                                  <span className={`text-3xs font-extrabold px-2 py-0.5 rounded-full border shrink-0 ${
+                                    isActive 
+                                      ? 'bg-emerald-50 text-[#006231] border-emerald-200' 
+                                      : 'bg-red-50 text-red-700 border-red-200'
+                                  }`}>
+                                    {isActive ? '● সক্রিয়' : '○ নিষ্ক্রিয়'}
                                   </span>
                                 </div>
+                                <div className="flex items-center space-x-2 text-2xs text-slate-500 mt-0.5 truncate">
+                                  <span className="font-semibold text-slate-700">{mem.role}</span>
+                                  <span>•</span>
+                                  <span className="font-mono">{mem.phone}</span>
+                                  <span>•</span>
+                                  <span className="font-mono text-3xs text-slate-400">#{mem.id}</span>
+                                </div>
                               </div>
-                              <span className="font-mono text-3xs text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">
-                                #{mem.id}
-                              </span>
                             </div>
 
-                            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
-                              <div className="flex items-center justify-between text-2xs">
-                                <span className="text-slate-500 font-medium">মোবাইল:</span>
-                                <strong className="text-slate-900 font-mono">{mem.phone}</strong>
+                            <div className="flex items-center space-x-2 shrink-0">
+                              <span className="hidden sm:inline-block text-3xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-lg">
+                                {isExpanded ? 'অপশন বন্ধ করুন' : 'বিস্তারিত ও অপশন'}
+                              </span>
+                              <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
+                                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                               </div>
-                              {mem.email && (
-                                <div className="flex items-center justify-between text-2xs">
-                                  <span className="text-slate-500 font-medium">ইমেইল:</span>
-                                  <span className="text-slate-700 font-mono truncate max-w-[170px]">{mem.email}</span>
+                            </div>
+                          </div>
+
+                          {/* Slide-Down Expanded Details & Action Options */}
+                          {isExpanded && (
+                            <div className="p-4 sm:p-5 bg-slate-50/80 border-t border-slate-200/70 space-y-4 animate-fadeIn">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                                {/* 1. Contact & Email */}
+                                <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+                                  <span className="text-3xs font-bold uppercase text-slate-400 block">যোগাযোগ তথ্য</span>
+                                  <div className="font-mono font-bold text-slate-800 text-2xs">{mem.phone}</div>
+                                  <div className="font-mono text-3xs text-slate-500 truncate">{mem.email || 'ইমেইল নেই'}</div>
                                 </div>
-                              )}
-                              <div className="flex items-center justify-between text-2xs pt-1 border-t border-slate-200/60">
-                                <span className="text-slate-500 font-medium">লগইন কী:</span>
-                                <div className="flex items-center space-x-1.5">
-                                  <span className="font-mono font-bold text-slate-800">
-                                    {isMemKeyVisible ? mem.accessKey : '••••••••'}
-                                  </span>
+
+                                {/* 2. Password / Key with Copy Button */}
+                                <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-3xs font-bold uppercase text-slate-400 block">লগইন পাসওয়ার্ড</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => setShowAccessKeys(prev => ({ ...prev, [mem.id]: !prev[mem.id] }))}
+                                      className="text-slate-400 hover:text-slate-700 cursor-pointer"
+                                      title={isMemKeyVisible ? 'লুকান' : 'দেখুন'}
+                                    >
+                                      <Eye className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-1 pt-0.5">
+                                    <code className="font-mono font-bold text-slate-900 text-xs bg-slate-100 px-2 py-0.5 rounded">
+                                      {isMemKeyVisible ? mem.accessKey : '••••••••'}
+                                    </code>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        navigator.clipboard?.writeText(mem.accessKey || 'admin123');
+                                        triggerAlert('পাসওয়ার্ড কপি হয়েছে!');
+                                      }}
+                                      className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-3xs inline-flex items-center space-x-1 cursor-pointer transition-colors"
+                                      title="পাসওয়ার্ড কপি করুন"
+                                    >
+                                      <Copy className="w-3 h-3" />
+                                      <span>কপি</span>
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* 3. Permissions Badges */}
+                                <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+                                  <span className="text-3xs font-bold uppercase text-slate-400 block">অনুমোদিত পারমিশনসমূহ</span>
+                                  <div className="flex flex-wrap gap-1 pt-0.5">
+                                    {(mem.permissions || ['projects', 'expenses']).map((perm, idx) => (
+                                      <span key={idx} className="px-2 py-0.5 rounded-md bg-emerald-50 text-[#006231] border border-emerald-100 text-3xs font-bold">
+                                        {perm === 'projects' ? 'প্রজেক্ট' : perm === 'expenses' ? 'ব্যয়' : perm === 'clients' ? 'ক্লায়েন্ট' : perm === 'payments' ? 'কিস্তি' : perm === 'directors' ? 'পরিচালক' : perm}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Interactive Actions Bar */}
+                              <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-slate-200/60">
+                                <div className="flex items-center space-x-2">
+                                  {/* Active / Deactive Toggle Button */}
                                   <button
                                     type="button"
-                                    onClick={() => setShowAccessKeys(prev => ({ ...prev, [mem.id]: !prev[mem.id] }))}
-                                    className="p-0.5 text-slate-400 hover:text-slate-700 cursor-pointer"
+                                    onClick={() => handleToggleOfficerStatus(mem.id)}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center space-x-1.5 ${
+                                      isActive 
+                                        ? 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200' 
+                                        : 'bg-emerald-50 hover:bg-emerald-100 text-[#006231] border-emerald-200'
+                                    }`}
                                   >
-                                    <Eye className="w-3 h-3" />
+                                    {isActive ? <UserX className="w-3.5 h-3.5 text-amber-700" /> : <UserCheck className="w-3.5 h-3.5 text-[#006231]" />}
+                                    <span>{isActive ? 'অ্যাকাউন্ট নিষ্ক্রিয় করুন (Deactivate)' : 'সক্রিয় করুন (Activate)'}</span>
+                                  </button>
+
+                                  <a
+                                    href={`tel:${mem.phone}`}
+                                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 inline-flex items-center space-x-1"
+                                  >
+                                    <Phone className="w-3.5 h-3.5 text-[#006231]" />
+                                    <span>কল দিন</span>
+                                  </a>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  {/* Edit Button */}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenEditTeam(mem)}
+                                    className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold cursor-pointer inline-flex items-center space-x-1 shadow-2xs"
+                                  >
+                                    <Edit3 className="w-3.5 h-3.5" />
+                                    <span>সম্পাদনা ও পারমিশন</span>
+                                  </button>
+
+                                  {/* Protected Delete Button */}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteTeam(mem.id, mem.name)}
+                                    className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-[#CE2028] text-xs font-bold border border-red-200 cursor-pointer inline-flex items-center space-x-1"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <span>অপসারণ</span>
                                   </button>
                                 </div>
                               </div>
                             </div>
-
-                            {/* Assigned Permissions Tags */}
-                            <div className="space-y-1">
-                              <div className="text-3xs font-bold uppercase tracking-wider text-slate-400">অনুমোদিত ক্ষমতা:</div>
-                              <div className="flex flex-wrap gap-1">
-                                {(mem.permissions || ['projects', 'expenses']).map((perm, idx) => (
-                                  <span key={idx} className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-3xs font-semibold">
-                                    {perm === 'projects' ? 'প্রজেক্ট' : perm === 'expenses' ? 'খরচ ভাউচার' : perm === 'clients' ? 'ক্লায়েন্ট' : perm === 'payments' ? 'কিস্তি জমা' : perm === 'directors' ? 'পরিচালক' : perm}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="pt-2 border-t border-slate-100 flex items-center space-x-1.5">
-                            <a
-                              href={`tel:${mem.phone}`}
-                              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
-                              title="কল দিন"
-                            >
-                              <Phone className="w-3.5 h-3.5 text-[#006231]" />
-                            </a>
-
-                            <button
-                              type="button"
-                              onClick={() => handleOpenEditTeam(mem)}
-                              className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-2xs font-bold flex items-center justify-center space-x-1 transition-colors cursor-pointer"
-                            >
-                              <Edit3 className="w-3.5 h-3.5 text-slate-600" />
-                              <span>সম্পাদনা</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTeam(mem.id, mem.name)}
-                              className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-[#CE2028] transition-colors cursor-pointer"
-                              title="অপসারণ করুন"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
+                          )}
                         </div>
                       );
                     })}
@@ -2181,7 +2284,27 @@ export default function ManagementDashboard({
                         </td>
                         <td className="py-3 px-4 text-right">
                           <div className="inline-flex items-center space-x-1.5 justify-end">
-                            {/* 1. Quick Dividend Pay Button */}
+                            {/* 1. Quick Add Capital Installment Button */}
+                            <button
+                              onClick={() => {
+                                setCapitalDepositTargetDirector(dir);
+                                setCapitalDepositForm({
+                                  amount: '',
+                                  date: new Date().toISOString().split('T')[0],
+                                  method: 'ব্যাংক চেক',
+                                  receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
+                                  note: 'মূলধনের কিস্তি জমা'
+                                });
+                                setIsCapitalDepositModalOpen(true);
+                              }}
+                              title="ভেঙে ভেঙে বা পরবর্তীতে নতুন মূলধন বিনিয়োগ যোগ করুন"
+                              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006231] font-bold text-2xs border border-emerald-200 cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
+                            >
+                              <Plus className="w-3.5 h-3.5 text-[#006231]" />
+                              <span>+ মূলধন জমা</span>
+                            </button>
+
+                            {/* 2. Quick Dividend Pay Button */}
                             <button
                               onClick={() => {
                                 setDividendTargetDirector(dir);
@@ -3431,10 +3554,10 @@ export default function ManagementDashboard({
                     জমার তারিখ
                   </label>
                   <input
-                    type="text"
+                    type="date"
                     value={capitalDepositForm.date}
                     onChange={(e) => setCapitalDepositForm({ ...capitalDepositForm, date: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#006231]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#006231] cursor-pointer"
                   />
                 </div>
                 <div>
@@ -3689,7 +3812,15 @@ export default function ManagementDashboard({
                     type="text"
                     placeholder="যেমন: মোহাম্মদ আরিফুল ইসলাম"
                     value={clientForm.name}
-                    onChange={(e) => setClientForm({ ...clientForm, name: e.target.value })}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const autoPrefix = val.toLowerCase().replace(/[^a-z0-9]/g, '');
+                      setClientForm(prev => ({ 
+                        ...prev, 
+                        name: val,
+                        emailPrefix: prev.emailPrefix || autoPrefix
+                      }));
+                    }}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                     required
                   />
@@ -3707,6 +3838,59 @@ export default function ManagementDashboard({
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                     required
                   />
+                </div>
+              </div>
+
+              {/* Client Portal Login Credentials (Fixed @alemarah.com & Password) */}
+              <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2 text-amber-900 font-extrabold text-xs">
+                    <Key className="w-4 h-4 text-amber-600" />
+                    <span>গ্রাহক পোর্টাল লগইন ও অ্যাকাউন্ট ক্রেডেনশিয়ালস</span>
+                  </div>
+                  <span className="text-3xs text-amber-700 font-bold bg-amber-100/70 px-2 py-0.5 rounded-full">
+                    সিস্টেম অ্যাকাউন্ট
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      গ্রাহক ইউজারনেম / ইমেইল (@alemarah.com ফিক্সড) *
+                    </label>
+                    <div className="flex items-center rounded-xl bg-white border border-slate-200 overflow-hidden focus-within:border-[#CE2028]">
+                      <input
+                        type="text"
+                        placeholder="যেমন: ariful"
+                        value={clientForm.emailPrefix}
+                        onChange={(e) => setClientForm({ ...clientForm, emailPrefix: e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, '') })}
+                        className="flex-1 px-3 py-2 text-xs font-semibold text-slate-800 outline-none min-w-0"
+                      />
+                      <span className="px-3 py-2 bg-slate-100 text-slate-600 font-mono font-bold text-xs border-l border-slate-200 shrink-0 select-none">
+                        @alemarah.com
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-slate-500 mt-1 block">
+                      গ্রাহক এই ইউজারনেম বা মোবাইল নম্বর দিয়ে লগইন করতে পারবেন
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      লগইন পাসওয়ার্ড (Password) *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="পাসওয়ার্ড লিখুন (ডিফল্ট: password123)"
+                      value={clientForm.password}
+                      onChange={(e) => setClientForm({ ...clientForm, password: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                      required
+                    />
+                    <span className="text-[10px] text-slate-500 mt-1 block">
+                      গ্রাহককে সহায়তার জন্য এটি সংরক্ষণ করা থাকবে
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -4306,13 +4490,34 @@ export default function ManagementDashboard({
                     </div>
                   </div>
 
-                  {/* Portal Credentials Drawer */}
-                  <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between text-2xs">
-                    <div>
-                      <span className="text-3xs text-slate-400 block font-bold uppercase tracking-wider">গ্রাহক পোর্টাল পাসওয়ার্ড</span>
-                      <code className="text-emerald-400 font-mono font-bold text-xs">{cl.password || 'password123'}</code>
+                  {/* Portal Credentials Drawer with Copy Option */}
+                  <div className="mt-5 pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-2xs">
+                    <div className="space-y-1">
+                      <span className="text-3xs text-slate-400 block font-bold uppercase tracking-wider">গ্রাহক পোর্টাল অ্যাকাউন্ট ও পাসওয়ার্ড</span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {cl.email && (
+                          <span className="text-3xs font-mono px-2 py-0.5 rounded-md bg-white/10 text-emerald-300 font-bold">
+                            {cl.email}
+                          </span>
+                        )}
+                        <code className="text-amber-300 font-mono font-bold text-xs bg-black/40 px-2 py-0.5 rounded-md border border-white/10">
+                          {cl.password || 'password123'}
+                        </code>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard?.writeText(cl.password || 'password123');
+                            triggerAlert('পাসওয়ার্ড কপি হয়েছে!');
+                          }}
+                          className="px-2 py-0.5 rounded bg-white/15 hover:bg-white/25 text-white text-3xs font-bold inline-flex items-center space-x-1 cursor-pointer transition-colors"
+                          title="পাসওয়ার্ড কপি করুন"
+                        >
+                          <Copy className="w-3 h-3" />
+                          <span>কপি</span>
+                        </button>
+                      </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left sm:text-right">
                       <span className="text-3xs text-slate-400 block font-bold uppercase tracking-wider">বুকিং স্ট্যাটাস</span>
                       <span className="text-3xs font-extrabold text-[#8EBF40] bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
                         অনুমোদিত ও কনফার্মড
