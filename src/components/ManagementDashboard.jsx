@@ -5391,45 +5391,7 @@ export default function ManagementDashboard({
                 )}
               </div>
 
-              {/* Bottom Sticky Action Bar */}
-              <div className="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center space-x-2">
-                  <a
-                    href={`tel:${cl.phone}`}
-                    className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center space-x-1.5 transition-colors cursor-pointer"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-[#006231]" />
-                    <span>কল দিন ({cl.phone})</span>
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedClientForProfile(null)}
-                    className="px-4 py-2.5 rounded-2xl text-slate-600 hover:text-slate-900 font-bold text-xs transition-colors cursor-pointer"
-                  >
-                    ফিরে যান
-                  </button>
-                </div>
 
-                <div className="flex items-center space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const targetId = cl.id;
-                      setSelectedClientForProfile(null);
-                      setPaymentForm({
-                        ...paymentForm,
-                        clientId: targetId,
-                        amount: cl.nextDueAmount || ''
-                      });
-                      setActiveTab('payments');
-                    }}
-                    className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-[#006231] to-[#0A4D27] hover:opacity-95 text-white font-bold text-xs shadow-md shadow-[#006231]/20 flex items-center space-x-1.5 transition-all cursor-pointer active:scale-95"
-                  >
-                    <DollarSign className="w-4 h-4" />
-                    <span>+ টাকা জমা এন্ট্রি</span>
-                  </button>
-                </div>
-              </div>
 
             </div>
           </div>
