@@ -98,22 +98,51 @@ export default function LoginPage({
           setIsSuccess(true);
           setStatusMessage(isEn ? 'Super Admin Master Access Granted!' : 'সুপার অ্যাডমিন মাস্টার এক্সেস অনুমোদিত! ড্যাশবোর্ডে প্রবেশ করা হচ্ছে...');
         } else {
-          matchedAdmin = store.managementTeam.find(
-            m => (
-              m.phone === identifierInput.trim() ||
-              (m.email && m.email.toLowerCase() === trimmedInput) ||
-              (m.id && m.id.toLowerCase() === trimmedInput)
+          // Check if matched with any Director in Board of Directors
+          const matchedDirector = (store.directors || []).find(
+            d => (
+              d.phone === identifierInput.trim() ||
+              (d.email && d.email.toLowerCase() === trimmedInput) ||
+              (d.id && d.id.toLowerCase() === trimmedInput) ||
+              (d.folioNo && d.folioNo.toLowerCase() === trimmedInput)
             )
           );
 
-          if (matchedAdmin) {
+          if (matchedDirector) {
             setIsSuccess(true);
-            setStatusMessage(isEn ? 'Management access granted!' : 'ম্যানেজমেন্ট এক্সেস অনুমোদিত!');
+            setStatusMessage(isEn ? `Welcome Director: ${matchedDirector.name}` : `বোর্ড পরিচালক মহোদয় স্বাগতম: ${matchedDirector.name}`);
+            matchedAdmin = {
+              id: matchedDirector.id,
+              name: matchedDirector.name,
+              nameEn: matchedDirector.nameEn,
+              role: matchedDirector.role,
+              roleType: 'director',
+              email: matchedDirector.email,
+              phone: matchedDirector.phone,
+              isDirector: true,
+              isSuperAdmin: false,
+              accessKey: matchedDirector.accessKey || 'admin123',
+              permissions: ['directors', 'projects', 'clients', 'payments', 'expenses'],
+              status: matchedDirector.status || 'সক্রিয় (Active)'
+            };
           } else {
-            // Default fallback
-            setIsSuccess(true);
-            matchedAdmin = store.managementTeam[1] || store.managementTeam[0];
-            setStatusMessage(isEn ? 'Management access granted!' : 'ম্যানেজমেন্ট এক্সেস অনুমোদিত!');
+            matchedAdmin = store.managementTeam.find(
+              m => (
+                m.phone === identifierInput.trim() ||
+                (m.email && m.email.toLowerCase() === trimmedInput) ||
+                (m.id && m.id.toLowerCase() === trimmedInput)
+              )
+            );
+
+            if (matchedAdmin) {
+              setIsSuccess(true);
+              setStatusMessage(isEn ? 'Management access granted!' : 'ম্যানেজমেন্ট এক্সেস অনুমোদিত!');
+            } else {
+              // Default fallback
+              setIsSuccess(true);
+              matchedAdmin = store.managementTeam[1] || store.managementTeam[0];
+              setStatusMessage(isEn ? 'Management access granted!' : 'ম্যানেজমেন্ট এক্সেস অনুমোদিত!');
+            }
           }
         }
 
@@ -138,6 +167,12 @@ export default function LoginPage({
       setPasswordInput(superAdmin?.accessKey || 'admin123');
       setIsSuccess(true);
       setStatusMessage(isEn ? 'Super Admin credentials filled. Click "Access Portal".' : 'সুপার অ্যাডমিন ইমেইল ও পাসওয়ার্ড বসানো হয়েছে।');
+    } else if (type === 'director') {
+      const director = store.directors?.[0] || { name: 'শেখ ফজলুল করীম মারুফ', phone: '01816233013', accessKey: 'admin123' };
+      setIdentifierInput(director?.phone || '01816233013');
+      setPasswordInput(director?.accessKey || 'admin123');
+      setIsSuccess(true);
+      setStatusMessage(isEn ? `Director credentials filled: ${director.name}` : `বোর্ড পরিচালক আইডি ও পাসওয়ার্ড বসানো হয়েছে (${director.name})।`);
     } else {
       const staffAdmin = store.managementTeam.find(m => !m.isSuperAdmin) || store.managementTeam[1] || store.managementTeam[0];
       setIdentifierInput(staffAdmin?.phone || '01918646575');
@@ -236,10 +271,10 @@ export default function LoginPage({
                 <span className="truncate">
                   {loginRole === 'customer' 
                     ? 'টেস্টিং: ০১৭১১-২২৩৩৪৪ (পাসওয়ার্ড: password123)' 
-                    : 'সুপার অ্যাডমিন: alemarah.officialbd@gmail.com (কী: admin123)'}
+                    : 'লগইন: সুপার অ্যাডমিন, ডিরেক্টর বা অফিসার ক্রেডেনশিয়াল'}
                 </span>
               </div>
-              <div className="flex items-center space-x-1.5 shrink-0">
+              <div className="flex items-center space-x-1.5 shrink-0 flex-wrap gap-y-1">
                 {loginRole === 'customer' ? (
                   <button
                     type="button"
@@ -253,7 +288,7 @@ export default function LoginPage({
                     <button
                       type="button"
                       onClick={() => handleDemoFill('superadmin')}
-                      className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-red-600 text-white text-xs font-bold shadow-2xs hover:opacity-90 transition-opacity cursor-pointer flex items-center space-x-1"
+                      className="px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-red-600 text-white text-xs font-bold shadow-2xs hover:opacity-90 transition-opacity cursor-pointer flex items-center space-x-1"
                       title="সুপার অ্যাডমিন ডেমো ফিল করুন"
                     >
                       <Crown className="w-3 h-3" />
@@ -261,11 +296,20 @@ export default function LoginPage({
                     </button>
                     <button
                       type="button"
+                      onClick={() => handleDemoFill('director')}
+                      className="px-2 py-1 rounded-lg bg-white text-[#006231] text-xs font-bold border border-emerald-200 shadow-2xs hover:bg-[#006231] hover:text-white transition-colors cursor-pointer flex items-center space-x-1"
+                      title="বোর্ড ডিরেক্টর ডেমো ফিল করুন"
+                    >
+                      <Shield className="w-3 h-3 text-[#006231]" />
+                      <span>বোর্ড ডিরেক্টর</span>
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleDemoFill('staff')}
-                      className="px-2 py-1 rounded-lg bg-white text-[#006231] text-xs font-bold border border-emerald-200 shadow-2xs hover:bg-[#006231] hover:text-white transition-colors cursor-pointer"
+                      className="px-2 py-1 rounded-lg bg-white text-slate-700 text-xs font-bold border border-slate-200 shadow-2xs hover:bg-slate-100 transition-colors cursor-pointer"
                       title="স্টাফ অ্যাডমিন ডেমো ফিল করুন"
                     >
-                      স্টাফ অফিসার
+                      অফিসার
                     </button>
                   </>
                 )}
@@ -286,7 +330,7 @@ export default function LoginPage({
                 <span>
                   {loginRole === 'customer' 
                     ? (isEn ? 'Customer ID or Mobile Number' : 'কাস্টমার আইডি বা মোবাইল নম্বর') 
-                    : (isEn ? 'Super Admin Email / Officer Mobile or ID' : 'সুপার অ্যাডমিন ইমেইল / অফিসারের মোবাইল বা আইডি')}
+                    : (isEn ? 'Super Admin / Director / Officer Mobile or ID' : 'সুপার অ্যাডমিন / ডিরেক্টর / কর্মকর্তার মোবাইল বা আইডি')}
                 </span>
               </label>
               <div className="relative">

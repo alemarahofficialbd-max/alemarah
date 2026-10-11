@@ -198,85 +198,127 @@ export default function Navbar({
             </div>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Slide-Down Drawer Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-x-0 top-[57px] bg-white border-b border-gray-200 shadow-2xl z-50 animate-fadeIn overflow-y-auto max-h-[85vh]">
-            <div className="p-4 space-y-3">
-              {/* Hotline Contact Info */}
-              <div className="p-3 bg-gray-50 rounded-xl flex items-center justify-between border border-gray-100">
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-[#CE2028]/10 flex items-center justify-center text-[#CE2028]">
-                    <Phone className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 font-medium">{t.nav.callUs}</div>
-                    <a href="tel:+8801816233013" className="text-xs sm:text-sm font-extrabold text-gray-900 tracking-wide">{t.nav.phoneNo}</a>
-                  </div>
-                </div>
-                <button
-                  onClick={toggleLanguage}
-                  className="px-2.5 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-[#006231] shadow-xs cursor-pointer"
-                >
-                  {t.nav.langSwitchTo}
-                </button>
-              </div>
+      {/* Full Screen Mobile Menu Drawer (Outside header to avoid backdrop-filter traps) */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-[70] bg-white flex flex-col overflow-y-auto animate-fadeIn select-none">
+          {/* Top Sticky Header */}
+          <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center justify-between shadow-2xs">
+            <button 
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleNavClick('home');
+              }}
+              className="cursor-pointer"
+            >
+              <img 
+                src="/alemarah_logo_header.svg" 
+                alt="Al-Emarah" 
+                className="h-8 w-auto object-contain"
+              />
+            </button>
 
-              {/* The 6 Main Navigation Links */}
-              <div className="space-y-1">
-                {navLinks.map((item) => {
-                  const IconComponent = item.icon;
-                  const isActive = currentPage === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleNavClick(item.id)}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-colors text-left cursor-pointer ${
-                        isActive 
-                          ? 'bg-red-50 text-[#CE2028] font-bold' 
-                          : 'text-gray-800 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <IconComponent className={`w-4 h-4 ${isActive ? 'text-[#CE2028]' : 'text-gray-400'}`} />
-                        <span>{item.label}</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-gray-300" />
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-2 space-y-2 border-t border-gray-100">
-                {/* সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড বাটন */}
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    handleNavClick(isLoggedIn ? 'dashboard' : 'login');
-                  }}
-                  className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 text-xs sm:text-sm font-semibold hover:bg-gray-100 cursor-pointer"
-                >
-                  <User className="w-4 h-4 text-[#CE2028]" />
-                  <span>{isLoggedIn ? (lang === 'en' ? 'Client Dashboard' : 'ক্লায়েন্ট ড্যাশবোর্ড') : t.nav.login}</span>
-                </button>
-
-                {/* সাইট ভিজিট বুক করুন বাটন */}
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    onOpenBookVisit();
-                  }}
-                  className="w-full flex items-center justify-center space-x-2 py-3 rounded-xl bg-[#CE2028] text-white text-sm font-bold shadow-md shadow-[#CE2028]/25 cursor-pointer"
-                >
-                  <Calendar className="w-4 h-4" />
-                  <span>{t.nav.bookVisit}</span>
-                </button>
-              </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-xs font-semibold cursor-pointer"
+              >
+                <Globe className="w-3.5 h-3.5 text-[#006231]" />
+                <span>{lang === 'en' ? 'বাংলা' : 'EN'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 cursor-pointer"
+                title="বন্ধ করুন"
+              >
+                <X className="w-6 h-6 text-[#CE2028]" />
+              </button>
             </div>
           </div>
-        )}
-      </header>
+
+          {/* Full Screen Content Body */}
+          <div className="flex-1 p-5 space-y-4 pb-28">
+            {/* Hotline Contact Info */}
+            <div className="p-3.5 bg-gray-50 rounded-2xl flex items-center justify-between border border-gray-100">
+              <div className="flex items-center space-x-3">
+                <div className="w-9 h-9 rounded-xl bg-[#CE2028]/10 flex items-center justify-center text-[#CE2028]">
+                  <Phone className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-3xs text-gray-500 font-medium">{t.nav.callUs}</div>
+                  <a href="tel:+8801816233013" className="text-xs font-extrabold text-gray-900 tracking-wide">{t.nav.phoneNo}</a>
+                </div>
+              </div>
+              <button
+                onClick={toggleLanguage}
+                className="px-2.5 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-[#006231] shadow-xs cursor-pointer"
+              >
+                {t.nav.langSwitchTo}
+              </button>
+            </div>
+
+            {/* The 6 Main Navigation Links */}
+            <div className="space-y-1.5">
+              <div className="text-3xs font-extrabold uppercase tracking-wider text-gray-400 px-3 pb-0.5">
+                ওয়েবসাইট মেনু
+              </div>
+              {navLinks.map((item) => {
+                const IconComponent = item.icon;
+                const isActive = currentPage === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleNavClick(item.id);
+                    }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl font-semibold text-sm transition-colors text-left cursor-pointer ${
+                      isActive 
+                        ? 'bg-red-50 text-[#CE2028] font-bold border border-red-100' 
+                        : 'text-gray-800 hover:bg-gray-50 bg-white border border-gray-100'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <IconComponent className={`w-4 h-4 ${isActive ? 'text-[#CE2028]' : 'text-gray-400'}`} />
+                      <span>{item.label}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="pt-3 space-y-2.5 border-t border-gray-100">
+              {/* সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড বাটন */}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleNavClick(isLoggedIn ? 'dashboard' : 'login');
+                }}
+                className="w-full flex items-center justify-center space-x-2 py-3 rounded-2xl border border-gray-200 bg-gray-50 text-gray-800 text-sm font-bold hover:bg-gray-100 cursor-pointer"
+              >
+                <User className="w-4 h-4 text-[#CE2028]" />
+                <span>{isLoggedIn ? (lang === 'en' ? 'Client Dashboard' : 'ক্লায়েন্ট ড্যাশবোর্ড') : t.nav.login}</span>
+              </button>
+
+              {/* সাইট ভিজিট বুক করুন বাটন */}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenBookVisit();
+                }}
+                className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-2xl bg-[#CE2028] text-white text-sm font-bold shadow-md shadow-[#CE2028]/25 cursor-pointer"
+              >
+                <Calendar className="w-4 h-4" />
+                <span>{t.nav.bookVisit}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Bottom Navigation Bar for Phone View (Exact 6 items as requested) */}
       <nav className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 py-1.5 px-1 z-40 lg:hidden shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">

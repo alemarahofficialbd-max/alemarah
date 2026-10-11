@@ -157,21 +157,6 @@ export default function ManagementDashboard({
     setTimeout(() => setSuccessAlert(''), 3500);
   };
 
-  // Close profile dropdown on outside click (supports mouse and mobile touch)
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setIsProfileOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
-    };
-  }, []);
-
   // -------------------------------------------------------------
   // FORM STATES
   // -------------------------------------------------------------
@@ -235,6 +220,8 @@ export default function ManagementDashboard({
   const [editingTeamMember, setEditingTeamMember] = useState(null);
   const [showAccessKeys, setShowAccessKeys] = useState({});
   const [expandedOfficers, setExpandedOfficers] = useState({});
+  const [teamAddSource, setTeamAddSource] = useState('new'); // 'new' | 'director'
+  const [selectedDirectorForAccessId, setSelectedDirectorForAccessId] = useState(null);
 
   const handleToggleOfficerStatus = (officerId) => {
     updateStore((prev) => ({
@@ -584,28 +571,50 @@ export default function ManagementDashboard({
     triggerAlert('প্রজেক্ট খরচের এন্ট্রি সফলভাবে যুক্ত হয়েছে!');
   };
 
-  const handleOpenAddTeam = () => {
+  const handleOpenAddTeam = (source = 'new') => {
     setEditingTeamMember(null);
+    setTeamAddSource(source);
+    setSelectedDirectorForAccessId(null);
     setTeamForm({
       name: '',
       phone: '',
       email: '',
       role: 'সাইট ইঞ্জিনিয়ার',
       accessKey: 'admin123',
-      permissions: ['projects', 'expenses']
+      permissions: ['projects', 'expenses'],
+      directorId: null
+    });
+    setIsTeamModalOpen(true);
+  };
+
+  const handleGrantDirectorAccess = (dir) => {
+    setEditingTeamMember(null);
+    setTeamAddSource('director');
+    setSelectedDirectorForAccessId(dir.id);
+    setTeamForm({
+      name: dir.name,
+      phone: dir.phone || '',
+      email: dir.email || '',
+      role: `বোর্ড ডিরেক্টর (${dir.role})`,
+      accessKey: dir.accessKey || 'admin123',
+      permissions: ['directors', 'projects', 'clients', 'payments', 'expenses'],
+      directorId: dir.id
     });
     setIsTeamModalOpen(true);
   };
 
   const handleOpenEditTeam = (mem) => {
     setEditingTeamMember(mem);
+    setTeamAddSource('new');
+    setSelectedDirectorForAccessId(mem.directorId || null);
     setTeamForm({
       name: mem.name || '',
       phone: mem.phone || '',
       email: mem.email || '',
       role: mem.role || 'সাইট ইঞ্জিনিয়ার',
       accessKey: mem.accessKey || 'admin123',
-      permissions: mem.permissions || ['projects', 'expenses']
+      permissions: mem.permissions || ['projects', 'expenses'],
+      directorId: mem.directorId || null
     });
     setIsTeamModalOpen(true);
   };
@@ -628,7 +637,8 @@ export default function ManagementDashboard({
               email: teamForm.email,
               role: teamForm.role,
               accessKey: teamForm.accessKey || 'admin123',
-              permissions: teamForm.permissions
+              permissions: teamForm.permissions,
+              directorId: teamForm.directorId || m.directorId || null
             };
           }
           return m;
@@ -645,37 +655,77 @@ export default function ManagementDashboard({
           };
         }
 
+        // Also sync director accessKey/credentials if this member was a director
+        const dirIdToSync = teamForm.directorId || editingTeamMember.directorId;
+        const updatedDirectors = dirIdToSync 
+          ? (prev.directors || []).map(d => d.id === dirIdToSync ? { ...d, accessKey: teamForm.accessKey || d.accessKey || 'admin123', phone: teamForm.phone || d.phone, email: teamForm.email || d.email } : d)
+          : prev.directors;
+
         return {
           ...prev,
           managementTeam: updatedTeam,
-          superAdmin: updatedSuperAdmin
+          superAdmin: updatedSuperAdmin,
+          directors: updatedDirectors
         };
       });
 
       triggerAlert(`অ্যাডমিন/কর্মকর্তা ${teamForm.name}-এর তথ্য সফলভাবে আপডেট হয়েছে!`);
     } else {
-      const newMember = {
-        id: `MGT-0${data.managementTeam.length + 1}`,
-        name: teamForm.name,
-        phone: teamForm.phone,
-        email: teamForm.email || '',
-        role: teamForm.role,
-        accessKey: teamForm.accessKey || 'admin123',
-        isSuperAdmin: false,
-        permissions: teamForm.permissions || ['projects', 'expenses'],
-        status: lang === 'bn' ? 'সক্রিয়' : 'Active'
-      };
+      updateStore((prev) => {
+        // If this director was already in team, update them; otherwise create new member
+        const existingIdx = prev.managementTeam.findIndex(m => 
+          (teamForm.directorId && m.directorId === teamForm.directorId) || 
+          m.phone === teamForm.phone
+        );
 
-      updateStore((prev) => ({
-        ...prev,
-        managementTeam: [...prev.managementTeam, newMember]
-      }));
+        let nextTeam = [...prev.managementTeam];
+        if (existingIdx !== -1) {
+          nextTeam[existingIdx] = {
+            ...nextTeam[existingIdx],
+            name: teamForm.name,
+            phone: teamForm.phone,
+            email: teamForm.email || nextTeam[existingIdx].email,
+            role: teamForm.role,
+            accessKey: teamForm.accessKey || nextTeam[existingIdx].accessKey || 'admin123',
+            permissions: teamForm.permissions || ['projects', 'expenses'],
+            directorId: teamForm.directorId || nextTeam[existingIdx].directorId || null,
+            status: lang === 'bn' ? 'সক্রিয়' : 'Active'
+          };
+        } else {
+          const newMember = {
+            id: teamForm.directorId ? `MGT-DIR-${teamForm.directorId.replace('DIR-', '')}` : `MGT-0${prev.managementTeam.length + 1}`,
+            name: teamForm.name,
+            phone: teamForm.phone,
+            email: teamForm.email || '',
+            role: teamForm.role,
+            accessKey: teamForm.accessKey || 'admin123',
+            isSuperAdmin: false,
+            isDirector: Boolean(teamForm.directorId),
+            directorId: teamForm.directorId || null,
+            permissions: teamForm.permissions || ['projects', 'expenses'],
+            status: lang === 'bn' ? 'সক্রিয়' : 'Active'
+          };
+          nextTeam.push(newMember);
+        }
 
-      triggerAlert(`নতুন কর্মকর্তা ${newMember.name} সফলভাবে যুক্ত হয়েছেন!`);
+        // Keep director accessKey synced
+        const updatedDirectors = teamForm.directorId 
+          ? (prev.directors || []).map(d => d.id === teamForm.directorId ? { ...d, accessKey: teamForm.accessKey || d.accessKey || 'admin123', phone: teamForm.phone || d.phone, email: teamForm.email || d.email } : d)
+          : prev.directors;
+
+        return {
+          ...prev,
+          managementTeam: nextTeam,
+          directors: updatedDirectors
+        };
+      });
+
+      triggerAlert(`${teamForm.name}-এর সিস্টেম অ্যাডমিন এক্সেস সফলভাবে অনুমোদিত হয়েছে!`);
     }
 
     setIsTeamModalOpen(false);
     setEditingTeamMember(null);
+    setSelectedDirectorForAccessId(null);
   };
 
   const handleDeleteTeam = (id, name) => {
@@ -1071,178 +1121,21 @@ export default function ManagementDashboard({
             </button>
 
             {/* Right: Circular Manager Avatar & Menu for Mobile */}
-            <div className="relative" ref={profileRef}>
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="relative cursor-pointer rounded-full p-0 border-0 bg-transparent focus:outline-none transition-transform hover:scale-105 active:scale-95 block"
-                aria-expanded={isProfileOpen}
-                title="ম্যানেজমেন্ট মেনু"
-              >
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs ring-2 shadow-xs ${
-                  isSuperAdmin 
-                    ? 'bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/60' 
-                    : 'bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white ring-[#CE2028]/30'
-                }`}>
-                  {isSuperAdmin ? <Crown className="w-4 h-4 text-amber-200" /> : (admin?.name ? admin.name.slice(0, 2) : 'ম্যা')}
-                </div>
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
-              </button>
-
-              {/* Fullscreen Mobile Drawer for Super Admin Profile & System Menu */}
-              {isProfileOpen && (
-                <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center animate-fadeIn">
-                  {/* Backdrop Click */}
-                  <div 
-                    className="absolute inset-0"
-                    onClick={() => setIsProfileOpen(false)}
-                  />
-
-                  {/* Bottom Sheet on Mobile / Centered Card on larger */}
-                  <div className="relative z-10 w-full sm:max-w-md bg-white rounded-t-[2.5rem] sm:rounded-3xl shadow-2xl border-t sm:border border-slate-200 overflow-hidden animate-slideUp max-h-[90vh] flex flex-col">
-                    {/* Top Drag Indicator & Header */}
-                    <div className="p-5 pb-4 bg-gradient-to-b from-slate-50 to-white border-b border-slate-100">
-                      <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-4 sm:hidden"></div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3.5 min-w-0">
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm ring-2 shadow-sm shrink-0 ${
-                            isSuperAdmin 
-                              ? 'bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/50' 
-                              : 'bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white ring-[#CE2028]/30'
-                          }`}>
-                            {isSuperAdmin ? <Crown className="w-6 h-6 text-amber-100" /> : (admin?.name ? admin.name.slice(0, 2) : 'ম্যা')}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="flex items-center space-x-1.5">
-                              <h3 className="text-base font-black text-slate-900 truncate">
-                                {admin?.name || 'সুপার অ্যাডমিন'}
-                              </h3>
-                              {isSuperAdmin && <Crown className="w-4 h-4 text-amber-500 shrink-0" />}
-                            </div>
-                            <p className="text-xs text-[#006231] font-bold">
-                              {isSuperAdmin ? (lang === 'bn' ? 'সুপার অ্যাডমিন' : 'Master Admin') : (admin?.role || (lang === 'bn' ? 'ম্যানেজমেন্ট টিম' : 'Management Team'))}
-                            </p>
-                            <p className="text-3xs text-slate-400 truncate">
-                              {admin?.email || admin?.phone || 'alemarah.officialbd@gmail.com'}
-                            </p>
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => setIsProfileOpen(false)}
-                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer shrink-0"
-                          title="বন্ধ করুন"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Menu Options List */}
-                    <div className="p-4 space-y-2 overflow-y-auto">
-                      <div className="text-3xs font-extrabold uppercase tracking-wider text-slate-400 px-3">
-                        কুইক অ্যাকশন ও ম্যানেজমেন্ট মেনু
-                      </div>
-
-                      {/* Settings Option */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsProfileOpen(false);
-                          navigateToTab('settings');
-                        }}
-                        className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200/60 transition-all text-left cursor-pointer group"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 rounded-xl bg-[#006231] text-white flex items-center justify-center shrink-0 shadow-xs">
-                            <Settings className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className="text-sm font-bold text-slate-900 group-hover:text-[#006231]">
-                              সিস্টেম সেটিংস ও সিকিউরিটি পিন
-                            </div>
-                            <div className="text-3xs text-slate-500 font-medium">
-                              ভাষা পরিবর্তন ও ডিলিট মাস্টার পিন কনফিগারেশন
-                            </div>
-                          </div>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
-                      </button>
-
-                      {/* All Dashboard Navigation Tabs for Fast Mobile Access */}
-                      <div className="pt-2">
-                        <div className="text-3xs font-extrabold uppercase tracking-wider text-slate-400 px-3 pb-1.5">
-                          সকল বিভাগ ও অপশন
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          {managementNavItems.map(item => {
-                            const ItemIcon = item.icon;
-                            const isCur = activeTab === item.id;
-                            return (
-                              <button
-                                key={item.id}
-                                type="button"
-                                onClick={() => {
-                                  setIsProfileOpen(false);
-                                  navigateToTab(item.id);
-                                }}
-                                className={`p-3 rounded-2xl flex items-center space-x-2.5 text-xs font-bold transition-all text-left cursor-pointer ${
-                                  isCur 
-                                    ? 'bg-[#CE2028] text-white shadow-md shadow-[#CE2028]/25' 
-                                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/60'
-                                }`}
-                              >
-                                <ItemIcon className={`w-4 h-4 shrink-0 ${isCur ? 'text-white' : 'text-slate-500'}`} />
-                                <span className="truncate">{item.shortLabel || item.label}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Website & Hotline */}
-                      <div className="pt-2 border-t border-slate-100 space-y-1.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsProfileOpen(false);
-                            onNavigateHome();
-                          }}
-                          className="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors text-left cursor-pointer"
-                        >
-                          <Home className="w-4 h-4 text-[#CE2028]" />
-                          <span>মূল ওয়েবসাইটে ফিরে যান</span>
-                        </button>
-
-                        <a
-                          href="tel:01918646575"
-                          className="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors text-left"
-                        >
-                          <Phone className="w-4 h-4 text-[#006231]" />
-                          <span>সাইট হটলাইনে কল করুন (01918-646575)</span>
-                        </a>
-                      </div>
-                    </div>
-
-                    {/* Bottom Logout Button */}
-                    <div className="p-4 bg-slate-50 border-t border-slate-100">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsProfileOpen(false);
-                          onLogout();
-                        }}
-                        className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-2xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white transition-all text-xs font-bold cursor-pointer active:scale-95"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>সিস্টেম থেকে লগআউট করুন</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <button
+              type="button"
+              onClick={() => setIsProfileOpen(true)}
+              className="relative cursor-pointer rounded-full p-0 border-0 bg-transparent focus:outline-none transition-transform hover:scale-105 active:scale-95 block"
+              title="ম্যানেজমেন্ট মেনু ও প্রোফাইল"
+            >
+              <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs ring-2 shadow-xs ${
+                isSuperAdmin 
+                  ? 'bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/60' 
+                  : 'bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white ring-[#CE2028]/30'
+              }`}>
+                {isSuperAdmin ? <Crown className="w-4 h-4 text-amber-200" /> : (admin?.name ? admin.name.slice(0, 2) : 'ম্যা')}
+              </div>
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+            </button>
           </div>
         </header>
 
@@ -1262,6 +1155,17 @@ export default function ManagementDashboard({
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>অ্যাডমিন কন্ট্রোল এক্সেস</span>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsProfileOpen(true)}
+              className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all cursor-pointer"
+              title="অ্যাডমিন মেনু ও প্রোফাইল"
+            >
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white flex items-center justify-center text-3xs font-black">
+                {isSuperAdmin ? <Crown className="w-3.5 h-3.5 text-amber-200" /> : (admin?.name ? admin.name.slice(0, 1) : 'A')}
+              </div>
+              <span className="hidden lg:inline">{admin?.name || 'অ্যাডমিন'}</span>
+            </button>
             <button
               onClick={onNavigateHome}
               className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
@@ -1336,7 +1240,7 @@ export default function ManagementDashboard({
       {/* ========================================================= */}
       {/* 3. MAIN WORKSPACE (SWITCHED VIA FOOTER NAVBAR)            */}
       {/* ========================================================= */}
-      <main className="w-full px-4 sm:px-6 lg:px-8 py-5 space-y-5 flex-1">
+      <main className="w-full px-4 sm:px-6 lg:px-8 pt-5 pb-32 sm:pb-12 lg:pb-16 space-y-5 flex-1">
         
         {/* ------------------------------------------------------- */}
         {/* TAB 1: CLIENT MANAGEMENT                                */}
@@ -2454,7 +2358,7 @@ export default function ManagementDashboard({
                 </div>
                 <button
                   type="button"
-                  onClick={handleOpenAddTeam}
+                  onClick={() => handleOpenAddTeam('new')}
                   className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 shrink-0"
                 >
                   <Plus className="w-4 h-4" />
@@ -2462,7 +2366,121 @@ export default function ManagementDashboard({
                 </button>
               </div>
 
-              {/* Sub-Admins & Officers Section */}
+              {/* 1. Board of Directors Access & Login Credentials Section */}
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+                      <Crown className="w-4 h-4 text-amber-500" />
+                      <span>বোর্ড অব ডিরেক্টরস ও সিস্টেম লগইন এক্সেস ({directorsList.length})</span>
+                    </h4>
+                    <p className="text-2xs text-slate-500 mt-0.5">
+                      সম্মানিত বোর্ড পরিচালকদের পোর্টাল লগইন ক্রেডেনশিয়াল ও অ্যাডমিন অ্যাক্সেস পারমিশন
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenAddTeam('director')}
+                    className="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold border border-amber-200 cursor-pointer self-start sm:self-auto flex items-center space-x-1"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                    <span>+ ডিরেক্টর এক্সেস দিন</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {directorsList.map((dir) => {
+                    const isDirKeyVisible = Boolean(showAccessKeys[dir.id]);
+                    const teamMatch = (data.managementTeam || []).find(m => m.directorId === dir.id || m.phone === dir.phone);
+                    const hasTeamAccess = Boolean(teamMatch);
+
+                    return (
+                      <div key={dir.id} className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center space-x-2.5 min-w-0">
+                            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                              {dir.image ? (
+                                <img src={dir.image} alt={dir.name} className="w-full h-full object-cover object-top" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-slate-600 font-bold text-sm bg-slate-100">
+                                  {dir.name.slice(0, 1)}
+                                </div>
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="font-bold text-slate-900 text-sm truncate">{dir.name}</div>
+                              <div className="text-xs text-[#CE2028] font-semibold truncate">{dir.role}</div>
+                              <div className="text-3xs text-slate-400 font-mono">ফোলিও: {dir.folioNo}</div>
+                            </div>
+                          </div>
+
+                          <span className={`px-2 py-0.5 rounded-md text-3xs font-bold shrink-0 ${
+                            hasTeamAccess 
+                              ? 'bg-emerald-50 text-[#006231] border border-emerald-200' 
+                              : 'bg-slate-100 text-slate-600 border border-slate-200'
+                          }`}>
+                            {hasTeamAccess ? 'অ্যাডমিন সক্রিয়' : 'বোর্ড মেম্বার'}
+                          </span>
+                        </div>
+
+                        {/* Login Credentials Box */}
+                        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1.5">
+                          <div className="flex items-center justify-between text-3xs text-slate-500 font-bold">
+                            <span>লগইন আইডি: <span className="font-mono text-slate-900">{dir.phone || dir.id}</span></span>
+                            <button
+                              type="button"
+                              onClick={() => setShowAccessKeys(prev => ({ ...prev, [dir.id]: !prev[dir.id] }))}
+                              className="text-slate-400 hover:text-slate-700 cursor-pointer"
+                              title={isDirKeyVisible ? 'লুকান' : 'দেখুন'}
+                            >
+                              {isDirKeyVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                          <div className="flex items-center justify-between gap-1 pt-0.5">
+                            <span className="text-3xs text-slate-400">পাসওয়ার্ড:</span>
+                            <code className="font-mono font-bold text-slate-900 text-xs bg-white px-2 py-0.5 rounded border border-slate-200">
+                              {isDirKeyVisible ? (dir.accessKey || 'admin123') : '••••••••'}
+                            </code>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard?.writeText(dir.accessKey || 'admin123');
+                                triggerAlert(`ডিরেক্টর ${dir.name}-এর পাসওয়ার্ড কপি হয়েছে!`);
+                              }}
+                              className="px-2 py-1 rounded bg-white hover:bg-slate-100 text-slate-700 font-bold text-3xs border border-slate-200 inline-flex items-center space-x-1 cursor-pointer transition-colors"
+                              title="পাসওয়ার্ড কপি করুন"
+                            >
+                              <Copy className="w-3 h-3" />
+                              <span>কপি</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                          <a
+                            href={`tel:${dir.phone}`}
+                            className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold inline-flex items-center space-x-1"
+                          >
+                            <Phone className="w-3 h-3 text-[#006231]" />
+                            <span>কল</span>
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => handleGrantDirectorAccess(dir)}
+                            className="px-3 py-1.5 rounded-xl bg-[#006231] hover:bg-[#004d26] text-white text-xs font-bold inline-flex items-center space-x-1 shadow-2xs cursor-pointer"
+                          >
+                            <KeyRound className="w-3 h-3" />
+                            <span>{hasTeamAccess ? 'পারমিশন পরিবর্তন' : 'অ্যাডমিন এক্সেস দিন'}</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. Sub-Admins & Officers Section */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
@@ -2732,39 +2750,41 @@ export default function ManagementDashboard({
 
 
             {/* Director Management: Mobile Expandable Cards + Desktop Full Table */}
-            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden mt-6">
-              <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/50">
+            <div className="space-y-3 mt-4 md:space-y-0 md:bg-white md:rounded-3xl md:border md:border-slate-200/90 md:shadow-xs md:overflow-hidden md:mt-6">
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white md:bg-slate-50/50 rounded-2xl md:rounded-none border border-slate-100 md:border-0 shadow-2xs md:shadow-none">
                 <div>
                   <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
                     <FileSpreadsheet className="w-4 h-4 text-[#006231]" />
                     <span>পরিচালকগণের মোট বিনিয়োগ ও ১০০% শেয়ার বণ্টন তালিকা</span>
                   </h4>
-                  <p className="text-2xs text-slate-500 mt-0.5">এক নজরে সকল ডিরেক্টরের বিনিয়োগকৃত টাকার অঙ্ক ও শেয়ার অনুপাত</p>
+                  <p className="hidden sm:block text-2xs text-slate-500 mt-0.5">এক নজরে সকল ডিরেক্টরের বিনিয়োগকৃত টাকার অঙ্ক ও শেয়ার অনুপাত</p>
                 </div>
-                <div className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-[#006231] font-black text-xs border border-emerald-200 self-start sm:self-auto">
+                {/* Total capital badge hidden on phone view as requested */}
+                <div className="hidden sm:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-[#006231] font-black text-xs border border-emerald-200 self-start sm:self-auto">
                   <span>সর্বমোট মূলধন:</span>
                   <span className="font-mono text-sm">{formatBDT(totalDirectorInvestment)}</span>
                 </div>
               </div>
 
-              {/* 1. MOBILE-ONLY VIEW: Expandable Accordion List */}
-              <div className="md:hidden divide-y divide-slate-100">
+              {/* 1. MOBILE-ONLY VIEW: Clean Box-free Expandable List */}
+              <div className="md:hidden space-y-2.5">
                 {directorsList.map((dir) => {
                   const isExp = Boolean(expandedDirectors[dir.id]);
+                  const isDirKeyVisible = Boolean(showAccessKeys[dir.id]);
 
                   return (
-                    <div key={dir.id} className="transition-colors">
+                    <div key={dir.id} className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-2xs transition-all">
                       {/* Compact Clean Header Row - Click to Toggle Expand */}
                       <div 
                         onClick={() => setExpandedDirectors(prev => ({ ...prev, [dir.id]: !prev[dir.id] }))}
-                        className="py-3 px-3.5 flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50 active:bg-slate-100 select-none"
+                        className="flex items-center justify-between gap-3 cursor-pointer select-none"
                       >
                         <div className="flex items-center space-x-2.5 min-w-0 flex-1">
-                          <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs">
+                          <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
                             {dir.image ? (
                               <img src={dir.image} alt={dir.name} className="w-full h-full object-cover object-top" />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-slate-500 font-bold text-xs bg-slate-100">
+                              <div className="w-full h-full flex items-center justify-center text-slate-600 font-bold text-xs bg-slate-100">
                                 {dir.name.slice(0, 1)}
                               </div>
                             )}
@@ -2777,7 +2797,7 @@ export default function ManagementDashboard({
 
                         {/* Right: Share % and Expand Arrow */}
                         <div className="shrink-0 flex items-center space-x-2">
-                          <span className="font-mono text-xs px-2.5 py-1 rounded-lg bg-emerald-50 text-[#006231] font-bold border border-emerald-200 shadow-2xs">
+                          <span className="font-mono text-xs px-2.5 py-1 rounded-lg bg-emerald-50 text-[#006231] font-bold border border-emerald-200">
                             {dir.sharePercentage}%
                           </span>
                           <div className={`p-1 rounded-lg bg-slate-100 text-slate-500 transition-transform duration-200 ${isExp ? 'rotate-180 text-[#006231] bg-emerald-50' : ''}`}>
@@ -2786,47 +2806,66 @@ export default function ManagementDashboard({
                         </div>
                       </div>
 
-                      {/* Expandable Slide-Down Details on Mobile */}
+                      {/* Clean Expandable Details without nested boxes */}
                       {isExp && (
-                        <div className="px-3.5 pb-3.5 pt-1 bg-slate-50/70 border-t border-slate-100 space-y-2.5 animate-fadeIn">
-                          {/* Investment & Folio Row */}
-                          <div className="grid grid-cols-2 gap-2 text-2xs pt-1">
-                            <div className="p-2.5 rounded-xl bg-white border border-slate-200/80">
-                              <span className="text-3xs text-slate-400 block font-bold uppercase">বিনিয়োগকৃত মূলধন</span>
-                              <strong className="text-[#006231] font-mono font-bold text-xs mt-0.5 block">
-                                {formatBDT(dir.investment)}
-                              </strong>
-                              <span className="text-3xs text-slate-500">{dir.sharePercentage}% মোট ইকুইটি শেয়ার</span>
+                        <div className="mt-3 pt-3 border-t border-slate-100 space-y-3 animate-fadeIn">
+                          {/* Clean Key-Value Grid */}
+                          <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+                            <div>
+                              <span className="text-3xs text-slate-400 block font-bold">বিনিয়োগকৃত মূলধন</span>
+                              <span className="text-[#006231] font-mono font-bold text-sm block mt-0.5">{formatBDT(dir.investment)}</span>
                             </div>
-
-                            <div className="p-2.5 rounded-xl bg-white border border-slate-200/80">
-                              <span className="text-3xs text-slate-400 block font-bold uppercase">শেয়ার ফোলিও ও সনদ</span>
-                              <strong className="text-slate-900 font-mono font-bold text-xs mt-0.5 block">
-                                {dir.folioNo}
-                              </strong>
-                              <span className="text-3xs text-slate-500">{dir.shareUnits?.toLocaleString('bn-BD') || '১,০০০'} টি ইউনিট</span>
+                            <div>
+                              <span className="text-3xs text-slate-400 block font-bold">শেয়ার সনদ ও ফোলিও</span>
+                              <span className="text-slate-900 font-mono font-bold block mt-0.5">{dir.folioNo}</span>
                             </div>
-                          </div>
-                          {/* Financial & Nominee Quick Info Grid */}
-                          <div className="grid grid-cols-2 gap-2 text-2xs">
-                            <div className="p-2.5 rounded-xl bg-white border border-slate-200/80">
-                              <span className="text-3xs text-slate-400 block font-bold uppercase">মোট গৃহীত লভ্যাংশ</span>
-                              <strong className="text-purple-900 font-mono font-bold text-xs mt-0.5 block">
-                                {formatBDT(dir.dividendEarned || 0)}
-                              </strong>
-                              <span className="text-3xs text-purple-600">{(dir.dividendHistory || []).length}টি কিস্তিতে প্রাপ্ত</span>
+                            <div>
+                              <span className="text-3xs text-slate-400 block font-bold">গৃহীত লভ্যাংশ</span>
+                              <span className="text-purple-900 font-mono font-bold block mt-0.5">{formatBDT(dir.dividendEarned || 0)}</span>
                             </div>
-
-                            <div className="p-2.5 rounded-xl bg-white border border-slate-200/80">
-                              <span className="text-3xs text-slate-400 block font-bold uppercase">মনোনীত নমিনি</span>
-                              <strong className="text-slate-800 truncate block mt-0.5">
-                                {dir.nomineeName || 'সংরক্ষিত'}
-                              </strong>
-                              <span className="text-3xs text-slate-500">{dir.nomineeRelation || 'উত্তরাধিকারী'} • {dir.nomineePhone || ''}</span>
+                            <div>
+                              <span className="text-3xs text-slate-400 block font-bold">মনোনীত নমিনি</span>
+                              <span className="text-slate-800 truncate block font-medium mt-0.5">{dir.nomineeName || 'সংরক্ষিত'}</span>
                             </div>
                           </div>
 
-                          {/* Quick Mobile Action Buttons */}
+                          {/* Director Login Info Display */}
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between gap-2 text-xs">
+                            <div className="min-w-0 flex-1">
+                              <span className="text-3xs text-slate-400 block font-bold">লগইন আইডি ও পাসওয়ার্ড</span>
+                              <div className="font-mono text-2xs text-slate-700 truncate mt-0.5">
+                                আইডি: <strong className="text-slate-900">{dir.phone || dir.folioNo}</strong> | পাসওয়ার্ড: <strong className="text-slate-900">{isDirKeyVisible ? (dir.accessKey || 'admin123') : '••••••••'}</strong>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-1 shrink-0">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setShowAccessKeys(prev => ({ ...prev, [dir.id]: !prev[dir.id] }));
+                                }}
+                                className="p-1 rounded bg-white border border-slate-200 text-slate-500 hover:text-slate-800 cursor-pointer"
+                                title={isDirKeyVisible ? 'লুকান' : 'দেখুন'}
+                              >
+                                {isDirKeyVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigator.clipboard?.writeText(dir.accessKey || 'admin123');
+                                  triggerAlert(`পাসওয়ার্ড (${dir.accessKey || 'admin123'}) কপি হয়েছে!`);
+                                }}
+                                className="px-2 py-1 rounded bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-3xs inline-flex items-center space-x-1 cursor-pointer"
+                                title="পাসওয়ার্ড কপি করুন"
+                              >
+                                <Copy className="w-3 h-3" />
+                                <span>কপি</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Quick Clean Action Buttons */}
                           <div className="grid grid-cols-2 gap-2 pt-1">
                             <button
                               type="button"
@@ -2841,7 +2880,7 @@ export default function ManagementDashboard({
                                 });
                                 setIsCapitalDepositModalOpen(true);
                               }}
-                              className="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006231] border border-emerald-200 text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95 shadow-2xs"
+                              className="py-2 px-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006231] border border-emerald-200 text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
                             >
                               <Plus className="w-3.5 h-3.5" />
                               <span>+ মূলধন জমা</span>
@@ -2860,29 +2899,28 @@ export default function ManagementDashboard({
                                 });
                                 setIsDividendModalOpen(true);
                               }}
-                              className="py-2.5 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95 shadow-2xs"
+                              className="py-2 px-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
                             >
                               <TrendingUp className="w-3.5 h-3.5" />
-                              <span>লভ্যাংশ পে</span>
+                              <span>লভ্যাংশ প্রদান</span>
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setSelectedDirectorForCertificate(dir)}
-                              className="py-2.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95 shadow-2xs"
+                              className="py-2 px-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
                             >
                               <Award className="w-3.5 h-3.5 text-amber-600" />
                               <span>শেয়ার সনদ</span>
                             </button>
 
-                            {/* Full Profile Details Button */}
                             <button
                               type="button"
                               onClick={() => {
                                 setSelectedDirectorForProfile(dir);
                                 setDirectorProfileActiveTab('dividends');
                               }}
-                              className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95 shadow-sm"
+                              className="py-2 px-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
                             >
                               <Eye className="w-3.5 h-3.5 text-emerald-400" />
                               <span>পূর্ণাঙ্গ প্রোফাইল</span>
@@ -2903,10 +2941,10 @@ export default function ManagementDashboard({
                       <th className="py-3 px-4">পরিচালকের নাম ও পদবি</th>
                       <th className="py-3 px-4">ফোলিও নং</th>
                       <th className="py-3 px-4">বিনিয়োগকৃত টাকা</th>
-                      <th className="py-3 px-4">শেয়ার অংশীদারিত্ব (% Share)</th>
-                      <th className="py-3 px-4 text-right">গৃহীত লভ্যাংশ (ডিভিডেন্ড)</th>
+                      <th className="py-3 px-4">শেয়ার অংশীদারিত্ব</th>
+                      <th className="py-3 px-4 text-right">গৃহীত মোট লভ্যাংশ</th>
                       <th className="py-3 px-4">মনোনীত নমিনি ও মোবাইল</th>
-                      <th className="py-3 px-4 text-right">কার্যক্রম ও ডিভিডেন্ড পে</th>
+                      <th className="py-3 px-4 text-right">কার্যক্রম ও লভ্যাংশ প্রদান</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -3375,7 +3413,7 @@ export default function ManagementDashboard({
       {/* MODAL: ADD DIRECTOR                                       */}
       {/* ========================================================= */}
       {isDirectorModalOpen && (
-        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -3657,7 +3695,7 @@ export default function ManagementDashboard({
         const totalDividendsReceived = (d.dividendHistory || []).reduce((acc, div) => acc + (div.amount || 0), 0) || d.dividendEarned;
 
         return (
-          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
             {/* Top Fullscreen Header Navbar */}
             <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md">
               <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
@@ -4018,7 +4056,7 @@ export default function ManagementDashboard({
         const certDir = selectedDirectorForCertificate;
 
         return (
-          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F4F1EA] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F4F1EA] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
             {/* Top Fullscreen Header Navigation */}
             <div className="sticky top-0 z-30 bg-slate-950 text-white px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-slate-800 shadow-md no-print">
               <div className="flex items-center space-x-3 sm:space-x-4">
@@ -4220,7 +4258,7 @@ export default function ManagementDashboard({
       {/* FULL SCREEN VIEW: CAPITAL INSTALLMENT DEPOSIT ENTRY       */}
       {/* ========================================================= */}
       {isCapitalDepositModalOpen && capitalDepositTargetDirector && (
-        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -4358,7 +4396,7 @@ export default function ManagementDashboard({
       {/* FULL SCREEN VIEW: DIVIDEND PAYOUT ENTRY                   */}
       {/* ========================================================= */}
       {isDividendModalOpen && dividendTargetDirector && (
-        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -4495,7 +4533,7 @@ export default function ManagementDashboard({
       {/* FULL SCREEN VIEW: ADD CLIENT                              */}
       {/* ========================================================= */}
       {isClientModalOpen && (
-        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -4793,7 +4831,7 @@ export default function ManagementDashboard({
       {/* FULL SCREEN VIEW: ADD PROJECT                             */}
       {/* ========================================================= */}
       {isProjectModalOpen && (
-        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -4976,7 +5014,7 @@ export default function ManagementDashboard({
       {/* FULL SCREEN VIEW: ADD / EDIT TEAM MEMBER & PERMISSIONS    */}
       {/* ========================================================= */}
       {isTeamModalOpen && (
-        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
@@ -4999,7 +5037,7 @@ export default function ManagementDashboard({
                   <h3 className="text-base font-bold text-slate-900">
                     {editingTeamMember 
                       ? (editingTeamMember.isSuperAdmin ? 'সুপার অ্যাডমিন তথ্য ও পাসওয়ার্ড সম্পাদনা' : 'কর্মকর্তার তথ্য ও পারমিশন সম্পাদনা') 
-                      : 'নতুন কর্মকর্তা / সাব-অ্যাডমিন যুক্ত করুন'}
+                      : (teamAddSource === 'director' ? 'বোর্ড ডিরেক্টরকে অ্যাডমিন এক্সেস প্রদান' : 'নতুন কর্মকর্তা / সাব-অ্যাডমিন যুক্ত করুন')}
                   </h3>
                   <p className="text-3xs text-slate-500">টিম মেম্বার রোল ও অ্যাক্সেস কন্ট্রোল</p>
                 </div>
@@ -5015,12 +5053,122 @@ export default function ManagementDashboard({
           </div>
 
           {/* Full Screen Body */}
-          <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 flex justify-center items-start">
+          <div className="flex-1 py-6 sm:py-8 pb-32 sm:pb-16 px-4 sm:px-6 flex justify-center items-start">
             <div className="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
+              {/* Mode Toggle when adding new access */}
+              {!editingTeamMember && (
+                <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-100 rounded-2xl mb-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTeamAddSource('new');
+                      setSelectedDirectorForAccessId(null);
+                      setTeamForm({
+                        name: '',
+                        phone: '',
+                        email: '',
+                        role: 'সাইট ইঞ্জিনিয়ার',
+                        accessKey: 'admin123',
+                        permissions: ['projects', 'expenses'],
+                        directorId: null
+                      });
+                    }}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      teamAddSource === 'new' 
+                        ? 'bg-white text-slate-900 shadow-xs' 
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    + নতুন কর্মকর্তা তৈরি
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTeamAddSource('director');
+                      const firstDir = directorsList[0];
+                      if (firstDir) {
+                        setSelectedDirectorForAccessId(firstDir.id);
+                        setTeamForm({
+                          name: firstDir.name,
+                          phone: firstDir.phone || '',
+                          email: firstDir.email || '',
+                          role: `বোর্ড ডিরেক্টর (${firstDir.role})`,
+                          accessKey: firstDir.accessKey || 'admin123',
+                          permissions: ['directors', 'projects', 'clients', 'payments', 'expenses'],
+                          directorId: firstDir.id
+                        });
+                      }
+                    }}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center space-x-1.5 ${
+                      teamAddSource === 'director' 
+                        ? 'bg-[#006231] text-white shadow-xs' 
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    <Crown className="w-3.5 h-3.5" />
+                    <span>ডিরেক্টর তালিকা থেকে নির্বাচন</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Director Selector Grid */}
+              {teamAddSource === 'director' && !editingTeamMember && (
+                <div className="space-y-2 p-3 bg-amber-50/70 rounded-2xl border border-amber-200/80 mb-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-2xs font-bold text-amber-900 uppercase tracking-wider flex items-center space-x-1">
+                      <Crown className="w-3.5 h-3.5 text-amber-600" />
+                      <span>বোর্ড ডিরেক্টর নির্বাচন করুন:</span>
+                    </label>
+                    <span className="text-3xs text-amber-700 font-medium">ক্লিক করলে তথ্য নিচে বসে যাবে</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {directorsList.map((d) => {
+                      const isSelected = selectedDirectorForAccessId === d.id || teamForm.directorId === d.id;
+                      return (
+                        <div
+                          key={d.id}
+                          onClick={() => {
+                            setSelectedDirectorForAccessId(d.id);
+                            setTeamForm({
+                              ...teamForm,
+                              name: d.name,
+                              phone: d.phone || '',
+                              email: d.email || '',
+                              role: `বোর্ড ডিরেক্টর (${d.role})`,
+                              accessKey: d.accessKey || 'admin123',
+                              permissions: ['directors', 'projects', 'clients', 'payments', 'expenses'],
+                              directorId: d.id
+                            });
+                          }}
+                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center space-x-2.5 ${
+                            isSelected 
+                              ? 'bg-white border-[#006231] shadow-xs ring-2 ring-[#006231]/20' 
+                              : 'bg-white/70 hover:bg-white border-slate-200'
+                          }`}
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-700 shrink-0">
+                            {d.image ? (
+                              <img src={d.image} alt={d.name} className="w-full h-full object-cover rounded-lg" />
+                            ) : (
+                              d.name.slice(0, 1)
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-bold text-xs text-slate-900 truncate">{d.name}</div>
+                            <div className="text-3xs text-[#CE2028] truncate">{d.role}</div>
+                          </div>
+                          {isSelected && <CheckCircle2 className="w-4 h-4 text-[#006231] shrink-0" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <form onSubmit={handleSaveTeam} className="space-y-4">
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  কর্মকর্তার নাম *
+                  {teamAddSource === 'director' ? 'পরিচালকের নাম *' : 'কর্মকর্তার নাম *'}
                 </label>
                 <input
                   type="text"
@@ -5159,7 +5307,7 @@ export default function ManagementDashboard({
         const percent = cl.totalPrice ? Math.round((cl.totalPaid / cl.totalPrice) * 100) : 0;
 
         return (
-          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
             {/* Clean Top Sticky Header */}
             <div className="sticky top-0 z-30 bg-slate-950/95 backdrop-blur-md text-white px-4 sm:px-8 py-3 flex items-center justify-between border-b border-slate-800/80 shadow-md">
               <div className="flex items-center space-x-3">
@@ -5739,7 +5887,7 @@ export default function ManagementDashboard({
         const { trx, client } = selectedReceiptForPrint;
 
         return (
-          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-40 bg-[#F1F5F9] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+          <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F1F5F9] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
             {/* Top Controls Header */}
             <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs no-print">
               <div className="flex items-center space-x-3">
@@ -5883,6 +6031,177 @@ export default function ManagementDashboard({
           </div>
         );
       })()}
+
+      {/* ========================================================= */}
+      {/* FULL SCREEN VIEW: ADMIN PROFILE & SYSTEM CONTROL MENU     */}
+      {/* ========================================================= */}
+      {isProfileOpen && (
+        <div className="fixed inset-0 z-[80] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
+          {/* Top Fullscreen Sticky Header */}
+          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={() => setIsProfileOpen(false)}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1"
+                title="ফিরে যান"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
+              </button>
+              <div className="flex items-center space-x-2">
+                {isSuperAdmin ? (
+                  <Crown className="w-5 h-5 text-amber-500" />
+                ) : (
+                  <ShieldCheck className="w-5 h-5 text-[#006231]" />
+                )}
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    ম্যানেজমেন্ট ও প্রোফাইল কন্ট্রোল
+                  </h3>
+                  <p className="text-3xs text-slate-500">কেন্দ্রীয় অ্যাডমিন প্যানেল ও দ্রুত অ্যাকশন</p>
+                </div>
+              </div>
+            </div>
+            <button 
+              type="button"
+              onClick={() => setIsProfileOpen(false)}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+              title="বন্ধ করুন"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Full Screen Body */}
+          <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 max-w-2xl w-full mx-auto space-y-5 pb-36">
+            {/* 1. VIP Admin Profile Card */}
+            <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg ring-4 shadow-sm shrink-0 ${
+                  isSuperAdmin 
+                    ? 'bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/40' 
+                    : 'bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white ring-[#CE2028]/25'
+                }`}>
+                  {isSuperAdmin ? <Crown className="w-7 h-7 text-amber-100" /> : (admin?.name ? admin.name.slice(0, 2) : 'ম্যা')}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center space-x-2">
+                    <h3 className="text-lg font-black text-slate-900 truncate">
+                      {admin?.name || 'সুপার অ্যাডমিন'}
+                    </h3>
+                    {isSuperAdmin && <Crown className="w-4 h-4 text-amber-500 shrink-0" />}
+                  </div>
+                  <p className="text-xs text-[#006231] font-bold mt-0.5">
+                    {isSuperAdmin ? 'সুপার অ্যাডমিন (Master Admin)' : (admin?.role || 'ম্যানেজমেন্ট টিম')}
+                  </p>
+                  <p className="text-3xs text-slate-500 font-mono mt-0.5 truncate">
+                    {admin?.email || admin?.phone || 'alemarah.officialbd@gmail.com'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. System Settings Quick Access */}
+            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-3">
+              <div className="text-3xs font-black uppercase tracking-wider text-slate-400">
+                সিস্টেম অ্যাকশন ও সিকিউরিটি
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  navigateToTab('settings');
+                }}
+                className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200/60 transition-all text-left cursor-pointer group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#006231] text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <Settings className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-slate-900 group-hover:text-[#006231]">
+                      সিস্টেম সেটিংস ও সিকিউরিটি পিন
+                    </div>
+                    <div className="text-3xs text-slate-500 font-medium">
+                      ভাষা পরিবর্তন ও ডিলিট মাস্টার পিন কনফিগারেশন
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+            {/* 3. All Dashboard Tabs Grid */}
+            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-3">
+              <div className="text-3xs font-black uppercase tracking-wider text-slate-400">
+                ড্যাশবোর্ডের সকল বিভাগ (দ্রুত নেভিগেশন)
+              </div>
+              <div className="grid grid-cols-2 gap-2.5">
+                {managementNavItems.map(item => {
+                  const ItemIcon = item.icon;
+                  const isCur = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        navigateToTab(item.id);
+                      }}
+                      className={`p-3.5 rounded-2xl flex items-center space-x-2.5 text-xs font-bold transition-all text-left cursor-pointer ${
+                        isCur 
+                          ? 'bg-[#CE2028] text-white shadow-md shadow-[#CE2028]/25' 
+                          : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/60'
+                      }`}
+                    >
+                      <ItemIcon className={`w-4 h-4 shrink-0 ${isCur ? 'text-white' : 'text-slate-500'}`} />
+                      <span className="truncate">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 4. External Links & Hotline */}
+            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  onNavigateHome();
+                }}
+                className="w-full flex items-center space-x-3 px-3.5 py-3 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold transition-colors text-left cursor-pointer border border-slate-100"
+              >
+                <Home className="w-4 h-4 text-[#CE2028]" />
+                <span>মূল ওয়েবসাইটে ফিরে যান</span>
+              </button>
+
+              <a
+                href="tel:01918646575"
+                className="w-full flex items-center space-x-3 px-3.5 py-3 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold transition-colors text-left border border-slate-100"
+              >
+                <Phone className="w-4 h-4 text-[#006231]" />
+                <span>সাইট হটলাইনে কল করুন (01918-646575)</span>
+              </a>
+            </div>
+
+            {/* 5. Logout Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsProfileOpen(false);
+                onLogout();
+              }}
+              className="w-full flex items-center justify-center space-x-2 px-4 py-3.5 rounded-2xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white transition-all text-xs font-bold cursor-pointer border border-red-200/60 shadow-2xs"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>সিস্টেম থেকে লগআউট করুন</span>
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
