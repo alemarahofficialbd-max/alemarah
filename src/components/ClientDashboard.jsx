@@ -777,24 +777,24 @@ export default function ClientDashboard({
       </div>
 
       {/* ========================================================= */}
-      {/* 3. MOBILE VIEW ONLY: FLOATING PILL FOOTER NAVBAR          */}
+      {/* 3. MOBILE VIEW ONLY: BOTTOM FOOTER NAVBAR (EDGE TO EDGE & ATTACHED TO BOTTOM) */}
       {/* (HIDDEN ON DESKTOP - SINCE DESKTOP USES LEFT SIDEBAR)    */}
       {/* ========================================================= */}
-      <nav className="md:hidden fixed bottom-3 left-4 right-4 z-50 max-w-sm mx-auto">
-        <div className="bg-white/95 backdrop-blur-2xl border border-slate-200 shadow-2xl rounded-full py-1.5 px-3 flex items-center justify-around ring-1 ring-black/5">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-2xl border-t border-slate-200 shadow-lg">
+        <div className="flex items-center justify-around py-2 px-3 max-w-lg mx-auto">
           {/* 1. কাস্টমার তথ্য */}
           <button
             onClick={() => setActiveTab('details')}
             aria-label="কাস্টমার তথ্য"
             title="কাস্টমার তথ্য"
-            className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
+            className={`p-2 rounded-xl transition-all cursor-pointer relative ${
               activeTab === 'details' 
-                ? 'bg-red-50 text-[#CE2028] scale-110 shadow-xs' 
+                ? 'bg-red-50 text-[#CE2028] scale-105 shadow-2xs font-bold' 
                 : 'text-slate-400 hover:text-slate-600'
             }`}
           >
             {activeTab === 'details' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute top-1 right-1.5 animate-pulse"></span>
             )}
             <User className="w-5 h-5" />
           </button>
@@ -804,14 +804,14 @@ export default function ClientDashboard({
             onClick={() => setActiveTab('payments')}
             aria-label="কিস্তির হিসাব"
             title="কিস্তির হিসাব"
-            className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
+            className={`p-2 rounded-xl transition-all cursor-pointer relative ${
               activeTab === 'payments' 
-                ? 'bg-red-50 text-[#CE2028] scale-110 shadow-xs' 
+                ? 'bg-red-50 text-[#CE2028] scale-105 shadow-2xs font-bold' 
                 : 'text-slate-400 hover:text-slate-600'
             }`}
           >
             {activeTab === 'payments' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute top-1 right-1.5 animate-pulse"></span>
             )}
             <CreditCard className="w-5 h-5" />
           </button>
@@ -821,14 +821,14 @@ export default function ClientDashboard({
             onClick={() => setActiveTab('progress')}
             aria-label="কাজের অগ্রগতি"
             title="কাজের অগ্রগতি"
-            className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
+            className={`p-2 rounded-xl transition-all cursor-pointer relative ${
               activeTab === 'progress' 
-                ? 'bg-red-50 text-[#CE2028] scale-110 shadow-xs' 
+                ? 'bg-red-50 text-[#CE2028] scale-105 shadow-2xs font-bold' 
                 : 'text-slate-400 hover:text-slate-600'
             }`}
           >
             {activeTab === 'progress' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute top-1 right-1.5 animate-pulse"></span>
             )}
             <HardHat className="w-5 h-5" />
           </button>
@@ -838,14 +838,14 @@ export default function ClientDashboard({
             onClick={() => setActiveTab('history')}
             aria-label="জমার হিস্ট্রি"
             title="জমার হিস্ট্রি"
-            className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
+            className={`p-2 rounded-xl transition-all cursor-pointer relative ${
               activeTab === 'history' 
-                ? 'bg-red-50 text-[#CE2028] scale-110 shadow-xs' 
+                ? 'bg-red-50 text-[#CE2028] scale-105 shadow-2xs font-bold' 
                 : 'text-slate-400 hover:text-slate-600'
             }`}
           >
             {activeTab === 'history' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute top-1 right-1.5 animate-pulse"></span>
             )}
             <FileText className="w-5 h-5" />
           </button>
@@ -855,12 +855,12 @@ export default function ClientDashboard({
             onClick={() => setActiveTab('profile')}
             aria-label="প্রোফাইল"
             title="প্রোফাইল"
-            className={`p-1.5 rounded-full transition-all cursor-pointer relative ${
-              activeTab === 'profile' ? 'scale-110' : 'hover:opacity-80'
+            className={`p-1 rounded-xl transition-all cursor-pointer relative ${
+              activeTab === 'profile' ? 'scale-105' : 'hover:opacity-80'
             }`}
           >
             {activeTab === 'profile' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute top-0.5 right-0.5 animate-pulse"></span>
             )}
             <div className="relative">
               {avatarImage ? (

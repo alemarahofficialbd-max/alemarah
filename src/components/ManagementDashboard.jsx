@@ -1380,7 +1380,7 @@ export default function ManagementDashboard({
               </div>
             </div>
 
-            {/* Mobile-First Clients Cards View: Clean & Compact List */}
+            {/* Mobile-First Clients Cards View: Clean & Compact List (Only Name, Small Project Name & Due Amount) */}
             <div className="block md:hidden space-y-2.5">
               {filteredClients.map((cl) => {
                 const due = (cl.totalPrice || 0) - (cl.totalPaid || 0);
@@ -1401,27 +1401,19 @@ export default function ManagementDashboard({
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center space-x-1.5 flex-wrap">
-                          <h4 className="font-bold text-slate-900 text-sm group-hover:text-[#006231] transition-colors leading-snug break-words">
-                            {cl.name}
-                          </h4>
-                          <span className="font-mono text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded text-3xs font-semibold shrink-0">
-                            {cl.id}
-                          </span>
-                        </div>
-                        <div className="text-2xs text-slate-500 font-medium truncate mt-0.5 flex items-center space-x-1.5">
-                          <span className="text-slate-700 font-semibold truncate">{cl.projectName}</span>
-                        </div>
+                        <h4 className="font-bold text-slate-900 text-sm group-hover:text-[#006231] transition-colors leading-snug truncate">
+                          {cl.name}
+                        </h4>
+                        <p className="text-2xs text-slate-500 font-medium truncate mt-0.5">
+                          {cl.projectName}
+                        </p>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-2 shrink-0">
                       <div className="text-right">
-                        <span className="inline-block px-2 py-0.5 rounded-lg bg-emerald-50 text-[#006231] border border-emerald-200/70 text-3xs font-bold">
-                          {cl.flatNo.split(' ')[0] || cl.flatNo}
-                        </span>
-                        <div className="text-3xs text-amber-700 font-bold mt-0.5">
-                          বাকি: {formatBDT(due)}
+                        <div className="text-xs font-bold text-amber-700">
+                          বকেয়া: {formatBDT(due)}
                         </div>
                       </div>
                       <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#006231] group-hover:translate-x-0.5 transition-all" />
@@ -3100,10 +3092,10 @@ export default function ManagementDashboard({
       </div>
 
       {/* ========================================================= */}
-      {/* 4. FLOATING PILL FOOTER NAVBAR (EXACTLY 5 ICONS - PHONE ONLY) */}
+      {/* 4. BOTTOM FOOTER NAVBAR (PHONE ONLY - EDGE TO EDGE & ATTACHED TO BOTTOM) */}
       {/* ========================================================= */}
-      <nav className="md:hidden fixed bottom-3 left-4 right-4 z-50 max-w-sm sm:max-w-md mx-auto">
-        <div className="bg-white/95 backdrop-blur-2xl border border-slate-200 shadow-2xl rounded-full py-1.5 px-3 flex items-center justify-around ring-1 ring-black/5">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-2xl border-t border-slate-200 shadow-lg">
+        <div className="flex items-center justify-around py-2 px-3 max-w-lg mx-auto">
           {managementNavItems.filter(item => item.id !== 'settings').map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -3113,14 +3105,14 @@ export default function ManagementDashboard({
                 onClick={() => navigateToTab(item.id)}
                 aria-label={item.shortLabel || item.label}
                 title={item.label}
-                className={`p-2.5 rounded-full transition-all cursor-pointer relative ${
+                className={`p-2 rounded-xl transition-all cursor-pointer relative ${
                   isActive 
-                    ? 'bg-red-50 text-[#CE2028] scale-110 shadow-xs' 
+                    ? 'bg-red-50 text-[#CE2028] scale-105 shadow-2xs font-bold' 
                     : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute -top-1 left-1/2 -translate-x-1/2 animate-pulse"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute top-1 right-1.5 animate-pulse"></span>
                 )}
                 <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
