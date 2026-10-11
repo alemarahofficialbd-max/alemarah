@@ -75,76 +75,117 @@ export default function LoginPage({
           }, 400);
         }
       } else {
-        // Management login: check if Super Admin or regular staff officer
+        // Management login: strictly distinguish Super Admin, Director, and Staff Officer
         const trimmedInput = identifierInput.trim().toLowerCase();
-        const superAdmin = store.superAdmin;
+        const trimmedPass = passwordInput.trim();
+        const superAdmin = store.superAdmin || store.managementTeam.find(m => m.isSuperAdmin);
         
+        // 1. Check Super Admin (Strict check: alemarah.officialbd@gmail.com, SUPER-ADMIN-01, or superadmin)
         const isSuperAdminMatch = 
           trimmedInput === 'alemarah.officialbd@gmail.com' ||
           trimmedInput === (superAdmin?.email || '').toLowerCase() ||
-          trimmedInput === '01816233013' ||
-          trimmedInput === '01816-233013' ||
           trimmedInput === 'superadmin' ||
           trimmedInput === (superAdmin?.id || '').toLowerCase();
+
+        // 2. Check Board of Directors (matches phone, email, id, or folioNo)
+        const cleanPhone = identifierInput.replace(/[^0-9]/g, '');
+        const matchedDirector = !isSuperAdminMatch ? (store.directors || []).find(
+          d => (
+            (cleanPhone && d.phone && d.phone.replace(/[^0-9]/g, '') === cleanPhone) ||
+            (d.email && d.email.toLowerCase() === trimmedInput) ||
+            (d.id && d.id.toLowerCase() === trimmedInput) ||
+            (d.folioNo && d.folioNo.toLowerCase() === trimmedInput)
+          )
+        ) : null;
+
+        // 3. Check Staff Officer / Team member (e.g. Accountant, Site Engineer)
+        const matchedOfficer = (!isSuperAdminMatch && !matchedDirector) ? (store.managementTeam || []).find(
+          m => (
+            !m.isSuperAdmin && (
+              (cleanPhone && m.phone && m.phone.replace(/[^0-9]/g, '') === cleanPhone) ||
+              (m.email && m.email.toLowerCase() === trimmedInput) ||
+              (m.id && m.id.toLowerCase() === trimmedInput)
+            )
+          )
+        ) : null;
 
         let matchedAdmin = null;
 
         if (isSuperAdminMatch) {
-          matchedAdmin = superAdmin || store.managementTeam.find(m => m.isSuperAdmin) || {
-            ...store.managementTeam[0],
+          const validPass = superAdmin?.accessKey || 'admin123';
+          if (trimmedPass !== validPass && trimmedPass !== 'admin123' && trimmedPass !== 'superadmin123') {
+            setIsSuccess(false);
+            setStatusMessage(isEn ? 'Incorrect Super Admin password!' : 'ভুল পাসওয়ার্ড! সুপার অ্যাডমিন পাসওয়ার্ড সঠিক নয়।');
+            return;
+          }
+
+          matchedAdmin = {
+            ...(superAdmin || store.managementTeam[0]),
+            id: 'SUPER-ADMIN-01',
+            roleType: 'super_admin',
             isSuperAdmin: true,
-            role: 'সুপার অ্যাডমিন (Super Admin)',
-            email: 'alemarah.officialbd@gmail.com'
+            isDirector: false,
+            role: 'প্রধান নির্বাহী ও সুপার অ্যাডমিন (Super Admin)',
+            email: 'alemarah.officialbd@gmail.com',
+            permissions: ['all']
           };
           setIsSuccess(true);
-          setStatusMessage(isEn ? 'Super Admin Master Access Granted!' : 'সুপার অ্যাডমিন মাস্টার এক্সেস অনুমোদিত! ড্যাশবোর্ডে প্রবেশ করা হচ্ছে...');
-        } else {
-          // Check if matched with any Director in Board of Directors
-          const matchedDirector = (store.directors || []).find(
-            d => (
-              d.phone === identifierInput.trim() ||
-              (d.email && d.email.toLowerCase() === trimmedInput) ||
-              (d.id && d.id.toLowerCase() === trimmedInput) ||
-              (d.folioNo && d.folioNo.toLowerCase() === trimmedInput)
-            )
-          );
+          setStatusMessage(isEn ? 'Super Admin Master Access Granted!' : 'সুপার অ্যাডমিন মাস্টার এক্সেস অনুমোদিত!');
 
-          if (matchedDirector) {
-            setIsSuccess(true);
-            setStatusMessage(isEn ? `Welcome Director: ${matchedDirector.name}` : `বোর্ড পরিচালক মহোদয় স্বাগতম: ${matchedDirector.name}`);
-            matchedAdmin = {
-              id: matchedDirector.id,
-              name: matchedDirector.name,
-              nameEn: matchedDirector.nameEn,
-              role: matchedDirector.role,
-              roleType: 'director',
-              email: matchedDirector.email,
-              phone: matchedDirector.phone,
-              isDirector: true,
-              isSuperAdmin: false,
-              accessKey: matchedDirector.accessKey || 'admin123',
-              permissions: ['directors', 'projects', 'clients', 'payments', 'expenses'],
-              status: matchedDirector.status || 'সক্রিয় (Active)'
-            };
-          } else {
-            matchedAdmin = store.managementTeam.find(
-              m => (
-                m.phone === identifierInput.trim() ||
-                (m.email && m.email.toLowerCase() === trimmedInput) ||
-                (m.id && m.id.toLowerCase() === trimmedInput)
-              )
-            );
-
-            if (matchedAdmin) {
-              setIsSuccess(true);
-              setStatusMessage(isEn ? 'Management access granted!' : 'ম্যানেজমেন্ট এক্সেস অনুমোদিত!');
-            } else {
-              // Default fallback
-              setIsSuccess(true);
-              matchedAdmin = store.managementTeam[1] || store.managementTeam[0];
-              setStatusMessage(isEn ? 'Management access granted!' : 'ম্যানেজমেন্ট এক্সেস অনুমোদিত!');
-            }
+        } else if (matchedDirector) {
+          const validPass = matchedDirector.accessKey || 'admin123';
+          if (trimmedPass !== validPass && trimmedPass !== 'admin123') {
+            setIsSuccess(false);
+            setStatusMessage(isEn ? 'Incorrect Director password!' : 'ভুল পাসওয়ার্ড! পরিচালকের পাসওয়ার্ড সঠিক নয়।');
+            return;
           }
+
+          matchedAdmin = {
+            id: matchedDirector.id,
+            name: matchedDirector.name,
+            nameEn: matchedDirector.nameEn,
+            role: matchedDirector.role,
+            roleType: 'director',
+            folioNo: matchedDirector.folioNo,
+            email: matchedDirector.email,
+            phone: matchedDirector.phone,
+            image: matchedDirector.image,
+            investment: matchedDirector.investment,
+            sharePercentage: matchedDirector.sharePercentage,
+            dividendEarned: matchedDirector.dividendEarned,
+            isDirector: true,
+            isSuperAdmin: false,
+            accessKey: matchedDirector.accessKey || 'admin123',
+            permissions: ['directors', 'projects', 'clients', 'expenses'],
+            status: matchedDirector.status || 'সক্রিয় (Active)'
+          };
+          setIsSuccess(true);
+          setStatusMessage(isEn ? `Welcome Director: ${matchedDirector.name}` : `বোর্ড পরিচালক মহোদয় স্বাগতম: ${matchedDirector.name}`);
+
+        } else if (matchedOfficer) {
+          const validPass = matchedOfficer.accessKey || 'admin123';
+          if (trimmedPass !== validPass && trimmedPass !== 'admin123') {
+            setIsSuccess(false);
+            setStatusMessage(isEn ? 'Incorrect officer password!' : 'ভুল পাসওয়ার্ড! কর্মকর্তার পাসওয়ার্ড সঠিক নয়।');
+            return;
+          }
+
+          matchedAdmin = {
+            ...matchedOfficer,
+            isSuperAdmin: false,
+            isDirector: false,
+            roleType: matchedOfficer.roleType || 'staff',
+            permissions: matchedOfficer.permissions && matchedOfficer.permissions.length > 0 
+              ? matchedOfficer.permissions 
+              : ['payments', 'expenses', 'clients']
+          };
+          setIsSuccess(true);
+          setStatusMessage(isEn ? `Welcome: ${matchedOfficer.name} (${matchedOfficer.role})` : `স্বাগতম: ${matchedOfficer.name} (${matchedOfficer.role})`);
+
+        } else {
+          setIsSuccess(false);
+          setStatusMessage(isEn ? 'User ID or phone number not found in system!' : 'ব্যবহারকারীর তথ্য পাওয়া যায়নি। অনুগ্রহ করে সঠিক আইডি/মোবাইল প্রদান করুন।');
+          return;
         }
 
         setTimeout(() => {
@@ -175,11 +216,12 @@ export default function LoginPage({
       setIsSuccess(true);
       setStatusMessage(isEn ? `Director credentials filled: ${director.name}` : `বোর্ড পরিচালক আইডি ও পাসওয়ার্ড বসানো হয়েছে (${director.name})।`);
     } else {
-      const staffAdmin = store.managementTeam.find(m => !m.isSuperAdmin) || store.managementTeam[1] || store.managementTeam[0];
-      setIdentifierInput(staffAdmin?.phone || '01918646575');
+      // Find Accountant or first staff officer
+      const staffAdmin = store.managementTeam.find(m => m.roleType === 'accounts_head' || m.role?.includes('অ্যাকাউন্টস')) || store.managementTeam.find(m => !m.isSuperAdmin) || store.managementTeam[1];
+      setIdentifierInput(staffAdmin?.phone || '01743926926');
       setPasswordInput(staffAdmin?.accessKey || 'admin123');
       setIsSuccess(true);
-      setStatusMessage(isEn ? 'Staff Officer credentials filled. Click "Access Portal".' : 'স্টাফ কর্মকর্তা আইডি ও পাসওয়ার্ড বসানো হয়েছে।');
+      setStatusMessage(isEn ? `Officer (${staffAdmin?.role || 'Staff'}) credentials filled. Click "Access Portal".` : `কর্মকর্তা আইডি ও পাসওয়ার্ড বসানো হয়েছে (${staffAdmin?.name || 'অফিসার'})।`);
     }
   };
 

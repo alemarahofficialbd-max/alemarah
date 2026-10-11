@@ -72,9 +72,46 @@ export default function ManagementDashboard({
   onNavigateHome 
 }) {
   const [data, setData] = useState(getManagementData);
+
+  // 1. Identify distinct user role types: Director, Super Admin, or Staff Officer
+  const isDirector = Boolean(
+    admin?.isDirector || 
+    admin?.roleType === 'director' || 
+    (data.directors || []).some(d => (d.id === admin?.id || (d.phone && d.phone === admin?.phone)) && !admin?.isSuperAdmin && admin?.roleType !== 'super_admin')
+  );
+
+  const isSuperAdmin = !isDirector && Boolean(
+    admin?.isSuperAdmin || 
+    admin?.roleType === 'super_admin' || 
+    admin?.id === 'SUPER-ADMIN-01' ||
+    (admin?.email && admin?.email.toLowerCase() === 'alemarah.officialbd@gmail.com') ||
+    (admin?.role && admin.role.includes('সুপার অ্যাডমিন'))
+  );
+
+  const isStaffOfficer = !isSuperAdmin && !isDirector;
+
+  // 2. Identify director profile if logged in as director
+  const loggedInDirector = isDirector 
+    ? (data.directors || []).find(d => d.id === admin?.id || d.phone === admin?.phone || d.email === admin?.email) || admin
+    : null;
+
   const [activeTab, setActiveTabState] = useState(() => {
     try {
-      return localStorage.getItem('alemarah_management_tab') || 'clients';
+      const saved = localStorage.getItem('alemarah_management_tab');
+      if (isDirector) {
+        if (saved && ['directors', 'projects', 'clients', 'expenses'].includes(saved)) {
+          return saved;
+        }
+        return 'directors';
+      }
+      if (isStaffOfficer) {
+        const perms = admin?.permissions || [];
+        if (saved && perms.includes(saved) && saved !== 'team' && saved !== 'settings' && saved !== 'directors') {
+          return saved;
+        }
+        return perms[0] || 'payments';
+      }
+      return saved || 'clients';
     } catch {
       return 'clients';
     }
@@ -130,13 +167,6 @@ export default function ManagementDashboard({
       setPinError('ভুল মাস্টার পিন! মুছে ফেলার অনুমতি দেওয়া সম্ভব নয়।');
     }
   };
-
-  // Check if current logged-in account has Super Admin privileges
-  const isSuperAdmin = admin?.isSuperAdmin || 
-    admin?.roleType === 'super_admin' || 
-    admin?.email === 'alemarah.officialbd@gmail.com' ||
-    admin?.phone === '01816233013' ||
-    Boolean(admin?.role?.includes('সুপার অ্যাডমিন'));
 
   const profileRef = useRef(null);
 
@@ -971,11 +1001,30 @@ export default function ManagementDashboard({
   ];
 
   const managementNavItems = allNavItems.filter(item => {
-    if (isSuperAdmin) return true; // Super admin has 100% full master access
-    if (item.id === 'settings') return true;
+    // 1. Super Admin has unrestricted 100% master access to all tabs
+    if (isSuperAdmin) return true;
+
+    // 2. Tab 5 (team) and Tab 7 (settings) are strictly reserved for Super Admin
+    if (item.id === 'team' || item.id === 'settings') return false;
+
+    // 3. Board Director access: Directors, Projects, Clients, Expenses
+    if (isDirector) {
+      return ['directors', 'projects', 'clients', 'expenses'].includes(item.id);
+    }
+
+    // 4. Staff / Officer (Accountant, Engineer, etc.): strictly permitted modules only
+    if (item.id === 'directors') return false;
     const perms = admin?.permissions || [];
-    return perms.includes(item.id) || perms.includes('all');
+    return perms.includes(item.id);
   });
+
+  // Automatically enforce tab permissions so unauthorized tabs cannot be accessed
+  useEffect(() => {
+    const allowedTabIds = managementNavItems.map(i => i.id);
+    if (allowedTabIds.length > 0 && !allowedTabIds.includes(activeTab)) {
+      setActiveTab(allowedTabIds[0]);
+    }
+  }, [managementNavItems, activeTab]);
 
   // Centralized Tab Navigation: automatically dismisses all open modals/profile views
   const navigateToTab = (tabId) => {
@@ -1129,19 +1178,31 @@ export default function ManagementDashboard({
               className="relative cursor-pointer rounded-full p-0 border-0 bg-transparent focus:outline-none transition-transform hover:scale-105 active:scale-95 block"
               title="ম্যানেজমেন্ট মেনু ও প্রোফাইল"
             >
-              <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs ring-2 shadow-xs ${
+              <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs ring-2 shadow-xs overflow-hidden ${
                 isSuperAdmin 
                   ? 'bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/60' 
-                  : 'bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white ring-[#CE2028]/30'
+                  : isDirector
+                    ? 'bg-gradient-to-tr from-[#006231] to-emerald-600 text-white ring-emerald-400/60'
+                    : 'bg-gradient-to-tr from-slate-700 to-slate-900 text-white ring-slate-300'
               }`}>
-                {isSuperAdmin ? <Crown className="w-4 h-4 text-amber-200" /> : (admin?.name ? admin.name.slice(0, 2) : 'ম্যা')}
+                {isSuperAdmin ? (
+                  <Crown className="w-4 h-4 text-amber-200" />
+                ) : isDirector ? (
+                  loggedInDirector?.image ? (
+                    <img src={loggedInDirector.image} alt={loggedInDirector.name} className="w-full h-full object-cover object-top" />
+                  ) : (
+                    <Award className="w-4 h-4 text-white" />
+                  )
+                ) : (
+                  <ShieldCheck className="w-4 h-4 text-white" />
+                )}
               </div>
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
             </button>
           </div>
         </header>
 
-        {/* Desktop-Only Subtle Top Bar (Breadcrumb & Live Project Tag) */}
+        {/* Desktop-Only Subtle Top Bar (Breadcrumb & Role Status) */}
         <header className="hidden md:flex items-center justify-between px-6 lg:px-8 py-4 bg-white/60 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-20">
           <div>
             <h1 className="text-base font-black text-slate-900">
@@ -1153,20 +1214,57 @@ export default function ManagementDashboard({
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-red-50 text-[#CE2028] text-xs font-bold border border-red-200/60">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>অ্যাডমিন কন্ট্রোল এক্সেস</span>
+            <div className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
+              isSuperAdmin 
+                ? 'bg-amber-50 text-amber-900 border-amber-200/80' 
+                : isDirector
+                  ? 'bg-emerald-50 text-[#006231] border-emerald-200/80'
+                  : 'bg-slate-100 text-slate-800 border-slate-200'
+            }`}>
+              {isSuperAdmin ? (
+                <>
+                  <Crown className="w-3.5 h-3.5 text-amber-600" />
+                  <span>সুপার অ্যাডমিন মাস্টার এক্সেস</span>
+                </>
+              ) : isDirector ? (
+                <>
+                  <Award className="w-3.5 h-3.5 text-[#006231]" />
+                  <span>বোর্ড ডিরেক্টর ও শেয়ারহোল্ডার</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="w-3.5 h-3.5 text-slate-600" />
+                  <span>{admin?.role || 'কর্মকর্তা প্যানেল'}</span>
+                </>
+              )}
             </div>
+
             <button
               type="button"
               onClick={() => setIsProfileOpen(true)}
               className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all cursor-pointer"
-              title="অ্যাডমিন মেনু ও প্রোফাইল"
+              title="ইউজার প্রোফাইল ও মেনু"
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white flex items-center justify-center text-3xs font-black">
-                {isSuperAdmin ? <Crown className="w-3.5 h-3.5 text-amber-200" /> : (admin?.name ? admin.name.slice(0, 1) : 'A')}
+              <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center text-3xs font-black">
+                {isSuperAdmin ? (
+                  <div className="w-full h-full bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white flex items-center justify-center">
+                    <Crown className="w-3.5 h-3.5 text-amber-200" />
+                  </div>
+                ) : isDirector ? (
+                  loggedInDirector?.image ? (
+                    <img src={loggedInDirector.image} alt={loggedInDirector.name} className="w-full h-full object-cover object-top" />
+                  ) : (
+                    <div className="w-full h-full bg-[#006231] text-white flex items-center justify-center font-bold">
+                      {loggedInDirector?.name?.slice(0, 1)}
+                    </div>
+                  )
+                ) : (
+                  <div className="w-full h-full bg-slate-700 text-white flex items-center justify-center">
+                    <ShieldCheck className="w-3.5 h-3.5 text-white" />
+                  </div>
+                )}
               </div>
-              <span className="hidden lg:inline">{admin?.name || 'অ্যাডমিন'}</span>
+              <span className="hidden lg:inline">{isDirector ? (loggedInDirector?.name || admin?.name) : (admin?.name || 'অ্যাডমিন')}</span>
             </button>
             <button
               onClick={onNavigateHome}
@@ -2696,15 +2794,83 @@ export default function ManagementDashboard({
               </div>
 
               <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setIsDirectorModalOpen(true)}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>+ নতুন ডিরেক্টর যুক্ত করুন</span>
-                </button>
+                {isSuperAdmin && (
+                  <button
+                    onClick={() => setIsDirectorModalOpen(true)}
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>+ নতুন ডিরেক্টর যুক্ত করুন</span>
+                  </button>
+                )}
+                {isDirector && loggedInDirector && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDirectorForCertificate(loggedInDirector)}
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-200 hover:bg-emerald-100 font-bold text-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                  >
+                    <ScrollText className="w-4 h-4" />
+                    <span>আমার শেয়ার সার্টিফিকেট</span>
+                  </button>
+                )}
               </div>
             </div>
+
+            {/* VIP Director Personal Shareholder Profile Card */}
+            {isDirector && loggedInDirector && (
+              <div className="bg-gradient-to-br from-[#006231] via-[#0A4D27] to-[#042814] rounded-3xl p-5 sm:p-7 text-white shadow-xl space-y-5 border border-emerald-400/20 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+
+                <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start justify-between gap-5">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-3 sm:space-y-0 sm:space-x-4 text-center sm:text-left">
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white/10 border-2 border-white/20 shrink-0 shadow-md">
+                      {loggedInDirector.image ? (
+                        <img src={loggedInDirector.image} alt={loggedInDirector.name} className="w-full h-full object-cover object-top" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center font-bold text-2xl text-white">
+                          {loggedInDirector.name.slice(0, 1)}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/15 text-emerald-200 text-3xs font-bold uppercase tracking-wider mb-1.5 border border-white/10">
+                        <Award className="w-3.5 h-3.5" />
+                        <span>আপনার ব্যক্তিগত শেয়ারহোল্ডার পোর্টফোলিও</span>
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-black text-white">{loggedInDirector.name}</h2>
+                      <p className="text-xs text-emerald-200 font-semibold mt-0.5">
+                        {loggedInDirector.role} | ফোলিও নম্বর: <span className="font-mono text-white font-bold">{loggedInDirector.folioNo}</span>
+                      </p>
+                      <p className="text-3xs text-emerald-300 font-mono mt-0.5">মোবাইল: {loggedInDirector.phone}</p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDirectorForCertificate(loggedInDirector)}
+                    className="px-4 py-2.5 rounded-xl bg-white text-[#006231] hover:bg-emerald-50 text-xs font-bold transition-all shadow-md flex items-center space-x-2 cursor-pointer shrink-0 active:scale-95"
+                  >
+                    <ScrollText className="w-4 h-4 text-[#006231]" />
+                    <span>শেয়ার সার্টিফিকেট ডাউনলোড / প্রিন্ট</span>
+                  </button>
+                </div>
+
+                <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+                  <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15">
+                    <span className="text-3xs text-emerald-200 font-bold block">আপনার পরিশোধিত মূলধন</span>
+                    <span className="text-base sm:text-xl font-mono font-black text-white block mt-0.5">{formatBDT(loggedInDirector.investment)}</span>
+                  </div>
+                  <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15">
+                    <span className="text-3xs text-emerald-200 font-bold block">শেয়ার অংশীদারিত্ব</span>
+                    <span className="text-base sm:text-xl font-mono font-black text-emerald-300 block mt-0.5">{loggedInDirector.sharePercentage}%</span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 p-3.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15">
+                    <span className="text-3xs text-emerald-200 font-bold block">গৃহীত মোট লভ্যাংশ</span>
+                    <span className="text-base sm:text-xl font-mono font-black text-amber-300 block mt-0.5">{formatBDT(loggedInDirector.dividendEarned)}</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Top KPI Metrics for Directors (Clean without cluttered badges) */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -6085,63 +6251,186 @@ export default function ManagementDashboard({
 
           {/* Full Screen Body */}
           <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 max-w-2xl w-full mx-auto space-y-5 pb-36">
-            {/* 1. VIP Admin Profile Card */}
-            <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg ring-4 shadow-sm shrink-0 ${
-                  isSuperAdmin 
-                    ? 'bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/40' 
-                    : 'bg-gradient-to-tr from-[#CE2028] to-[#991B1B] text-white ring-[#CE2028]/25'
-                }`}>
-                  {isSuperAdmin ? <Crown className="w-7 h-7 text-amber-100" /> : (admin?.name ? admin.name.slice(0, 2) : 'ম্যা')}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center space-x-2">
-                    <h3 className="text-lg font-black text-slate-900 truncate">
-                      {admin?.name || 'সুপার অ্যাডমিন'}
-                    </h3>
-                    {isSuperAdmin && <Crown className="w-4 h-4 text-amber-500 shrink-0" />}
-                  </div>
-                  <p className="text-xs text-[#006231] font-bold mt-0.5">
-                    {isSuperAdmin ? 'সুপার অ্যাডমিন (Master Admin)' : (admin?.role || 'ম্যানেজমেন্ট টিম')}
-                  </p>
-                  <p className="text-3xs text-slate-500 font-mono mt-0.5 truncate">
-                    {admin?.email || admin?.phone || 'alemarah.officialbd@gmail.com'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. System Settings Quick Access */}
-            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-3">
-              <div className="text-3xs font-black uppercase tracking-wider text-slate-400">
-                সিস্টেম অ্যাকশন ও সিকিউরিটি
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsProfileOpen(false);
-                  navigateToTab('settings');
-                }}
-                className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200/60 transition-all text-left cursor-pointer group"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#006231] text-white flex items-center justify-center shrink-0 shadow-xs">
-                    <Settings className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-slate-900 group-hover:text-[#006231]">
-                      সিস্টেম সেটিংস ও সিকিউরিটি পিন
+            {/* 1. VIP Role Profile Card */}
+            {isDirector && loggedInDirector ? (
+              <div className="bg-gradient-to-br from-amber-50/70 via-white to-slate-50 rounded-3xl p-5 sm:p-6 border border-amber-200/80 shadow-xs space-y-5">
+                <div className="flex items-center space-x-4">
+                  {loggedInDirector.image ? (
+                    <img
+                      src={loggedInDirector.image}
+                      alt={loggedInDirector.name}
+                      className="w-16 h-16 rounded-2xl object-cover ring-4 ring-amber-400/30 shadow-sm shrink-0"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#006231] to-[#CE2028] text-white flex items-center justify-center font-black text-xl ring-4 ring-amber-400/30 shadow-sm shrink-0">
+                      {loggedInDirector.name?.slice(0, 2) || 'ডি'}
                     </div>
-                    <div className="text-3xs text-slate-500 font-medium">
-                      ভাষা পরিবর্তন ও ডিলিট মাস্টার পিন কনফিগারেশন
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center space-x-2">
+                      <h3 className="text-lg font-black text-slate-900 truncate">
+                        {loggedInDirector.name}
+                      </h3>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-3xs font-extrabold bg-amber-100 text-amber-800 border border-amber-300 shrink-0">
+                        বোর্ড ডিরেক্টর
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#006231] font-bold mt-0.5">
+                      {loggedInDirector.role || 'পরিচালক ও শেয়ারহোল্ডার'}
+                    </p>
+                    <p className="text-3xs text-slate-500 font-mono mt-0.5">
+                      ফোলিও নং: {loggedInDirector.folioNo || 'AEP-DIR'} • ফোন: {loggedInDirector.phone || 'N/A'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Director Portfolio Metrics */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
+                  <div className="p-3 bg-white rounded-2xl border border-amber-100 shadow-2xs">
+                    <div className="text-3xs font-bold text-slate-400 uppercase">মোট বিনিয়োগ</div>
+                    <div className="text-sm sm:text-base font-black text-[#006231] font-mono mt-0.5">
+                      {formatBDT(loggedInDirector.investment || 0)}
                     </div>
                   </div>
+                  <div className="p-3 bg-white rounded-2xl border border-amber-100 shadow-2xs">
+                    <div className="text-3xs font-bold text-slate-400 uppercase">শেয়ার অংশ</div>
+                    <div className="text-sm sm:text-base font-black text-[#CE2028] font-mono mt-0.5">
+                      {loggedInDirector.sharePercentage || 0}%
+                    </div>
+                  </div>
+                  <div className="p-3 bg-white rounded-2xl border border-amber-100 shadow-2xs col-span-2 sm:col-span-1">
+                    <div className="text-3xs font-bold text-slate-400 uppercase">অর্জিত লভ্যাংশ</div>
+                    <div className="text-sm sm:text-base font-black text-amber-700 font-mono mt-0.5">
+                      {formatBDT(loggedInDirector.dividendEarned || 0)}
+                    </div>
+                  </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
+
+                {/* Direct Action Buttons for Director */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      setSelectedDirectorForCertificate(loggedInDirector);
+                    }}
+                    className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-[#CE2028] hover:opacity-95 text-white font-bold text-xs shadow-sm cursor-pointer transition-all"
+                  >
+                    <Award className="w-4 h-4 text-amber-200" />
+                    <span>শেয়ার সার্টিফিকেট প্রিন্ট</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      setSelectedDirectorForProfile(loggedInDirector);
+                    }}
+                    className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/80 font-bold text-xs shadow-2xs cursor-pointer transition-all"
+                  >
+                    <Eye className="w-4 h-4 text-[#006231]" />
+                    <span>পূর্ণাঙ্গ প্রোফাইল বিবরণ</span>
+                  </button>
+                </div>
+              </div>
+            ) : isSuperAdmin ? (
+              <div className="bg-gradient-to-br from-amber-500/10 via-white to-red-500/10 rounded-3xl p-5 sm:p-6 border border-amber-300/80 shadow-xs space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg ring-4 shadow-sm shrink-0 bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/40">
+                    <Crown className="w-7 h-7 text-amber-100" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center space-x-2">
+                      <h3 className="text-lg font-black text-slate-900 truncate">
+                        {admin?.name || 'সুপার অ্যাডমিন'}
+                      </h3>
+                      <Crown className="w-4 h-4 text-amber-500 shrink-0" />
+                    </div>
+                    <p className="text-xs text-[#006231] font-bold mt-0.5">
+                      সুপার অ্যাডমিন (Master Admin)
+                    </p>
+                    <p className="text-3xs text-slate-500 font-mono mt-0.5 truncate">
+                      {admin?.email || 'alemarah.officialbd@gmail.com'}
+                    </p>
+                  </div>
+                </div>
+                <div className="p-3 bg-white/80 rounded-2xl border border-amber-200/60 flex items-center justify-between text-xs font-bold text-slate-700">
+                  <span className="flex items-center space-x-2">
+                    <ShieldCheck className="w-4 h-4 text-[#006231]" />
+                    <span>সিস্টেম পারমিশন: সম্পূর্ণ ৭টি মডিউল</span>
+                  </span>
+                  <span className="text-3xs px-2 py-0.5 rounded-full bg-emerald-100 text-[#006231] font-mono">
+                    MASTER ACCESS
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg ring-4 shadow-sm shrink-0 bg-gradient-to-tr from-slate-700 to-slate-900 text-white ring-slate-300">
+                    <ShieldCheck className="w-7 h-7 text-emerald-400" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center space-x-2">
+                      <h3 className="text-lg font-black text-slate-900 truncate">
+                        {admin?.name || 'অফিসার / সাব-অ্যাডমিন'}
+                      </h3>
+                    </div>
+                    <p className="text-xs text-[#006231] font-bold mt-0.5">
+                      {admin?.role || 'কর্মকর্তা'}
+                    </p>
+                    <p className="text-3xs text-slate-500 font-mono mt-0.5 truncate">
+                      {admin?.phone || admin?.email || 'অফিসিয়াল একাউন্ট'}
+                    </p>
+                  </div>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/70 space-y-2">
+                  <div className="text-3xs font-black uppercase text-slate-400">অনুমোদিত অ্যাক্সেস মডিউল:</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(admin?.permissions || []).map((permKey) => (
+                      <span key={permKey} className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[#006231] text-3xs font-bold">
+                        {permKey === 'clients' ? 'গ্রাহক ও বুকিং' :
+                         permKey === 'payments' ? 'পেমেন্ট ও কালেকশন' :
+                         permKey === 'projects' ? 'প্রজেক্ট কন্ট্রোল' :
+                         permKey === 'expenses' ? 'খরচ ও ক্যাশ' : permKey}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 2. System Settings Quick Access (Super Admin Only) */}
+            {isSuperAdmin && (
+              <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-3">
+                <div className="text-3xs font-black uppercase tracking-wider text-slate-400">
+                  সিস্টেম অ্যাকশন ও সিকিউরিটি
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    navigateToTab('settings');
+                  }}
+                  className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200/60 transition-all text-left cursor-pointer group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#006231] text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Settings className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-slate-900 group-hover:text-[#006231]">
+                        সিস্টেম সেটিংস ও সিকিউরিটি পিন
+                      </div>
+                      <div className="text-3xs text-slate-500 font-medium">
+                        ভাষা পরিবর্তন ও ডিলিট মাস্টার পিন কনফিগারেশন
+                      </div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            )}
 
             {/* 3. All Dashboard Tabs Grid */}
             <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-3">
