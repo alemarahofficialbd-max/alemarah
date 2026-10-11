@@ -13,7 +13,8 @@ import {
   CheckCircle2,
   HardHat,
   Key,
-  Crown
+  Crown,
+  Shield
 } from 'lucide-react';
 import { getManagementData } from '../data/managementStore';
 
