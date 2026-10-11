@@ -1430,10 +1430,6 @@ export default function ManagementDashboard({
                         </div>
                       </div>
                     </div>
-
-                    <div className="flex items-center shrink-0 pl-1">
-                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#006231] group-hover:translate-x-0.5 transition-all" />
-                    </div>
                   </div>
                 );
               })}
