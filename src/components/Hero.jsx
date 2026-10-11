@@ -147,10 +147,10 @@ export default function Hero({
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 font-medium focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all cursor-pointer"
               >
                 <option value="all">{t.hero.searchBox.allLocations}</option>
-                <option value="Signboard-Sanarpar">{lang === 'en' ? 'Signboard - Sanarpar' : 'সাইনবোর্ড - সানারপাড়'}</option>
-                <option value="Purana Paltan">{lang === 'en' ? 'Purana Paltan' : 'পুরানা পল্টন'}</option>
+                <option value="Sanarpar">{lang === 'en' ? 'Signboard - Sanarpar' : 'সাইনবোর্ড - সানারপাড়'}</option>
+                <option value="Paltan">{lang === 'en' ? 'Purana Paltan' : 'পুরানা পল্টন'}</option>
                 <option value="Commercial Hub">{lang === 'en' ? 'Commercial Zone' : 'বাণিজ্যিক জোন'}</option>
-                <option value="Agro Project">{lang === 'en' ? 'Emarah Agro' : 'ইমারাহ এগ্রো'}</option>
+                <option value="Agro">{lang === 'en' ? 'Emarah Agro' : 'ইমারাহ এগ্রো'}</option>
                 <option value="Dhaka">{lang === 'en' ? 'Dhaka Metropolitan' : 'ঢাকা মেট্রোপলিটন'}</option>
               </select>
             </div>

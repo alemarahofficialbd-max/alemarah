@@ -326,7 +326,8 @@ export const initialManagementData = {
         { id: 'DIV-501', date: '৩১ ডিসেম্বর, ২০২৪', amount: 1095000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-501', note: 'বার্ষিক শেয়ার লভ্যাংশ' }
       ]
     }
-  ]
+  ],
+  inquiries: []
 };
 
 // Load saved data or return default
@@ -339,7 +340,7 @@ export const getManagementData = () => {
       if (!parsed.directors || parsed.directors.length === 0) {
         parsed.directors = canonicalDirs;
       } else {
-        // Ensure the 5 canonical directors are preserved in the exact 1-5 serial order
+        // Ensure canonical directors preserve existing edits and serial order
         parsed.directors = canonicalDirs.map(defaultDir => {
           const existing = parsed.directors.find(x => x.id === defaultDir.id);
           if (!existing) return defaultDir;
@@ -347,11 +348,11 @@ export const getManagementData = () => {
           return {
             ...defaultDir,
             ...existing,
-            name: defaultDir.name,
-            nameEn: defaultDir.nameEn,
-            role: defaultDir.role,
-            roleEn: defaultDir.roleEn,
-            image: defaultDir.image,
+            name: existing.name || defaultDir.name,
+            nameEn: existing.nameEn || defaultDir.nameEn,
+            role: existing.role || defaultDir.role,
+            roleEn: existing.roleEn || defaultDir.roleEn,
+            image: existing.image || defaultDir.image,
             folioNo: cleanedFolioNo,
             accessKey: existing.accessKey || defaultDir.accessKey || 'admin123',
             installments: existing.installments && existing.installments.length > 0 
@@ -391,6 +392,9 @@ export const getManagementData = () => {
         parsed.managementTeam = initialManagementData.managementTeam;
       } else if (!parsed.managementTeam.some(m => m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com')) {
         parsed.managementTeam = [initialManagementData.superAdmin, ...parsed.managementTeam];
+      }
+      if (!parsed.inquiries) {
+        parsed.inquiries = [];
       }
       return parsed;
     }
@@ -460,6 +464,62 @@ export const syncToSupabase = async (data) => {
         budget: Number(p.budget) || 0
       }));
       await supabase.from('projects').upsert(projRows, { onConflict: 'id' });
+
+      // 3b. Sync Project Expenses
+      const allExpenses = [];
+      data.projects.forEach(p => {
+        if (p.expenses && p.expenses.length > 0) {
+          p.expenses.forEach(exp => {
+            allExpenses.push({
+              id: exp.id,
+              project_id: p.id,
+              title: exp.title || '',
+              amount: Number(exp.amount) || 0,
+              date: exp.date || ''
+            });
+          });
+        }
+      });
+      if (allExpenses.length > 0) {
+        await supabase.from('project_expenses').upsert(allExpenses, { onConflict: 'id' });
+      }
+    }
+
+    // 4. Sync Clients & Payment History
+    if (data.clients && data.clients.length > 0) {
+      const clientRows = data.clients.map(c => ({
+        id: c.id,
+        name: c.name,
+        phone: c.phone || '',
+        password: c.password || 'password123',
+        project_id: c.projectId || null,
+        project_name: c.projectName || '',
+        flat_no: c.flatNo || '',
+        total_price: Number(c.totalPrice) || 0,
+        total_paid: Number(c.totalPaid) || 0,
+        next_due_date: c.nextDueDate || '',
+        next_due_amount: Number(c.nextDueAmount) || 0
+      }));
+      await supabase.from('clients').upsert(clientRows, { onConflict: 'id' });
+
+      // 4b. Sync Payments
+      const allPayments = [];
+      data.clients.forEach(c => {
+        if (c.paymentHistory && c.paymentHistory.length > 0) {
+          c.paymentHistory.forEach(pay => {
+            allPayments.push({
+              id: pay.id,
+              client_id: c.id,
+              date: pay.date || '',
+              amount: Number(pay.amount) || 0,
+              method: pay.method || ''
+            });
+          });
+        }
+      });
+      if (allPayments.length > 0) {
+        await supabase.from('client_payments').upsert(allPayments, { onConflict: 'id' });
+      }
     }
   } catch (err) {
     console.log('Supabase sync notice (offline or pending tables):', err?.message || err);
@@ -517,72 +577,120 @@ export const syncFromSupabase = async () => {
     }
 
     if (directorsRes.data && directorsRes.data.length > 0) {
-      updated.directors = directorsRes.data.map(d => ({
-        id: d.id,
-        name: d.name,
-        nameEn: d.name_en,
-        role: d.role,
-        roleEn: d.role_en,
-        folioNo: d.folio_no,
-        image: d.image,
-        investment: Number(d.investment) || 0,
-        sharePercentage: Number(d.share_percentage) || 0,
-        dividendEarned: Number(d.dividend_earned) || 0,
-        phone: d.phone,
-        email: d.email,
-        joiningDate: d.joining_date,
-        status: d.status,
-        nomineeName: d.nominee_name,
-        nomineeRelation: d.nominee_relation,
-        nomineePhone: d.nominee_phone,
-        theme: d.theme
-      }));
+      const remoteDirs = directorsRes.data.map(d => {
+        const localDir = (current.directors || []).find(x => x.id === d.id);
+        return {
+          id: d.id,
+          name: d.name,
+          nameEn: d.name_en,
+          role: d.role,
+          roleEn: d.role_en,
+          folioNo: d.folio_no,
+          image: d.image || localDir?.image || null,
+          investment: Number(d.investment) || localDir?.investment || 0,
+          sharePercentage: Number(d.share_percentage) || localDir?.sharePercentage || 0,
+          dividendEarned: Number(d.dividend_earned) || localDir?.dividendEarned || 0,
+          phone: d.phone || localDir?.phone || '',
+          email: d.email || localDir?.email || '',
+          accessKey: localDir?.accessKey || 'admin123',
+          joiningDate: d.joining_date || localDir?.joiningDate || '',
+          status: d.status || localDir?.status || 'সক্রিয় (Active)',
+          nomineeName: d.nominee_name || localDir?.nomineeName || '',
+          nomineeRelation: d.nominee_relation || localDir?.nomineeRelation || '',
+          nomineePhone: d.nominee_phone || localDir?.nomineePhone || '',
+          theme: d.theme || localDir?.theme || 'emerald',
+          installments: localDir?.installments || [],
+          dividendHistory: localDir?.dividendHistory || []
+        };
+      });
+      // Retain any locally added directors that aren't yet in Supabase
+      const extraLocalDirs = (current.directors || []).filter(ld => !directorsRes.data.some(d => d.id === ld.id));
+      updated.directors = [...remoteDirs, ...extraLocalDirs];
     }
 
     if (projectsRes.data && projectsRes.data.length > 0) {
-      updated.projects = projectsRes.data.map(p => ({
-        id: p.id,
-        name: p.name,
-        nameEn: p.name_en,
-        location: p.location,
-        progress: p.progress,
-        currentStage: p.current_stage,
-        budget: Number(p.budget) || 0,
-        expenses: (p.expenses || []).map(e => ({
+      const remoteProjects = projectsRes.data.map(p => {
+        const localProj = (current.projects || []).find(x => x.id === p.id);
+        const expensesFromRemote = (p.expenses || []).map(e => ({
           id: e.id,
           title: e.title,
           amount: Number(e.amount) || 0,
           date: e.date
-        }))
-      }));
+        }));
+        return {
+          id: p.id,
+          name: p.name,
+          nameEn: p.name_en,
+          location: p.location,
+          progress: p.progress,
+          currentStage: p.current_stage,
+          budget: Number(p.budget) || 0,
+          type: localProj?.type || 'residential',
+          totalFloors: localProj?.totalFloors || 10,
+          unitsPerFloor: localProj?.unitsPerFloor || 2,
+          units: localProj?.units || [],
+          expenses: expensesFromRemote.length > 0 ? expensesFromRemote : (localProj?.expenses || [])
+        };
+      });
+      const extraLocalProjects = (current.projects || []).filter(lp => !projectsRes.data.some(p => p.id === lp.id));
+      updated.projects = [...remoteProjects, ...extraLocalProjects];
     }
 
     if (clientsRes.data && clientsRes.data.length > 0) {
-      updated.clients = clientsRes.data.map(c => ({
-        id: c.id,
-        name: c.name,
-        phone: c.phone,
-        password: c.password,
-        projectId: c.project_id,
-        projectName: c.project_name,
-        flatNo: c.flat_no,
-        totalPrice: Number(c.total_price) || 0,
-        totalPaid: Number(c.total_paid) || 0,
-        nextDueDate: c.next_due_date,
-        nextDueAmount: Number(c.next_due_amount) || 0,
-        paymentHistory: (c.paymentHistory || []).map(pay => ({
+      const remoteClients = clientsRes.data.map(c => {
+        const localClient = (current.clients || []).find(x => x.id === c.id);
+        const paymentsFromRemote = (c.paymentHistory || []).map(pay => ({
           id: pay.id,
           date: pay.date,
           amount: Number(pay.amount) || 0,
           method: pay.method
-        }))
-      }));
+        }));
+        return {
+          id: c.id,
+          name: c.name,
+          phone: c.phone,
+          password: c.password || localClient?.password || 'password123',
+          projectId: c.project_id || localClient?.projectId,
+          projectName: c.project_name || localClient?.projectName,
+          flatNo: c.flat_no || localClient?.flatNo,
+          totalPrice: Number(c.total_price) || 0,
+          totalPaid: Number(c.total_paid) || 0,
+          nextDueDate: c.next_due_date || localClient?.nextDueDate,
+          nextDueAmount: Number(c.next_due_amount) || 0,
+          paymentHistory: paymentsFromRemote.length > 0 ? paymentsFromRemote : (localClient?.paymentHistory || [])
+        };
+      });
+      // Retain any locally added clients that aren't yet in Supabase
+      const extraLocalClients = (current.clients || []).filter(lc => !clientsRes.data.some(c => c.id === lc.id));
+      updated.clients = [...remoteClients, ...extraLocalClients];
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: updated }));
   } catch (err) {
     console.log('Supabase sync notice:', err);
+  }
+};
+
+// Save customer or investor inquiries from the public website
+export const saveInquiry = (inquiry) => {
+  try {
+    const current = getManagementData();
+    const newInquiry = {
+      id: `INQ-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`,
+      date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      timestamp: new Date().toISOString(),
+      status: 'নতুন (New)',
+      ...inquiry
+    };
+    const updated = {
+      ...current,
+      inquiries: [newInquiry, ...(current.inquiries || [])]
+    };
+    saveManagementData(updated);
+    return newInquiry;
+  } catch (e) {
+    console.error('Error saving inquiry:', e);
   }
 };
 

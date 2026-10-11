@@ -179,7 +179,8 @@ export default function ManagementDashboard({
   }, []);
 
   const updateStore = (updater) => {
-    const updated = typeof updater === 'function' ? updater(data) : updater;
+    const currentData = getManagementData();
+    const updated = typeof updater === 'function' ? updater(currentData) : updater;
     setData(updated);
     saveManagementData(updated);
   };
@@ -363,8 +364,12 @@ export default function ManagementDashboard({
     }
 
     const selectedProj = data.projects.find(p => p.id === clientForm.projectId) || data.projects[0];
+    if (!selectedProj) {
+      alert('অনুগ্রহ করে প্রথমে কমপক্ষে একটি প্রজেক্ট তৈরি করুন।');
+      return;
+    }
     const initialPaidNum = Number(clientForm.initialPaid) || 0;
-    const newId = `CLI-${Math.floor(10000 + Math.random() * 90000)}`;
+    const newId = `CLI-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const generatedEmail = clientForm.emailPrefix 
       ? `${clientForm.emailPrefix.trim()}@alemarah.com`
@@ -386,7 +391,7 @@ export default function ManagementDashboard({
       nextDueAmount: Number(clientForm.nextDueAmount) || 0,
       paymentHistory: initialPaidNum > 0 ? [
         {
-          id: `TRX-${Math.floor(100 + Math.random() * 900)}`,
+          id: `TRX-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
           date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
           amount: initialPaidNum,
           method: 'বুকিং মানি / প্রাথমিক জমা'
@@ -437,7 +442,7 @@ export default function ManagementDashboard({
     }
 
     const newTrx = {
-      id: `TRX-${Math.floor(100 + Math.random() * 900)}`,
+      id: `TRX-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
       date: paymentForm.date ? new Date(paymentForm.date).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       amount: payAmount,
       method: paymentForm.method || 'ব্যাংক ডিপোজিট'

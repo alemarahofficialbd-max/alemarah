@@ -112,7 +112,17 @@ export default function App() {
     }
   });
 
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(() => {
+    try {
+      const savedProjId = localStorage.getItem('alemarah_selected_project_id');
+      if (savedProjId) {
+        return projectsData.find(p => p.id === savedProjId) || projectsData[0];
+      }
+      return projectsData[0];
+    } catch {
+      return projectsData[0];
+    }
+  });
   const [preselectedProject, setPreselectedProject] = useState(null);
   const [searchFilter, setSearchFilter] = useState(null);
   
@@ -221,6 +231,11 @@ export default function App() {
 
   const handleSelectProject = (project) => {
     setSelectedProject(project);
+    try {
+      if (project?.id) {
+        localStorage.setItem('alemarah_selected_project_id', project.id);
+      }
+    } catch {}
     navigateTo('project-details');
   };
 
@@ -276,6 +291,8 @@ export default function App() {
   // Find agro project for the spotlight card
   const agroProject = projectsData.find(p => p.id === 'emarah-agro');
 
+  const activePortalTarget = currentAdmin ? 'management' : (currentClient ? 'dashboard' : 'login');
+
   return (
     <div className={`min-h-screen bg-[#FBFBFB] flex flex-col font-${lang === 'bn' ? 'bengali' : 'sans'}`}>
       {/* Official Header (Logo, Hotline, Language, Sign-In, and Book Visit) */}
@@ -286,9 +303,11 @@ export default function App() {
           lang={lang}
           setLang={setLang}
           t={t}
-          onOpenLogin={() => navigateTo(isLoggedIn ? 'dashboard' : 'login')}
+          onOpenLogin={() => navigateTo(activePortalTarget)}
           onOpenBookVisit={() => handleOpenBookVisit()}
           isLoggedIn={isLoggedIn}
+          userPortal={activePortalTarget}
+          userRole={currentAdmin ? 'admin' : (currentClient ? 'client' : null)}
         />
       )}
 
@@ -1117,9 +1136,9 @@ export default function App() {
         {/* ==================================================== */}
         {/* PAGE 8: DEDICATED FULL-PAGE PROJECT DETAILS          */}
         {/* ==================================================== */}
-        {currentPage === 'project-details' && selectedProject && (
+        {currentPage === 'project-details' && (
           <ProjectDetailsPage
-            project={selectedProject}
+            project={selectedProject || projectsData[0]}
             lang={lang}
             t={t}
             onBack={() => navigateTo('projects')}

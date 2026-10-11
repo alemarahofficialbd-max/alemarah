@@ -23,7 +23,9 @@ export default function Navbar({
   t, 
   onOpenLogin, 
   onOpenBookVisit,
-  isLoggedIn = false 
+  isLoggedIn = false,
+  userPortal = 'dashboard',
+  userRole = null
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -60,6 +62,13 @@ export default function Navbar({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const portalDestination = isLoggedIn ? userPortal : 'login';
+  const portalLabel = isLoggedIn 
+    ? (userPortal === 'management' 
+        ? (lang === 'en' ? 'Management Panel' : 'ম্যানেজমেন্ট প্যানেল') 
+        : (lang === 'en' ? 'Client Dashboard' : 'ক্লায়েন্ট ড্যাশবোর্ড'))
+    : t.nav.login;
+
   return (
     <>
       {/* Top Notification / Hotline Strip */}
@@ -89,13 +98,13 @@ export default function Navbar({
 
             <span className="text-gray-600">|</span>
 
-            {/* সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড বাটন */}
+            {/* সাইন ইন / পোর্টাল ড্যাশবোর্ড বাটন */}
             <button 
-              onClick={() => handleNavClick(isLoggedIn ? 'dashboard' : 'login')}
+              onClick={() => handleNavClick(portalDestination)}
               className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors cursor-pointer group"
             >
               <User className={`w-3.5 h-3.5 ${isLoggedIn ? 'text-[#8EBF40]' : 'text-[#CE2028]'}`} />
-              <span className="font-semibold">{isLoggedIn ? (lang === 'en' ? 'Client Dashboard' : 'ক্লায়েন্ট ড্যাশবোর্ড') : t.nav.login}</span>
+              <span className="font-semibold">{portalLabel}</span>
               {isLoggedIn && (
                 <span className="w-1.5 h-1.5 rounded-full bg-[#8EBF40] animate-pulse"></span>
               )}
@@ -292,16 +301,16 @@ export default function Navbar({
 
             {/* Action Buttons */}
             <div className="pt-3 space-y-2.5 border-t border-gray-100">
-              {/* সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড বাটন */}
+              {/* সাইন ইন / পোর্টাল ড্যাশবোর্ড বাটন */}
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  handleNavClick(isLoggedIn ? 'dashboard' : 'login');
+                  handleNavClick(portalDestination);
                 }}
                 className="w-full flex items-center justify-center space-x-2 py-3 rounded-2xl border border-gray-200 bg-gray-50 text-gray-800 text-sm font-bold hover:bg-gray-100 cursor-pointer"
               >
                 <User className="w-4 h-4 text-[#CE2028]" />
-                <span>{isLoggedIn ? (lang === 'en' ? 'Client Dashboard' : 'ক্লায়েন্ট ড্যাশবোর্ড') : t.nav.login}</span>
+                <span>{portalLabel}</span>
               </button>
 
               {/* সাইট ভিজিট বুক করুন বাটন */}

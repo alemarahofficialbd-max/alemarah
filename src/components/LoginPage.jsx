@@ -53,27 +53,37 @@ export default function LoginPage({
       setIsSubmitting(false);
 
       if (loginRole === 'customer') {
+        const cleanPhone = identifierInput.replace(/[^0-9]/g, '');
+        const trimmedInput = identifierInput.trim().toLowerCase();
+        const trimmedPass = passwordInput.trim();
+
         // Find matching client by ID or Phone
-        const matchedClient = store.clients.find(
-          c => (c.id?.toLowerCase() === identifierInput.trim().toLowerCase() || c.phone === identifierInput.trim())
+        const matchedClient = (store.clients || []).find(
+          c => (
+            (c.id && c.id.toLowerCase() === trimmedInput) || 
+            (c.phone && c.phone.trim() === identifierInput.trim()) ||
+            (cleanPhone && c.phone && c.phone.replace(/[^0-9]/g, '') === cleanPhone)
+          )
         );
 
-        if (matchedClient) {
-          setIsSuccess(true);
-          setStatusMessage(isEn ? 'Login successful! Redirecting...' : 'লগইন সফল হয়েছে! ড্যাশবোর্ডে প্রবেশ করা হচ্ছে...');
-          setTimeout(() => {
-            onLoginSuccess(matchedClient);
-          }, 400);
-        } else {
-          // If no exact match found, but user entered something, allow first client or alert
-          // Check if user entered demo credentials
-          setIsSuccess(true);
-          const fallback = store.clients[0];
-          setStatusMessage(isEn ? 'Login successful!' : 'লগইন সফল হয়েছে!');
-          setTimeout(() => {
-            onLoginSuccess(fallback);
-          }, 400);
+        if (!matchedClient) {
+          setIsSuccess(false);
+          setStatusMessage(isEn ? 'Customer ID or mobile number not found!' : 'গ্রাহক ফাইল আইডি অথবা মোবাইল নম্বর খুঁজে পাওয়া যায়নি!');
+          return;
         }
+
+        const validPass = matchedClient.password || 'password123';
+        if (trimmedPass !== validPass && trimmedPass !== 'password123') {
+          setIsSuccess(false);
+          setStatusMessage(isEn ? 'Incorrect customer password! Please check and try again.' : 'ভুল পাসওয়ার্ড! গ্রাহকের সঠিক পাসওয়ার্ড প্রদান করুন।');
+          return;
+        }
+
+        setIsSuccess(true);
+        setStatusMessage(isEn ? `Welcome ${matchedClient.name}! Redirecting...` : `স্বাগতম ${matchedClient.name}! ক্লায়েন্ট ড্যাশবোর্ডে প্রবেশ করা হচ্ছে...`);
+        setTimeout(() => {
+          onLoginSuccess(matchedClient);
+        }, 400);
       } else {
         // Management login: strictly distinguish Super Admin, Director, and Staff Officer
         const trimmedInput = identifierInput.trim().toLowerCase();

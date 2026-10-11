@@ -52,6 +52,9 @@ export default function Projects({
         if (searchFilter.propertyType === 'apartment' && item.typeEn.toLowerCase().includes('commercial')) {
           return false;
         }
+        if (searchFilter.propertyType === 'agro' && !item.typeEn.toLowerCase().includes('agro')) {
+          return false;
+        }
       }
     }
 

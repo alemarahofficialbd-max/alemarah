@@ -17,6 +17,7 @@ import {
   HelpCircle,
   FileText
 } from 'lucide-react';
+import { saveInquiry } from '../data/managementStore';
 
 export default function InvestmentPage({ 
   lang = 'bn', 
@@ -35,6 +36,20 @@ export default function InvestmentPage({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    try {
+      saveInquiry({
+        name: formData.name,
+        phone: formData.phone,
+        investmentAmount: formData.investmentAmount,
+        interestedSector: formData.interestedSector,
+        message: formData.message,
+        inquiryType: 'investment'
+      });
+    } catch (err) {
+      console.error('Error saving investment inquiry:', err);
+    }
+
     setFormSubmitted(true);
     setTimeout(() => {
       setFormSubmitted(false);

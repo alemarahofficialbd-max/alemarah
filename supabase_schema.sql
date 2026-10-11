@@ -181,3 +181,22 @@ VALUES
 ('TRX-201', 'CLI-99432', '১ জুন, ২০২৬', 2000000, 'বুকিং মানি ও চুক্তি'),
 ('TRX-202', 'CLI-99432', '১ আগস্ট, ২০২৬', 1500000, 'ব্যাংক চেক')
 ON CONFLICT (id) DO NOTHING;
+
+-- 7. CUSTOMER & INVESTOR INQUIRIES / LEADS TABLE
+CREATE TABLE IF NOT EXISTS public.inquiries (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT,
+    project_id TEXT,
+    inquiry_type TEXT DEFAULT 'site_visit', -- 'site_visit' | 'investment'
+    investment_amount TEXT,
+    interested_sector TEXT,
+    message TEXT,
+    status TEXT DEFAULT 'নতুন (New)',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public insert inquiries" ON public.inquiries FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated read/manage inquiries" ON public.inquiries FOR ALL USING (true);

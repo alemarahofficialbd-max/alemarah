@@ -14,6 +14,7 @@ import {
   Navigation
 } from 'lucide-react';
 import { projectsData } from '../data/projectsData';
+import { saveInquiry } from '../data/managementStore';
 
 export default function ContactSection({ lang, t, preselectedProject }) {
   const [formData, setFormData] = useState({
@@ -30,6 +31,21 @@ export default function ContactSection({ lang, t, preselectedProject }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
+
+    try {
+      saveInquiry({
+        name: formData.fullName,
+        phone: formData.phone,
+        email: formData.email,
+        projectId: formData.project,
+        preferredDate: formData.date,
+        message: formData.message,
+        inquiryType: 'site_visit'
+      });
+    } catch (err) {
+      console.error('Error saving contact inquiry:', err);
+    }
+
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
@@ -41,7 +57,7 @@ export default function ContactSection({ lang, t, preselectedProject }) {
         date: '',
         message: ''
       });
-    }, 1000);
+    }, 600);
   };
 
   return (

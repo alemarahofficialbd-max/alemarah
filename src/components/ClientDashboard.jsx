@@ -72,23 +72,51 @@ export default function ClientDashboard({
   const totalDue = (client?.totalPrice || 0) - (client?.totalPaid || 0);
   const paidPercent = client?.totalPrice ? Math.round((client.totalPaid / client.totalPrice) * 100) : 0;
 
-  // Handle Avatar file upload
+  // Handle Avatar file upload with canvas downscaling (preventing localStorage QuotaExceededError)
   const handleAvatarChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 4 * 1024 * 1024) {
-      alert('ছবির সাইজ সর্বোচ্চ ৪ মেগাবাইট হতে হবে।');
+    if (file.size > 8 * 1024 * 1024) {
+      alert('ছবির সাইজ সর্বোচ্চ ৮ মেগাবাইট হতে হবে।');
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const dataUrl = event.target.result;
-      setAvatarImage(dataUrl);
-      try {
-        localStorage.setItem(`alemarah_avatar_${client?.id}`, dataUrl);
-      } catch {}
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxSize = 180;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxSize) {
+            height = Math.round((height * maxSize) / width);
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = Math.round((width * maxSize) / height);
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        setAvatarImage(compressedDataUrl);
+        try {
+          localStorage.setItem(`alemarah_avatar_${client?.id}`, compressedDataUrl);
+        } catch (err) {
+          console.error('Error storing avatar in localStorage:', err);
+        }
+      };
+      img.src = event.target.result;
     };
     reader.readAsDataURL(file);
   };
