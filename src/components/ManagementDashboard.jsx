@@ -1413,22 +1413,24 @@ export default function ManagementDashboard({
                           cl.name ? cl.name.slice(0, 2) : 'গ্রা'
                         )}
                       </div>
-                      <div className="min-w-0 flex-1">
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        {/* 1st Line: Full Name */}
                         <h4 className="font-bold text-slate-900 text-sm group-hover:text-[#006231] transition-colors leading-snug truncate">
                           {cl.name}
                         </h4>
-                        <p className="text-2xs text-slate-500 font-medium truncate mt-0.5">
-                          {cl.projectName}
-                        </p>
+
+                        {/* 2nd Line: Small Project Name & Small Due Amount */}
+                        <div className="flex items-center space-x-2 text-2xs text-slate-500 font-medium truncate">
+                          <span className="truncate">{cl.projectName}</span>
+                          <span className="text-slate-300 shrink-0">•</span>
+                          <span className="text-amber-700 font-semibold shrink-0">
+                            বকেয়া: {formatBDT(due)}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2 shrink-0">
-                      <div className="text-right">
-                        <div className="text-xs font-bold text-amber-700">
-                          বকেয়া: {formatBDT(due)}
-                        </div>
-                      </div>
+                    <div className="flex items-center shrink-0 pl-1">
                       <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#006231] group-hover:translate-x-0.5 transition-all" />
                     </div>
                   </div>
