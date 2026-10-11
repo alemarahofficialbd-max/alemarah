@@ -273,7 +273,7 @@ export default function AboutUs({ lang, t }) {
 
           {/* Unified Grid: All Executive Committee Board of Directors */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6">
-            {(t.about.board?.members || []).map((member) => (
+            {(t.about.board?.members || []).map((member, idx) => (
               <div 
                 key={member.id}
                 className="bg-white rounded-3xl border border-gray-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group"
@@ -287,6 +287,10 @@ export default function AboutUs({ lang, t }) {
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  {/* Serial Number Badge */}
+                  <div className="absolute top-3 left-3 w-6 h-6 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-mono font-bold flex items-center justify-center border border-white/20 shadow-sm">
+                    {idx + 1}
+                  </div>
                 </div>
 
                 {/* Info */}

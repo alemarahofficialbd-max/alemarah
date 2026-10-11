@@ -246,14 +246,6 @@ export const translations = {
             image: "/images/chairman.webp"
           },
           {
-            id: "dir_nur_hossain",
-            name: "Alhaj Mawlana Nur Hossain",
-            role: "Director",
-            organization: "Al-Emarah Properties",
-            education: "Prominent Islamic Scholar & Entrepreneur",
-            image: "/images/alhaj_mawlana_nur_hossain.jpg"
-          },
-          {
             id: "md",
             name: "Talukdar Tariq Masud",
             role: "Managing Director",
@@ -262,12 +254,12 @@ export const translations = {
             image: "/images/managing_director.webp"
           },
           {
-            id: "dir_al_amin",
-            name: "Al Amin Hawladar",
+            id: "dir_nur_hossain",
+            name: "Alhaj Mawlana Nur Hossain",
             role: "Director",
             organization: "Al-Emarah Properties",
-            education: "Entrepreneur & Director, Al-Emarah Properties",
-            image: "/images/al_amin_hawladar.jpg"
+            education: "Prominent Islamic Scholar & Entrepreneur",
+            image: "/images/alhaj_mawlana_nur_hossain.jpg"
           },
           {
             id: "dir_taneem",
@@ -276,6 +268,14 @@ export const translations = {
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
             image: "/images/taneem_mahfuj.jpg"
+          },
+          {
+            id: "dir_al_amin",
+            name: "Al Amin Hawladar",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/al_amin_hawladar.jpg"
           }
         ]
       }
@@ -945,14 +945,6 @@ export const translations = {
             image: "/images/chairman.webp"
           },
           {
-            id: "dir_nur_hossain",
-            name: "আলহাজ্ব মাওলানা নূর হোসাইন",
-            role: "পরিচালক",
-            organization: "আল-ইমারাহ প্রোপার্টিজ",
-            education: "বিশিষ্ট ইসলামি ব্যক্তিত্ব ও উদ্যোক্তা",
-            image: "/images/alhaj_mawlana_nur_hossain.jpg"
-          },
-          {
             id: "md",
             name: "তালুকদার তারিক মাসউদ",
             role: "ব্যবস্থাপনা পরিচালক",
@@ -961,12 +953,12 @@ export const translations = {
             image: "/images/managing_director.webp"
           },
           {
-            id: "dir_al_amin",
-            name: "আল আমিন হাওলাদার",
+            id: "dir_nur_hossain",
+            name: "আলহাজ্ব মাওলানা নূর হোসাইন",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
-            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
-            image: "/images/al_amin_hawladar.jpg"
+            education: "বিশিষ্ট ইসলামি ব্যক্তিত্ব ও উদ্যোক্তা",
+            image: "/images/alhaj_mawlana_nur_hossain.jpg"
           },
           {
             id: "dir_taneem",
@@ -975,6 +967,14 @@ export const translations = {
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
             image: "/images/taneem_mahfuj.jpg"
+          },
+          {
+            id: "dir_al_amin",
+            name: "আল আমিন হাওলাদার",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/al_amin_hawladar.jpg"
           }
         ]
       }

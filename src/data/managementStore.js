@@ -197,6 +197,7 @@ export const initialManagementData = {
       dividendEarned: 3650000, // ৳ ৩৬,৫০,০০০
       phone: '01816233013',
       email: 'chairman@alemarahproperties.com',
+      accessKey: 'admin123',
       joiningDate: '১ জানুয়ারি, ২০২৪',
       status: 'সক্রিয় (Active)',
       nomineeName: 'আইনানুগ উত্তরসূরি',
@@ -226,6 +227,7 @@ export const initialManagementData = {
       dividendEarned: 2920000, // ৳ ২৯,২০,০০০
       phone: '01918646575',
       email: 'md@alemarahproperties.com',
+      accessKey: 'admin123',
       joiningDate: '১ জানুয়ারি, ২০২৪',
       status: 'সক্রিয় (Active)',
       nomineeName: 'আইনানুগ উত্তরসূরি',
@@ -243,22 +245,23 @@ export const initialManagementData = {
     },
     {
       id: 'DIR-03',
-      name: 'ইঞ্জি. এম. এ. রহমান',
-      nameEn: 'Engr. M. A. Rahman',
-      role: 'পরিচালক (প্রকৌশল ও কারিগরি)',
-      roleEn: 'Director (Technical & Engineering)',
+      name: 'আলহাজ্ব মাওলানা নূর হোসাইন',
+      nameEn: 'Alhaj Mawlana Nur Hossain',
+      role: 'পরিচালক',
+      roleEn: 'Director',
       folioNo: 'DIR-003',
-      image: null,
+      image: '/images/alhaj_mawlana_nur_hossain.jpg',
       investment: 10000000, // ৳ ১,০০,০০,০০০
       sharePercentage: 15, // 15%
       dividendEarned: 1460000, // ৳ ১৪,৬০,০০০
       phone: '01743926926',
-      email: 'technical@alemarahproperties.com',
+      email: 'nur.hossain@alemarahproperties.com',
+      accessKey: 'admin123',
       joiningDate: '১৫ মার্চ, ২০২৪',
       status: 'সক্রিয় (Active)',
-      nomineeName: 'মোসা. ফারহানা রহমান',
-      nomineeRelation: 'স্ত্রী',
-      nomineePhone: '01711-223344',
+      nomineeName: 'আইনানুগ উত্তরসূরি',
+      nomineeRelation: 'পরিবার',
+      nomineePhone: '01743-926926',
       theme: 'blue',
       installments: [
         { id: 'INS-301', date: '১৫ মার্চ, ২০২৪', amount: 5000000, method: 'চেক ডিপোজিট', receiptNo: 'RCPT-CAP-301', note: '১ম কিস্তি মূলধন' },
@@ -270,22 +273,23 @@ export const initialManagementData = {
     },
     {
       id: 'DIR-04',
-      name: 'ব্যারিস্টার এস. এইচ. চৌধুরী',
-      nameEn: 'Barrister S. H. Chowdhury',
-      role: 'পরিচালক (আইন ও কমপ্লায়েন্স)',
-      roleEn: 'Director (Legal & Compliance)',
+      name: 'তানিম মাহফুজ',
+      nameEn: 'Tanim Mahfuj',
+      role: 'পরিচালক',
+      roleEn: 'Director',
       folioNo: 'DIR-004',
-      image: null,
+      image: '/images/taneem_mahfuj.jpg',
       investment: 7500000, // ৳ ৭৫,০০,০০০
       sharePercentage: 10, // 10%
       dividendEarned: 1095000, // ৳ ১০,৯৫,০০০
       phone: '01914425073',
-      email: 'legal@alemarahproperties.com',
+      email: 'tanim.mahfuj@alemarahproperties.com',
+      accessKey: 'admin123',
       joiningDate: '১০ মে, ২০২৪',
       status: 'সক্রিয় (Active)',
-      nomineeName: 'সাইফুল চৌধুরী',
-      nomineeRelation: 'পুত্র',
-      nomineePhone: '01911-334455',
+      nomineeName: 'আইনানুগ উত্তরসূরি',
+      nomineeRelation: 'পরিবার',
+      nomineePhone: '01914-425073',
       theme: 'amber',
       installments: [
         { id: 'INS-401', date: '১০ মে, ২০২৪', amount: 4000000, method: 'পে-অর্ডার', receiptNo: 'RCPT-CAP-401', note: '১ম কিস্তি' },
@@ -297,22 +301,23 @@ export const initialManagementData = {
     },
     {
       id: 'DIR-05',
-      name: 'তানভীর হাসান, এফসিএ',
-      nameEn: 'Tanvir Hasan, FCA',
-      role: 'পরিচালক (অর্থ ও নিরীক্ষা)',
-      roleEn: 'Director (Finance & Audit)',
+      name: 'আল আমিন হাওলাদার',
+      nameEn: 'Al Amin Hawladar',
+      role: 'পরিচালক',
+      roleEn: 'Director',
       folioNo: 'DIR-005',
-      image: null,
+      image: '/images/al_amin_hawladar.jpg',
       investment: 7500000, // ৳ ৭৫,০০,০০০
       sharePercentage: 10, // 10%
       dividendEarned: 1095000, // ৳ ১০,৯৫,০০০
       phone: '01833544548',
-      email: 'accounts@alemarahproperties.com',
+      email: 'alamin.hawladar@alemarahproperties.com',
+      accessKey: 'admin123',
       joiningDate: '১ জুলাই, ২০২৪',
       status: 'সক্রিয় (Active)',
-      nomineeName: 'নাজমিন হাসান',
-      nomineeRelation: 'স্ত্রী',
-      nomineePhone: '01811-556677',
+      nomineeName: 'আইনানুগ উত্তরসূরি',
+      nomineeRelation: 'পরিবার',
+      nomineePhone: '01833-544548',
       theme: 'purple',
       installments: [
         { id: 'INS-501', date: '১ জুলাই, ২০২৪', amount: 7500000, method: 'ব্যাংক ট্রান্সফার', receiptNo: 'RCPT-CAP-501', note: 'এককালীন পরিশোধিত মূলধন' }
@@ -330,27 +335,35 @@ export const getManagementData = () => {
     const data = localStorage.getItem(STORAGE_KEY);
     if (data) {
       const parsed = JSON.parse(data);
+      const canonicalDirs = initialManagementData.directors;
       if (!parsed.directors || parsed.directors.length === 0) {
-        parsed.directors = initialManagementData.directors;
+        parsed.directors = canonicalDirs;
       } else {
-        parsed.directors = parsed.directors.map(d => {
-          const defaultDir = initialManagementData.directors.find(x => x.id === d.id);
-          const cleanedFolioNo = d.folioNo ? d.folioNo.replace(/^AEP-/, '') : (defaultDir?.folioNo || `DIR-00${d.id?.slice(-1) || '1'}`);
+        // Ensure the 5 canonical directors are preserved in the exact 1-5 serial order
+        parsed.directors = canonicalDirs.map(defaultDir => {
+          const existing = parsed.directors.find(x => x.id === defaultDir.id);
+          if (!existing) return defaultDir;
+          const cleanedFolioNo = existing.folioNo ? existing.folioNo.replace(/^AEP-/, '') : defaultDir.folioNo;
           return {
-            ...d,
+            ...defaultDir,
+            ...existing,
+            name: defaultDir.name,
+            nameEn: defaultDir.nameEn,
+            role: defaultDir.role,
+            roleEn: defaultDir.roleEn,
+            image: defaultDir.image,
             folioNo: cleanedFolioNo,
-            installments: d.installments && d.installments.length > 0 
-              ? d.installments 
-              : (defaultDir?.installments || [
-                  { id: `INS-${d.id}-1`, date: d.joiningDate || '১ জানুয়ারি, ২০২৪', amount: d.investment, method: 'ব্যাংক স্থানান্তর', receiptNo: `RCPT-${cleanedFolioNo || '001'}`, note: 'পরিশোধিত মূলধন জমা' }
-                ]),
-            dividendHistory: d.dividendHistory && d.dividendHistory.length > 0
-              ? d.dividendHistory
-              : (defaultDir?.dividendHistory || (d.dividendEarned > 0 ? [
-                  { id: `DIV-${d.id}-1`, date: '৩১ ডিসেম্বর, ২০২৪', amount: d.dividendEarned, method: 'ব্যাংক ট্রান্সফার', voucherNo: `VCH-${cleanedFolioNo || '001'}`, note: 'বার্ষিক লভ্যাংশ পরিশোধ' }
-                ] : []))
+            accessKey: existing.accessKey || defaultDir.accessKey || 'admin123',
+            installments: existing.installments && existing.installments.length > 0 
+              ? existing.installments 
+              : defaultDir.installments,
+            dividendHistory: existing.dividendHistory && existing.dividendHistory.length > 0
+              ? existing.dividendHistory
+              : defaultDir.dividendHistory
           };
-        });
+        }).concat(
+          parsed.directors.filter(d => !canonicalDirs.some(c => c.id === d.id))
+        );
       }
       if (!parsed.projects || parsed.projects.length === 0) {
         parsed.projects = initialManagementData.projects;

@@ -2391,7 +2391,7 @@ export default function ManagementDashboard({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {directorsList.map((dir) => {
+                  {directorsList.map((dir, idx) => {
                     const isDirKeyVisible = Boolean(showAccessKeys[dir.id]);
                     const teamMatch = (data.managementTeam || []).find(m => m.directorId === dir.id || m.phone === dir.phone);
                     const hasTeamAccess = Boolean(teamMatch);
@@ -2410,7 +2410,10 @@ export default function ManagementDashboard({
                               )}
                             </div>
                             <div className="min-w-0">
-                              <div className="font-bold text-slate-900 text-sm truncate">{dir.name}</div>
+                              <div className="font-bold text-slate-900 text-sm truncate">
+                                <span className="text-slate-400 font-mono text-xs mr-1">{idx + 1}.</span>
+                                {dir.name}
+                              </div>
                               <div className="text-xs text-[#CE2028] font-semibold truncate">{dir.role}</div>
                               <div className="text-3xs text-slate-400 font-mono">ফোলিও: {dir.folioNo}</div>
                             </div>
@@ -2770,7 +2773,7 @@ export default function ManagementDashboard({
 
               {/* 1. MOBILE-ONLY VIEW: Clean Box-free Expandable List */}
               <div className="md:hidden space-y-2.5">
-                {directorsList.map((dir) => {
+                {directorsList.map((dir, idx) => {
                   const isExp = Boolean(expandedDirectors[dir.id]);
                   const isDirKeyVisible = Boolean(showAccessKeys[dir.id]);
 
@@ -2792,7 +2795,10 @@ export default function ManagementDashboard({
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="font-bold text-slate-900 text-sm truncate leading-snug">{dir.name}</div>
+                            <div className="font-bold text-slate-900 text-sm truncate leading-snug">
+                              <span className="text-slate-400 font-mono text-xs mr-1">{idx + 1}.</span>
+                              {dir.name}
+                            </div>
                             <div className="text-xs text-[#CE2028] font-semibold truncate mt-0.5">{dir.role}</div>
                           </div>
                         </div>
@@ -2940,6 +2946,7 @@ export default function ManagementDashboard({
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-100/70 border-b border-slate-200/80 text-slate-600 font-bold uppercase tracking-wider text-3xs">
                     <tr>
+                      <th className="py-3 px-3 text-center w-10">ক্র.</th>
                       <th className="py-3 px-4">পরিচালকের নাম ও পদবি</th>
                       <th className="py-3 px-4">ফোলিও নং</th>
                       <th className="py-3 px-4">বিনিয়োগকৃত টাকা</th>
@@ -2950,8 +2957,9 @@ export default function ManagementDashboard({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {directorsList.map((dir) => (
+                    {directorsList.map((dir, idx) => (
                       <tr key={dir.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="py-3 px-3 text-center font-mono font-bold text-slate-400">{idx + 1}</td>
                         <td className="py-3 px-4">
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-12 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs">
