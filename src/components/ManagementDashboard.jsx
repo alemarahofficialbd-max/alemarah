@@ -194,6 +194,7 @@ export default function ManagementDashboard({
   // 2. Receive Payment Form
   const [paymentSelectedProjectId, setPaymentSelectedProjectId] = useState('all');
   const [isPaymentClientPickerOpen, setIsPaymentClientPickerOpen] = useState(false);
+  const [paymentClientSearchQuery, setPaymentClientSearchQuery] = useState('');
   const [showAllPayments, setShowAllPayments] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
     clientId: '',
@@ -1591,7 +1592,7 @@ export default function ManagementDashboard({
                   </select>
                 </div>
 
-                {/* Step 2: Visual Customer Selector With Photos and Sliding Picker */}
+                {/* Step 2: Visual Customer Selector With Half-Screen Bottom Sheet Picker */}
                 <div>
                   <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     ২. কাস্টমার নির্বাচন করুন *
@@ -1600,11 +1601,11 @@ export default function ManagementDashboard({
                   {/* Selected Customer Active Card */}
                   {targetClientForCalc ? (
                     <div 
-                      onClick={() => setIsPaymentClientPickerOpen(!isPaymentClientPickerOpen)}
+                      onClick={() => setIsPaymentClientPickerOpen(true)}
                       className="p-3 rounded-2xl bg-gradient-to-r from-emerald-50/80 via-white to-emerald-50/30 border-2 border-[#006231]/30 hover:border-[#006231] cursor-pointer transition-all shadow-xs flex items-center justify-between gap-3 group"
                     >
                       <div className="flex items-center space-x-3 min-w-0">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden ring-2 ring-emerald-500/30 shadow-xs">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden ring-2 ring-emerald-500/30 shadow-xs">
                           {targetClientForCalc.image ? (
                             <img src={targetClientForCalc.image} alt={targetClientForCalc.name} className="w-full h-full object-cover" />
                           ) : (
@@ -1633,7 +1634,7 @@ export default function ManagementDashboard({
                           {formatBDT(targetClientDue)}
                         </span>
                         <div className="text-3xs text-[#006231] font-bold group-hover:underline">
-                          {isPaymentClientPickerOpen ? 'তালিকা লুকান ▲' : 'পরিবর্তন করুন ▼'}
+                          পরিবর্তন করুন ▼
                         </div>
                       </div>
                     </div>
@@ -1644,7 +1645,7 @@ export default function ManagementDashboard({
                       className="w-full p-3.5 rounded-2xl bg-white border-2 border-dashed border-slate-300 hover:border-[#006231] text-slate-700 hover:text-[#006231] font-bold text-xs sm:text-sm transition-all flex items-center justify-between shadow-2xs group cursor-pointer"
                     >
                       <div className="flex items-center space-x-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-emerald-50 text-slate-400 group-hover:text-[#006231] flex items-center justify-center transition-colors">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-emerald-50 text-slate-500 group-hover:text-[#006231] flex items-center justify-center transition-colors">
                           <Users className="w-4 h-4" />
                         </div>
                         <span>কাস্টমার নির্বাচন করতে এখানে ক্লিক করুন</span>
@@ -1653,76 +1654,200 @@ export default function ManagementDashboard({
                     </button>
                   )}
 
-                  {/* Dropdown / Grid List of all matching customers with avatars */}
+                  {/* Half-Screen Bottom Sheet Customer Selector Modal */}
                   {isPaymentClientPickerOpen && (() => {
-                    const filteredList = paymentSelectedProjectId === 'all'
-                      ? data.clients
-                      : data.clients.filter(c => c.projectId === paymentSelectedProjectId);
+                    const filteredList = data.clients.filter(c => {
+                      const matchesProject = paymentSelectedProjectId === 'all' || c.projectId === paymentSelectedProjectId;
+                      if (!matchesProject) return false;
+                      if (!paymentClientSearchQuery.trim()) return true;
+                      const q = paymentClientSearchQuery.toLowerCase().trim();
+                      const name = (c.name || '').toLowerCase();
+                      const phone = (c.phone || '').toLowerCase();
+                      const id = (c.id || '').toLowerCase();
+                      const project = (c.projectName || '').toLowerCase();
+                      const flat = (c.flatNo || '').toLowerCase();
+                      return name.includes(q) || phone.includes(q) || id.includes(q) || project.includes(q) || flat.includes(q);
+                    });
 
                     return (
-                      <div className="mt-2 p-2 rounded-2xl bg-white border border-slate-200 shadow-xl max-h-72 overflow-y-auto space-y-1.5 animate-fadeIn">
-                        <div className="px-2 py-1 text-3xs font-extrabold uppercase text-slate-400 tracking-wider flex justify-between">
-                          <span>উপলব্ধ কাস্টমার তালিকা ({filteredList.length} জন)</span>
-                          <button 
-                            type="button" 
-                            onClick={() => setIsPaymentClientPickerOpen(false)}
-                            className="text-[#CE2028] hover:underline"
-                          >
-                            বন্ধ করুন ✕
-                          </button>
-                        </div>
+                      <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex flex-col justify-end sm:justify-center items-center animate-fadeIn select-none">
+                        {/* Dismiss backdrop */}
+                        <div 
+                          className="absolute inset-0"
+                          onClick={() => {
+                            setIsPaymentClientPickerOpen(false);
+                            setPaymentClientSearchQuery('');
+                          }}
+                        />
 
-                        {filteredList.length === 0 ? (
-                          <div className="p-4 text-center text-xs text-slate-400">
-                            এই প্রজেক্টে কোনো কাস্টমার নিবন্ধিত নেই।
-                          </div>
-                        ) : (
-                          filteredList.map(c => {
-                            const cDue = (c.totalPrice || 0) - (c.totalPaid || 0);
-                            const isCurrent = c.id === paymentForm.clientId;
+                        {/* Bottom Sheet Drawer on Mobile / Centered Sheet on larger */}
+                        <div 
+                          className="relative z-10 w-full sm:max-w-lg bg-white rounded-t-[2.2rem] sm:rounded-3xl shadow-2xl border-t sm:border border-slate-200 overflow-hidden flex flex-col max-h-[78vh] sm:max-h-[82vh] animate-slideUp"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Top Drag Indicator (mobile only) */}
+                          <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mt-3 mb-1 sm:hidden"></div>
 
-                            return (
-                              <div
-                                key={c.id}
-                                onClick={() => {
-                                  setPaymentForm({ ...paymentForm, clientId: c.id });
-                                  setIsPaymentClientPickerOpen(false);
-                                }}
-                                className={`p-2.5 rounded-xl flex items-center justify-between gap-3 cursor-pointer transition-colors ${
-                                  isCurrent
-                                    ? 'bg-emerald-50 border border-emerald-300 ring-1 ring-emerald-400'
-                                    : 'hover:bg-slate-50 border border-transparent'
-                                }`}
-                              >
-                                <div className="flex items-center space-x-2.5 min-w-0">
-                                  <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden shadow-2xs">
-                                    {c.image ? (
-                                      <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                      c.name ? c.name.slice(0, 2) : 'গ্রা'
-                                    )}
-                                  </div>
-                                  <div className="min-w-0">
-                                    <div className="text-xs font-bold text-slate-900 truncate flex items-center space-x-1">
-                                      <span>{c.name}</span>
-                                      <span className="text-3xs text-slate-400 font-mono">({c.id})</span>
-                                    </div>
-                                    <div className="text-3xs text-slate-500 truncate">
-                                      {c.projectName} • {c.flatNo}
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="text-right shrink-0">
-                                  <div className="text-xs font-bold text-amber-700 font-mono">
-                                    {formatBDT(cDue)}
-                                  </div>
-                                  <span className="text-3xs text-slate-400">বকেয়া</span>
-                                </div>
+                          {/* Header */}
+                          <div className="px-5 py-3.5 flex items-center justify-between border-b border-slate-100">
+                            <div className="flex items-center space-x-2.5">
+                              <div className="w-9 h-9 rounded-full bg-emerald-50 text-[#006231] flex items-center justify-center shrink-0">
+                                <Users className="w-5 h-5" />
                               </div>
-                            );
-                          })
-                        )}
+                              <div>
+                                <h3 className="font-bold text-sm sm:text-base text-slate-900">
+                                  কাস্টমার নির্বাচন করুন...
+                                </h3>
+                                <p className="text-3xs text-slate-500 font-medium">
+                                  মোট {filteredList.length} জন কাস্টমার উপলব্ধ
+                                </p>
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsPaymentClientPickerOpen(false);
+                                setPaymentClientSearchQuery('');
+                              }}
+                              className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                              title="বন্ধ করুন"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+
+                          {/* Search Input */}
+                          <div className="px-5 pt-3 pb-2">
+                            <div className="relative">
+                              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                              <input
+                                type="text"
+                                value={paymentClientSearchQuery}
+                                onChange={(e) => setPaymentClientSearchQuery(e.target.value)}
+                                placeholder="নাম বা প্রতিষ্ঠান লিখে খুঁজুন..."
+                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-9 py-2.5 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+                                autoFocus
+                              />
+                              {paymentClientSearchQuery && (
+                                <button
+                                  type="button"
+                                  onClick={() => setPaymentClientSearchQuery('')}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Horizontal Project Filter Chips */}
+                          <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar px-5 pb-2.5 text-2xs">
+                            <button
+                              type="button"
+                              onClick={() => setPaymentSelectedProjectId('all')}
+                              className={`px-3 py-1 rounded-full whitespace-nowrap font-bold transition-all cursor-pointer ${
+                                paymentSelectedProjectId === 'all'
+                                  ? 'bg-[#006231] text-white shadow-2xs'
+                                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                              }`}
+                            >
+                              সকল প্রজেক্ট ({data.clients.length})
+                            </button>
+                            {data.projects.map(p => {
+                              const pCount = data.clients.filter(c => c.projectId === p.id).length;
+                              return (
+                                <button
+                                  key={p.id}
+                                  type="button"
+                                  onClick={() => setPaymentSelectedProjectId(p.id)}
+                                  className={`px-3 py-1 rounded-full whitespace-nowrap font-bold transition-all cursor-pointer ${
+                                    paymentSelectedProjectId === p.id
+                                      ? 'bg-[#006231] text-white shadow-2xs'
+                                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                  }`}
+                                >
+                                  {p.name} ({pCount})
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {/* Customer List Items */}
+                          <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1 divide-y divide-slate-100">
+                            {filteredList.length === 0 ? (
+                              <div className="py-12 text-center text-slate-400 space-y-1">
+                                <Users className="w-8 h-8 mx-auto text-slate-300" />
+                                <p className="text-xs font-semibold text-slate-600">কোনো কাস্টমার পাওয়া যায়নি</p>
+                                <p className="text-3xs text-slate-400">ভিন্ন নাম বা প্রজেক্ট দিয়ে অনুসন্ধান করুন</p>
+                              </div>
+                            ) : (
+                              filteredList.map(c => {
+                                const cDue = (c.totalPrice || 0) - (c.totalPaid || 0);
+                                const isCurrent = c.id === paymentForm.clientId;
+
+                                return (
+                                  <div
+                                    key={c.id}
+                                    onClick={() => {
+                                      setPaymentForm({ ...paymentForm, clientId: c.id });
+                                      setIsPaymentClientPickerOpen(false);
+                                      setPaymentClientSearchQuery('');
+                                    }}
+                                    className={`p-2.5 rounded-2xl flex items-center justify-between gap-3 cursor-pointer transition-all active:scale-[0.99] ${
+                                      isCurrent
+                                        ? 'bg-emerald-50/80 border border-emerald-300 ring-1 ring-emerald-400/50 shadow-2xs'
+                                        : 'hover:bg-slate-50 border border-transparent'
+                                    }`}
+                                  >
+                                    <div className="flex items-center space-x-3 min-w-0">
+                                      <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden shadow-2xs ring-2 ring-emerald-500/20">
+                                        {c.image ? (
+                                          <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                          c.name ? c.name.slice(0, 2) : 'গ্রা'
+                                        )}
+                                      </div>
+                                      <div className="min-w-0">
+                                        <div className="text-sm font-bold text-slate-900 truncate flex items-center space-x-1.5">
+                                          <span>{c.name}</span>
+                                          <span className="text-3xs font-mono font-medium text-slate-400">({c.id})</span>
+                                        </div>
+                                        <div className="flex items-center space-x-1.5 mt-0.5 flex-wrap">
+                                          <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-[#006231] border border-emerald-200/60 truncate max-w-[130px]">
+                                            {c.projectName}
+                                          </span>
+                                          <span className="text-2xs text-slate-500 font-medium truncate">
+                                            ফ্ল্যাট: {c.flatNo}
+                                          </span>
+                                          {c.phone && (
+                                            <span className="text-3xs font-mono text-slate-400 hidden sm:inline">
+                                              • {c.phone}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center space-x-2 shrink-0">
+                                      <div className="text-right">
+                                        <div className="text-xs sm:text-sm font-black text-amber-700 font-mono">
+                                          {formatBDT(cDue)}
+                                        </div>
+                                        <span className="text-[10px] text-slate-400 font-medium">বকেয়া</span>
+                                      </div>
+                                      {isCurrent && (
+                                        <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center ml-1 shrink-0 shadow-2xs">
+                                          <Check className="w-3.5 h-3.5" />
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                        </div>
                       </div>
                     );
                   })()}
