@@ -320,6 +320,128 @@ export default function AboutUs({ lang, t }) {
         </div>
 
         {/* ========================================================= */}
+        {/* UNITED EMARAH LIMITED & SISTER CONCERNS                   */}
+        {/* ========================================================= */}
+        <div id="group-concerns" className="pt-6 space-y-10">
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-red-50 text-[#CE2028] text-xs font-bold uppercase tracking-wider">
+              <Building2 className="w-3.5 h-3.5" />
+              <span>{t.about.concerns?.badge || (lang === 'en' ? 'Corporate Ecosystem' : 'গ্রুপ কাঠামো ও অঙ্গপ্রতিষ্ঠানসমূহ')}</span>
+            </div>
+
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#231F20] tracking-tight">
+              {t.about.concerns?.title || (lang === 'en' ? 'United Emarah Limited & Sister Concerns' : 'ইউনাইটেড ইমারাহ লিমিটেড ও সিস্টার কনসার্নস')}
+            </h3>
+
+            <p className="text-xs sm:text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              {t.about.concerns?.subtitle || (lang === 'en' 
+                ? 'A progressive corporate conglomerate delivering excellence across real estate development, agriculture, and emerging growth ventures in Bangladesh.'
+                : 'আবাসন উন্নয়ন, আধুনিক কৃষি ও বহুমুখী শিল্প উদ্যোগের সমন্বয়ে দেশের অর্থনীতিতে ভূমিকা রাখা একটি সুদৃঢ় প্রাতিষ্ঠানিক পরিবার।')}
+            </p>
+          </div>
+
+          {/* Master Parent / Holding Company Showcase Card */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1C1819] via-[#241F21] to-[#121011] p-6 sm:p-10 text-white shadow-2xl border border-white/10">
+            {/* Background Ambient Glow */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#CE2028]/20 via-[#006231]/10 to-transparent blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+
+            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10">
+              {/* Left Info */}
+              <div className="space-y-4 max-w-xl text-center lg:text-left">
+                <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-emerald-400 text-xs font-bold tracking-wide">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>{t.about.concerns?.parentTag || (lang === 'en' ? 'Principal Parent / Holding Company' : 'মূল মাদার / প্যারেন্ট কোম্পানি')}</span>
+                </div>
+
+                <h4 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
+                  UNITED EMARAH LIMITED
+                </h4>
+
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-normal">
+                  {t.about.concerns?.parentDesc || (lang === 'en'
+                    ? 'The parent holding company responsible for strategic direction, policy enforcement, capital stewardship, and ethical corporate governance across all group ventures.'
+                    : 'গ্রুপের সার্বিক দিকনির্দেশনা, কৌশলগত নীতি ও সুশাসনের মূল চালিকাশক্তি হিসেবে দায়িত্বরত শীর্ষ মাদার প্রতিষ্ঠান।')}
+                </p>
+
+                <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-xs text-gray-300">
+                  <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 font-medium">
+                    {lang === 'en' ? '✓ Registered Conglomerate' : '✓ নিবন্ধিত কর্পোরেট গ্রুপ'}
+                  </span>
+                  <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 font-medium">
+                    {lang === 'en' ? '✓ Multi-Sector Growth' : '✓ বহুমুখী শিল্প বিনিয়োগ'}
+                  </span>
+                  <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 font-medium">
+                    {lang === 'en' ? '✓ Ethical Corporate Governance' : '✓ সুশাসিত ব্যবস্থাপনা'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Right Logo Display Frame */}
+              <div className="w-full lg:w-auto shrink-0 flex justify-center">
+                <div className="p-6 sm:p-8 rounded-2xl bg-white shadow-xl border border-gray-100 flex items-center justify-center max-w-xs sm:max-w-sm w-full">
+                  <img
+                    src="/images/united_emarah_limited.svg"
+                    alt="United Emarah Limited"
+                    className="w-full h-auto max-h-24 object-contain"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sister Concerns Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {(t.about.concerns?.list || []).map((concern) => (
+              <div
+                key={concern.id}
+                className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+              >
+                <div className="space-y-5">
+                  <div className="flex items-start justify-between gap-4">
+                    {/* Concern Logo Box */}
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-slate-50 border border-gray-100 p-3 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
+                      <img
+                        src={concern.logo}
+                        alt={concern.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+
+                    <div className="text-right">
+                      <span className="inline-block px-3 py-1 rounded-full text-[11px] font-bold tracking-wide bg-emerald-50 text-[#006231] border border-emerald-200">
+                        {concern.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold text-[#CE2028] uppercase tracking-wider block">
+                      {concern.badge}
+                    </span>
+                    <h4 className="text-xl sm:text-2xl font-black text-gray-900 group-hover:text-[#006231] transition-colors">
+                      {concern.name}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                      {concern.desc}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-500">
+                  <span className="text-[#006231] font-bold flex items-center gap-1.5">
+                    <CheckCircle className="w-4 h-4 text-[#8EBF40]" />
+                    {concern.highlight}
+                  </span>
+                  <span className="text-3xs px-2 py-0.5 rounded bg-gray-100 text-gray-600 font-mono font-medium">
+                    {lang === 'en' ? 'A Concern of UEL' : 'ইউনাইটেড ইমারাহ এর অঙ্গপ্রতিষ্ঠান'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ========================================================= */}
         {/* NEW SECTION: CORPORATE POLICIES & GOVERNANCE ACCORDION   */}
         {/* (Corporate Governance, Shareholder Policy, Commitment)   */}
         {/* ========================================================= */}

@@ -44,16 +44,25 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 pb-12 border-b border-white/10">
           {/* Brand Info (Span 2) */}
           <div className="lg:col-span-2 space-y-4">
-            <button 
-              onClick={() => handleLinkClick('#home')} 
-              className="inline-block cursor-pointer text-left transition-opacity hover:opacity-90"
-            >
-              <img 
-                src="/alemarah_logo_footer.svg" 
-                alt="Al-Emarah Properties Limited" 
-                className="h-10 sm:h-12 w-auto object-contain"
-              />
-            </button>
+            <div className="space-y-2">
+              <button 
+                onClick={() => handleLinkClick('#home')} 
+                className="inline-block cursor-pointer text-left transition-opacity hover:opacity-90"
+              >
+                <img 
+                  src="/alemarah_logo_footer.svg" 
+                  alt="Al-Emarah Properties Limited" 
+                  className="h-10 sm:h-12 w-auto object-contain"
+                />
+              </button>
+
+              <div>
+                <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-3xs sm:text-xs text-gray-300">
+                  <span className="text-gray-400">{lang === 'en' ? 'A Concern of' : 'একটি অঙ্গপ্রতিষ্ঠান :'}</span>
+                  <span className="font-extrabold text-white tracking-wide">UNITED EMARAH LIMITED</span>
+                </div>
+              </div>
+            </div>
 
             <p className="text-xs sm:text-sm text-gray-400 leading-relaxed max-w-sm">
               {t.footer.tagline}
@@ -196,6 +205,45 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
                 <Mail className="w-4 h-4 text-blue-400 shrink-0" />
                 <a href="mailto:info@alemarahproperties.com" className="hover:text-white transition-colors">info@alemarahproperties.com</a>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Group Conglomerate & Sister Concerns Bar */}
+        <div className="py-6 border-b border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-2 text-center md:text-left">
+            <span className="w-2 h-2 rounded-full bg-[#006231]"></span>
+            <span className="text-3xs sm:text-xs font-bold uppercase tracking-wider text-gray-400">
+              {lang === 'en' ? 'Corporate Group & Sister Concerns:' : 'কর্পোরেট গ্রুপ ও অঙ্গপ্রতিষ্ঠানসমূহ:'}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+            {/* United Emarah Limited (Parent) */}
+            <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span className="text-xs font-black tracking-wide text-white">UNITED EMARAH LIMITED</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-medium">
+                {lang === 'en' ? 'Parent Company' : 'মাদার কোম্পানি'}
+              </span>
+            </div>
+
+            {/* Al-Emarah Properties (Sister Concern) */}
+            <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <span className="w-2 h-2 rounded-full bg-[#CE2028]"></span>
+              <span className="text-xs font-bold text-gray-200">Al-Emarah Properties</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-300 font-medium">
+                {lang === 'en' ? 'Real Estate' : 'আবাসন'}
+              </span>
+            </div>
+
+            {/* Emarah Agro (Sister Concern) */}
+            <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <span className="w-2 h-2 rounded-full bg-[#8EBF40]"></span>
+              <span className="text-xs font-bold text-gray-200">Emarah Agro</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-300 font-medium">
+                {lang === 'en' ? 'Agro & Farming' : 'কৃষি ও খামার'}
+              </span>
             </div>
           </div>
         </div>

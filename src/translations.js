@@ -278,6 +278,35 @@ export const translations = {
             image: "/images/al_amin_hawladar.jpg"
           }
         ]
+      },
+      concerns: {
+        badge: "Corporate Ecosystem",
+        title: "United Emarah Limited & Sister Concerns",
+        subtitle: "A progressive corporate conglomerate delivering excellence across real estate development, agriculture, and emerging growth ventures in Bangladesh.",
+        parentTag: "Principal Parent / Holding Company",
+        parentTitle: "UNITED EMARAH LIMITED",
+        parentDesc: "The parent holding company responsible for strategic direction, policy enforcement, capital stewardship, and ethical corporate governance across all group ventures.",
+        sisterTag: "Sister Concern & Subsidiary",
+        list: [
+          {
+            id: "properties",
+            name: "Al-Emarah Properties Limited",
+            badge: "Real Estate & Infrastructure",
+            desc: "Pioneering premium residential condominiums, smart commercial landmarks, and shared investment partnerships in Dhaka.",
+            logo: "/alemarah_logo.svg",
+            status: "Flagship Venture",
+            highlight: "Residential & Commercial Developments"
+          },
+          {
+            id: "agro",
+            name: "Emarah Agro",
+            badge: "Agriculture & Agro Ventures",
+            desc: "Modernizing sustainable agriculture, dairy farming, organic food supply chains, and green agribusiness with integrity and advanced agro-technology.",
+            logo: "/images/emarah_agro.jpg",
+            status: "Agro Initiative",
+            highlight: "Organic Food & Modern Farming"
+          }
+        ]
       }
     },
 
@@ -975,6 +1004,35 @@ export const translations = {
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
             image: "/images/al_amin_hawladar.jpg"
+          }
+        ]
+      },
+      concerns: {
+        badge: "গ্রুপ কাঠামো ও অঙ্গপ্রতিষ্ঠানসমূহ",
+        title: "ইউনাইটেড ইমারাহ লিমিটেড ও সিস্টার কনসার্নস",
+        subtitle: "আবাসন উন্নয়ন, আধুনিক কৃষি ও বহুমুখী শিল্প উদ্যোগের সমন্বয়ে দেশের অর্থনীতিতে ভূমিকা রাখা একটি সুদৃঢ় প্রাতিষ্ঠানিক পরিবার।",
+        parentTag: "মূল মাদার / প্যারেন্ট কোম্পানি",
+        parentTitle: "UNITED EMARAH LIMITED",
+        parentDesc: "গ্রুপের সার্বিক দিকনির্দেশনা, কৌশলগত নীতি ও সুশাসনের মূল চালিকাশক্তি হিসেবে দায়িত্বরত শীর্ষ মাদার প্রতিষ্ঠান।",
+        sisterTag: "অঙ্গপ্রতিষ্ঠান / সিস্টার কনসার্ন",
+        list: [
+          {
+            id: "properties",
+            name: "আল-ইমারাহ প্রোপার্টিজ লিমিটেড",
+            badge: "রিয়েল এস্টেট ও অবকাঠামো উন্নয়ন",
+            desc: "ঢাকাসহ দেশের সম্ভাবনাময় লোকেশনে পরিকল্পিত আধুনিক অ্যাপার্টমেন্ট, বাণিজ্যিক ভবন, হালাল আবাসন ও লাভজনক শেয়ার পার্টনারশিপ প্রকল্প।",
+            logo: "/alemarah_logo.svg",
+            status: "ফ্ল্যাগশিপ প্রতিষ্ঠান",
+            highlight: "পরিকল্পিত ও বিশ্বস্ত আবাসন প্রকল্প"
+          },
+          {
+            id: "agro",
+            name: "ইমারাহ এগ্রো",
+            badge: "আধুনিক কৃষি ও ডেইরি উদ্যোগ",
+            desc: "নিরাপদ খাদ্য উৎপাদন, আধুনিক কৃষি প্রযুক্তি, টেকসই পশুপালন ও পরিবেশবান্ধব খামার ব্যবস্থাপনার মাধ্যমে কৃষিখাতে নির্ভরযোগ্য উদ্যোগ।",
+            logo: "/images/emarah_agro.jpg",
+            status: "এগ্রো ও ফার্মিং উদ্যোগ",
+            highlight: "নিরাপদ খাদ্য ও টেকসই খামার"
           }
         ]
       }
