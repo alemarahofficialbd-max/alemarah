@@ -34,7 +34,20 @@ export default function ClientDashboard({
   onLogout, 
   onNavigateHome 
 }) {
-  const [activeTab, setActiveTab] = useState('details'); // 'details', 'payments', 'progress', 'history', 'profile'
+  const [activeTab, setActiveTabState] = useState(() => {
+    try {
+      return localStorage.getItem('alemarah_client_tab') || 'details';
+    } catch {
+      return 'details';
+    }
+  });
+
+  const setActiveTab = (tabId) => {
+    setActiveTabState(tabId);
+    try {
+      localStorage.setItem('alemarah_client_tab', tabId);
+    } catch {}
+  };
   
   // Load management data to ensure sync with admin updates
   const mgtData = getManagementData();

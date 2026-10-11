@@ -70,7 +70,20 @@ export default function ManagementDashboard({
   onNavigateHome 
 }) {
   const [data, setData] = useState(getManagementData);
-  const [activeTab, setActiveTab] = useState('clients'); // 'clients', 'payments', 'projects', 'expenses', 'team'
+  const [activeTab, setActiveTabState] = useState(() => {
+    try {
+      return localStorage.getItem('alemarah_management_tab') || 'clients';
+    } catch {
+      return 'clients';
+    }
+  });
+
+  const setActiveTab = (tabId) => {
+    setActiveTabState(tabId);
+    try {
+      localStorage.setItem('alemarah_management_tab', tabId);
+    } catch {}
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [projectFilter, setProjectFilter] = useState('all');
   const [selectedClientForProfile, setSelectedClientForProfile] = useState(null);

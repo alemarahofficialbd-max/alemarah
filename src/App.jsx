@@ -56,14 +56,80 @@ import {
 
 export default function App() {
   const [lang, setLang] = useState('bn'); // 'bn' (Bangla) or 'en' (English)
-  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'projects', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management'
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentClient, setCurrentClient] = useState(null);
-  const [currentAdmin, setCurrentAdmin] = useState(null);
+
+  // Retrieve persisted login sessions
+  const [currentAdmin, setCurrentAdmin] = useState(() => {
+    try {
+      const stored = localStorage.getItem('alemarah_admin_session');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [currentClient, setCurrentClient] = useState(() => {
+    try {
+      const stored = localStorage.getItem('alemarah_client_session');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      const hasAdmin = Boolean(localStorage.getItem('alemarah_admin_session'));
+      const hasClient = Boolean(localStorage.getItem('alemarah_client_session'));
+      return hasAdmin || hasClient;
+    } catch {
+      return false;
+    }
+  });
+
+  const [currentPage, setCurrentPage] = useState(() => {
+    try {
+      const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details'];
+      const hash = window.location.hash.replace('#', '');
+      const hasAdmin = Boolean(localStorage.getItem('alemarah_admin_session'));
+      const hasClient = Boolean(localStorage.getItem('alemarah_client_session'));
+
+      if (hash && validPages.includes(hash)) {
+        if (hash === 'management') return hasAdmin ? 'management' : 'login';
+        if (hash === 'dashboard') return hasClient ? 'dashboard' : 'login';
+        return hash;
+      }
+
+      const savedPage = localStorage.getItem('alemarah_current_page');
+      if (savedPage && validPages.includes(savedPage)) {
+        if (savedPage === 'management') return hasAdmin ? 'management' : 'home';
+        if (savedPage === 'dashboard') return hasClient ? 'dashboard' : 'home';
+        return savedPage;
+      }
+
+      return 'home';
+    } catch {
+      return 'home';
+    }
+  });
+
   const [selectedProject, setSelectedProject] = useState(null);
   const [preselectedProject, setPreselectedProject] = useState(null);
   const [searchFilter, setSearchFilter] = useState(null);
-  const [showSplash, setShowSplash] = useState(true);
+  
+  // Skip splash screen if reloading directly inside management or dashboard
+  const [showSplash, setShowSplash] = useState(() => {
+    try {
+      const hash = window.location.hash.replace('#', '');
+      const savedPage = localStorage.getItem('alemarah_current_page');
+      const hasAdmin = Boolean(localStorage.getItem('alemarah_admin_session'));
+      const hasClient = Boolean(localStorage.getItem('alemarah_client_session'));
+      if ((hash === 'management' || savedPage === 'management') && hasAdmin) return false;
+      if ((hash === 'dashboard' || savedPage === 'dashboard') && hasClient) return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
 
   useEffect(() => {
     const handleBeforeInstall = (e) => {
@@ -85,23 +151,51 @@ export default function App() {
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
   }, []);
 
-  // Synchronize browser history and hash navigation (back/forward button support)
+  // Synchronize browser history and hash navigation (back/forward button support & refresh retention)
   useEffect(() => {
-    const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'project-details'];
+    const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details'];
     const initialHash = window.location.hash.replace('#', '');
     
+    const hasAdmin = Boolean(localStorage.getItem('alemarah_admin_session'));
+    const hasClient = Boolean(localStorage.getItem('alemarah_client_session'));
+    const savedPage = localStorage.getItem('alemarah_current_page');
+
+    let resolvedPage = 'home';
+
     if (initialHash && validPages.includes(initialHash)) {
-      setCurrentPage(initialHash);
-      window.history.replaceState({ page: initialHash }, '', `#${initialHash}`);
-    } else {
-      window.history.replaceState({ page: 'home' }, '', window.location.pathname);
+      if (initialHash === 'management') {
+        resolvedPage = hasAdmin ? 'management' : 'login';
+      } else if (initialHash === 'dashboard') {
+        resolvedPage = hasClient ? 'dashboard' : 'login';
+      } else {
+        resolvedPage = initialHash;
+      }
+    } else if (savedPage && validPages.includes(savedPage)) {
+      if (savedPage === 'management') {
+        resolvedPage = hasAdmin ? 'management' : 'home';
+      } else if (savedPage === 'dashboard') {
+        resolvedPage = hasClient ? 'dashboard' : 'home';
+      } else {
+        resolvedPage = savedPage;
+      }
     }
+
+    setCurrentPage(resolvedPage);
+    try {
+      localStorage.setItem('alemarah_current_page', resolvedPage);
+    } catch (e) {}
+
+    const url = resolvedPage === 'home' ? window.location.pathname : `#${resolvedPage}`;
+    window.history.replaceState({ page: resolvedPage }, '', url);
 
     const handlePopState = (event) => {
       const pageFromState = event.state?.page;
       const hash = window.location.hash.replace('#', '');
       const targetPage = pageFromState || (hash && validPages.includes(hash) ? hash : 'home');
       setCurrentPage(targetPage);
+      try {
+        localStorage.setItem('alemarah_current_page', targetPage);
+      } catch (e) {}
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -115,6 +209,9 @@ export default function App() {
 
   const navigateTo = (pageId, addToHistory = true) => {
     setCurrentPage(pageId);
+    try {
+      localStorage.setItem('alemarah_current_page', pageId);
+    } catch (e) {}
     if (addToHistory) {
       const url = pageId === 'home' ? window.location.pathname : `#${pageId}`;
       window.history.pushState({ page: pageId }, '', url);
@@ -142,12 +239,22 @@ export default function App() {
   const handleLoginSuccess = (client) => {
     setIsLoggedIn(true);
     setCurrentClient(client);
+    try {
+      localStorage.setItem('alemarah_logged_in', 'true');
+      localStorage.setItem('alemarah_client_session', JSON.stringify(client));
+      localStorage.setItem('alemarah_current_page', 'dashboard');
+    } catch (e) {}
     navigateTo('dashboard');
   };
 
   const handleManagementLoginSuccess = (admin) => {
     setIsLoggedIn(true);
     setCurrentAdmin(admin);
+    try {
+      localStorage.setItem('alemarah_logged_in', 'true');
+      localStorage.setItem('alemarah_admin_session', JSON.stringify(admin));
+      localStorage.setItem('alemarah_current_page', 'management');
+    } catch (e) {}
     navigateTo('management');
   };
 
@@ -155,6 +262,14 @@ export default function App() {
     setIsLoggedIn(false);
     setCurrentClient(null);
     setCurrentAdmin(null);
+    try {
+      localStorage.removeItem('alemarah_logged_in');
+      localStorage.removeItem('alemarah_client_session');
+      localStorage.removeItem('alemarah_admin_session');
+      localStorage.removeItem('alemarah_management_tab');
+      localStorage.removeItem('alemarah_client_tab');
+      localStorage.setItem('alemarah_current_page', 'home');
+    } catch (e) {}
     navigateTo('home');
   };
 
