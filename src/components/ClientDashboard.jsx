@@ -25,7 +25,7 @@ import {
   Settings,
   HelpCircle
 } from 'lucide-react';
-import { formatBDT, getManagementData } from '../data/managementStore';
+import { formatBDT, getManagementData, updateStore } from '../data/managementStore';
 
 export default function ClientDashboard({ 
   client: propClient, 
@@ -114,6 +114,12 @@ export default function ClientDashboard({
           localStorage.setItem(`alemarah_avatar_${client?.id}`, compressedDataUrl);
         } catch (err) {
           console.error('Error storing avatar in localStorage:', err);
+        }
+        if (client?.id) {
+          updateStore((prev) => ({
+            ...prev,
+            clients: prev.clients.map(c => c.id === client.id ? { ...c, image: compressedDataUrl } : c)
+          }));
         }
       };
       img.src = event.target.result;
@@ -488,13 +494,13 @@ export default function ClientDashboard({
                   </div>
                   <div>
                     <div className="text-2xs font-bold text-[#CE2028] uppercase tracking-wider">পরবর্তী কিস্তির সময়সীমা</div>
-                    <div className="text-base font-black text-slate-900">{client?.nextDueDate}</div>
+                    <div className="text-base font-black text-slate-900">{client?.nextDueDate || 'নির্ধারিত হয়নি'}</div>
                     <div className="text-xs text-slate-600">নির্ধারিত তারিখে জমা দিয়ে রসিদ নিশ্চিত করুন</div>
                   </div>
                 </div>
                 <div className="sm:text-right bg-white sm:bg-transparent p-3 sm:p-0 rounded-2xl border sm:border-0 border-red-100">
                   <div className="text-3xs text-slate-400 font-bold uppercase">প্রদেয় টাকার পরিমাণ</div>
-                  <div className="text-xl font-black text-[#CE2028]">{formatBDT(client?.nextDueAmount)}</div>
+                  <div className="text-xl font-black text-[#CE2028]">{formatBDT(client?.nextDueAmount || 0)}</div>
                 </div>
               </div>
 

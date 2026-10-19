@@ -38,21 +38,25 @@ export default function Projects({
         return false;
       }
       if (searchFilter.location && searchFilter.location !== 'all') {
-        const areaMatch = item.areaEn.toLowerCase().includes(searchFilter.location.toLowerCase()) ||
-                          item.locationEn.toLowerCase().includes(searchFilter.location.toLowerCase());
+        const targetLoc = searchFilter.location.toLowerCase();
+        const areaMatch = (item.areaEn?.toLowerCase() || '').includes(targetLoc) ||
+                          (item.locationEn?.toLowerCase() || '').includes(targetLoc) ||
+                          (item.location?.toLowerCase() || '').includes(targetLoc) ||
+                          (item.locationBn?.toLowerCase() || '').includes(targetLoc);
         if (!areaMatch) return false;
       }
       if (searchFilter.propertyType && searchFilter.propertyType !== 'all') {
-        if (searchFilter.propertyType === 'commercial' && !item.typeEn.toLowerCase().includes('commercial')) {
+        const itemType = (item.typeEn?.toLowerCase() || '') + ' ' + (item.type?.toLowerCase() || '') + ' ' + (item.typeBn?.toLowerCase() || '');
+        if (searchFilter.propertyType === 'commercial' && !itemType.includes('commercial') && !itemType.includes('বাণিজ্যিক')) {
           return false;
         }
-        if (searchFilter.propertyType === 'condo' && !item.typeEn.toLowerCase().includes('condo')) {
+        if (searchFilter.propertyType === 'condo' && !itemType.includes('condo')) {
           return false;
         }
-        if (searchFilter.propertyType === 'apartment' && item.typeEn.toLowerCase().includes('commercial')) {
+        if (searchFilter.propertyType === 'apartment' && (itemType.includes('commercial') || itemType.includes('বাণিজ্যিক'))) {
           return false;
         }
-        if (searchFilter.propertyType === 'agro' && !item.typeEn.toLowerCase().includes('agro')) {
+        if (searchFilter.propertyType === 'agro' && !itemType.includes('agro') && !itemType.includes('এগ্রো')) {
           return false;
         }
       }

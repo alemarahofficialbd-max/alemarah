@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS public.projects (
     progress INTEGER DEFAULT 0,
     current_stage TEXT,
     budget NUMERIC(15, 2) DEFAULT 0,
+    units JSONB DEFAULT '[]'::jsonb,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

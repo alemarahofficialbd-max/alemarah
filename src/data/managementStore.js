@@ -461,7 +461,8 @@ export const syncToSupabase = async (data) => {
         location: p.location || '',
         progress: Number(p.progress) || 0,
         current_stage: p.currentStage || '',
-        budget: Number(p.budget) || 0
+        budget: Number(p.budget) || 0,
+        units: p.units || []
       }));
       await supabase.from('projects').upsert(projRows, { onConflict: 'id' });
 
@@ -529,11 +530,12 @@ export const syncToSupabase = async (data) => {
 // Background sync from Supabase
 export const syncFromSupabase = async () => {
   try {
-    const [adminsRes, directorsRes, projectsRes, clientsRes] = await Promise.all([
+    const [adminsRes, directorsRes, projectsRes, clientsRes, inquiriesRes] = await Promise.all([
       supabase.from('admins').select('*'),
       supabase.from('directors').select('*'),
       supabase.from('projects').select('*, expenses:project_expenses(*)'),
-      supabase.from('clients').select('*, paymentHistory:client_payments(*)')
+      supabase.from('clients').select('*, paymentHistory:client_payments(*)'),
+      supabase.from('inquiries').select('*')
     ]);
 
     // If tables do not exist yet, return gracefully
@@ -628,7 +630,8 @@ export const syncFromSupabase = async () => {
           type: localProj?.type || 'residential',
           totalFloors: localProj?.totalFloors || 10,
           unitsPerFloor: localProj?.unitsPerFloor || 2,
-          units: localProj?.units || [],
+          handoverDate: localProj?.handoverDate || 'ডিসেম্বর ২০২৮',
+          units: (p.units && Array.isArray(p.units) && p.units.length > 0) ? p.units : (localProj?.units || []),
           expenses: expensesFromRemote.length > 0 ? expensesFromRemote : (localProj?.expenses || [])
         };
       });
@@ -663,6 +666,23 @@ export const syncFromSupabase = async () => {
       // Retain any locally added clients that aren't yet in Supabase
       const extraLocalClients = (current.clients || []).filter(lc => !clientsRes.data.some(c => c.id === lc.id));
       updated.clients = [...remoteClients, ...extraLocalClients];
+    }
+
+    if (inquiriesRes && inquiriesRes.data && inquiriesRes.data.length > 0) {
+      const remoteInquiries = inquiriesRes.data.map(inq => ({
+        id: inq.id,
+        type: inq.type,
+        name: inq.name,
+        phone: inq.phone,
+        email: inq.email,
+        message: inq.message,
+        projectName: inq.project_name,
+        investmentAmount: inq.investment_amount,
+        status: inq.status || 'নতুন ইনকোয়ারি',
+        date: inq.created_at ? new Date(inq.created_at).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : (inq.date || '')
+      }));
+      const extraLocalInquiries = (current.inquiries || []).filter(li => !inquiriesRes.data.some(r => r.id === li.id));
+      updated.inquiries = [...remoteInquiries, ...extraLocalInquiries];
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -712,6 +732,14 @@ export const saveManagementData = (data) => {
   } catch (e) {
     console.error('Error saving management data to localStorage:', e);
   }
+};
+
+// Atomic state updater universally available
+export const updateStore = (updater) => {
+  const current = getManagementData();
+  const nextData = typeof updater === 'function' ? updater(current) : updater;
+  saveManagementData(nextData);
+  return nextData;
 };
 
 // Subscription listener for real-time sync across components
