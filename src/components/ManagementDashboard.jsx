@@ -1751,16 +1751,14 @@ export default function ManagementDashboard({
                           </td>
                           <td className="py-4 px-6">
                             <div className="font-bold text-slate-800">{cl.projectName}</div>
-                            <div className="text-2xs text-emerald-700 font-semibold">{cl.flatNo}</div>
+                            <div className="text-2xs text-emerald-700 font-semibold">{(cl.flatNo || '').replace(/\s*\([^)]*\)/g, '').trim()}</div>
                           </td>
                           <td className="py-4 px-6 font-bold text-slate-900">
                             {formatBDT(cl.totalPrice)}
                           </td>
                           <td className="py-4 px-6 font-black text-[#006231]">
                             <div>{formatBDT(cl.totalPaid)}</div>
-                            <span className="text-3xs font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded">
-                              {percent}% আদায়
-                            </span>
+
                           </td>
                           <td className="py-4 px-6 font-bold text-amber-700">
                             {formatBDT(due)}
