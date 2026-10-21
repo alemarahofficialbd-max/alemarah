@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { 
-  Building2, 
+  Building2,
+  Lock, 
   User, 
   LogOut, 
   CheckCircle2, 
@@ -51,8 +52,10 @@ export default function ClientDashboard({
   
   // Load management data to ensure sync with admin updates
   const mgtData = getManagementData();
-  const client = propClient || mgtData.clients[0];
-  const project = mgtData.projects.find(p => p.id === client?.projectId) || mgtData.projects[0];
+  const client = propClient
+    ? (mgtData.clients.find(c => c.id === propClient.id || (c.phone && propClient.phone && c.phone.replace(/[^0-9]/g, '') === propClient.phone.replace(/[^0-9]/g, ''))) || propClient)
+    : null;
+  const project = client ? (mgtData.projects.find(p => p.id === client.projectId) || null) : null;
 
   // Selected receipt modal
   const [selectedReceipt, setSelectedReceipt] = useState(null);
@@ -141,6 +144,28 @@ export default function ClientDashboard({
     { id: 'history', label: 'জমার হিস্ট্রি', shortLabel: 'হিস্ট্রি', icon: FileText },
     { id: 'profile', label: 'প্রোফাইল ও সেটিংস', shortLabel: 'প্রোফাইল', icon: Settings }
   ];
+
+  if (!client) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full border border-slate-200 text-center space-y-4 shadow-sm">
+          <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">লগইন প্রয়োজন</h2>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            আপনার ক্লায়েন্ট ড্যাশবোর্ড ও কিস্তির হিসাব দেখতে অনুগ্রহ করে সঠিক কাস্টমার আইডি অথবা মোবাইল নম্বর দিয়ে লগইন করুন।
+          </p>
+          <button
+            onClick={onLogout}
+            className="w-full py-3 rounded-xl bg-[#006231] text-white font-bold text-sm hover:opacity-95 transition-all cursor-pointer shadow-md shadow-[#006231]/20"
+          >
+            লগইন পেজে যান
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row font-sans animate-fadeIn">

@@ -149,7 +149,7 @@ export default function App() {
       if (!hasPrompted) {
         setTimeout(() => {
           try {
-            e.prompt();
+            const p = e.prompt(); if (p && p.catch) p.catch(() => {});
             sessionStorage.setItem('aep_install_prompted', 'true');
           } catch (err) {
             console.log('Install prompt notice:', err);

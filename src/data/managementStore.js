@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabaseClient';
 
-const STORAGE_KEY = 'alemarah_management_store_v1';
+const STORAGE_KEY = 'alemarah_management_store_v4';
 
 export const initialManagementData = {
   projects: [
@@ -29,108 +29,10 @@ export const initialManagementData = {
         '২য় তলা, ফ্ল্যাট ২-এ (১২৬৫ বর্গফুট)',
         '২য় তলা, ফ্ল্যাট ২-বি (১২৬৫ বর্গফুট)'
       ],
-      expenses: [
-        { id: 'EXP-1', title: 'পাইলিং ও ডিপ বেসমেন্ট পাইলিং', amount: 18000000, date: '১০ মার্চ ২০২৬' },
-        { id: 'EXP-2', title: '১ম থেকে ৫ম তলা আরসিসি ফ্রেম স্ট্রাকচার', amount: 31000000, date: '১৫ মে ২০২৬' },
-        { id: 'EXP-3', title: '৬ষ্ঠ ও ৭ম তলা চলমান ঢালাই ও ব্রিকওয়ার্ক', amount: 12000000, date: '২০ সেপ্টেম্বর ২০২৬' }
-      ]
-    },
-    {
-      id: 'barakah-tower-01',
-      name: 'বারাকাহ টাওয়ার ০১',
-      nameEn: 'Barakah Tower 01',
-      location: 'পুরানা পল্টন, ঢাকা',
-      progress: 35,
-      currentStage: '৩য় তলা কলাম ও ছাদ সাটারিং',
-      budget: 62000000, // ৳ ৬,২০,০০,০০০
-      type: 'residential',
-      totalFloors: 9,
-      unitsPerFloor: 2,
-      units: [
-        '৮ম তলা, ইউনিট ৮-এ (১৪৫০ বর্গফুট)',
-        '৮ম তলা, ইউনিট ৮-বি (১৪৫০ বর্গফুট)',
-        '৭ম তলা, ইউনিট ৭-এ (১৪৫০ বর্গফুট)',
-        '৭ম তলা, ইউনিট ৭-বি (১৪৫০ বর্গফুট)',
-        '৬ষ্ঠ তলা, ইউনিট ৬-এ (১৪৫০ বর্গফুট)',
-        '৬ষ্ঠ তলা, ইউনিট ৬-বি (১৪৫০ বর্গফুট)',
-        '৫ম তলা, ইউনিট ৫-এ (১৪৫০ বর্গফুট)',
-        '৫ম তলা, ইউনিট ৫-বি (১৪৫০ বর্গফুট)',
-        '৪র্থ তলা, ইউনিট ৪-এ (১৪৫০ বর্গফুট)',
-        '৪র্থ তলা, ইউনিট ৪-বি (১৪৫০ বর্গফুট)',
-        '৩য় তলা, ইউনিট ৩-এ (১৪৫০ বর্গফুট)',
-        '৩য় তলা, ইউনিট ৩-বি (১৪৫০ বর্গফুট)',
-        '২য় তলা, ইউনিট ২-এ (১৪৫০ বর্গফুট)',
-        '২য় তলা, ইউনিট ২-বি (১৪৫০ বর্গফুট)'
-      ],
-      expenses: [
-        { id: 'EXP-B1', title: 'পাইলিং ও সয়েল প্রটেকশন রিটেইনিং ওয়াল', amount: 11500000, date: '১ জুন ২০২৬' },
-        { id: 'EXP-B2', title: 'বেসমেন্ট ও গ্রাউন্ড ফ্লোর ঢালাই', amount: 9500000, date: '১৮ আগস্ট ২০২৬' }
-      ]
-    },
-    {
-      id: 'alemarah-shopping-mall',
-      name: 'আল ইমারাহ শপিং মল',
-      nameEn: 'Al Emarah Shopping Mall',
-      location: '২২ ফুট প্রশস্ত রাস্তা সংলগ্ন, প্রাইম বাণিজ্যিক জোন',
-      progress: 15,
-      currentStage: 'সাইট ডেভেলপমেন্ট ও সয়েল টেস্ট সম্পন্ন',
-      budget: 120000000, // ৳ ১২,০০,০০,০০০
-      type: 'commercial_share',
-      totalFloors: 6,
-      unitsPerFloor: 10,
-      units: [
-        'গ্রাউন্ড ফ্লোর, দোকান নং জি-০১ (১৮০ বর্গফুট)',
-        'গ্রাউন্ড ফ্লোর, দোকান নং জি-০২ (১৮০ বর্গফুট)',
-        'গ্রাউন্ড ফ্লোর, দোকান নং জি-০৩ (১৮০ বর্গফুট)',
-        '১ম তলা, দোকান নং ১০১ (২২০ বর্গফুট)',
-        '১ম তলা, দোকান নং ১০২ (২২০ বর্গফুট)',
-        '২য় তলা, ফুডকোর্ট স্পেস এফ-০১ (৩০০ বর্গফুট)',
-        '৩য় তলা, কর্পোরেট অফিস স্যুট ও-০১ (৪৫০ বর্গফুট)',
-        'বাণিজ্যিক পার্টনারশিপ শেয়ার অংশ ০১ (১% ইকুইটি)',
-        'বাণিজ্যিক পার্টনারশিপ শেয়ার অংশ ০২ (১% ইকুইটি)'
-      ],
-      expenses: [
-        { id: 'EXP-M1', title: 'ভূমি উন্নয়ন, বাউন্ডারি ওয়াল ও সয়েল টেস্ট', amount: 14000000, date: '৫ সেপ্টেম্বর ২০২৬' }
-      ]
+      expenses: []
     }
   ],
-  clients: [
-    {
-      id: 'CLI-88214',
-      name: 'মোহাম্মদ আরিফুল ইসলাম',
-      phone: '01711223344',
-      password: 'password123',
-      projectId: 'al-quds-tower',
-      projectName: 'আল কুদস টাওয়ার',
-      flatNo: '৭ম তলা, ফ্ল্যাট ৭-বি (১২৬৫ বর্গফুট)',
-      totalPrice: 12000000, // ৳ ১,২০,০০,০০০
-      totalPaid: 7200000,   // ৳ ৭২,০০,০০০
-      nextDueDate: '১৫ অক্টোবর, ২০২৬',
-      nextDueAmount: 600000,
-      paymentHistory: [
-        { id: 'TRX-101', date: '১৫ জুলাই, ২০২৬', amount: 2400000, method: 'ব্যাংক ডিপোজিট (সিটি ব্যাংক)' },
-        { id: 'TRX-102', date: '১৫ আগস্ট, ২০২৬', amount: 2400000, method: 'ব্যাংক ডিপোজিট (ইসলামী ব্যাংক)' },
-        { id: 'TRX-103', date: '১৫ সেপ্টেম্বর, ২০২৬', amount: 2400000, method: 'পে-অর্ডার' }
-      ]
-    },
-    {
-      id: 'CLI-99432',
-      name: 'ইঞ্জিঃ রফিকুল ইসলাম',
-      phone: '01819988776',
-      password: 'password123',
-      projectId: 'barakah-tower-01',
-      projectName: 'বারাকাহ টাওয়ার ০১',
-      flatNo: '৪র্থ তলা, ইউনিট ৪-এ (১৪৫০ বর্গফুট)',
-      totalPrice: 9500000, // ৳ ৯৫,০০,০০০
-      totalPaid: 3500000,  // ৳ ৩৫,০০,০০০
-      nextDueDate: '১ নভেম্বর, ২০২৬',
-      nextDueAmount: 500000,
-      paymentHistory: [
-        { id: 'TRX-201', date: '১ জুন, ২০২৬', amount: 2000000, method: 'বুকিং মানি ও চুক্তি' },
-        { id: 'TRX-202', date: '১ আগস্ট, ২০২৬', amount: 1500000, method: 'ব্যাংক চেক' }
-      ]
-    }
-  ],
+  clients: [],
   superAdmin: {
     id: 'SUPER-ADMIN-01',
     name: 'প্রধান নির্বাহী ও সুপার অ্যাডমিন',
@@ -157,176 +59,9 @@ export const initialManagementData = {
       isSuperAdmin: true,
       permissions: ['all'],
       status: 'সক্রিয় (Active)'
-    },
-    {
-      id: 'MGT-01',
-      name: 'প্রকৌশলী মহিউদ্দিন আহমেদ',
-      email: 'engineer@alemarahproperties.com',
-      phone: '01918646575',
-      role: 'প্রজেক্ট ডিরেক্টর / সাইট ইনচার্জ',
-      roleType: 'project_director',
-      accessKey: 'admin123',
-      isSuperAdmin: false,
-      permissions: ['projects', 'expenses'],
-      status: 'সক্রিয় (Active)'
-    },
-    {
-      id: 'MGT-02',
-      name: 'মুহাম্মদ আব্দুর রহমান',
-      email: 'accounts@alemarahproperties.com',
-      phone: '01743926926',
-      role: 'হেড অফ অ্যাকাউন্টস & ফাইন্যান্স',
-      roleType: 'accounts_head',
-      accessKey: 'admin123',
-      isSuperAdmin: false,
-      permissions: ['payments', 'expenses', 'clients'],
-      status: 'সক্রিয় (Active)'
     }
   ],
-  directors: [
-    {
-      id: 'DIR-01',
-      name: 'শেখ ফজলুল করীম মারুফ',
-      nameEn: 'Sheikh Fazlul Karim Maroof',
-      role: 'চেয়ারম্যান',
-      roleEn: 'Chairman',
-      folioNo: 'DIR-001',
-      image: '/images/chairman.webp',
-      investment: 25000000, // ৳ ২,৫০,০০,০০০
-      sharePercentage: 35, // 35%
-      dividendEarned: 3650000, // ৳ ৩৬,৫০,০০০
-      phone: '01816233013',
-      email: 'chairman@alemarahproperties.com',
-      accessKey: 'admin123',
-      joiningDate: '১ জানুয়ারি, ২০২৪',
-      status: 'সক্রিয় (Active)',
-      nomineeName: 'আইনানুগ উত্তরসূরি',
-      nomineeRelation: 'পরিবার',
-      nomineePhone: '01816-233013',
-      theme: 'crimson',
-      installments: [
-        { id: 'INS-01', date: '১৫ জানুয়ারি, ২০২৪', amount: 10000000, method: 'ব্যাংক স্থানান্তর (সিটি ব্যাংক)', receiptNo: 'RCPT-CAP-101', note: 'প্রাথমিক ইকুইটি মূলধন জমা' },
-        { id: 'INS-02', date: '১০ এপ্রিল, ২০২৪', amount: 8000000, method: 'পে-অর্ডার (ইসলামী ব্যাংক)', receiptNo: 'RCPT-CAP-102', note: '২য় কিস্তির পরিশোধিত ক্যাপিটাল' },
-        { id: 'INS-03', date: '০৫ অক্টোবর, ২০২৪', amount: 7000000, method: 'ব্যাংক চেক (প্রাইম ব্যাংক)', receiptNo: 'RCPT-CAP-103', note: '৩য় কিস্তি (চূড়ান্ত পরিশোধিত মূলধন)' }
-      ],
-      dividendHistory: [
-        { id: 'DIV-01', date: '৩০ জুন, ২০২৪', amount: 1650000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-201', note: 'অর্ধবার্ষিক মুনাফা বণ্টন (H1 ২০২৪)' },
-        { id: 'DIV-02', date: '৩১ ডিসেম্বর, ২০২৪', amount: 2000000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-202', note: 'বার্ষিক ডিভিডেন্ড প্রদান (FY ২০২৪)' }
-      ]
-    },
-    {
-      id: 'DIR-02',
-      name: 'তালুকদার তারিক মাসউদ',
-      nameEn: 'Talukdar Tariq Masud',
-      role: 'ব্যবস্থাপনা পরিচালক',
-      roleEn: 'Managing Director',
-      folioNo: 'DIR-002',
-      image: '/images/managing_director.webp',
-      investment: 20000000, // ৳ ২,০০,০০,০০০
-      sharePercentage: 30, // 30%
-      dividendEarned: 2920000, // ৳ ২৯,২০,০০০
-      phone: '01918646575',
-      email: 'md@alemarahproperties.com',
-      accessKey: 'admin123',
-      joiningDate: '১ জানুয়ারি, ২০২৪',
-      status: 'সক্রিয় (Active)',
-      nomineeName: 'আইনানুগ উত্তরসূরি',
-      nomineeRelation: 'পরিবার',
-      nomineePhone: '01918-646575',
-      theme: 'emerald',
-      installments: [
-        { id: 'INS-201', date: '২০ জানুয়ারি, ২০২৪', amount: 10000000, method: 'ব্যাংক ট্রান্সফার (উত্তরা ব্যাংক)', receiptNo: 'RCPT-CAP-201', note: '১ম কিস্তি প্রারম্ভিক শেয়ার মূলধন' },
-        { id: 'INS-202', date: '১৫ মে, ২০২৪', amount: 10000000, method: 'পে-অর্ডার (পূবালী ব্যাংক)', receiptNo: 'RCPT-CAP-202', note: '২য় কিস্তি (সম্পূর্ণ পরিশোধিত)' }
-      ],
-      dividendHistory: [
-        { id: 'DIV-101', date: '৩০ জুন, ২০২৪', amount: 1320000, method: 'ব্যাংক ট্রান্সফার', voucherNo: 'VCH-DIV-203', note: 'অর্ধবার্ষিক মুনাফা বণ্টন' },
-        { id: 'DIV-102', date: '৩১ ডিসেম্বর, ২০২৪', amount: 1600000, method: 'ব্যাংক ট্রান্সফার', voucherNo: 'VCH-DIV-204', note: 'বার্ষিক ডিভিডেন্ড ক্লিয়ারেন্স' }
-      ]
-    },
-    {
-      id: 'DIR-03',
-      name: 'আলহাজ্ব মাওলানা নূর হোসাইন',
-      nameEn: 'Alhaj Mawlana Nur Hossain',
-      role: 'পরিচালক',
-      roleEn: 'Director',
-      folioNo: 'DIR-003',
-      image: '/images/alhaj_mawlana_nur_hossain.jpg',
-      investment: 10000000, // ৳ ১,০০,০০,০০০
-      sharePercentage: 15, // 15%
-      dividendEarned: 1460000, // ৳ ১৪,৬০,০০০
-      phone: '01743926926',
-      email: 'nur.hossain@alemarahproperties.com',
-      accessKey: 'admin123',
-      joiningDate: '১৫ মার্চ, ২০২৪',
-      status: 'সক্রিয় (Active)',
-      nomineeName: 'আইনানুগ উত্তরসূরি',
-      nomineeRelation: 'পরিবার',
-      nomineePhone: '01743-926926',
-      theme: 'blue',
-      installments: [
-        { id: 'INS-301', date: '১৫ মার্চ, ২০২৪', amount: 5000000, method: 'চেক ডিপোজিট', receiptNo: 'RCPT-CAP-301', note: '১ম কিস্তি মূলধন' },
-        { id: 'INS-302', date: '১ আগস্ট, ২০২৪', amount: 5000000, method: 'ব্যাংক ট্রান্সফার', receiptNo: 'RCPT-CAP-302', note: '২য় কিস্তি মূলধন' }
-      ],
-      dividendHistory: [
-        { id: 'DIV-301', date: '৩১ ডিসেম্বর, ২০২৪', amount: 1460000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-301', note: 'বার্ষিক শেয়ার লভ্যাংশ' }
-      ]
-    },
-    {
-      id: 'DIR-04',
-      name: 'তানিম মাহফুজ',
-      nameEn: 'Tanim Mahfuj',
-      role: 'পরিচালক',
-      roleEn: 'Director',
-      folioNo: 'DIR-004',
-      image: '/images/taneem_mahfuj.jpg',
-      investment: 7500000, // ৳ ৭৫,০০,০০০
-      sharePercentage: 10, // 10%
-      dividendEarned: 1095000, // ৳ ১০,৯৫,০০০
-      phone: '01914425073',
-      email: 'tanim.mahfuj@alemarahproperties.com',
-      accessKey: 'admin123',
-      joiningDate: '১০ মে, ২০২৪',
-      status: 'সক্রিয় (Active)',
-      nomineeName: 'আইনানুগ উত্তরসূরি',
-      nomineeRelation: 'পরিবার',
-      nomineePhone: '01914-425073',
-      theme: 'amber',
-      installments: [
-        { id: 'INS-401', date: '১০ মে, ২০২৪', amount: 4000000, method: 'পে-অর্ডার', receiptNo: 'RCPT-CAP-401', note: '১ম কিস্তি' },
-        { id: 'INS-402', date: '২০ সেপ্টেম্বর, ২০২৪', amount: 3500000, method: 'ব্যাংক চেক', receiptNo: 'RCPT-CAP-402', note: '২য় কিস্তি' }
-      ],
-      dividendHistory: [
-        { id: 'DIV-401', date: '৩১ ডিসেম্বর, ২০২৪', amount: 1095000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-401', note: 'বার্ষিক শেয়ার লভ্যাংশ' }
-      ]
-    },
-    {
-      id: 'DIR-05',
-      name: 'আল আমিন হাওলাদার',
-      nameEn: 'Al Amin Hawladar',
-      role: 'পরিচালক',
-      roleEn: 'Director',
-      folioNo: 'DIR-005',
-      image: '/images/al_amin_hawladar.jpg',
-      investment: 7500000, // ৳ ৭৫,০০,০০০
-      sharePercentage: 10, // 10%
-      dividendEarned: 1095000, // ৳ ১০,৯৫,০০০
-      phone: '01833544548',
-      email: 'alamin.hawladar@alemarahproperties.com',
-      accessKey: 'admin123',
-      joiningDate: '১ জুলাই, ২০২৪',
-      status: 'সক্রিয় (Active)',
-      nomineeName: 'আইনানুগ উত্তরসূরি',
-      nomineeRelation: 'পরিবার',
-      nomineePhone: '01833-544548',
-      theme: 'purple',
-      installments: [
-        { id: 'INS-501', date: '১ জুলাই, ২০২৪', amount: 7500000, method: 'ব্যাংক ট্রান্সফার', receiptNo: 'RCPT-CAP-501', note: 'এককালীন পরিশোধিত মূলধন' }
-      ],
-      dividendHistory: [
-        { id: 'DIV-501', date: '৩১ ডিসেম্বর, ২০২৪', amount: 1095000, method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার', voucherNo: 'VCH-DIV-501', note: 'বার্ষিক শেয়ার লভ্যাংশ' }
-      ]
-    }
-  ],
+  directors: [],
   inquiries: []
 };
 
@@ -336,9 +71,9 @@ export const getManagementData = () => {
     const data = localStorage.getItem(STORAGE_KEY);
     if (data) {
       const parsed = JSON.parse(data);
-      const canonicalDirs = initialManagementData.directors;
-      if (!parsed.directors || parsed.directors.length === 0) {
-        parsed.directors = canonicalDirs;
+      const canonicalDirs = initialManagementData.directors || [];
+      if (!parsed.directors) {
+        parsed.directors = [];
       } else {
         // Ensure canonical directors preserve existing edits and serial order
         parsed.directors = canonicalDirs.map(defaultDir => {

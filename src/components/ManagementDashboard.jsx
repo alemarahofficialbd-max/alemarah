@@ -58,7 +58,12 @@ import {
   Car,
   Store,
   Maximize2,
-  SlidersHorizontal
+  SlidersHorizontal,
+  ScrollText,
+  Bed,
+  Bath,
+  Ruler,
+  Tag
 } from 'lucide-react';
 import { 
   formatBDT, 
@@ -103,7 +108,8 @@ export default function ManagementDashboard({
     try {
       const saved = localStorage.getItem('alemarah_management_tab');
       if (isDirector) {
-        if (saved && ['directors', 'projects', 'clients', 'expenses'].includes(saved)) {
+        const allowed = ['directors', ...(admin?.permissions || [])];
+        if (saved && allowed.includes(saved)) {
           return saved;
         }
         return 'directors';
@@ -113,7 +119,7 @@ export default function ManagementDashboard({
         if (saved && perms.includes(saved) && saved !== 'team' && saved !== 'settings' && saved !== 'directors') {
           return saved;
         }
-        return perms[0] || 'payments';
+        return perms[0] || '';
       }
       return saved || 'clients';
     } catch {
@@ -215,8 +221,6 @@ export default function ManagementDashboard({
 
   // 2. Receive Payment Form
   const [paymentSelectedProjectId, setPaymentSelectedProjectId] = useState('all');
-  const [isPaymentClientPickerOpen, setIsPaymentClientPickerOpen] = useState(false);
-  const [paymentClientSearchQuery, setPaymentClientSearchQuery] = useState('');
   const [isPaymentFormOpenMobile, setIsPaymentFormOpenMobile] = useState(false);
   const [showAllPayments, setShowAllPayments] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
@@ -872,7 +876,7 @@ export default function ManagementDashboard({
       email: '',
       role: 'সাইট ইঞ্জিনিয়ার',
       accessKey: 'admin123',
-      permissions: ['projects', 'expenses'],
+      permissions: [],
       directorId: null
     });
     setIsTeamModalOpen(true);
@@ -888,7 +892,7 @@ export default function ManagementDashboard({
       email: dir.email || '',
       role: `বোর্ড ডিরেক্টর (${dir.role})`,
       accessKey: dir.accessKey || 'admin123',
-      permissions: ['directors', 'projects', 'clients', 'payments', 'expenses'],
+      permissions: [],
       directorId: dir.id
     });
     setIsTeamModalOpen(true);
@@ -904,7 +908,7 @@ export default function ManagementDashboard({
       email: mem.email || '',
       role: mem.role || 'সাইট ইঞ্জিনিয়ার',
       accessKey: mem.accessKey || 'admin123',
-      permissions: mem.permissions || ['projects', 'expenses'],
+      permissions: Array.isArray(mem.permissions) ? mem.permissions : [],
       directorId: mem.directorId || null
     });
     setIsTeamModalOpen(true);
@@ -978,7 +982,7 @@ export default function ManagementDashboard({
             email: teamForm.email || nextTeam[existingIdx].email,
             role: teamForm.role,
             accessKey: teamForm.accessKey || nextTeam[existingIdx].accessKey || 'admin123',
-            permissions: teamForm.permissions || ['projects', 'expenses'],
+            permissions: Array.isArray(teamForm.permissions) ? teamForm.permissions : [],
             directorId: teamForm.directorId || nextTeam[existingIdx].directorId || null,
             status: lang === 'bn' ? 'সক্রিয়' : 'Active'
           };
@@ -993,7 +997,7 @@ export default function ManagementDashboard({
             isSuperAdmin: false,
             isDirector: Boolean(teamForm.directorId),
             directorId: teamForm.directorId || null,
-            permissions: teamForm.permissions || ['projects', 'expenses'],
+            permissions: Array.isArray(teamForm.permissions) ? teamForm.permissions : [],
             status: lang === 'bn' ? 'সক্রিয়' : 'Active'
           };
           nextTeam.push(newMember);
@@ -1248,6 +1252,9 @@ export default function ManagementDashboard({
   const totalDirectorShares = directorsList.reduce((acc, d) => acc + (d.sharePercentage || 0), 0);
   const totalDirectorDividends = directorsList.reduce((acc, d) => acc + (d.dividendEarned || 0), 0);
 
+  // Director full management access check: Super Admin or explicitly permitted in permissions
+  const hasDirectorFullAccess = isSuperAdmin || (admin?.permissions || []).includes('directors');
+
   // Management Footer Navbar items with Role-Based Permission Control
   const allNavItems = [
     { id: 'clients', label: '১. ক্লায়েন্ট তালিকা ও নতুন এন্ট্রি', shortLabel: 'ক্লায়েন্ট', icon: Users },
@@ -1255,7 +1262,12 @@ export default function ManagementDashboard({
     { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল', shortLabel: 'প্রজেক্ট', icon: Building2 },
     { id: 'expenses', label: '৪. প্রজেক্ট বাজেট ও খরচ', shortLabel: 'বাজেট ও খরচ', icon: Wallet },
     { id: 'team', label: '৫. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
-    { id: 'directors', label: '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', shortLabel: 'ডিরেক্টরস', icon: Award },
+    { 
+      id: 'directors', 
+      label: isDirector && !hasDirectorFullAccess ? 'ব্যক্তিগত পোর্টফোলিও ও শেয়ার' : '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', 
+      shortLabel: isDirector && !hasDirectorFullAccess ? 'আমার শেয়ার' : 'ডিরেক্টরস', 
+      icon: Award 
+    },
     { id: 'settings', label: '৭. সেটিংস, ভাষা ও সিকিউরিটি পিন', shortLabel: 'সেটিংস', icon: Settings }
   ];
 
@@ -1266,12 +1278,14 @@ export default function ManagementDashboard({
     // 2. Tab 5 (team) and Tab 7 (settings) are strictly reserved for Super Admin
     if (item.id === 'team' || item.id === 'settings') return false;
 
-    // 3. Board Director access: Directors, Projects, Clients, Expenses
+    // 3. Board Director access: By default, ONLY personal portfolio under 'directors'
     if (isDirector) {
-      return ['directors', 'projects', 'clients', 'expenses'].includes(item.id);
+      if (item.id === 'directors') return true;
+      const perms = admin?.permissions || [];
+      return perms.includes(item.id);
     }
 
-    // 4. Staff / Officer (Accountant, Engineer, etc.): strictly permitted modules only
+    // 4. Staff / Officer: strictly permitted modules only
     if (item.id === 'directors') return false;
     const perms = admin?.permissions || [];
     return perms.includes(item.id);
@@ -1600,11 +1614,23 @@ export default function ManagementDashboard({
       {/* 3. MAIN WORKSPACE (SWITCHED VIA FOOTER NAVBAR)            */}
       {/* ========================================================= */}
       <main className="w-full px-4 sm:px-6 lg:px-8 pt-5 pb-32 sm:pb-12 lg:pb-16 space-y-5 flex-1">
-        
+        {/* Access Restricted Banner if no modules permitted */}
+        {managementNavItems.length === 0 && (
+          <div className="bg-white rounded-3xl p-8 sm:p-12 text-center max-w-lg mx-auto border border-slate-200/90 shadow-sm space-y-4 my-12 animate-fadeIn">
+            <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+              <Lock className="w-8 h-8" />
+            </div>
+            <h3 className="text-lg font-black text-slate-900">অ্যাক্সেস সংরক্ষিত</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              আপনার অ্যাকাউন্টে বর্তমানে কোনো অতিরিক্ত মডিউলের অনুমোদন (Permission) প্রদান করা হয়নি। মডিউল ব্যবহারের অনুমতির জন্য সুপার অ্যাডমিনের সাথে যোগাযোগ করুন।
+            </p>
+          </div>
+        )}
+
         {/* ------------------------------------------------------- */}
         {/* TAB 1: CLIENT MANAGEMENT                                */}
         {/* ------------------------------------------------------- */}
-        {activeTab === 'clients' && (
+        {managementNavItems.some(i => i.id === 'clients') && activeTab === 'clients' && (
           <div className="space-y-4 animate-fadeIn">
             {/* Search & Project Filter Bar */}
             <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3.5">
@@ -1713,7 +1739,6 @@ export default function ManagementDashboard({
                       <th className="py-3.5 px-6">মোট চুক্তি মূল্য</th>
                       <th className="py-3.5 px-6">পরিশোধিত</th>
                       <th className="py-3.5 px-6">বকেয়া / বাকি</th>
-                      <th className="py-3.5 px-6">পরবর্তী পেমেন্ট তারিখ</th>
                       <th className="py-3.5 px-6 text-right">অ্যাকশন</th>
                     </tr>
                   </thead>
@@ -1739,11 +1764,8 @@ export default function ManagementDashboard({
                                 )}
                               </div>
                               <div>
-                                <div className="font-bold text-slate-900 group-hover:text-[#006231] transition-colors flex items-center space-x-1.5">
-                                  <span>{cl.name}</span>
-                                  <span className="font-mono text-3xs text-slate-400 bg-slate-100 px-1 py-0.2 rounded font-normal">
-                                    {cl.id}
-                                  </span>
+                                <div className="font-bold text-slate-900 group-hover:text-[#006231] transition-colors">
+                                  {cl.name}
                                 </div>
                                 <div className="text-2xs text-slate-500">{cl.phone}</div>
                               </div>
@@ -1763,22 +1785,8 @@ export default function ManagementDashboard({
                           <td className="py-4 px-6 font-bold text-amber-700">
                             {formatBDT(due)}
                           </td>
-                          <td className="py-4 px-6">
-                            <div className="text-xs text-slate-900 font-bold">{cl.nextDueDate}</div>
-                            <div className="text-2xs text-[#CE2028] font-bold">{formatBDT(cl.nextDueAmount)}</div>
-                          </td>
                           <td className="py-4 px-6 text-right">
                             <div className="flex items-center justify-end space-x-2">
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedClientForProfile(cl);
-                                }}
-                                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all cursor-pointer"
-                              >
-                                প্রোফাইল
-                              </button>
                               <button
                                 type="button"
                                 onClick={(e) => {
@@ -1809,7 +1817,7 @@ export default function ManagementDashboard({
         {/* ------------------------------------------------------- */}
         {/* TAB 2: কিস্তি ও জমা এন্ট্রি (PAYMENTS COLLECTION)        */}
         {/* ------------------------------------------------------- */}
-        {activeTab === 'payments' && (
+        {managementNavItems.some(i => i.id === 'payments') && activeTab === 'payments' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 animate-fadeIn">
             {/* Payment Entry Form (5 cols) */}
             <div className="lg:col-span-5 bg-white p-4 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
@@ -1892,20 +1900,44 @@ export default function ManagementDashboard({
                     </select>
                   </div>
 
-                  {/* Step 2: Visual Customer Selector With Half-Screen Bottom Sheet Picker */}
+                  {/* Step 2: Customer Selection Dropdown */}
                   <div>
                     <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                       ২. কাস্টমার নির্বাচন করুন *
                     </label>
+                    <select
+                      value={paymentForm.clientId}
+                      onChange={(e) => {
+                        const selId = e.target.value;
+                        const matched = data.clients.find(c => c.id === selId);
+                        setPaymentForm(prev => ({
+                          ...prev,
+                          clientId: selId,
+                          amount: matched?.nextDueAmount ? String(matched.nextDueAmount) : prev.amount
+                        }));
+                      }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] cursor-pointer"
+                      required
+                    >
+                      <option value="">-- কাস্টমার নির্বাচন করুন --</option>
+                      {data.clients
+                        .filter(c => paymentSelectedProjectId === 'all' || c.projectId === paymentSelectedProjectId || c.id === paymentForm.clientId)
+                        .map(cl => {
+                          const clDue = (cl.totalPrice || 0) - (cl.totalPaid || 0);
+                          const cleanFlat = (cl.flatNo || '').replace(/\s*\([^)]*\)/g, '').trim();
+                          return (
+                            <option key={cl.id} value={cl.id}>
+                              {cl.name} — {cl.projectName || 'প্রজেক্ট'} {cleanFlat ? `(${cleanFlat})` : ''} | বকেয়া: ৳ {clDue.toLocaleString('bn-BD')}
+                            </option>
+                          );
+                        })}
+                    </select>
 
-                    {/* Selected Customer Active Card */}
-                    {targetClientForCalc ? (
-                      <div 
-                        onClick={() => setIsPaymentClientPickerOpen(true)}
-                        className="p-3 rounded-2xl bg-gradient-to-r from-emerald-50/80 via-white to-emerald-50/30 border-2 border-[#006231]/30 hover:border-[#006231] cursor-pointer transition-all shadow-xs flex items-center justify-between gap-3 group"
-                      >
+                    {/* Selected Customer Active Info Card */}
+                    {targetClientForCalc && (
+                      <div className="mt-2.5 p-3 rounded-xl bg-gradient-to-r from-emerald-50/90 via-white to-emerald-50/40 border border-emerald-200/80 shadow-2xs flex items-center justify-between gap-3">
                         <div className="flex items-center space-x-3 min-w-0">
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden ring-2 ring-emerald-500/30 shadow-xs">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden ring-2 ring-emerald-500/20 shadow-xs">
                             {targetClientForCalc.image ? (
                               <img src={targetClientForCalc.image} alt={targetClientForCalc.name} className="w-full h-full object-cover" />
                             ) : (
@@ -1913,244 +1945,28 @@ export default function ManagementDashboard({
                             )}
                           </div>
                           <div className="min-w-0">
-                            <div className="font-bold text-slate-900 text-sm truncate flex items-center space-x-1.5">
-                              <span>{targetClientForCalc.name}</span>
-                              <span className="font-mono text-3xs px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-normal">
-                                {targetClientForCalc.id}
-                              </span>
+                            <div className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                              {targetClientForCalc.name}
                             </div>
                             <div className="text-2xs text-[#006231] font-semibold truncate">
                               {targetClientForCalc.projectName} • {targetClientForCalc.flatNo}
                             </div>
-                            <div className="text-3xs text-slate-500 font-medium">
-                              মোবাইল: <strong className="text-slate-700 font-mono">{targetClientForCalc.phone}</strong>
-                            </div>
+                            {targetClientForCalc.phone && (
+                              <div className="text-3xs text-slate-500 font-medium">
+                                মোবাইল: <strong className="text-slate-700 font-mono">{targetClientForCalc.phone}</strong>
+                              </div>
+                            )}
                           </div>
                         </div>
 
                         <div className="text-right shrink-0">
-                          <span className="text-3xs text-slate-400 block uppercase font-bold">বর্তমান বকেয়া</span>
-                          <span className="text-xs sm:text-sm font-black text-amber-700">
+                          <span className="text-3xs text-slate-500 block uppercase font-bold">বর্তমান বকেয়া</span>
+                          <span className="text-xs sm:text-sm font-black text-amber-700 font-mono">
                             {formatBDT(targetClientDue)}
                           </span>
-                          <div className="text-3xs text-[#006231] font-bold group-hover:underline">
-                            পরিবর্তন করুন ▼
-                          </div>
                         </div>
                       </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setIsPaymentClientPickerOpen(true)}
-                        className="w-full p-3.5 rounded-2xl bg-white border-2 border-dashed border-slate-300 hover:border-[#006231] text-slate-700 hover:text-[#006231] font-bold text-xs sm:text-sm transition-all flex items-center justify-between shadow-2xs group cursor-pointer"
-                      >
-                        <div className="flex items-center space-x-2.5">
-                          <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-emerald-50 text-slate-500 group-hover:text-[#006231] flex items-center justify-center transition-colors">
-                            <Users className="w-4 h-4" />
-                          </div>
-                          <span>কাস্টমার নির্বাচন করুন</span>
-                        </div>
-                        <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-[#006231] transition-transform" />
-                      </button>
                     )}
-
-                    {/* Half-Screen Bottom Sheet Customer Selector Modal */}
-                    {isPaymentClientPickerOpen && (() => {
-                      const filteredList = data.clients.filter(c => {
-                        const matchesProject = paymentSelectedProjectId === 'all' || c.projectId === paymentSelectedProjectId;
-                        if (!matchesProject) return false;
-                        if (!paymentClientSearchQuery.trim()) return true;
-                        const q = paymentClientSearchQuery.toLowerCase().trim();
-                        const name = (c.name || '').toLowerCase();
-                        const phone = (c.phone || '').toLowerCase();
-                        const id = (c.id || '').toLowerCase();
-                        const project = (c.projectName || '').toLowerCase();
-                        const flat = (c.flatNo || '').toLowerCase();
-                        return name.includes(q) || phone.includes(q) || id.includes(q) || project.includes(q) || flat.includes(q);
-                      });
-
-                      return (
-                        <div className="fixed inset-0 z-[70] bg-slate-950/70 backdrop-blur-xs flex flex-col justify-end sm:justify-center items-center animate-fadeIn select-none">
-                          {/* Dismiss backdrop */}
-                          <div 
-                            className="absolute inset-0"
-                            onClick={() => {
-                              setIsPaymentClientPickerOpen(false);
-                              setPaymentClientSearchQuery('');
-                            }}
-                          />
-
-                          {/* Bottom Sheet Drawer on Mobile / Centered Sheet on larger */}
-                          <div 
-                            className="relative z-10 w-full sm:max-w-lg bg-white rounded-t-[2.2rem] sm:rounded-3xl shadow-2xl border-t sm:border border-slate-200 overflow-hidden flex flex-col max-h-[80vh] sm:max-h-[85vh] animate-slideUp"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {/* Top Drag Indicator (mobile only) */}
-                            <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mt-3 mb-1 sm:hidden"></div>
-
-                            {/* Header */}
-                            <div className="px-5 py-3.5 flex items-center justify-between border-b border-slate-100">
-                              <div className="flex items-center space-x-2.5">
-                                <div className="w-9 h-9 rounded-full bg-emerald-50 text-[#006231] flex items-center justify-center shrink-0">
-                                  <Users className="w-5 h-5" />
-                                </div>
-                                <div>
-                                  <h3 className="font-bold text-sm sm:text-base text-slate-900">
-                                    কাস্টমার নির্বাচন করুন...
-                                  </h3>
-                                  <p className="text-3xs text-slate-500 font-medium">
-                                    মোট {filteredList.length} জন কাস্টমার উপলব্ধ
-                                  </p>
-                                </div>
-                              </div>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setIsPaymentClientPickerOpen(false);
-                                  setPaymentClientSearchQuery('');
-                                }}
-                                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                                title="বন্ধ করুন"
-                              >
-                                <X className="w-5 h-5" />
-                              </button>
-                            </div>
-
-                            {/* Search Input */}
-                            <div className="px-5 pt-3 pb-2">
-                              <div className="relative">
-                                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                                <input
-                                  type="text"
-                                  value={paymentClientSearchQuery}
-                                  onChange={(e) => setPaymentClientSearchQuery(e.target.value)}
-                                  placeholder="নাম বা প্রতিষ্ঠান লিখে খুঁজুন..."
-                                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-9 py-2.5 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
-                                  autoFocus
-                                />
-                                {paymentClientSearchQuery && (
-                                  <button
-                                    type="button"
-                                    onClick={() => setPaymentClientSearchQuery('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
-                                  >
-                                    <X className="w-3.5 h-3.5" />
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Horizontal Project Filter Chips */}
-                            <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar px-5 pb-2.5 text-2xs">
-                              <button
-                                type="button"
-                                onClick={() => setPaymentSelectedProjectId('all')}
-                                className={`px-3 py-1 rounded-full whitespace-nowrap font-bold transition-all cursor-pointer ${
-                                  paymentSelectedProjectId === 'all'
-                                    ? 'bg-[#006231] text-white shadow-2xs'
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                }`}
-                              >
-                                সকল প্রজেক্ট ({data.clients.length})
-                              </button>
-                              {data.projects.map(p => {
-                                const pCount = data.clients.filter(c => c.projectId === p.id).length;
-                                return (
-                                  <button
-                                    key={p.id}
-                                    type="button"
-                                    onClick={() => setPaymentSelectedProjectId(p.id)}
-                                    className={`px-3 py-1 rounded-full whitespace-nowrap font-bold transition-all cursor-pointer ${
-                                      paymentSelectedProjectId === p.id
-                                        ? 'bg-[#006231] text-white shadow-2xs'
-                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                    }`}
-                                  >
-                                    {p.name} ({pCount})
-                                  </button>
-                                );
-                              })}
-                            </div>
-
-                            {/* Customer List Items with ample bottom clearance */}
-                            <div className="flex-1 overflow-y-auto px-4 py-2 pb-24 sm:pb-6 space-y-1 divide-y divide-slate-100">
-                              {filteredList.length === 0 ? (
-                                <div className="py-12 text-center text-slate-400 space-y-1">
-                                  <Users className="w-8 h-8 mx-auto text-slate-300" />
-                                  <p className="text-xs font-semibold text-slate-600">কোনো কাস্টমার পাওয়া যায়নি</p>
-                                  <p className="text-3xs text-slate-400">ভিন্ন নাম বা প্রজেক্ট দিয়ে অনুসন্ধান করুন</p>
-                                </div>
-                              ) : (
-                                filteredList.map(c => {
-                                  const cDue = (c.totalPrice || 0) - (c.totalPaid || 0);
-                                  const isCurrent = c.id === paymentForm.clientId;
-
-                                  return (
-                                    <div
-                                      key={c.id}
-                                      onClick={() => {
-                                        setPaymentForm({ ...paymentForm, clientId: c.id });
-                                        setIsPaymentClientPickerOpen(false);
-                                        setPaymentClientSearchQuery('');
-                                      }}
-                                      className={`p-2.5 rounded-2xl flex items-center justify-between gap-3 cursor-pointer transition-all active:scale-[0.99] ${
-                                        isCurrent
-                                          ? 'bg-emerald-50/80 border border-emerald-300 ring-1 ring-emerald-400/50 shadow-2xs'
-                                          : 'hover:bg-slate-50 border border-transparent'
-                                      }`}
-                                    >
-                                      <div className="flex items-center space-x-3 min-w-0">
-                                        <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden shadow-2xs ring-2 ring-emerald-500/20">
-                                          {c.image ? (
-                                            <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
-                                          ) : (
-                                            c.name ? c.name.slice(0, 2) : 'গ্রা'
-                                          )}
-                                        </div>
-                                        <div className="min-w-0">
-                                          <div className="text-sm font-bold text-slate-900 truncate flex items-center space-x-1.5">
-                                            <span>{c.name}</span>
-                                            <span className="text-3xs font-mono font-medium text-slate-400">({c.id})</span>
-                                          </div>
-                                          <div className="flex items-center space-x-1.5 mt-0.5 flex-wrap">
-                                            <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-[#006231] border border-emerald-200/60 truncate max-w-[130px]">
-                                              {c.projectName}
-                                            </span>
-                                            <span className="text-2xs text-slate-500 font-medium truncate">
-                                              ফ্ল্যাট: {c.flatNo}
-                                            </span>
-                                            {c.phone && (
-                                              <span className="text-3xs font-mono text-slate-400 hidden sm:inline">
-                                                • {c.phone}
-                                              </span>
-                                            )}
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div className="flex items-center space-x-2 shrink-0">
-                                        <div className="text-right">
-                                          <div className="text-xs sm:text-sm font-black text-amber-700 font-mono">
-                                            {formatBDT(cDue)}
-                                          </div>
-                                          <span className="text-[10px] text-slate-400 font-medium">বকেয়া</span>
-                                        </div>
-                                        {isCurrent && (
-                                          <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center ml-1 shrink-0 shadow-2xs">
-                                            <Check className="w-3.5 h-3.5" />
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  );
-                                })
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
                   </div>
 
                 <div>
@@ -2361,7 +2177,7 @@ export default function ManagementDashboard({
         {/* ------------------------------------------------------- */}
         {/* TAB 3: PROJECT MANAGEMENT & PROGRESS UPDATE             */}
         {/* ------------------------------------------------------- */}
-        {activeTab === 'projects' && (
+        {managementNavItems.some(i => i.id === 'projects') && activeTab === 'projects' && (
           <div className="space-y-4 animate-fadeIn">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
               <div>
@@ -2506,7 +2322,7 @@ export default function ManagementDashboard({
         {/* ------------------------------------------------------- */}
         {/* TAB 4: PROJECT EXPENSE & SHORT BUDGET BREAKDOWN         */}
         {/* ------------------------------------------------------- */}
-        {activeTab === 'expenses' && (
+        {managementNavItems.some(i => i.id === 'expenses') && activeTab === 'expenses' && (
           <div className="space-y-5 animate-fadeIn">
             {/* Top Project Selector & Budget Summary */}
             <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
@@ -2672,7 +2488,7 @@ export default function ManagementDashboard({
         {/* ------------------------------------------------------- */}
         {/* TAB 5: SUPER ADMIN & TEAM ROLE MANAGEMENT               */}
         {/* ------------------------------------------------------- */}
-        {activeTab === 'team' && (() => {
+        {managementNavItems.some(i => i.id === 'team') && activeTab === 'team' && (() => {
           const superAdminMember = data.managementTeam?.find(m => m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com') || data.superAdmin || {
             name: 'প্রধান নির্বাহী ও সুপার অ্যাডমিন',
             email: 'alemarah.officialbd@gmail.com',
@@ -2949,11 +2765,11 @@ export default function ManagementDashboard({
                                 <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
                                   <span className="text-3xs font-bold uppercase text-slate-400 block">অনুমোদিত পারমিশনসমূহ</span>
                                   <div className="flex flex-wrap gap-1 pt-0.5">
-                                    {(mem.permissions || ['projects', 'expenses']).map((perm, idx) => (
+                                    {(mem.permissions && mem.permissions.length > 0) ? mem.permissions.map((perm, idx) => (
                                       <span key={idx} className="px-2 py-0.5 rounded-md bg-emerald-50 text-[#006231] border border-emerald-100 text-3xs font-bold">
                                         {perm === 'projects' ? 'প্রজেক্ট' : perm === 'expenses' ? 'ব্যয়' : perm === 'clients' ? 'ক্লায়েন্ট' : perm === 'payments' ? 'কিস্তি' : perm === 'directors' ? 'পরিচালক' : perm}
                                       </span>
-                                    ))}
+                                    )) : <span className="text-3xs text-slate-400 font-semibold italic">কোনো অতিরিক্ত পারমিশন নেই (সংরক্ষিত)</span>}
                                   </div>
                                 </div>
                               </div>
@@ -3021,101 +2837,107 @@ export default function ManagementDashboard({
         {/* ------------------------------------------------------- */}
         {/* TAB 6: BOARD OF DIRECTORS & SHAREHOLDERS                 */}
         {/* ------------------------------------------------------- */}
-        {activeTab === 'directors' && (
+        {managementNavItems.some(i => i.id === 'directors') && activeTab === 'directors' && (
           <div className="space-y-6 animate-fadeIn">
-            {/* Header Action Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs">
-              <div>
-                <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#CE2028] animate-pulse"></span>
-                  <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    বোর্ড অব ডিরেক্টরস ও শেয়ারহোল্ডার ক্যাপিটাল
-                  </h3>
+            {/* Header Action Bar (SuperAdmin only) */}
+            {!isDirector && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#CE2028] animate-pulse"></span>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      বোর্ড অব ডিরেক্টরস ও শেয়ারহোল্ডার ক্যাপিটাল
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    কোম্পানির সম্মানিত পরিচালকবৃন্দ, বিনিয়োগকৃত মূলধন, শেয়ার শতাংশ এবং ডিভিডেন্ড বিতরণ হিসাব
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  কোম্পানির সম্মানিত পরিচালকবৃন্দ, বিনিয়োগকৃত মূলধন, শেয়ার শতাংশ এবং ডিভিডেন্ড বিতরণ হিসাব
-                </p>
-              </div>
 
-              <div className="flex items-center space-x-2">
-                {isSuperAdmin && (
-                  <button
-                    onClick={() => setIsDirectorModalOpen(true)}
-                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>+ নতুন ডিরেক্টর যুক্ত করুন</span>
-                  </button>
-                )}
-                {isDirector && loggedInDirector && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDirectorForCertificate(loggedInDirector)}
-                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-200 hover:bg-emerald-100 font-bold text-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
-                  >
-                    <ScrollText className="w-4 h-4" />
-                    <span>আমার শেয়ার সার্টিফিকেট</span>
-                  </button>
-                )}
+                <div className="flex items-center space-x-2">
+                  {isSuperAdmin && (
+                    <button
+                      onClick={() => setIsDirectorModalOpen(true)}
+                      className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>+ নতুন ডিরেক্টর যুক্ত করুন</span>
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* VIP Director Personal Shareholder Profile Card */}
             {isDirector && loggedInDirector && (
-              <div className="bg-gradient-to-br from-[#006231] via-[#0A4D27] to-[#042814] rounded-3xl p-5 sm:p-7 text-white shadow-xl space-y-5 border border-emerald-400/20 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
-
-                <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start justify-between gap-5">
+              <div className="bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-xs space-y-6">
+                <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-5 pb-5 border-b border-slate-100">
                   <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-3 sm:space-y-0 sm:space-x-4 text-center sm:text-left">
-                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white/10 border-2 border-white/20 shrink-0 shadow-md">
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs">
                       {loggedInDirector.image ? (
                         <img src={loggedInDirector.image} alt={loggedInDirector.name} className="w-full h-full object-cover object-top" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center font-bold text-2xl text-white">
+                        <div className="w-full h-full flex items-center justify-center font-bold text-2xl text-[#006231] bg-emerald-50">
                           {loggedInDirector.name.slice(0, 1)}
                         </div>
                       )}
                     </div>
                     <div>
-                      <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/15 text-emerald-200 text-3xs font-bold uppercase tracking-wider mb-1.5 border border-white/10">
+                      <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#006231] text-3xs font-bold uppercase tracking-wider mb-2 border border-emerald-200/60">
                         <Award className="w-3.5 h-3.5" />
-                        <span>আপনার ব্যক্তিগত শেয়ারহোল্ডার পোর্টফোলিও</span>
+                        <span>ব্যক্তিগত শেয়ারহোল্ডার পোর্টফোলিও</span>
                       </div>
-                      <h2 className="text-xl sm:text-2xl font-black text-white">{loggedInDirector.name}</h2>
-                      <p className="text-xs text-emerald-200 font-semibold mt-0.5">
-                        {loggedInDirector.role} | ফোলিও নম্বর: <span className="font-mono text-white font-bold">{loggedInDirector.folioNo}</span>
-                      </p>
-                      <p className="text-3xs text-emerald-300 font-mono mt-0.5">মোবাইল: {loggedInDirector.phone}</p>
+                      <h2 className="text-xl sm:text-2xl font-black text-slate-900">{loggedInDirector.name}</h2>
+                      <div className="flex items-center flex-wrap gap-2 mt-1 justify-center sm:justify-start">
+                        <span className="text-xs text-slate-600 font-semibold">{loggedInDirector.role}</span>
+                        <span className="text-slate-300">•</span>
+                        <span className="text-xs text-slate-500">ফোলিও:</span>
+                        <span className="font-mono text-xs px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 font-bold border border-slate-200">
+                          {loggedInDirector.folioNo}
+                        </span>
+                        {loggedInDirector.phone && (
+                          <>
+                            <span className="text-slate-300">•</span>
+                            <span className="text-xs text-slate-500 font-mono">মোবাইল: {loggedInDirector.phone}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setSelectedDirectorForCertificate(loggedInDirector)}
-                    className="px-4 py-2.5 rounded-xl bg-white text-[#006231] hover:bg-emerald-50 text-xs font-bold transition-all shadow-md flex items-center space-x-2 cursor-pointer shrink-0 active:scale-95"
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] hover:opacity-95 text-white text-xs font-bold transition-all shadow-md shadow-[#006231]/20 flex items-center space-x-2 cursor-pointer shrink-0 active:scale-95"
                   >
-                    <ScrollText className="w-4 h-4 text-[#006231]" />
+                    <ScrollText className="w-4 h-4 text-white" />
                     <span>শেয়ার সার্টিফিকেট ডাউনলোড / প্রিন্ট</span>
                   </button>
                 </div>
 
-                <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
-                  <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15">
-                    <span className="text-3xs text-emerald-200 font-bold block">আপনার পরিশোধিত মূলধন</span>
-                    <span className="text-base sm:text-xl font-mono font-black text-white block mt-0.5">{formatBDT(loggedInDirector.investment)}</span>
+                {/* Director Portfolio Metrics */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/60 space-y-1">
+                    <span className="text-3xs text-slate-500 font-bold block uppercase tracking-wide">আপনার পরিশোধিত মূলধন</span>
+                    <span className="text-lg sm:text-2xl font-mono font-black text-[#006231] block">{formatBDT(loggedInDirector.investment)}</span>
+                    <span className="text-[11px] text-slate-500 font-medium block">কোম্পানিতে অর্পিত শেয়ার মূলধন</span>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15">
-                    <span className="text-3xs text-emerald-200 font-bold block">শেয়ার অংশীদারিত্ব</span>
-                    <span className="text-base sm:text-xl font-mono font-black text-emerald-300 block mt-0.5">{loggedInDirector.sharePercentage}%</span>
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                    <span className="text-3xs text-slate-500 font-bold block uppercase tracking-wide">শেয়ার অংশীদারিত্ব</span>
+                    <span className="text-lg sm:text-2xl font-mono font-black text-slate-800 block">{loggedInDirector.sharePercentage}%</span>
+                    <span className="text-[11px] text-slate-500 font-medium block">কোম্পানির মোট ইকুইটি শেয়ারের মধ্যে</span>
                   </div>
-                  <div className="col-span-2 sm:col-span-1 p-3.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15">
-                    <span className="text-3xs text-emerald-200 font-bold block">গৃহীত মোট লভ্যাংশ</span>
-                    <span className="text-base sm:text-xl font-mono font-black text-amber-300 block mt-0.5">{formatBDT(loggedInDirector.dividendEarned)}</span>
+                  <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/60 space-y-1">
+                    <span className="text-3xs text-slate-500 font-bold block uppercase tracking-wide">গৃহীত মোট লভ্যাংশ</span>
+                    <span className="text-lg sm:text-2xl font-mono font-black text-amber-700 block">{formatBDT(loggedInDirector.dividendEarned)}</span>
+                    <span className="text-[11px] text-slate-500 font-medium block">ডিভিডেন্ড থেকে প্রাপ্ত সর্বমোট আয়</span>
                   </div>
                 </div>
               </div>
             )}
 
+{hasDirectorFullAccess && (
+              <>
             {/* Top KPI Metrics for Directors (Clean without cluttered badges) */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1.5">
@@ -3183,7 +3005,12 @@ export default function ManagementDashboard({
 
               {/* 1. MOBILE-ONLY VIEW: Clean Box-free Expandable List */}
               <div className="md:hidden space-y-2.5">
-                {directorsList.map((dir, idx) => {
+                {directorsList.length === 0 ? (
+                  <div className="p-8 text-center bg-white rounded-2xl border border-slate-100 text-slate-400 text-xs">
+                    এখনো কোনো পরিচালক যুক্ত করা হয়নি। উপরে '+ নতুন ডিরেক্টর যুক্ত করুন' বাটনে ক্লিক করে নতুন পরিচালক এন্ট্রি দিন।
+                  </div>
+                ) : (
+                directorsList.map((dir, idx) => {
                   const isExp = Boolean(expandedDirectors[dir.id]);
                   const isDirKeyVisible = Boolean(showAccessKeys[dir.id]);
 
@@ -3348,7 +3175,8 @@ export default function ManagementDashboard({
                       )}
                     </div>
                   );
-                })}
+                })
+                )}
               </div>
 
               {/* 2. DESKTOP-ONLY VIEW: Full Width Spreadsheet Table */}
@@ -3367,7 +3195,14 @@ export default function ManagementDashboard({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {directorsList.map((dir, idx) => (
+                    {directorsList.length === 0 ? (
+                      <tr>
+                        <td colSpan="8" className="py-12 text-center text-slate-400 text-xs">
+                          এখনো কোনো পরিচালক যুক্ত করা হয়নি। উপরে '+ নতুন ডিরেক্টর যুক্ত করুন' বাটনে ক্লিক করে নতুন পরিচালক এন্ট্রি দিন।
+                        </td>
+                      </tr>
+                    ) : (
+                    directorsList.map((dir, idx) => (
                       <tr key={dir.id} className="hover:bg-slate-50/80 transition-colors">
                         <td className="py-3 px-3 text-center font-mono font-bold text-slate-400">{idx + 1}</td>
                         <td className="py-3 px-4">
@@ -3487,18 +3322,21 @@ export default function ManagementDashboard({
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    ))
+                    )}
                   </tbody>
                 </table>
               </div>
             </div>
+              </>
+            )}
           </div>
         )}
 
         {/* ========================================================= */}
         {/* TAB 7: সিস্টেম সেটিংস, ভাষা ও মাস্টার সিকিউরিটি পিন      */}
         {/* ========================================================= */}
-        {activeTab === 'settings' && (
+        {managementNavItems.some(i => i.id === 'settings') && activeTab === 'settings' && (
           <div className="space-y-6 animate-fadeIn select-none">
             {/* Header Action Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs">
@@ -5640,7 +5478,12 @@ export default function ManagementDashboard({
                   }`}
                 >
                   <Building2 className="w-4 h-4" />
-                  <span>ইউনিট ও ইনভেন্টরি হাব ({unitsData.length})</span>
+                  <span>ইউনিট ও ইনভেন্টরি হাব</span>
+                  <span className={`px-2 py-0.5 rounded-md text-xs font-mono font-bold ${
+                    projectDetailsTab === 'inventory' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
+                  }`}>
+                    {unitsData.length}
+                  </span>
                 </button>
 
                 <button
@@ -5776,21 +5619,23 @@ export default function ManagementDashboard({
                       <button
                         type="button"
                         onClick={() => setInventoryTypeFilter('available')}
-                        className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer shrink-0 ${
-                          inventoryTypeFilter === 'available' ? 'bg-[#006231] text-white' : 'bg-emerald-50 text-[#006231] hover:bg-emerald-100'
+                        className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer shrink-0 flex items-center space-x-1.5 ${
+                          inventoryTypeFilter === 'available' ? 'bg-[#006231] text-white shadow-xs' : 'bg-emerald-50 text-[#006231] hover:bg-emerald-100 border border-emerald-200/60'
                         }`}
                       >
-                        ✅ খালি ({availableUnits.length})
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>খালি ({availableUnits.length})</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setInventoryTypeFilter('booked')}
-                        className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer shrink-0 ${
-                          inventoryTypeFilter === 'booked' ? 'bg-rose-600 text-white' : 'bg-rose-50 text-rose-700 hover:bg-rose-100'
+                        className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer shrink-0 flex items-center space-x-1.5 ${
+                          inventoryTypeFilter === 'booked' ? 'bg-rose-600 text-white shadow-xs' : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60'
                         }`}
                       >
-                        🔒 বুকড ({bookedUnits.length})
+                        <Lock className="w-3.5 h-3.5" />
+                        <span>বুকড ({bookedUnits.length})</span>
                       </button>
                     </div>
                   </div>
@@ -5881,49 +5726,59 @@ export default function ManagementDashboard({
                               {/* Size Badge & Specs */}
                               <div className="flex items-center flex-wrap gap-1.5 pt-1">
                                 {u.sizeSqft ? (
-                                  <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-[#006231] text-2xs font-extrabold border border-emerald-200/60 flex items-center space-x-1">
-                                    <span>📐 {u.sizeSqft} বর্গফুট</span>
+                                  <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-[#006231] text-2xs font-extrabold border border-emerald-200/70 inline-flex items-center space-x-1.5 shadow-2xs">
+                                    <Ruler className="w-3.5 h-3.5 text-[#006231]" />
+                                    <span>{u.sizeSqft} বর্গফুট</span>
                                   </span>
                                 ) : null}
 
                                 {u.beds ? (
-                                  <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-3xs font-bold">
-                                    🛏️ {u.beds} বেড
+                                  <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 text-3xs font-bold border border-slate-200/70 inline-flex items-center space-x-1.5">
+                                    <Bed className="w-3.5 h-3.5 text-slate-500" />
+                                    <span>{u.beds} বেড</span>
                                   </span>
                                 ) : null}
 
                                 {u.baths ? (
-                                  <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-3xs font-bold">
-                                    🚿 {u.baths} বাথ
+                                  <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 text-3xs font-bold border border-slate-200/70 inline-flex items-center space-x-1.5">
+                                    <Bath className="w-3.5 h-3.5 text-slate-500" />
+                                    <span>{u.baths} বাথ</span>
                                   </span>
                                 ) : null}
 
                                 {u.price > 0 ? (
-                                  <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-900 text-3xs font-bold">
-                                    ৳ {formatBDT(u.price)}
+                                  <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-900 text-3xs font-extrabold border border-slate-200/80 inline-flex items-center space-x-1.5">
+                                    <Tag className="w-3 h-3 text-slate-500" />
+                                    <span>৳ {formatBDT(u.price)}</span>
                                   </span>
                                 ) : null}
                               </div>
 
                               {/* Booked Client Information or Available status */}
                               {booked && matchedClient ? (
-                                <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200/80 text-3xs space-y-1">
+                                <div className="p-3 rounded-2xl bg-rose-50/80 border border-rose-200/80 text-3xs space-y-1.5 shadow-2xs">
                                   <div className="flex items-center justify-between font-bold text-rose-800">
-                                    <span className="flex items-center space-x-1">
-                                      <span>🔒 বুকড ক্রেতা:</span>
+                                    <span className="flex items-center space-x-1.5">
+                                      <Lock className="w-3.5 h-3.5 text-rose-600" />
+                                      <span className="uppercase tracking-wider font-extrabold text-[10px]">বুকড ক্রেতা</span>
                                     </span>
-                                    <span className="font-mono">{matchedClient.folioNo || matchedClient.id}</span>
+                                    <span className="font-mono text-xs font-black bg-white px-1.5 py-0.2 rounded border border-rose-200">{matchedClient.folioNo || matchedClient.id}</span>
                                   </div>
-                                  <div className="font-black text-slate-900 truncate">{matchedClient.name}</div>
-                                  <div className="text-slate-600 flex items-center justify-between">
-                                    <span>জমা: {formatBDT(matchedClient.totalPaid)}</span>
-                                    <span className="text-rose-700 font-bold">বকেয়া: {formatBDT(matchedClient.totalPrice - matchedClient.totalPaid)}</span>
+                                  <div className="font-black text-slate-900 text-xs truncate">{matchedClient.name}</div>
+                                  <div className="text-slate-600 flex items-center justify-between pt-1 border-t border-rose-100/80 font-medium">
+                                    <span>জমা: <strong className="text-emerald-700 font-mono font-bold">{formatBDT(matchedClient.totalPaid)}</strong></span>
+                                    <span className="text-rose-700 font-bold">বকেয়া: <strong className="font-mono">{formatBDT(matchedClient.totalPrice - matchedClient.totalPaid)}</strong></span>
                                   </div>
                                 </div>
                               ) : (
-                                <div className="p-2 rounded-xl bg-emerald-50/60 border border-emerald-100 text-3xs font-bold text-[#006231] flex items-center justify-between">
-                                  <span>✅ অবিক্রিত / খালি ইউনিট</span>
-                                  <span className="text-emerald-700">বরাদ্দযোগ্য</span>
+                                <div className="p-2.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/70 text-3xs font-bold text-[#006231] flex items-center justify-between shadow-2xs">
+                                  <span className="flex items-center space-x-1.5">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                    <span>অবিক্রিত / খালি ইউনিট</span>
+                                  </span>
+                                  <span className="text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-md font-extrabold text-[10px] border border-emerald-200">
+                                    বরাদ্দযোগ্য
+                                  </span>
                                 </div>
                               )}
                             </div>
@@ -6612,7 +6467,7 @@ export default function ManagementDashboard({
                           email: firstDir.email || '',
                           role: `বোর্ড ডিরেক্টর (${firstDir.role})`,
                           accessKey: firstDir.accessKey || 'admin123',
-                          permissions: ['directors', 'projects', 'clients', 'payments', 'expenses'],
+                          permissions: [],
                           directorId: firstDir.id
                         });
                       }
@@ -6654,7 +6509,7 @@ export default function ManagementDashboard({
                               email: d.email || '',
                               role: `বোর্ড ডিরেক্টর (${d.role})`,
                               accessKey: d.accessKey || 'admin123',
-                              permissions: ['directors', 'projects', 'clients', 'payments', 'expenses'],
+                              permissions: [],
                               directorId: d.id
                             });
                           }}

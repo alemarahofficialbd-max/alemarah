@@ -230,12 +230,12 @@ export const translations = {
       mdDesignation: "Managing Director",
       mdEducation: "BSS Political Science, Govt Titumir College",
 
-      // Executive Committee Board of Directors
+      // Executive Committee
       board: {
         badge: "Leadership & Governance",
-        title: "Executive Committee Board of Directors",
+        title: "Executive Committee",
         subtitle: "Visionary leadership upholding ethical governance, transparent management, and strategic development for Al-Emarah Properties.",
-        leadershipBadge: "Executive Board",
+        leadershipBadge: "Executive Committee",
         members: [
           {
             id: "chairman",
@@ -268,14 +268,6 @@ export const translations = {
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
             image: "/images/taneem_mahfuj.jpg"
-          },
-          {
-            id: "dir_al_amin",
-            name: "Al Amin Hawladar",
-            role: "Director",
-            organization: "Al-Emarah Properties",
-            education: "Entrepreneur & Director, Al-Emarah Properties",
-            image: "/images/al_amin_hawladar.jpg"
           }
         ]
       },
@@ -958,12 +950,12 @@ export const translations = {
       mdDesignation: "ব্যবস্থাপনা পরিচালক",
       mdEducation: "BSS রাষ্ট্রবিজ্ঞান, সরকারি তিতুমীর কলেজ",
 
-      // Executive Committee Board of Directors
+      // Executive Committee
       board: {
         badge: "নির্বাহী নেতৃত্ব ও সুশাসন",
-        title: "Executive Committee Board of Directors",
-        subtitle: "সুপরিকল্পিত উন্নয়ন, স্বচ্ছ ব্যবস্থাপনা ও আস্থার সাথে স্থায়ী সম্পদ গড়ার লক্ষ্যে পরিচালিত কার্যনির্বাহী কমিটি ও পরিচালনা পর্ষদ।",
-        leadershipBadge: "কার্যনির্বাহী পরিচালনা পর্ষদ",
+        title: "Executive Committee",
+        subtitle: "সুপরিকল্পিত উন্নয়ন, স্বচ্ছ ব্যবস্থাপনা ও আস্থার সাথে স্থায়ী সম্পদ গড়ার লক্ষ্যে পরিচালিত কার্যনির্বাহী কমিটি।",
+        leadershipBadge: "কার্যনির্বাহী কমিটি",
         members: [
           {
             id: "chairman",
@@ -996,14 +988,6 @@ export const translations = {
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
             image: "/images/taneem_mahfuj.jpg"
-          },
-          {
-            id: "dir_al_amin",
-            name: "আল আমিন হাওলাদার",
-            role: "পরিচালক",
-            organization: "আল-ইমারাহ প্রোপার্টিজ",
-            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
-            image: "/images/al_amin_hawladar.jpg"
           }
         ]
       },

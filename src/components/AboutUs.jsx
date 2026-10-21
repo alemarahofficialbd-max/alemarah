@@ -250,7 +250,7 @@ export default function AboutUs({ lang, t }) {
         </div>
 
         {/* ========================================================= */}
-        {/* EXECUTIVE COMMITTEE BOARD OF DIRECTORS                   */}
+        {/* EXECUTIVE COMMITTEE                                      */}
         {/* ========================================================= */}
         <div id="board-of-directors" className="pt-4 space-y-10">
           <div className="text-center max-w-3xl mx-auto space-y-3">
@@ -260,19 +260,19 @@ export default function AboutUs({ lang, t }) {
             </div>
 
             <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#231F20] tracking-tight">
-              {t.about.board?.title || 'Executive Committee Board of Directors'}
+              {t.about.board?.title || 'Executive Committee'}
             </h3>
 
             <p className="text-xs sm:text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
               {t.about.board?.subtitle || (lang === 'en' 
                 ? 'Visionary leadership upholding ethical governance, transparent management, and strategic development for Al-Emarah Properties.'
-                : 'সুপরিকল্পিত উন্নয়ন, স্বচ্ছ ব্যবস্থাপনা ও আস্থার সাথে স্থায়ী সম্পদ গড়ার লক্ষ্যে পরিচালিত কার্যনির্বাহী কমিটি ও পরিচালনা পর্ষদ।'
+                : 'সুপরিকল্পিত উন্নয়ন, স্বচ্ছ ব্যবস্থাপনা ও আস্থার সাথে স্থায়ী সম্পদ গড়ার লক্ষ্যে পরিচালিত কার্যনির্বাহী কমিটি।'
               )}
             </p>
           </div>
 
-          {/* Unified Grid: All Executive Committee Board of Directors */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6">
+          {/* Unified Grid: All Executive Committee Members */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {(t.about.board?.members || []).map((member, idx) => (
               <div 
                 key={member.id}

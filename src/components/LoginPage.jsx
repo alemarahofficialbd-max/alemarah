@@ -150,6 +150,15 @@ export default function LoginPage({
             return;
           }
 
+          const directorInTeam = (store.managementTeam || []).find(m => 
+            (m.directorId && m.directorId === matchedDirector.id) ||
+            (m.phone && cleanPhone && m.phone.replace(/[^0-9]/g, '') === cleanPhone) ||
+            (m.email && m.email.toLowerCase() === trimmedInput)
+          );
+          const directorPerms = directorInTeam && Array.isArray(directorInTeam.permissions)
+            ? directorInTeam.permissions
+            : (Array.isArray(matchedDirector.permissions) ? matchedDirector.permissions : []);
+
           matchedAdmin = {
             id: matchedDirector.id,
             name: matchedDirector.name,
@@ -166,7 +175,7 @@ export default function LoginPage({
             isDirector: true,
             isSuperAdmin: false,
             accessKey: matchedDirector.accessKey || 'admin123',
-            permissions: ['directors', 'projects', 'clients', 'expenses'],
+            permissions: directorPerms,
             status: matchedDirector.status || 'সক্রিয় (Active)'
           };
           setIsSuccess(true);
@@ -185,9 +194,7 @@ export default function LoginPage({
             isSuperAdmin: false,
             isDirector: false,
             roleType: matchedOfficer.roleType || 'staff',
-            permissions: matchedOfficer.permissions && matchedOfficer.permissions.length > 0 
-              ? matchedOfficer.permissions 
-              : ['payments', 'expenses', 'clients']
+            permissions: Array.isArray(matchedOfficer.permissions) ? matchedOfficer.permissions : []
           };
           setIsSuccess(true);
           setStatusMessage(isEn ? `Welcome: ${matchedOfficer.name} (${matchedOfficer.role})` : `স্বাগতম: ${matchedOfficer.name} (${matchedOfficer.role})`);
