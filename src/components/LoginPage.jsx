@@ -16,7 +16,7 @@ import {
   Crown,
   Shield
 } from 'lucide-react';
-import { getManagementData } from '../data/managementStore';
+import { getManagementData, getCustomerUnits, findCustomerByIdentifier } from '../data/managementStore';
 
 export default function LoginPage({ 
   lang, 
@@ -53,36 +53,40 @@ export default function LoginPage({
       setIsSubmitting(false);
 
       if (loginRole === 'customer') {
-        const cleanPhone = identifierInput.replace(/[^0-9]/g, '');
         const trimmedInput = identifierInput.trim().toLowerCase();
         const trimmedPass = passwordInput.trim();
 
-        // Find matching client by ID or Phone
-        const matchedClient = (store.clients || []).find(
-          c => (
-            (c.id && c.id.toLowerCase() === trimmedInput) || 
-            (c.phone && c.phone.trim() === identifierInput.trim()) ||
-            (cleanPhone && c.phone && c.phone.replace(/[^0-9]/g, '') === cleanPhone)
-          )
-        );
+        // Customer identity (phone + password) is shared across every unit they own.
+        // Allow logging in with a specific unit's file ID too, resolved back to its owner.
+        const matchedUnitById = (store.clients || []).find(c => c.id && c.id.toLowerCase() === trimmedInput);
+        const customer = findCustomerByIdentifier(store, identifierInput) ||
+          (matchedUnitById ? findCustomerByIdentifier(store, matchedUnitById.phone) : null);
 
-        if (!matchedClient) {
+        if (!customer) {
           setIsSuccess(false);
           setStatusMessage(isEn ? 'Customer ID or mobile number not found!' : 'গ্রাহক ফাইল আইডি অথবা মোবাইল নম্বর খুঁজে পাওয়া যায়নি!');
           return;
         }
 
-        const validPass = matchedClient.password || 'password123';
+        const validPass = customer.password || 'password123';
         if (trimmedPass !== validPass) {
           setIsSuccess(false);
           setStatusMessage(isEn ? 'Incorrect customer password! Please check and try again.' : 'ভুল পাসওয়ার্ড! গ্রাহকের সঠিক পাসওয়ার্ড প্রদান করুন।');
           return;
         }
 
+        const units = getCustomerUnits(store, customer.id);
+        if (units.length === 0) {
+          setIsSuccess(false);
+          setStatusMessage(isEn ? 'No flat/unit found on this account!' : 'এই অ্যাকাউন্টে কোনো ফ্ল্যাট/ইউনিট পাওয়া যায়নি!');
+          return;
+        }
+        const matchedClient = (matchedUnitById && units.find(u => u.id === matchedUnitById.id)) || units[0];
+
         setIsSuccess(true);
-        setStatusMessage(isEn ? `Welcome ${matchedClient.name}! Redirecting...` : `স্বাগতম ${matchedClient.name}! ক্লায়েন্ট ড্যাশবোর্ডে প্রবেশ করা হচ্ছে...`);
+        setStatusMessage(isEn ? `Welcome ${customer.name}! Redirecting...` : `স্বাগতম ${customer.name}! ক্লায়েন্ট ড্যাশবোর্ডে প্রবেশ করা হচ্ছে...`);
         setTimeout(() => {
-          onLoginSuccess(matchedClient);
+          onLoginSuccess({ ...matchedClient, customer, units });
         }, 400);
       } else {
         // Management login: strictly distinguish Super Admin, Director, and Staff Officer

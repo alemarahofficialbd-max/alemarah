@@ -62,7 +62,65 @@ export const initialManagementData = {
     }
   ],
   directors: [],
-  inquiries: []
+  inquiries: [],
+  // Customer identity (phone + password + status) is canonical here.
+  // A customer can own multiple units — see `clients`, each unit record
+  // carries a `customerId` pointing back to this array.
+  customers: []
+};
+
+// Build a stable customer id from a phone number so repeated migrations
+// of the same phone always resolve to the same customer record.
+const customerIdFromPhone = (phone) => {
+  const digits = (phone || '').replace(/[^0-9]/g, '');
+  return digits ? `CUS-${digits}` : `CUS-${Date.now().toString(36).toUpperCase()}`;
+};
+
+// Ensure every client/unit row has a customerId, and that a matching
+// customer identity record exists in `customers`. Multiple unit rows
+// sharing the same phone number collapse onto a single customer.
+const migrateClientsToCustomers = (data) => {
+  const clients = data.clients || [];
+  const customers = data.customers ? [...data.customers] : [];
+  const findCustomerByPhone = (phone) => {
+    const digits = (phone || '').replace(/[^0-9]/g, '');
+    return digits ? customers.find(c => (c.phone || '').replace(/[^0-9]/g, '') === digits) : null;
+  };
+
+  const migratedClients = clients.map(client => {
+    if (client.customerId && customers.some(c => c.id === client.customerId)) {
+      return client;
+    }
+    let customer = findCustomerByPhone(client.phone);
+    if (!customer) {
+      customer = {
+        id: customerIdFromPhone(client.phone),
+        name: client.name || '',
+        phone: client.phone || '',
+        password: client.password || 'password123',
+        status: client.status || 'সক্রিয় (Active)',
+        createdAt: client.createdAt || new Date().toISOString()
+      };
+      customers.push(customer);
+    }
+    return { ...client, customerId: customer.id };
+  });
+
+  return { ...data, clients: migratedClients, customers };
+};
+
+// All unit/purchase records belonging to one customer (phone-linked identity).
+export const getCustomerUnits = (data, customerId) =>
+  (data.clients || []).filter(c => c.customerId === customerId);
+
+// Find a customer identity by phone or by any of their unit record ids.
+export const findCustomerByIdentifier = (data, identifier) => {
+  const cleanPhone = (identifier || '').replace(/[^0-9]/g, '');
+  const trimmed = (identifier || '').trim().toLowerCase();
+  return (data.customers || []).find(cust =>
+    (cleanPhone && cust.phone && cust.phone.replace(/[^0-9]/g, '') === cleanPhone) ||
+    (cust.id && cust.id.toLowerCase() === trimmed)
+  ) || null;
 };
 
 // Load saved data or return default
@@ -131,12 +189,15 @@ export const getManagementData = () => {
       if (!parsed.inquiries) {
         parsed.inquiries = [];
       }
-      return parsed;
+      if (!parsed.customers) {
+        parsed.customers = [];
+      }
+      return migrateClientsToCustomers(parsed);
     }
   } catch (e) {
     console.error('Error loading management data from localStorage:', e);
   }
-  return initialManagementData;
+  return migrateClientsToCustomers(initialManagementData);
 };
 
 // Background async sync to Supabase
@@ -221,10 +282,23 @@ export const syncToSupabase = async (data) => {
       }
     }
 
-    // 4. Sync Clients & Payment History
+    // 4. Sync Customers (login identity, shared across a customer's units)
+    if (data.customers && data.customers.length > 0) {
+      const customerRows = data.customers.map(cust => ({
+        id: cust.id,
+        name: cust.name || '',
+        phone: cust.phone || '',
+        password: cust.password || 'password123',
+        status: cust.status || 'সক্রিয় (Active)'
+      }));
+      await supabase.from('customers').upsert(customerRows, { onConflict: 'id' });
+    }
+
+    // 4b. Sync Client Units & Payment History
     if (data.clients && data.clients.length > 0) {
       const clientRows = data.clients.map(c => ({
         id: c.id,
+        customer_id: c.customerId || null,
         name: c.name,
         phone: c.phone || '',
         password: c.password || 'password123',
@@ -238,7 +312,7 @@ export const syncToSupabase = async (data) => {
       }));
       await supabase.from('clients').upsert(clientRows, { onConflict: 'id' });
 
-      // 4b. Sync Payments
+      // 4c. Sync Payments
       const allPayments = [];
       data.clients.forEach(c => {
         if (c.paymentHistory && c.paymentHistory.length > 0) {
@@ -265,12 +339,13 @@ export const syncToSupabase = async (data) => {
 // Background sync from Supabase
 export const syncFromSupabase = async () => {
   try {
-    const [adminsRes, directorsRes, projectsRes, clientsRes, inquiriesRes] = await Promise.all([
+    const [adminsRes, directorsRes, projectsRes, clientsRes, inquiriesRes, customersRes] = await Promise.all([
       supabase.from('admins').select('*'),
       supabase.from('directors').select('*'),
       supabase.from('projects').select('*, expenses:project_expenses(*)'),
       supabase.from('clients').select('*, paymentHistory:client_payments(*)'),
-      supabase.from('inquiries').select('*')
+      supabase.from('inquiries').select('*'),
+      supabase.from('customers').select('*')
     ]);
 
     // If tables do not exist yet, return gracefully
@@ -385,6 +460,7 @@ export const syncFromSupabase = async () => {
         }));
         return {
           id: c.id,
+          customerId: c.customer_id || localClient?.customerId,
           name: c.name,
           phone: c.phone,
           password: c.password || localClient?.password || 'password123',
@@ -401,6 +477,18 @@ export const syncFromSupabase = async () => {
       // Retain any locally added clients that aren't yet in Supabase
       const extraLocalClients = (current.clients || []).filter(lc => !clientsRes.data.some(c => c.id === lc.id));
       updated.clients = [...remoteClients, ...extraLocalClients];
+    }
+
+    if (customersRes && customersRes.data && customersRes.data.length > 0) {
+      const remoteCustomers = customersRes.data.map(cust => ({
+        id: cust.id,
+        name: cust.name,
+        phone: cust.phone,
+        password: cust.password,
+        status: cust.status
+      }));
+      const extraLocalCustomers = (current.customers || []).filter(lc => !customersRes.data.some(c => c.id === lc.id));
+      updated.customers = [...remoteCustomers, ...extraLocalCustomers];
     }
 
     if (inquiriesRes && inquiriesRes.data && inquiriesRes.data.length > 0) {
@@ -420,8 +508,9 @@ export const syncFromSupabase = async () => {
       updated.inquiries = [...remoteInquiries, ...extraLocalInquiries];
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: updated }));
+    const migrated = migrateClientsToCustomers(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+    window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: migrated }));
   } catch (err) {
     console.log('Supabase sync notice:', err);
   }
