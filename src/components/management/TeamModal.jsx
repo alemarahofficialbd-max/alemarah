@@ -244,15 +244,21 @@ export default function TeamModal({
 
           <div>
             <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-              লগইন অ্যাক্সেস কী / পাসওয়ার্ড *
+              {editingTeamMember ? 'নতুন পাসওয়ার্ড সেট করুন (ঐচ্ছিক)' : 'লগইন অ্যাক্সেস কী / পাসওয়ার্ড *'}
             </label>
             <input
               type="text"
               value={form.accessKey}
               onChange={(e) => setForm({ ...form, accessKey: e.target.value })}
+              placeholder={editingTeamMember ? 'ফাঁকা রাখলে বর্তমান পাসওয়ার্ড অপরিবর্তিত থাকবে' : ''}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-              required
+              required={!editingTeamMember}
             />
+            {editingTeamMember && (
+              <span className="text-[10px] text-slate-500 mt-1 block">
+                নিরাপত্তার জন্য বর্তমান পাসওয়ার্ড দেখানো হয় না — পরিবর্তন করতে চাইলে নতুন একটি লিখুন
+              </span>
+            )}
           </div>
 
           {!editingTeamMember?.isSuperAdmin && (

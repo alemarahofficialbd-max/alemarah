@@ -70,7 +70,9 @@ import {
   getManagementData,
   saveManagementData,
   subscribeToManagementData,
-  customerIdFromPhone
+  customerIdFromPhone,
+  hashPassword,
+  isHashedPassword
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -416,7 +418,7 @@ export default function ManagementDashboard({
   // -------------------------------------------------------------
   // HANDLERS
   // -------------------------------------------------------------
-  const handleAddClient = (e) => {
+  const handleAddClient = async (e) => {
     e.preventDefault();
 
     const isExistingCustomer = Boolean(clientForm.existingCustomerId);
@@ -447,7 +449,7 @@ export default function ManagementDashboard({
       id: customerIdFromPhone(clientForm.phone),
       name: clientForm.name,
       phone: clientForm.phone,
-      password: clientForm.password || 'password123',
+      password: await hashPassword(clientForm.password || 'password123'),
       status: 'সক্রিয় (Active)'
     };
     const isNewCustomerRecord = !existingCustomer && !phoneMatch;
@@ -908,7 +910,7 @@ export default function ManagementDashboard({
       phone: dir.phone || '',
       email: dir.email || '',
       role: `বোর্ড ডিরেক্টর (${dir.role})`,
-      accessKey: dir.accessKey || 'admin123',
+      accessKey: '',
       permissions: [],
       directorId: dir.id
     });
@@ -924,19 +926,24 @@ export default function ManagementDashboard({
       phone: mem.phone || '',
       email: mem.email || '',
       role: mem.role || 'সাইট ইঞ্জিনিয়ার',
-      accessKey: mem.accessKey || 'admin123',
+      accessKey: '',
       permissions: Array.isArray(mem.permissions) ? mem.permissions : [],
       directorId: mem.directorId || null
     });
     setIsTeamModalOpen(true);
   };
 
-  const handleSaveTeam = (e) => {
+  const handleSaveTeam = async (e) => {
     e.preventDefault();
     if (!teamForm.name || !teamForm.phone) {
       alert('নাম এবং মোবাইল নম্বর পূরণ করুন।');
       return;
     }
+
+    // Blank password field means "keep the existing credential unchanged";
+    // only hash and apply a new one when the admin actually typed something.
+    const newAccessKeyHash = teamForm.accessKey ? await hashPassword(teamForm.accessKey) : null;
+    const defaultAccessKeyHash = newAccessKeyHash ? null : await hashPassword('admin123');
 
     if (editingTeamMember) {
       updateStore((prev) => {
@@ -948,7 +955,7 @@ export default function ManagementDashboard({
               phone: teamForm.phone,
               email: teamForm.email,
               role: teamForm.role,
-              accessKey: teamForm.accessKey || 'admin123',
+              accessKey: newAccessKeyHash || m.accessKey || defaultAccessKeyHash,
               permissions: teamForm.permissions,
               directorId: teamForm.directorId || m.directorId || null
             };
@@ -963,14 +970,14 @@ export default function ManagementDashboard({
             name: teamForm.name,
             phone: teamForm.phone,
             email: teamForm.email || updatedSuperAdmin.email,
-            accessKey: teamForm.accessKey || 'admin123'
+            accessKey: newAccessKeyHash || updatedSuperAdmin.accessKey || defaultAccessKeyHash
           };
         }
 
         // Also sync director accessKey/credentials if this member was a director
         const dirIdToSync = teamForm.directorId || editingTeamMember.directorId;
         const updatedDirectors = dirIdToSync 
-          ? (prev.directors || []).map(d => d.id === dirIdToSync ? { ...d, accessKey: teamForm.accessKey || d.accessKey || 'admin123', phone: teamForm.phone || d.phone, email: teamForm.email || d.email } : d)
+          ? (prev.directors || []).map(d => d.id === dirIdToSync ? { ...d, accessKey: newAccessKeyHash || d.accessKey || defaultAccessKeyHash, phone: teamForm.phone || d.phone, email: teamForm.email || d.email } : d)
           : prev.directors;
 
         return {
@@ -998,7 +1005,7 @@ export default function ManagementDashboard({
             phone: teamForm.phone,
             email: teamForm.email || nextTeam[existingIdx].email,
             role: teamForm.role,
-            accessKey: teamForm.accessKey || nextTeam[existingIdx].accessKey || 'admin123',
+            accessKey: newAccessKeyHash || nextTeam[existingIdx].accessKey || defaultAccessKeyHash,
             permissions: Array.isArray(teamForm.permissions) ? teamForm.permissions : [],
             directorId: teamForm.directorId || nextTeam[existingIdx].directorId || null,
             status: lang === 'bn' ? 'সক্রিয়' : 'Active'
@@ -1010,7 +1017,7 @@ export default function ManagementDashboard({
             phone: teamForm.phone,
             email: teamForm.email || '',
             role: teamForm.role,
-            accessKey: teamForm.accessKey || 'admin123',
+            accessKey: newAccessKeyHash || defaultAccessKeyHash,
             isSuperAdmin: false,
             isDirector: Boolean(teamForm.directorId),
             directorId: teamForm.directorId || null,
@@ -1022,7 +1029,7 @@ export default function ManagementDashboard({
 
         // Keep director accessKey synced
         const updatedDirectors = teamForm.directorId 
-          ? (prev.directors || []).map(d => d.id === teamForm.directorId ? { ...d, accessKey: teamForm.accessKey || d.accessKey || 'admin123', phone: teamForm.phone || d.phone, email: teamForm.email || d.email } : d)
+          ? (prev.directors || []).map(d => d.id === teamForm.directorId ? { ...d, accessKey: newAccessKeyHash || d.accessKey || defaultAccessKeyHash, phone: teamForm.phone || d.phone, email: teamForm.email || d.email } : d)
           : prev.directors;
 
         return {
@@ -2622,24 +2629,30 @@ export default function ManagementDashboard({
                               {isDirKeyVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                             </button>
                           </div>
-                          <div className="flex items-center justify-between gap-1 pt-0.5">
-                            <span className="text-3xs text-slate-400">পাসওয়ার্ড:</span>
-                            <code className="font-mono font-bold text-slate-900 text-xs bg-white px-2 py-0.5 rounded border border-slate-200">
-                              {isDirKeyVisible ? (dir.accessKey || 'admin123') : '••••••••'}
-                            </code>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                navigator.clipboard?.writeText(dir.accessKey || 'admin123');
-                                triggerAlert(`ডিরেক্টর ${dir.name}-এর পাসওয়ার্ড কপি হয়েছে!`);
-                              }}
-                              className="px-2 py-1 rounded bg-white hover:bg-slate-100 text-slate-700 font-bold text-3xs border border-slate-200 inline-flex items-center space-x-1 cursor-pointer transition-colors"
-                              title="পাসওয়ার্ড কপি করুন"
-                            >
-                              <Copy className="w-3 h-3" />
-                              <span>কপি</span>
-                            </button>
-                          </div>
+                          {isHashedPassword(dir.accessKey) ? (
+                            <div className="text-3xs text-slate-500 pt-0.5">
+                              নিরাপত্তার জন্য পাসওয়ার্ড দেখানো/কপি করা যাবে না
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between gap-1 pt-0.5">
+                              <span className="text-3xs text-slate-400">পাসওয়ার্ড:</span>
+                              <code className="font-mono font-bold text-slate-900 text-xs bg-white px-2 py-0.5 rounded border border-slate-200">
+                                {isDirKeyVisible ? (dir.accessKey || 'admin123') : '••••••••'}
+                              </code>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard?.writeText(dir.accessKey || 'admin123');
+                                  triggerAlert(`ডিরেক্টর ${dir.name}-এর পাসওয়ার্ড কপি হয়েছে!`);
+                                }}
+                                className="px-2 py-1 rounded bg-white hover:bg-slate-100 text-slate-700 font-bold text-3xs border border-slate-200 inline-flex items-center space-x-1 cursor-pointer transition-colors"
+                                title="পাসওয়ার্ড কপি করুন"
+                              >
+                                <Copy className="w-3 h-3" />
+                                <span>কপি</span>
+                              </button>
+                            </div>
+                          )}
                         </div>
 
                         {/* Action buttons */}
@@ -2765,23 +2778,29 @@ export default function ManagementDashboard({
                                       <Eye className="w-3.5 h-3.5" />
                                     </button>
                                   </div>
-                                  <div className="flex items-center justify-between gap-1 pt-0.5">
-                                    <code className="font-mono font-bold text-slate-900 text-xs bg-slate-100 px-2 py-0.5 rounded">
-                                      {isMemKeyVisible ? mem.accessKey : '••••••••'}
-                                    </code>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        navigator.clipboard?.writeText(mem.accessKey || 'admin123');
-                                        triggerAlert('পাসওয়ার্ড কপি হয়েছে!');
-                                      }}
-                                      className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-3xs inline-flex items-center space-x-1 cursor-pointer transition-colors"
-                                      title="পাসওয়ার্ড কপি করুন"
-                                    >
-                                      <Copy className="w-3 h-3" />
-                                      <span>কপি</span>
-                                    </button>
-                                  </div>
+                                  {isHashedPassword(mem.accessKey) ? (
+                                    <div className="text-3xs text-slate-500 pt-0.5">
+                                      নিরাপত্তার জন্য পাসওয়ার্ড দেখানো/কপি করা যাবে না — পরিবর্তন করতে "সম্পাদনা" থেকে নতুন পাসওয়ার্ড সেট করুন
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center justify-between gap-1 pt-0.5">
+                                      <code className="font-mono font-bold text-slate-900 text-xs bg-slate-100 px-2 py-0.5 rounded">
+                                        {isMemKeyVisible ? mem.accessKey : '••••••••'}
+                                      </code>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          navigator.clipboard?.writeText(mem.accessKey || 'admin123');
+                                          triggerAlert('পাসওয়ার্ড কপি হয়েছে!');
+                                        }}
+                                        className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-3xs inline-flex items-center space-x-1 cursor-pointer transition-colors"
+                                        title="পাসওয়ার্ড কপি করুন"
+                                      >
+                                        <Copy className="w-3 h-3" />
+                                        <span>কপি</span>
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* 3. Permissions Badges */}
@@ -3119,19 +3138,21 @@ export default function ManagementDashboard({
                               >
                                 {isDirKeyVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                               </button>
+                              {!isHashedPassword(dir.accessKey) && (
                               <button
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   navigator.clipboard?.writeText(dir.accessKey || 'admin123');
-                                  triggerAlert(`পাসওয়ার্ড (${dir.accessKey || 'admin123'}) কপি হয়েছে!`);
+                                  triggerAlert(`পাসওয়ার্ড (${dir.accessKey || 'admin123'}) কপি হয়েছে!`);
                                 }}
                                 className="px-2 py-1 rounded bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-3xs inline-flex items-center space-x-1 cursor-pointer"
-                                title="পাসওয়ার্ড কপি করুন"
+                                title="পাসওয়ার্ড কপি করুন"
                               >
                                 <Copy className="w-3 h-3" />
                                 <span>কপি</span>
                               </button>
+                              )}
                             </div>
                           </div>
 
@@ -5432,7 +5453,8 @@ export default function ManagementDashboard({
                 {(() => {
                   const isDeactivated = cl.status === 'deactive' || cl.status === 'নিষ্ক্রিয়';
                   const accountLoginId = cl.phone || cl.id;
-                  const accountPassword = cl.password || 'password123';
+                  const passwordIsHashed = isHashedPassword(cl.password);
+                  const accountPassword = passwordIsHashed ? null : (cl.password || 'password123');
 
                   return (
                     <div className="lg:col-span-5 bg-white rounded-3xl p-4 sm:p-6 lg:p-7 text-slate-800 border border-slate-200/90 shadow-sm relative overflow-hidden flex flex-col justify-between">
@@ -5538,23 +5560,25 @@ export default function ManagementDashboard({
                           {/* Password */}
                           <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
                             <div className="min-w-0">
-                              <span className="text-[10px] text-slate-400 block font-semibold">পাসওয়ার্ড</span>
+                              <span className="text-[10px] text-slate-400 block font-semibold">পাসওয়ার্ড</span>
                               <strong className="text-amber-700 font-mono text-xs font-bold truncate block">
-                                {accountPassword}
+                                {passwordIsHashed ? 'নিরাপত্তার জন্য দেখানো যাবে না' : accountPassword}
                               </strong>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                navigator.clipboard?.writeText(accountPassword);
-                                triggerAlert('পাসওয়ার্ড কপি হয়েছে!');
-                              }}
-                              className="p-1.5 rounded-lg bg-white hover:bg-emerald-50 text-slate-600 hover:text-[#006231] border border-slate-200 text-3xs font-bold inline-flex items-center space-x-1 cursor-pointer transition-colors shrink-0"
-                              title="পাসওয়ার্ড কপি করুন"
-                            >
-                              <Copy className="w-3.5 h-3.5" />
-                              <span>কপি</span>
-                            </button>
+                            {!passwordIsHashed && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard?.writeText(accountPassword);
+                                  triggerAlert('পাসওয়ার্ড কপি হয়েছে!');
+                                }}
+                                className="p-1.5 rounded-lg bg-white hover:bg-emerald-50 text-slate-600 hover:text-[#006231] border border-slate-200 text-3xs font-bold inline-flex items-center space-x-1 cursor-pointer transition-colors shrink-0"
+                                title="পাসওয়ার্ড কপি করুন"
+                              >
+                                <Copy className="w-3.5 h-3.5" />
+                                <span>কপি</span>
+                              </button>
+                            )}
                           </div>
                         </div>
 

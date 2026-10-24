@@ -2,6 +2,54 @@ import { supabase } from '../lib/supabaseClient';
 
 const STORAGE_KEY = 'alemarah_management_store_v4';
 
+// -------------------------------------------------------------
+// Password hashing (Web Crypto PBKDF2-SHA256) — runs entirely in the
+// browser since this app has no backend server of its own. Stored as
+// "pbkdf2$<iterations>$<saltHex>$<hashHex>" so the format is
+// self-describing; a value that doesn't match this shape is treated as
+// a legacy plaintext password and verified by direct comparison, then
+// upgraded to a hash the next time it's used (see verifyPassword).
+// -------------------------------------------------------------
+const PBKDF2_ITERATIONS = 100000;
+
+const bufToHex = (buf) => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+const hexToBuf = (hex) => {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+  return bytes;
+};
+
+const deriveBits = async (plainText, salt, iterations) => {
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(plainText), { name: 'PBKDF2' }, false, ['deriveBits']
+  );
+  return crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
+    keyMaterial,
+    256
+  );
+};
+
+export const isHashedPassword = (value) => typeof value === 'string' && value.startsWith('pbkdf2$');
+
+export const hashPassword = async (plainText) => {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const bits = await deriveBits(plainText, salt, PBKDF2_ITERATIONS);
+  return `pbkdf2$${PBKDF2_ITERATIONS}$${bufToHex(salt)}$${bufToHex(bits)}`;
+};
+
+// Returns true/false. If `stored` is legacy plaintext and it matches,
+// the caller should persist a fresh hash via hashPassword + its own save.
+export const verifyPassword = async (plainText, stored) => {
+  if (!stored) return false;
+  if (!isHashedPassword(stored)) {
+    return plainText === stored;
+  }
+  const [, iterStr, saltHex, hashHex] = stored.split('$');
+  const bits = await deriveBits(plainText, hexToBuf(saltHex), Number(iterStr));
+  return bufToHex(bits) === hashHex;
+};
+
 export const initialManagementData = {
   projects: [
     {
@@ -564,6 +612,32 @@ export const updateStore = (updater) => {
   const nextData = typeof updater === 'function' ? updater(current) : updater;
   saveManagementData(nextData);
   return nextData;
+};
+
+// Silently upgrades a legacy plaintext credential to a PBKDF2 hash once it
+// has been verified correct at login — used by LoginPage so every account
+// gets hashed the next time its owner signs in, with no action needed from
+// anyone and the user's password itself never changing.
+export const upgradeCredentialHash = (kind, id, hashedValue) => {
+  updateStore((prev) => {
+    if (kind === 'customer') {
+      return { ...prev, customers: (prev.customers || []).map(c => c.id === id ? { ...c, password: hashedValue } : c) };
+    }
+    if (kind === 'superAdmin') {
+      return {
+        ...prev,
+        superAdmin: prev.superAdmin ? { ...prev.superAdmin, accessKey: hashedValue } : prev.superAdmin,
+        managementTeam: (prev.managementTeam || []).map(m => m.isSuperAdmin ? { ...m, accessKey: hashedValue } : m)
+      };
+    }
+    if (kind === 'director') {
+      return { ...prev, directors: (prev.directors || []).map(d => d.id === id ? { ...d, accessKey: hashedValue } : d) };
+    }
+    if (kind === 'officer') {
+      return { ...prev, managementTeam: (prev.managementTeam || []).map(m => m.id === id ? { ...m, accessKey: hashedValue } : m) };
+    }
+    return prev;
+  });
 };
 
 // Subscription listener for real-time sync across components
