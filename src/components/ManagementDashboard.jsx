@@ -69,7 +69,8 @@ import {
   formatBDT,
   getManagementData,
   saveManagementData,
-  subscribeToManagementData
+  subscribeToManagementData,
+  customerIdFromPhone
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -215,12 +216,7 @@ export default function ManagementDashboard({
   // -------------------------------------------------------------
   // 1. New Client Form
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
-  const [clientForm, setClientForm] = useState({
-    name: '',
-    image: '',
-    emailPrefix: '',
-    phone: '',
-    password: 'password123',
+  const emptyUnitRow = () => ({
     projectId: data.projects[0]?.id || '',
     flatNo: '',
     totalPrice: '',
@@ -228,6 +224,18 @@ export default function ManagementDashboard({
     nextDueDate: '১৫ নভেম্বর, ২০২৬',
     nextDueAmount: '৫০০০০০'
   });
+  const emptyClientForm = () => ({
+    name: '',
+    image: '',
+    emailPrefix: '',
+    phone: '',
+    password: 'password123',
+    // '' = registering a brand-new customer; otherwise the id of an existing
+    // customer this form is just adding one or more extra units to.
+    existingCustomerId: '',
+    units: [emptyUnitRow()]
+  });
+  const [clientForm, setClientForm] = useState(emptyClientForm);
 
   // 2. Receive Payment Form
   const [paymentSelectedProjectId, setPaymentSelectedProjectId] = useState('all');
@@ -410,67 +418,88 @@ export default function ManagementDashboard({
   // -------------------------------------------------------------
   const handleAddClient = (e) => {
     e.preventDefault();
-    if (!clientForm.name || !clientForm.phone || !clientForm.totalPrice) {
-      alert('অনুগ্রহ করে কাস্টমারের নাম, ফোন ও মোট মূল্য লিখুন।');
+
+    const isExistingCustomer = Boolean(clientForm.existingCustomerId);
+    const existingCustomer = isExistingCustomer
+      ? (data.customers || []).find(c => c.id === clientForm.existingCustomerId)
+      : null;
+
+    if (!isExistingCustomer && (!clientForm.name || !clientForm.phone)) {
+      alert('নাম ও ফোন নম্বর আবশ্যক');
+      return;
+    }
+    const hasIncompleteUnit = clientForm.units.some(u => !u.flatNo || !u.totalPrice);
+    if (hasIncompleteUnit) {
+      alert('প্রতিটি ইউনিটের ফ্ল্যাট ও মূল্য আবশ্যক');
+      return;
+    }
+    if (!data.projects.length) {
+      alert('প্রথমে একটি প্রজেক্ট তৈরি করুন');
       return;
     }
 
-    const selectedProj = data.projects.find(p => p.id === clientForm.projectId) || data.projects[0];
-    if (!selectedProj) {
-      alert('অনুগ্রহ করে প্রথমে কমপক্ষে একটি প্রজেক্ট তৈরি করুন।');
-      return;
-    }
-    const initialPaidNum = Number(clientForm.initialPaid) || 0;
-    const newId = `CLI-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const phoneMatch = !isExistingCustomer
+      ? (data.customers || []).find(c => c.phone && clientForm.phone &&
+          c.phone.replace(/[^0-9]/g, '') === clientForm.phone.replace(/[^0-9]/g, ''))
+      : null;
 
-    const generatedEmail = clientForm.emailPrefix 
-      ? `${clientForm.emailPrefix.trim()}@alemarah.com`
-      : `${clientForm.name.toLowerCase().replace(/[^a-z0-9]/g, '') || 'client'}${Math.floor(100 + Math.random() * 900)}@alemarah.com`;
-
-    const newClient = {
-      id: newId,
+    const targetCustomer = existingCustomer || phoneMatch || {
+      id: customerIdFromPhone(clientForm.phone),
       name: clientForm.name,
-      image: clientForm.image || '',
-      email: generatedEmail,
       phone: clientForm.phone,
       password: clientForm.password || 'password123',
+      status: 'সক্রিয় (Active)'
+    };
+    const isNewCustomerRecord = !existingCustomer && !phoneMatch;
+
+    const generatedEmail = clientForm.emailPrefix
+      ? `${clientForm.emailPrefix.trim()}@alemarah.com`
+      : `${(targetCustomer.name || 'client').toLowerCase().replace(/[^a-z0-9]/g, '') || 'client'}${Math.floor(100 + Math.random() * 900)}@alemarah.com`;
+
+    const newUnits = clientForm.units.map((unit, idx) => {
+      const selectedProj = data.projects.find(p => p.id === unit.projectId) || data.projects[0];
+      const initialPaidNum = Number(unit.initialPaid) || 0;
+      return {
+      id: `CLI-${Date.now().toString(36).toUpperCase()}-${idx}-${Math.floor(1000 + Math.random() * 9000)}`,
+      customerId: targetCustomer.id,
+      name: targetCustomer.name,
+      image: clientForm.image || '',
+      email: generatedEmail,
+      phone: targetCustomer.phone,
+      password: targetCustomer.password,
       projectId: selectedProj.id,
       projectName: selectedProj.name,
-      flatNo: clientForm.flatNo || 'বরাদ্দকৃত ইউনিট',
-      totalPrice: Number(clientForm.totalPrice) || 0,
+      flatNo: unit.flatNo || 'বরাদ্দকৃত ইউনিট',
+      totalPrice: Number(unit.totalPrice) || 0,
       totalPaid: initialPaidNum,
-      nextDueDate: clientForm.nextDueDate || '১৫ নভেম্বর, ২০২৬',
-      nextDueAmount: Number(clientForm.nextDueAmount) || 0,
+      nextDueDate: unit.nextDueDate || '',
+      nextDueAmount: Number(unit.nextDueAmount) || 0,
       paymentHistory: initialPaidNum > 0 ? [
         {
-          id: `TRX-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+          id: `TRX-${Date.now().toString(36).toUpperCase()}-${idx}-${Math.floor(1000 + Math.random() * 9000)}`,
           date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
           amount: initialPaidNum,
           method: 'বুকিং মানি / প্রাথমিক জমা'
         }
       ] : []
     };
+    });
 
     updateStore((prev) => ({
       ...prev,
-      clients: [newClient, ...prev.clients]
+      clients: [...newUnits, ...prev.clients],
+      customers: isNewCustomerRecord
+        ? [targetCustomer, ...(prev.customers || [])]
+        : (prev.customers || [])
     }));
 
     setIsClientModalOpen(false);
-    setClientForm({
-      name: '',
-      image: '',
-      emailPrefix: '',
-      phone: '',
-      password: 'password123',
-      projectId: data.projects[0]?.id || '',
-      flatNo: '',
-      totalPrice: '',
-      initialPaid: '',
-      nextDueDate: '১৫ নভেম্বর, ২০২৬',
-      nextDueAmount: '৫০০০০০'
-    });
-    triggerAlert(`নতুন ক্লায়েন্ট "${newClient.name}" সফলভাবে যুক্ত হয়েছেন!`);
+    setClientForm(emptyClientForm());
+    triggerAlert(
+      newUnits.length > 1
+        ? `"${targetCustomer.name}"-এর জন্য ${newUnits.length}টি ইউনিট সফলভাবে যুক্ত হয়েছে!`
+        : `নতুন ক্লায়েন্ট "${targetCustomer.name}" সফলভাবে যুক্ত হয়েছেন!`
+    );
   };
 
   const handleReceivePayment = (e) => {
@@ -1636,7 +1665,10 @@ export default function ManagementDashboard({
                 </div>
 
                 <button
-                  onClick={() => setIsClientModalOpen(true)}
+                  onClick={() => {
+                    setClientForm(emptyClientForm());
+                    setIsClientModalOpen(true);
+                  }}
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
                 >
                   <Plus className="w-4 h-4" />
@@ -2294,7 +2326,7 @@ export default function ManagementDashboard({
                       <button
                         type="button"
                         onClick={() => {
-                          setClientForm(prev => ({ ...prev, projectId: proj.id }));
+                          setClientForm({ ...emptyClientForm(), units: [{ ...emptyUnitRow(), projectId: proj.id }] });
                           setIsClientModalOpen(true);
                         }}
                         className="text-[#006231] hover:text-[#0A4D27] font-bold flex items-center space-x-1 cursor-pointer"
@@ -4546,6 +4578,8 @@ export default function ManagementDashboard({
         setForm={setClientForm}
         projects={data.projects}
         clients={data.clients}
+        customers={data.customers || []}
+        emptyUnitRow={emptyUnitRow}
         isSidebarCollapsed={isSidebarCollapsed}
         onClose={() => setIsClientModalOpen(false)}
         onSubmit={handleAddClient}
@@ -4661,7 +4695,7 @@ export default function ManagementDashboard({
                 <button
                   type="button"
                   onClick={() => {
-                    setClientForm(prev => ({ ...prev, projectId: activeProj.id }));
+                    setClientForm({ ...emptyClientForm(), units: [{ ...emptyUnitRow(), projectId: activeProj.id }] });
                     setIsClientModalOpen(true);
                   }}
                   className="hidden sm:flex px-3.5 py-2 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white text-xs font-bold shadow-sm items-center space-x-1.5 transition-all cursor-pointer"
@@ -5052,12 +5086,15 @@ export default function ManagementDashboard({
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      setClientForm(prev => ({
-                                        ...prev,
-                                        projectId: activeProj.id,
-                                        flatNo: u.name,
-                                        totalPrice: u.price > 0 ? String(u.price) : ''
-                                      }));
+                                      setClientForm({
+                                        ...emptyClientForm(),
+                                        units: [{
+                                          ...emptyUnitRow(),
+                                          projectId: activeProj.id,
+                                          flatNo: u.name,
+                                          totalPrice: u.price > 0 ? String(u.price) : ''
+                                        }]
+                                      });
                                       setIsClientModalOpen(true);
                                     }}
                                     className="flex-1 py-1.5 px-2.5 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white text-3xs font-bold flex items-center justify-center space-x-1 transition-all cursor-pointer shadow-xs active:scale-95"
@@ -5116,7 +5153,7 @@ export default function ManagementDashboard({
                     <button
                       type="button"
                       onClick={() => {
-                        setClientForm(prev => ({ ...prev, projectId: activeProj.id }));
+                        setClientForm({ ...emptyClientForm(), units: [{ ...emptyUnitRow(), projectId: activeProj.id }] });
                         setIsClientModalOpen(true);
                       }}
                       className="px-4 py-2 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white text-xs font-bold shadow-md shadow-[#006231]/20 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"

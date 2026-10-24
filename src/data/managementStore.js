@@ -71,7 +71,7 @@ export const initialManagementData = {
 
 // Build a stable customer id from a phone number so repeated migrations
 // of the same phone always resolve to the same customer record.
-const customerIdFromPhone = (phone) => {
+export const customerIdFromPhone = (phone) => {
   const digits = (phone || '').replace(/[^0-9]/g, '');
   return digits ? `CUS-${digits}` : `CUS-${Date.now().toString(36).toUpperCase()}`;
 };
