@@ -126,7 +126,7 @@ export default function AboutUs({ lang, t }) {
                 </div>
 
                 <div className="flex-1 space-y-2 text-center sm:text-left">
-                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic font-serif">
+                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic">
                     "{t.about.chairmanQuote}"
                   </p>
                 </div>
@@ -164,7 +164,7 @@ export default function AboutUs({ lang, t }) {
                 </div>
 
                 <div className="flex-1 space-y-2 text-center sm:text-left">
-                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic font-serif">
+                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic">
                     "{t.about.mdQuote}"
                   </p>
                 </div>

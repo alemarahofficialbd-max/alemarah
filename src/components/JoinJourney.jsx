@@ -31,7 +31,7 @@ export default function JoinJourney({ lang, t, onJoinClick, onExplorePolicy }) {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#231F20] tracking-tight">
             {jj.title}
           </h2>
-          <p className="text-base text-gray-600 font-serif italic max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base text-gray-600 italic max-w-2xl mx-auto leading-relaxed">
             "{jj.headline}"
           </p>
         </div>

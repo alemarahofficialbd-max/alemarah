@@ -48,12 +48,12 @@ export default function Navbar({
   };
 
   const navLinks = [
-    { id: 'home', label: t.nav.home, icon: Home },
-    { id: 'projects', label: t.nav.projects, icon: Building2 },
-    { id: 'investment', label: t.nav.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ ও শেয়ার'), icon: Coins },
-    { id: 'why-us', label: t.nav.whyUs, icon: ShieldCheck },
-    { id: 'about', label: t.nav.about, icon: Compass },
-    { id: 'contact', label: t.nav.contact, icon: Phone }
+    { id: 'home', label: t.nav.home, shortLabel: t.nav.home, icon: Home },
+    { id: 'projects', label: t.nav.projects, shortLabel: t.nav.projects, icon: Building2 },
+    { id: 'investment', label: t.nav.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ ও শেয়ার'), shortLabel: lang === 'en' ? 'Invest' : 'বিনিয়োগ', icon: Coins },
+    { id: 'why-us', label: t.nav.whyUs, shortLabel: lang === 'en' ? 'Why Us' : 'কেন আমরা', icon: ShieldCheck },
+    { id: 'about', label: t.nav.about, shortLabel: lang === 'en' ? 'About' : 'আমাদের', icon: Compass },
+    { id: 'contact', label: t.nav.contact, shortLabel: t.nav.contact, icon: Phone }
   ];
 
   const handleNavClick = (pageId) => {
@@ -346,10 +346,10 @@ export default function Navbar({
                 <div className={`p-1 rounded-lg transition-transform group-active:scale-90 ${isActive ? 'bg-red-50 text-[#CE2028]' : ''}`}>
                   <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 mx-auto" />
                 </div>
-                <span className={`text-[9.5px] sm:text-[11px] leading-tight mt-0.5 truncate max-w-full block ${
+                <span className={`text-[10px] sm:text-[11px] leading-tight mt-0.5 truncate max-w-full block ${
                   isActive ? 'font-bold text-[#CE2028]' : 'font-medium text-gray-600'
                 }`}>
-                  {item.label}
+                  {item.shortLabel || item.label}
                 </span>
               </button>
             );
