@@ -73,7 +73,7 @@ export default function LoginPage({
         }
 
         const validPass = matchedClient.password || 'password123';
-        if (trimmedPass !== validPass && trimmedPass !== 'password123') {
+        if (trimmedPass !== validPass) {
           setIsSuccess(false);
           setStatusMessage(isEn ? 'Incorrect customer password! Please check and try again.' : 'ভুল পাসওয়ার্ড! গ্রাহকের সঠিক পাসওয়ার্ড প্রদান করুন।');
           return;
@@ -123,7 +123,7 @@ export default function LoginPage({
 
         if (isSuperAdminMatch) {
           const validPass = superAdmin?.accessKey || 'admin123';
-          if (trimmedPass !== validPass && trimmedPass !== 'admin123' && trimmedPass !== 'superadmin123') {
+          if (trimmedPass !== validPass) {
             setIsSuccess(false);
             setStatusMessage(isEn ? 'Incorrect Super Admin password!' : 'ভুল পাসওয়ার্ড! সুপার অ্যাডমিন পাসওয়ার্ড সঠিক নয়।');
             return;
@@ -144,7 +144,7 @@ export default function LoginPage({
 
         } else if (matchedDirector) {
           const validPass = matchedDirector.accessKey || 'admin123';
-          if (trimmedPass !== validPass && trimmedPass !== 'admin123') {
+          if (trimmedPass !== validPass) {
             setIsSuccess(false);
             setStatusMessage(isEn ? 'Incorrect Director password!' : 'ভুল পাসওয়ার্ড! পরিচালকের পাসওয়ার্ড সঠিক নয়।');
             return;
@@ -183,7 +183,7 @@ export default function LoginPage({
 
         } else if (matchedOfficer) {
           const validPass = matchedOfficer.accessKey || 'admin123';
-          if (trimmedPass !== validPass && trimmedPass !== 'admin123') {
+          if (trimmedPass !== validPass) {
             setIsSuccess(false);
             setStatusMessage(isEn ? 'Incorrect officer password!' : 'ভুল পাসওয়ার্ড! কর্মকর্তার পাসওয়ার্ড সঠিক নয়।');
             return;
@@ -323,7 +323,8 @@ export default function LoginPage({
             </button>
           </div>
 
-          {/* Demo Credentials Quick-Fill Bar */}
+          {/* Demo Credentials Quick-Fill Bar (dev-only: never exposes real credentials in production) */}
+          {import.meta.env.DEV && (
           <div className="mb-6 p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div className="flex items-center space-x-2 text-xs text-[#006231] font-semibold">
@@ -376,6 +377,7 @@ export default function LoginPage({
               </div>
             </div>
           </div>
+          )}
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-4">
