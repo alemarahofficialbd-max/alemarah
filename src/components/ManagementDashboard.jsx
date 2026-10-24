@@ -589,6 +589,7 @@ export default function ManagementDashboard({
   };
 
   const handleDeleteUnitFromProject = (projId, unit) => {
+    if (!isSuperAdmin) return;
     const uData = getUnitData(unit);
     const projClients = data.clients.filter(c => c.projectId === projId);
     const isBooked = projClients.some(c => c.flatNo === uData.name || (uData.unitNo && c.flatNo?.includes(uData.unitNo)));
@@ -764,6 +765,7 @@ export default function ManagementDashboard({
   };
 
   const handleDeleteProject = (projId, projName) => {
+    if (!isSuperAdmin) return;
     requestProtectedDelete(
       `প্রজেক্ট "${projName}" মুছে ফেলা`,
       `আপনি কি নিশ্চিতভাবে "${projName}" প্রজেক্টটি এবং এর সকল ডাটা মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
@@ -827,6 +829,29 @@ export default function ManagementDashboard({
       date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })
     });
     triggerAlert('প্রজেক্ট খরচের এন্ট্রি সফলভাবে যুক্ত হয়েছে!');
+  };
+
+  const handleDeleteExpense = (projId, expId, expTitle) => {
+    if (!isSuperAdmin) return;
+    requestProtectedDelete(
+      `খরচ এন্ট্রি মুছে ফেলা`,
+      `আপনি কি নিশ্চিতভাবে "${expTitle}" খরচের এন্ট্রিটি মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
+      () => {
+        updateStore((prev) => ({
+          ...prev,
+          projects: prev.projects.map(p => {
+            if (p.id === projId) {
+              return {
+                ...p,
+                expenses: (p.expenses || []).filter(exp => exp.id !== expId)
+              };
+            }
+            return p;
+          })
+        }));
+        triggerAlert(`খরচের এন্ট্রি সফলভাবে মুছে ফেলা হয়েছে!`);
+      }
+    );
   };
 
   const handleOpenAddTeam = (source = 'new') => {
@@ -987,6 +1012,7 @@ export default function ManagementDashboard({
   };
 
   const handleDeleteTeam = (id, name) => {
+    if (!isSuperAdmin) return;
     requestProtectedDelete(
       `অ্যাডমিন/কর্মকর্তা "${name}" অপসারণ`,
       `আপনি কি নিশ্চিতভাবে "${name}"-কে অপসারণ করতে চান? অনুমতি দিতে মাস্টার পিন লিখুন।`,
@@ -2193,14 +2219,16 @@ export default function ManagementDashboard({
                           </p>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteProject(proj.id, proj.name)}
-                          className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
-                          title="প্রজেক্ট মুছে ফেলুন"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {isSuperAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteProject(proj.id, proj.name)}
+                            className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+                            title="প্রজেক্ট মুছে ফেলুন"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
 
                       {/* Specs Grid */}
@@ -2775,14 +2803,16 @@ export default function ManagementDashboard({
                                   </button>
 
                                   {/* Protected Delete Button */}
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteTeam(mem.id, mem.name)}
-                                    className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-[#CE2028] text-xs font-bold border border-red-200 cursor-pointer inline-flex items-center space-x-1"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                    <span>অপসারণ</span>
-                                  </button>
+                                  {isSuperAdmin && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteTeam(mem.id, mem.name)}
+                                      className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-[#CE2028] text-xs font-bold border border-red-200 cursor-pointer inline-flex items-center space-x-1"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                      <span>অপসারণ</span>
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -5036,14 +5066,16 @@ export default function ManagementDashboard({
                                     <span>ক্রেতা বরাদ্দ দিন</span>
                                   </button>
 
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteUnitFromProject(activeProj.id, u)}
-                                    className="p-1.5 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                                    title="ইউনিট ডিলিট করুন"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
+                                  {isSuperAdmin && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteUnitFromProject(activeProj.id, u)}
+                                      className="p-1.5 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                      title="ইউনিট ডিলিট করুন"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
                                 </>
                               ) : (
                                 <button
@@ -5247,14 +5279,16 @@ export default function ManagementDashboard({
                               <td className="py-3 px-4 text-slate-600">{exp.date}</td>
                               <td className="py-3 px-4 text-right font-black text-rose-700">৳ {formatBDT(exp.amount)}</td>
                               <td className="py-3 px-4 text-center">
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteExpense(activeProj.id, exp.id, exp.title)}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                                  title="খরচ ডিলিট করুন"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
+                                {isSuperAdmin && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteExpense(activeProj.id, exp.id, exp.title)}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                    title="খরচ ডিলিট করুন"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                )}
                               </td>
                             </tr>
                           ))}
