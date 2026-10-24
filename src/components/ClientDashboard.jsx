@@ -52,9 +52,20 @@ export default function ClientDashboard({
   
   // Load management data to ensure sync with admin updates
   const mgtData = getManagementData();
-  const client = propClient
-    ? (mgtData.clients.find(c => c.id === propClient.id || (c.phone && propClient.phone && c.phone.replace(/[^0-9]/g, '') === propClient.phone.replace(/[^0-9]/g, ''))) || propClient)
-    : null;
+
+  // A customer can own more than one flat/shop (same or different project).
+  // All of them share one login; the customer picks which unit to view.
+  const customerId = propClient?.customerId || propClient?.customer?.id;
+  const ownedUnits = customerId
+    ? mgtData.clients.filter(c => c.customerId === customerId)
+    : (propClient ? mgtData.clients.filter(c => c.id === propClient.id) : []);
+  const [selectedUnitId, setSelectedUnitId] = useState(propClient?.id);
+
+  const client = ownedUnits.find(c => c.id === selectedUnitId)
+    || ownedUnits[0]
+    || (propClient
+      ? (mgtData.clients.find(c => c.id === propClient.id || (c.phone && propClient.phone && c.phone.replace(/[^0-9]/g, '') === propClient.phone.replace(/[^0-9]/g, ''))) || propClient)
+      : null);
   const project = client ? (mgtData.projects.find(p => p.id === client.projectId) || null) : null;
 
   // Selected receipt modal
@@ -343,6 +354,28 @@ export default function ClientDashboard({
             </button>
           </div>
         </header>
+
+        {/* Unit Switcher: only shown when this customer owns more than one flat/shop */}
+        {ownedUnits.length > 1 && (
+          <div className="px-4 sm:px-6 pt-3">
+            <div className="max-w-4xl mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+              <span className="text-2xs font-bold text-slate-500 shrink-0">আপনার ইউনিট:</span>
+              {ownedUnits.map(unit => (
+                <button
+                  key={unit.id}
+                  onClick={() => setSelectedUnitId(unit.id)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-colors cursor-pointer ${
+                    unit.id === client?.id
+                      ? 'bg-[#006231] text-white border-[#006231]'
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-[#006231]/40'
+                  }`}
+                >
+                  {unit.projectName} ({unit.flatNo})
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Dynamic Tab Workspace */}
         <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 pt-5 space-y-6 flex-1">
