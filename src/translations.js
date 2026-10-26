@@ -7,6 +7,7 @@ export const translations = {
       investment: "Investment",
       whyUs: "Why Al-Emarah",
       about: "About Us",
+      careers: "Careers",
       contact: "Contact",
       login: "Client Dashboard",
       bookVisit: "Schedule Visit",
@@ -23,6 +24,7 @@ export const translations = {
         investment: "Investment",
         whyUs: "Why Us",
         about: "About Us",
+        careers: "Careers",
         contact: "Contact",
         login: "Client Dashboard"
       }
@@ -727,6 +729,7 @@ export const translations = {
       investment: "বিনিয়োগ ও শেয়ার",
       whyUs: "কেন আল-ইমারাহ",
       about: "আমাদের সম্পর্কে",
+      careers: "ক্যারিয়ার",
       contact: "যোগাযোগ",
       login: "সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড",
       bookVisit: "সাইট ভিজিট বুক করুন",
@@ -743,6 +746,7 @@ export const translations = {
         investment: "বিনিয়োগ ও শেয়ার",
         whyUs: "কেন আল-ইমারাহ",
         about: "আমাদের সম্পর্কে",
+        careers: "ক্যারিয়ার",
         contact: "যোগাযোগ",
         login: "সাইন ইন / ক্লায়েন্ট ড্যাশবোর্ড"
       }

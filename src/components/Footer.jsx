@@ -8,7 +8,8 @@ import {
   Coins,
   ShieldCheck,
   Compass,
-  ArrowUp
+  ArrowUp,
+  Briefcase
 } from 'lucide-react';
 
 export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpenInstallApp, isLoggedIn = false }) {
@@ -22,6 +23,7 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
     { id: 'investment', label: t?.nav?.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ ও শেয়ার'), icon: Coins },
     { id: 'why-us', label: t?.nav?.whyUs || (lang === 'en' ? 'Why Us' : 'কেন আল-ইমারাহ'), icon: ShieldCheck },
     { id: 'about', label: t?.nav?.about || (lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'), icon: Compass },
+    { id: 'careers', label: t?.nav?.careers || (lang === 'en' ? 'Careers & Jobs' : 'ক্যারিয়ার ও নিয়োগ'), icon: Briefcase },
     { id: 'contact', label: t?.nav?.contact || (lang === 'en' ? 'Contact' : 'যোগাযোগ'), icon: Phone }
   ];
 
@@ -31,6 +33,7 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
     else if (href === '#investment') page = 'investment';
     else if (href === '#about') page = 'about';
     else if (href === '#why-us') page = 'why-us';
+    else if (href === '#careers') page = 'careers';
     else if (href === '#contact') page = 'contact';
     else if (href === '#login') page = isLoggedIn ? 'dashboard' : 'login';
     

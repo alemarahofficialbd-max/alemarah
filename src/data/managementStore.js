@@ -114,7 +114,8 @@ export const initialManagementData = {
   // Customer identity (phone + password + status) is canonical here.
   // A customer can own multiple units — see `clients`, each unit record
   // carries a `customerId` pointing back to this array.
-  customers: []
+  customers: [],
+  jobApplications: []
 };
 
 // Build a stable customer id from a phone number so repeated migrations
@@ -583,6 +584,28 @@ export const saveInquiry = (inquiry) => {
     return newInquiry;
   } catch (e) {
     console.error('Error saving inquiry:', e);
+  }
+};
+
+// Save career job application from the public website
+export const saveJobApplication = (application) => {
+  try {
+    const current = getManagementData();
+    const newApp = {
+      id: JOB--,
+      date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      timestamp: new Date().toISOString(),
+      status: 'নতুন আবেদন (New)',
+      ...application
+    };
+    const updated = {
+      ...current,
+      jobApplications: [newApp, ...(current.jobApplications || [])]
+    };
+    saveManagementData(updated);
+    return newApp;
+  } catch (e) {
+    console.error('Error saving job application:', e);
   }
 };
 

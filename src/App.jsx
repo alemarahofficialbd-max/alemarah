@@ -13,6 +13,7 @@ import ManagementDashboard from './components/ManagementDashboard';
 import JoinJourney from './components/JoinJourney';
 import InvestmentPage from './components/InvestmentPage';
 import Footer from './components/Footer';
+import CareerPage from './components/CareerPage';
 import SplashScreen from './components/SplashScreen';
 import { translations } from './translations';
 import { projectsData } from './data/projectsData';
@@ -25,6 +26,7 @@ import {
   Sprout, 
   Sparkles,
   Calendar,
+  Briefcase,
   ChevronRight,
   MapPin,
   Coins,
@@ -941,6 +943,36 @@ export default function App() {
                 </div>
               </div>
             </section>
+
+            {/* Career & Hiring Spotlight Banner on Homepage */}
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+              <div className="bg-gradient-to-r from-[#17261C] via-[#0A4D27] to-[#122217] text-white rounded-3xl p-6 sm:p-10 border border-emerald-500/25 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="space-y-2 text-center md:text-left relative z-10 max-w-2xl">
+                  <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-3xs sm:text-xs font-bold uppercase tracking-wider">
+                    <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>{lang === 'en' ? 'We Are Hiring' : 'নিয়োগ চলছে — আল-ইমারাহ পরিবার'}</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  </div>
+                  <h3 className="text-xl sm:text-3xl font-black text-white">
+                    {lang === 'en' ? 'Looking for a Meaningful Career in Real Estate?' : 'আপনার মেধা ও সততা দিয়ে গড়ে তুলুন ভবিষ্যৎ ক্যারিয়ার'}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-normal">
+                    {lang === 'en' 
+                      ? 'Explore active vacancies in civil site engineering, corporate sales, and accounts with ethical values and attractive compensation.'
+                      : 'প্রজেক্ট সাইট ইঞ্জিনিয়ারিং, কর্পোরেট সেলস ও অ্যাকাউন্টস বিভাগে আকর্ষণীয় বেতন ও সুশৃঙ্খল কর্মপরিবেশে যোগ দিন। সরাসরি অনলাইনে আবেদন করুন।'}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => navigateTo('careers')}
+                  className="px-6 py-3.5 rounded-xl bg-white hover:bg-emerald-50 text-[#006231] font-black text-xs sm:text-sm shadow-lg transition-all flex items-center space-x-2 shrink-0 cursor-pointer active:scale-95 relative z-10"
+                >
+                  <Briefcase className="w-4 h-4 text-[#006231]" />
+                  <span>{lang === 'en' ? 'View Job Circulars & Apply' : 'সকল নিয়োগ বিজ্ঞপ্তি ও আবেদন'}</span>
+                  <ArrowRight className="w-4 h-4 text-[#006231]" />
+                </button>
+              </div>
+            </section>
           </div>
         )}
 
@@ -1090,6 +1122,19 @@ export default function App() {
               lang={lang}
               t={t}
               preselectedProject={preselectedProject}
+            />
+          </div>
+        )}
+
+        {/* ==================================================== */}
+        {/* PAGE 5B: DEDICATED CAREER & JOB CIRCULARS PAGE     */}
+        {/* ==================================================== */}
+        {currentPage === 'careers' && (
+          <div className="animate-fadeIn">
+            <CareerPage
+              lang={lang}
+              t={t}
+              onNavigate={navigateTo}
             />
           </div>
         )}
