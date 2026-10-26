@@ -246,10 +246,10 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
       </section>
 
       {/* ========================================================= */}
-      {/* 4 CORE CAREER PILLARS                                     */}
+      {/* 4 CORE CAREER PILLARS (Mobile: 2 cols x 2 rows, compact)  */}
       {/* ========================================================= */}
-      <section className="pt-10 sm:pt-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <section className="pt-6 sm:pt-14 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6">
           {careerPillars.map((pillar, idx) => {
             const icons = {
               ShieldCheck: ShieldCheck,
@@ -262,22 +262,22 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
             return (
               <div 
                 key={idx}
-                className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-gray-200/90 shadow-md shadow-black/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-3"
+                className="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-6 border border-gray-200/90 shadow-2xs sm:shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-2 sm:space-y-3"
               >
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-[#006231] border border-emerald-100 flex items-center justify-center shrink-0">
-                  <IconComponent className="w-6 h-6" />
+                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-emerald-50 text-[#006231] border border-emerald-100 flex items-center justify-center shrink-0">
+                  <IconComponent className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-gray-900 leading-snug">
+                  <h3 className="text-xs sm:text-lg font-black text-gray-900 leading-snug">
                     {isEn ? pillar.titleEn : pillar.titleBn}
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1.5 leading-relaxed">
+                  <p className="text-3xs sm:text-sm text-gray-600 mt-1 sm:mt-1.5 leading-relaxed line-clamp-3 sm:line-clamp-none">
                     {isEn ? pillar.descEn : pillar.descBn}
                   </p>
                 </div>
-                <div className="pt-2 border-t border-gray-100 flex items-center text-3xs sm:text-2xs font-bold text-[#006231]">
-                  <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-600" />
-                  <span>{isEn ? 'Al-Emarah Standard' : 'প্রাতিষ্ঠানিক প্রতিশ্রুতি'}</span>
+                <div className="pt-1.5 sm:pt-2 border-t border-gray-100 flex items-center text-[10px] sm:text-2xs font-bold text-[#006231]">
+                  <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 text-emerald-600 shrink-0" />
+                  <span className="truncate">{isEn ? 'Al-Emarah Standard' : 'প্রাতিষ্ঠানিক প্রতিশ্রুতি'}</span>
                 </div>
               </div>
             );
