@@ -13,6 +13,7 @@ import {
   ArrowRight, 
   Send, 
   ChevronRight, 
+  ChevronLeft, 
   Building2, 
   ShieldCheck, 
   TrendingUp, 
@@ -492,156 +493,349 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
       </section>
 
       {/* ========================================================= */}
-      {/* MODAL 1: JOB DETAILS MODAL                                */}
+      {/* FULL SCREEN JOB DETAILS VIEW                              */}
       {/* ========================================================= */}
       {selectedJobForDetails && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100 flex flex-col justify-between">
-            {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex items-start justify-between z-10">
-              <div>
-                <div className="inline-block px-3 py-1 rounded-full bg-emerald-50 text-[#006231] text-3xs font-bold uppercase tracking-wider mb-2">
-                  {isEn ? selectedJobForDetails.departmentEn : selectedJobForDetails.departmentBn}
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black text-gray-900">
-                  {isEn ? selectedJobForDetails.titleEn : selectedJobForDetails.titleBn}
-                </h3>
-                <p className="text-xs text-gray-500 mt-1 flex items-center space-x-2">
-                  <MapPin className="w-3.5 h-3.5 text-[#CE2028]" />
-                  <span>{isEn ? selectedJobForDetails.locationEn : selectedJobForDetails.locationBn}</span>
-                </p>
-              </div>
-
-              <button
-                onClick={() => setSelectedJobForDetails(null)}
-                className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 space-y-6 text-xs sm:text-sm text-gray-700">
-              {/* Quick Summary Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 p-4 rounded-2xl border border-gray-200">
-                <div>
-                  <span className="text-3xs text-gray-400 block uppercase font-bold">{isEn ? 'Vacancy' : 'পদসংখ্যা'}</span>
-                  <span className="font-bold text-gray-900">{isEn ? selectedJobForDetails.vacancyEn : selectedJobForDetails.vacancyBn}</span>
-                </div>
-                <div>
-                  <span className="text-3xs text-gray-400 block uppercase font-bold">{isEn ? 'Type' : 'চাকরির ধরন'}</span>
-                  <span className="font-bold text-gray-900">{isEn ? selectedJobForDetails.employmentTypeEn : selectedJobForDetails.employmentTypeBn}</span>
-                </div>
-                <div>
-                  <span className="text-3xs text-gray-400 block uppercase font-bold">{isEn ? 'Experience' : 'অভিজ্ঞতা'}</span>
-                  <span className="font-bold text-gray-900">{isEn ? selectedJobForDetails.experienceEn : selectedJobForDetails.experienceBn}</span>
-                </div>
-                <div>
-                  <span className="text-3xs text-gray-400 block uppercase font-bold">{isEn ? 'Deadline' : 'আবেদনের শেষ সময়'}</span>
-                  <span className="font-bold text-emerald-700">{isEn ? selectedJobForDetails.deadlineEn : selectedJobForDetails.deadlineBn}</span>
-                </div>
-              </div>
-
-              {/* Responsibilities */}
-              <div className="space-y-2">
-                <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider flex items-center space-x-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-[#006231]" />
-                  <span>{isEn ? 'Key Responsibilities' : 'প্রধান দায়িত্বসমূহ'}</span>
-                </h4>
-                <ul className="space-y-1.5 list-disc pl-5 text-gray-600">
-                  {(isEn ? selectedJobForDetails.responsibilitiesEn : selectedJobForDetails.responsibilitiesBn).map((resp, i) => (
-                    <li key={i}>{resp}</li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Requirements */}
-              <div className="space-y-2">
-                <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider flex items-center space-x-1.5">
-                  <GraduationCap className="w-4 h-4 text-blue-600" />
-                  <span>{isEn ? 'Qualifications & Requirements' : 'শিক্ষাগত যোগ্যতা ও অভিজ্ঞতা'}</span>
-                </h4>
-                <ul className="space-y-1.5 list-disc pl-5 text-gray-600">
-                  {(isEn ? selectedJobForDetails.requirementsEn : selectedJobForDetails.requirementsBn).map((req, i) => (
-                    <li key={i}>{req}</li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Compensation & Benefits */}
-              <div className="space-y-2">
-                <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider flex items-center space-x-1.5">
-                  <DollarSign className="w-4 h-4 text-purple-600" />
-                  <span>{isEn ? 'Compensation & Benefits' : 'বেতন ও অন্যান্য সুযোগ-সুবিধা'}</span>
-                </h4>
-                <ul className="space-y-1.5 list-disc pl-5 text-gray-600">
-                  {(isEn ? selectedJobForDetails.benefitsEn : selectedJobForDetails.benefitsBn).map((ben, i) => (
-                    <li key={i}>{ben}</li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Official Application & Company Details Box */}
-              <div className="bg-emerald-50/70 p-4 sm:p-5 rounded-2xl border border-emerald-200/80 space-y-2.5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                  <span className="text-xs font-black text-[#006231] uppercase tracking-wider flex items-center space-x-1.5">
-                    <Send className="w-3.5 h-3.5" />
-                    <span>{isEn ? 'Application Instructions' : 'আবেদন পদ্ধতি'}</span>
-                  </span>
-                  <span className="font-mono font-bold text-slate-700 text-3xs">
-                    {selectedJobForDetails.companyName || 'AL EMARAH PROPERTIES LIMITED'}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-700 leading-relaxed font-medium">
-                  {isEn 
-                    ? 'Interested candidates are requested to send their updated CV via the "Apply Online" button or directly to our official email / hotline.'
-                    : 'আগ্রহী প্রার্থীদের হালনাগাদ CV সরাসরি অনলাইনে সাবমিট করার জন্য অথবা আমাদের অফিসিয়াল ই-মেইল ঠিকানায় পাঠানোর জন্য অনুরোধ করা হচ্ছে।'}
-                </p>
-                <div className="pt-2 border-t border-emerald-200/60 flex flex-wrap items-center gap-3 text-xs text-gray-800">
-                  <div className="flex items-center space-x-1.5 font-mono">
-                    <span className="font-bold text-gray-500">{isEn ? 'Email:' : 'ই-মেইল:'}</span>
-                    <a href={`mailto:${selectedJobForDetails.contactEmail || 'alemarah.officialbd@gmail.com'}`} className="hover:underline font-bold text-[#006231]">
-                      {selectedJobForDetails.contactEmail || 'alemarah.officialbd@gmail.com'}
-                    </a>
-                  </div>
-                  <span className="text-gray-300">•</span>
-                  <div className="flex items-center space-x-1.5 font-mono">
-                    <span className="font-bold text-gray-500">{isEn ? 'Contact:' : 'যোগাযোগ:'}</span>
-                    <a href="tel:01816233013" className="hover:underline font-bold text-slate-900">
-                      {selectedJobForDetails.contactPhone || '01816-233013 / 01918-646575'}
-                    </a>
-                  </div>
-                </div>
-                <div className="text-3xs text-emerald-800 font-bold tracking-wide pt-1 border-t border-emerald-200/40">
-                  {isEn ? 'AL EMARAH PROPERTIES LIMITED • Trust • Transparency • Partnership' : 'AL EMARAH PROPERTIES LIMITED • বিশ্বস্ততা • স্বচ্ছতা • অংশীদারিত্ব'}
-                </div>
-              </div>
-            </div>
-
-            {/* Footer Action */}
-            <div className="p-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-3">
+        <div className="fixed inset-0 z-50 bg-[#FAFBF9] flex flex-col overflow-y-auto animate-fadeIn text-[#231F20]">
+          {/* Top Sticky Navigation Bar */}
+          <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-2xs">
+            <div className="flex items-center space-x-3">
               <button
                 type="button"
                 onClick={() => setSelectedJobForDetails(null)}
-                className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold text-xs hover:bg-gray-100 cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs flex items-center space-x-1.5 transition-all cursor-pointer"
               >
-                {isEn ? 'Close' : 'বন্ধ করুন'}
+                <ChevronLeft className="w-4 h-4" />
+                <span>{isEn ? 'Back to Listings' : 'ফিরে যান'}</span>
               </button>
 
+              <div className="hidden sm:block h-5 w-px bg-gray-200"></div>
+
+              <div className="hidden sm:flex items-center space-x-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-bold uppercase tracking-wider border border-emerald-200">
+                  {isEn ? selectedJobForDetails.departmentEn : selectedJobForDetails.departmentBn}
+                </span>
+                <span className="text-xs font-bold text-gray-700 truncate max-w-xs md:max-w-md">
+                  {isEn ? selectedJobForDetails.titleEn : selectedJobForDetails.titleBn}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2.5">
               <button
                 type="button"
                 onClick={() => handleOpenApplyModal(selectedJobForDetails)}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>{isEn ? 'Apply for this Job' : 'এই পদে আবেদন করুন'}</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedJobForDetails(null)}
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
+                title={isEn ? 'Close' : 'বন্ধ করুন'}
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-          </div>
+          </header>
+
+          {/* Body: Responsive Wide Layout */}
+          <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
+            {/* Header Banner Card */}
+            <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-xs space-y-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-bl-full -z-0 opacity-70 pointer-events-none"></div>
+
+              <div className="relative z-10 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="px-3 py-1 rounded-full bg-emerald-50 text-[#006231] font-bold text-xs uppercase tracking-wide border border-emerald-200">
+                      {isEn ? selectedJobForDetails.departmentEn : selectedJobForDetails.departmentBn}
+                    </span>
+                    {selectedJobForDetails.badgeBn && (
+                      <span className="px-3 py-1 rounded-full bg-red-50 text-[#CE2028] font-black text-xs border border-red-200">
+                        {isEn ? selectedJobForDetails.badgeEn : selectedJobForDetails.badgeBn}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs font-mono text-gray-500">
+                    {selectedJobForDetails.companyName || 'AL EMARAH PROPERTIES LIMITED'}
+                  </div>
+                </div>
+
+                <h1 className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight leading-snug">
+                  {isEn ? selectedJobForDetails.titleEn : selectedJobForDetails.titleBn}
+                </h1>
+
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed font-normal max-w-3xl">
+                  {isEn ? selectedJobForDetails.overviewEn : selectedJobForDetails.overviewBn}
+                </p>
+
+                {/* Slogan pill */}
+                <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-gray-50 border border-gray-200 text-xs font-bold text-[#006231]">
+                  <span>{selectedJobForDetails.mottoBn || 'বিশ্বস্ততা • স্বচ্ছতা • অংশীদারিত্ব'}</span>
+                </div>
+              </div>
+
+              {/* 6-Metric Highlights Grid */}
+              <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-4 border-t border-gray-100 text-xs">
+                <div className="bg-gray-50/80 p-3.5 rounded-2xl border border-gray-200/80">
+                  <span className="text-3xs text-gray-400 block uppercase font-bold mb-1 flex items-center space-x-1">
+                    <Users className="w-3 h-3 text-[#006231]" />
+                    <span>{isEn ? 'Vacancy' : 'পদসংখ্যা'}</span>
+                  </span>
+                  <span className="font-black text-gray-900 text-sm">{isEn ? selectedJobForDetails.vacancyEn : selectedJobForDetails.vacancyBn}</span>
+                </div>
+
+                <div className="bg-gray-50/80 p-3.5 rounded-2xl border border-gray-200/80">
+                  <span className="text-3xs text-gray-400 block uppercase font-bold mb-1 flex items-center space-x-1">
+                    <Clock className="w-3 h-3 text-emerald-600" />
+                    <span>{isEn ? 'Job Type' : 'চাকরির ধরন'}</span>
+                  </span>
+                  <span className="font-bold text-gray-900">{isEn ? selectedJobForDetails.employmentTypeEn : selectedJobForDetails.employmentTypeBn}</span>
+                </div>
+
+                <div className="bg-gray-50/80 p-3.5 rounded-2xl border border-gray-200/80">
+                  <span className="text-3xs text-gray-400 block uppercase font-bold mb-1 flex items-center space-x-1">
+                    <MapPin className="w-3 h-3 text-[#CE2028]" />
+                    <span>{isEn ? 'Location' : 'কর্মস্থল'}</span>
+                  </span>
+                  <span className="font-bold text-gray-900">{isEn ? selectedJobForDetails.locationEn : selectedJobForDetails.locationBn}</span>
+                </div>
+
+                <div className="bg-gray-50/80 p-3.5 rounded-2xl border border-gray-200/80">
+                  <span className="text-3xs text-gray-400 block uppercase font-bold mb-1 flex items-center space-x-1">
+                    <GraduationCap className="w-3 h-3 text-blue-600" />
+                    <span>{isEn ? 'Experience' : 'অভিজ্ঞতা'}</span>
+                  </span>
+                  <span className="font-bold text-gray-900">{isEn ? selectedJobForDetails.experienceEn : selectedJobForDetails.experienceBn}</span>
+                </div>
+
+                <div className="bg-gray-50/80 p-3.5 rounded-2xl border border-gray-200/80">
+                  <span className="text-3xs text-gray-400 block uppercase font-bold mb-1 flex items-center space-x-1">
+                    <DollarSign className="w-3 h-3 text-purple-600" />
+                    <span>{isEn ? 'Salary' : 'মাসিক বেতন'}</span>
+                  </span>
+                  <span className="font-black text-[#006231]">{isEn ? selectedJobForDetails.salaryEn : selectedJobForDetails.salaryBn}</span>
+                </div>
+
+                <div className="bg-gray-50/80 p-3.5 rounded-2xl border border-gray-200/80">
+                  <span className="text-3xs text-gray-400 block uppercase font-bold mb-1 flex items-center space-x-1">
+                    <Calendar className="w-3 h-3 text-amber-600" />
+                    <span>{isEn ? 'Deadline' : 'আবেদনের শেষ সময়'}</span>
+                  </span>
+                  <span className="font-bold text-red-600">{isEn ? selectedJobForDetails.deadlineEn : selectedJobForDetails.deadlineBn}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 2-Column Details Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left Column (2 Cols): Details & Scope */}
+              <div className="lg:col-span-2 space-y-8">
+                {/* 1. Responsibilities */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200/80 shadow-xs space-y-4">
+                  <div className="flex items-center space-x-2.5 pb-3 border-b border-gray-100">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center">
+                      <CheckCircle2 className="w-5 h-5 text-[#006231]" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-gray-900">
+                        {isEn ? 'Key Responsibilities' : 'প্রধান দায়িত্বসমূহ'}
+                      </h3>
+                      <p className="text-xs text-gray-500">দায়িত্ব ও প্রাতিষ্ঠানিক কাজের পরিধি</p>
+                    </div>
+                  </div>
+
+                  <ul className="space-y-3 text-xs sm:text-sm text-gray-700">
+                    {(isEn ? selectedJobForDetails.responsibilitiesEn : selectedJobForDetails.responsibilitiesBn).map((resp, i) => (
+                      <li key={i} className="flex items-start space-x-3">
+                        <span className="w-5 h-5 rounded-full bg-emerald-100 text-[#006231] font-bold text-3xs flex items-center justify-center shrink-0 mt-0.5">
+                          {i + 1}
+                        </span>
+                        <span className="leading-relaxed">{resp}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* 2. Educational Qualification & Skills */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200/80 shadow-xs space-y-4">
+                  <div className="flex items-center space-x-2.5 pb-3 border-b border-gray-100">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+                      <GraduationCap className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-gray-900">
+                        {isEn ? 'Qualifications & Requirements' : 'শিক্ষাগত যোগ্যতা ও প্রয়োজনীয় দক্ষতা'}
+                      </h3>
+                      <p className="text-xs text-gray-500">আবেদনকারীর কাঙ্ক্ষিত শিক্ষাগত মান ও অভিজ্ঞতা</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 text-xs sm:text-sm text-blue-950 font-bold flex items-center space-x-2.5">
+                    <GraduationCap className="w-5 h-5 text-blue-600 shrink-0" />
+                    <span>{isEn ? selectedJobForDetails.educationEn : selectedJobForDetails.educationBn}</span>
+                  </div>
+
+                  <ul className="space-y-3 text-xs sm:text-sm text-gray-700">
+                    {(isEn ? selectedJobForDetails.requirementsEn : selectedJobForDetails.requirementsBn).map((req, i) => (
+                      <li key={i} className="flex items-start space-x-3">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <span className="leading-relaxed">{req}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* 3. Compensation & Perks */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200/80 shadow-xs space-y-4">
+                  <div className="flex items-center space-x-2.5 pb-3 border-b border-gray-100">
+                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
+                      <DollarSign className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-gray-900">
+                        {isEn ? 'Compensation & Benefits' : 'বেতন ও অন্যান্য সুযোগ-সুবিধা'}
+                      </h3>
+                      <p className="text-xs text-gray-500">আকর্ষণীয় সুযোগ ও প্রাতিষ্ঠানিক সুবিধা</p>
+                    </div>
+                  </div>
+
+                  <ul className="space-y-3 text-xs sm:text-sm text-gray-700">
+                    {(isEn ? selectedJobForDetails.benefitsEn : selectedJobForDetails.benefitsBn).map((ben, i) => (
+                      <li key={i} className="flex items-start space-x-3">
+                        <Sparkles className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
+                        <span className="leading-relaxed">{ben}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Right Sidebar (1 Col): Apply & Contact */}
+              <div className="space-y-6">
+                {/* Apply Action Card */}
+                <div className="bg-gradient-to-br from-[#006231] to-[#0A4D27] text-white rounded-3xl p-6 sm:p-7 shadow-lg shadow-[#006231]/20 space-y-5">
+                  <div className="inline-block px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-3xs font-bold uppercase tracking-wider">
+                    {isEn ? 'Direct Application' : 'সরাসরি আবেদন'}
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-black">আবেদন করতে চান?</h4>
+                    <p className="text-xs text-emerald-100 mt-1 leading-relaxed">
+                      অনলাইন আবেদন ফরম পূরণ করে আপনার সিভি বা বায়োডাটার ড্রাইভ লিঙ্ক জমা দিন।
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenApplyModal(selectedJobForDetails)}
+                    className="w-full py-3.5 px-4 rounded-xl bg-white text-[#006231] font-black text-xs hover:bg-emerald-50 transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-md active:scale-95"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>{isEn ? 'Apply Online Now' : 'অনলাইনে এখনই আবেদন করুন'}</span>
+                  </button>
+
+                  <div className="pt-3 border-t border-white/15 text-3xs text-emerald-200 text-center">
+                    শেষ তারিখ: <strong>{isEn ? selectedJobForDetails.deadlineEn : selectedJobForDetails.deadlineBn}</strong>
+                  </div>
+                </div>
+
+                {/* Direct Contact Card */}
+                <div className="bg-white rounded-3xl p-6 border border-gray-200/80 shadow-xs space-y-4">
+                  <h4 className="text-sm font-black text-gray-900 uppercase tracking-wide">
+                    {isEn ? 'Recruitment Support' : 'যোগাযোগ ও আবেদন পদ্ধতি'}
+                  </h4>
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    আগ্রহী প্রার্থীদের হালনাগাদ CV সরাসরি অনলাইনে সাবমিট করার জন্য অথবা আমাদের অফিসিয়াল ই-মেইল ঠিকানায় পাঠানোর জন্য অনুরোধ করা হচ্ছে।
+                  </p>
+
+                  <div className="space-y-3 pt-2 text-xs">
+                    <a
+                      href={`mailto:${selectedJobForDetails.contactEmail || 'alemarah.officialbd@gmail.com'}`}
+                      className="flex items-center space-x-3 p-3 rounded-xl bg-gray-50 hover:bg-emerald-50 text-gray-800 hover:text-[#006231] transition-all border border-gray-200"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100 text-[#006231] flex items-center justify-center shrink-0">
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <div className="truncate">
+                        <span className="text-3xs text-gray-400 block font-bold">ই-মেইল</span>
+                        <span className="font-bold font-mono text-xs truncate block">{selectedJobForDetails.contactEmail || 'alemarah.officialbd@gmail.com'}</span>
+                      </div>
+                    </a>
+
+                    <a
+                      href="tel:01816233013"
+                      className="flex items-center space-x-3 p-3 rounded-xl bg-gray-50 hover:bg-emerald-50 text-gray-800 hover:text-[#006231] transition-all border border-gray-200"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100 text-[#006231] flex items-center justify-center shrink-0">
+                        <PhoneCall className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-3xs text-gray-400 block font-bold">হটলাইন / যোগাযোগ</span>
+                        <span className="font-bold font-mono text-xs">{selectedJobForDetails.contactPhone || '01816-233013 / 01918-646575'}</span>
+                      </div>
+                    </a>
+
+                    <a
+                      href="https://wa.me/8801816233013"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center space-x-3 p-3 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#128C7E] transition-all border border-[#25D366]/30"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#25D366] text-white flex items-center justify-center shrink-0">
+                        <Send className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-3xs text-gray-500 block font-bold">WhatsApp যোগাযোগ</span>
+                        <span className="font-bold font-mono text-xs">+880 1816-233013</span>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Company Values */}
+                <div className="bg-emerald-50/60 rounded-3xl p-5 border border-emerald-200/70 text-center space-y-2">
+                  <Building2 className="w-6 h-6 text-[#006231] mx-auto" />
+                  <div className="font-black text-xs text-gray-900">
+                    {selectedJobForDetails.companyName || 'AL EMARAH PROPERTIES LIMITED'}
+                  </div>
+                  <div className="text-3xs text-[#006231] font-bold tracking-wide">
+                    {selectedJobForDetails.mottoBn || 'বিশ্বস্ততা • স্বচ্ছতা • অংশীদারিত্ব'}
+                  </div>
+                  <div className="text-3xs text-gray-500">
+                    {selectedJobForDetails.locationBn || 'পুরানা পল্টন, ঢাকা'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+
+          {/* Sticky Bottom Bar */}
+          <footer className="sticky bottom-0 z-30 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-lg">
+            <button
+              type="button"
+              onClick={() => setSelectedJobForDetails(null)}
+              className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold text-xs hover:bg-gray-100 cursor-pointer"
+            >
+              {isEn ? 'Close & Return' : 'ফিরে যান'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleOpenApplyModal(selectedJobForDetails)}
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>{isEn ? 'Apply for this Job' : 'এই পদে আবেদন করুন'}</span>
+            </button>
+          </footer>
         </div>
       )}
 
-      {/* ========================================================= */}
+            {/* ========================================================= */}
       {/* MODAL 2: APPLY ONLINE FORM MODAL                          */}
       {/* ========================================================= */}
       {selectedJobForApply && (
