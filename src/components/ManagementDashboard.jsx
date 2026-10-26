@@ -63,7 +63,8 @@ import {
   Bed,
   Bath,
   Ruler,
-  Tag
+  Tag,
+  ExternalLink
 } from 'lucide-react';
 import {
   formatBDT,
@@ -72,7 +73,9 @@ import {
   subscribeToManagementData,
   customerIdFromPhone,
   hashPassword,
-  isHashedPassword
+  isHashedPassword,
+  deleteJobApplication,
+  updateJobApplicationStatus
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -2871,6 +2874,136 @@ export default function ManagementDashboard({
                         </div>
                       );
                     })}
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Job Applications & Candidate CVs Section */}
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden mt-6">
+                <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-50 to-white">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-100 flex items-center justify-center shrink-0">
+                      <Briefcase className="w-5 h-5 text-[#006231]" />
+                    </div>
+                    <div>
+                      <h4 className="text-base font-black text-slate-900 flex items-center space-x-2">
+                        <span>ক্যারিয়ার পোর্টাল: চাকরির প্রাপ্ত আবেদন ও সিভি তালিকা</span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-3xs font-black">
+                          {(data.jobApplications || []).length} জন আবেদনকারী
+                        </span>
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        ওয়েবসাইট থেকে জমাকৃত সকল আবেদনকারীর তথ্য, যোগাযোগের নম্বর, শিক্ষাগত যোগ্যতা ও জীবনবৃত্তান্ত (CV)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {(!data.jobApplications || data.jobApplications.length === 0) ? (
+                  <div className="p-10 text-center text-slate-400 space-y-2">
+                    <FileText className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
+                    <p className="text-xs font-bold text-slate-600">এখনও কোনো চাকরির আবেদন জমা পড়েনি</p>
+                    <p className="text-3xs text-slate-400">ওয়েবসাইটের কেরিয়ার পেজ থেকে কেউ আবেদন করলে এখানে স্বয়ংক্রিয়ভাবে তালিকাভুক্ত হবে।</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-slate-100 overflow-x-auto">
+                    {data.jobApplications.map((app) => (
+                      <div key={app.id} className="p-4 sm:p-5 hover:bg-slate-50/70 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div className="space-y-1.5 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-sm font-black text-slate-900">{app.applicantName}</span>
+                            <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-[#006231] font-bold text-3xs border border-emerald-200">
+                              {app.jobTitle || app.submittedPosition || 'Accounts & Administration Officer'}
+                            </span>
+                            <span className="font-mono text-3xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                              {app.id}
+                            </span>
+                            <span className="text-3xs text-slate-400">{app.date}</span>
+                            <span className="px-2 py-0.5 rounded text-3xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                              {app.status || 'নতুন আবেদন'}
+                            </span>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-600">
+                            <span className="flex items-center space-x-1">
+                              <Phone className="w-3.5 h-3.5 text-[#006231]" />
+                              <span className="font-bold">{app.phone}</span>
+                            </span>
+                            {app.email && (
+                              <span className="flex items-center space-x-1">
+                                <Mail className="w-3.5 h-3.5 text-blue-600" />
+                                <span>{app.email}</span>
+                              </span>
+                            )}
+                            {app.education && (
+                              <span className="flex items-center space-x-1">
+                                <GraduationCap className="w-3.5 h-3.5 text-purple-600" />
+                                <span>{app.education}</span>
+                              </span>
+                            )}
+                            {app.expectedSalary && (
+                              <span className="flex items-center space-x-1">
+                                <DollarSign className="w-3.5 h-3.5 text-amber-600" />
+                                <span>প্রত্যাশিত বেতন: <strong>{app.expectedSalary}</strong></span>
+                              </span>
+                            )}
+                          </div>
+
+                          {app.coverNote && (
+                            <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 italic">
+                              "{app.coverNote}"
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          {app.cvLink && (
+                            <a
+                              href={app.cvLink}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center space-x-1 shadow-2xs cursor-pointer"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              <span>সিভি দেখুন</span>
+                            </a>
+                          )}
+
+                          <a
+                            href={`https://wa.me/88${(app.phone || '').replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3.5 py-1.5 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-bold flex items-center space-x-1 shadow-2xs cursor-pointer"
+                          >
+                            <span>WhatsApp</span>
+                          </a>
+
+                          <a
+                            href={`tel:${app.phone}`}
+                            className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center space-x-1 cursor-pointer"
+                          >
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>কল</span>
+                          </a>
+
+                          {isSuperAdmin && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (window.confirm(`আপনি কি "${app.applicantName}" এর আবেদনটি মুছে ফেলতে চান?`)) {
+                                  deleteJobApplication(app.id);
+                                }
+                              }}
+                              className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700 cursor-pointer"
+                              title="আবেদন মুছে ফেলুন"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

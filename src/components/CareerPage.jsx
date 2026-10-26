@@ -193,33 +193,33 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
   return (
     <div className="bg-[#FAFBF9] min-h-screen pb-24 text-[#231F20] font-sans antialiased">
       {/* ========================================================= */}
-      {/* HERO SECTION                                              */}
+      {/* HERO SECTION (Clean White Executive Theme)                 */}
       {/* ========================================================= */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#1C1819] via-[#241F21] to-[#1C1819] text-white pt-16 pb-20 sm:pt-20 sm:pb-28">
-        {/* Ambient Gradient Glows */}
-        <div className="absolute top-0 right-1/4 w-[450px] h-[450px] bg-[#CE2028]/20 rounded-full blur-[140px] pointer-events-none"></div>
-        <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-[#006231]/25 rounded-full blur-[150px] pointer-events-none"></div>
+      <section className="relative overflow-hidden bg-white text-[#231F20] pt-12 pb-16 sm:pt-16 sm:pb-20 border-b border-gray-100 shadow-2xs">
+        {/* Subtle Ambient Light Glows */}
+        <div className="absolute top-0 right-1/4 w-[450px] h-[450px] bg-emerald-500/5 rounded-full blur-[140px] pointer-events-none"></div>
+        <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[150px] pointer-events-none"></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-5">
           {/* Top Badge */}
-          <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-emerald-400 text-xs sm:text-sm font-bold tracking-wide backdrop-blur-md">
-            <Briefcase className="w-4 h-4 text-emerald-400" />
+          <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-[#006231] text-xs sm:text-sm font-bold tracking-wide shadow-2xs">
+            <Briefcase className="w-4 h-4 text-[#006231]" />
             <span>{isEn ? 'Career Opportunities at Al-Emarah' : 'ক্যারিয়ার সুযোগ ও নিয়োগ বিজ্ঞপ্তি'}</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#006231] animate-pulse"></span>
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight max-w-4xl mx-auto">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight max-w-4xl mx-auto text-gray-900">
             <span>{isEn ? 'Build Your Rewarding Career with ' : 'আল-ইমারাহ পরিবারে গড়ে তুলুন '}</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-[#8EBF40]">
+            <span className="text-[#006231]">
               {isEn ? 'Al-Emarah Properties' : 'আপনার উজ্জ্বল ক্যারিয়ার'}
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-sm sm:text-base md:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed font-normal">
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed font-normal">
             {isEn 
-              ? 'Join our mission of planned, Shariah-compliant real estate development. We welcome committed professionals, visionary engineers, and proactive sales leaders.'
+              ? 'Join our mission of planned, Shariah-compliant real estate development. We welcome committed professionals, accountants, and proactive officers.'
               : 'পরিকল্পিত ও হালাল আবাসন বিনির্মাণে আমাদের সাথে যুক্ত হোন। আমরা সৎ, দক্ষ ও পেশাদার প্রতিভাদের স্বাগত জানাই—একটি মর্যাদাশীল ও অগ্রসর কর্মপরিবেশে।'}
           </p>
 
@@ -227,7 +227,7 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">
             <a 
               href="#openings" 
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-sm shadow-lg shadow-[#006231]/30 hover:opacity-95 transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-sm shadow-md shadow-[#006231]/25 hover:opacity-95 transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95"
             >
               <span>{isEn ? 'Explore Open Positions' : 'বর্তমান পদসমূহ দেখুন'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -235,9 +235,9 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
 
             <button
               onClick={() => handleOpenApplyModal(null)}
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 font-bold text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95 shadow-2xs"
             >
-              <FileText className="w-4 h-4 text-emerald-400" />
+              <FileText className="w-4 h-4 text-[#006231]" />
               <span>{isEn ? 'Drop Your CV (General)' : 'যেকোনো পদে সিভি জমা দিন'}</span>
             </button>
           </div>
@@ -247,7 +247,7 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
       {/* ========================================================= */}
       {/* 4 CORE CAREER PILLARS                                     */}
       {/* ========================================================= */}
-      <section className="-mt-10 sm:-mt-14 relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="pt-10 sm:pt-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {careerPillars.map((pillar, idx) => {
             const icons = {
@@ -370,7 +370,7 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className={filteredJobs.length === 1 ? "max-w-3xl mx-auto w-full" : "grid grid-cols-1 lg:grid-cols-2 gap-6"}>
             {filteredJobs.map((job) => {
               return (
                 <div 
@@ -930,10 +930,31 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
                 : 'বাছাইকৃত প্রার্থীদের মোবাইল বা ইমেইলের মাধ্যমে প্রাথমিক সাক্ষাৎকারের জন্য ডাকা হবে।'}
             </div>
 
+            {/* Direct Instant Action Buttons */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center gap-2.5">
+              <a
+                href={`https://wa.me/8801816233013?text=${encodeURIComponent(`আসসালামু আলাইকুম। আমি আল-ইমারাহ প্রপার্টিজের "${submittedApplication.submittedPosition || submittedApplication.jobTitle || 'Accounts & Admin'}" পদে আবেদন করেছি। আমার ট্র্যাকিং আইডি: ${submittedApplication.id}। আমার মোবাইল: ${submittedApplication.phone}।`)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold text-xs flex items-center justify-center space-x-1.5 transition-all shadow-sm"
+              >
+                <span>হোয়াটসঅ্যাপে সিভি ফরোয়ার্ড করুন</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+
+              <a
+                href={`mailto:alemarah.officialbd@gmail.com?subject=${encodeURIComponent(`Job Application - ${submittedApplication.submittedPosition || submittedApplication.jobTitle} - ${submittedApplication.id}`)}&body=${encodeURIComponent(`আবেদনকারীর নাম: ${submittedApplication.applicantName || ''}\nমোবাইল: ${submittedApplication.phone || ''}\nট্র্যাকিং আইডি: ${submittedApplication.id}\nসিভি ড্রাইভ লিঙ্ক: ${submittedApplication.cvLink || ''}\n`)}`}
+                className="w-full py-2.5 px-4 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs flex items-center justify-center space-x-1.5 transition-all shadow-sm"
+              >
+                <span>ইমেইলে পাঠান</span>
+                <Send className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
             <button
               type="button"
               onClick={() => setSubmittedApplication(null)}
-              className="w-full py-3 rounded-xl bg-gray-900 hover:bg-black text-white font-bold text-xs transition-all cursor-pointer shadow-md"
+              className="w-full py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs transition-all cursor-pointer border border-gray-200"
             >
               {isEn ? 'Close Window' : 'ঠিক আছে, সম্পন্ন করুন'}
             </button>

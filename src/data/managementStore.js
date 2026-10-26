@@ -592,7 +592,7 @@ export const saveJobApplication = (application) => {
   try {
     const current = getManagementData();
     const newApp = {
-      id: JOB--,
+      id: application.id || JOB--,
       date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       timestamp: new Date().toISOString(),
       status: 'নতুন আবেদন (New)',
@@ -600,12 +600,44 @@ export const saveJobApplication = (application) => {
     };
     const updated = {
       ...current,
-      jobApplications: [newApp, ...(current.jobApplications || [])]
+      jobApplications: [newApp, ...(current.jobApplications || []).filter(a => a.id !== newApp.id)]
     };
     saveManagementData(updated);
     return newApp;
   } catch (e) {
     console.error('Error saving job application:', e);
+  }
+};
+
+// Delete job application from management
+export const deleteJobApplication = (appId) => {
+  try {
+    const current = getManagementData();
+    const updated = {
+      ...current,
+      jobApplications: (current.jobApplications || []).filter(a => a.id !== appId)
+    };
+    saveManagementData(updated);
+    return updated;
+  } catch (e) {
+    console.error('Error deleting job application:', e);
+  }
+};
+
+// Update job application review status
+export const updateJobApplicationStatus = (appId, newStatus) => {
+  try {
+    const current = getManagementData();
+    const updated = {
+      ...current,
+      jobApplications: (current.jobApplications || []).map(a => 
+        a.id === appId ? { ...a, status: newStatus } : a
+      )
+    };
+    saveManagementData(updated);
+    return updated;
+  } catch (e) {
+    console.error('Error updating job application status:', e);
   }
 };
 
