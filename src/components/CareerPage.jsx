@@ -580,6 +580,42 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
                   ))}
                 </ul>
               </div>
+
+              {/* Official Application & Company Details Box */}
+              <div className="bg-emerald-50/70 p-4 sm:p-5 rounded-2xl border border-emerald-200/80 space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span className="text-xs font-black text-[#006231] uppercase tracking-wider flex items-center space-x-1.5">
+                    <Send className="w-3.5 h-3.5" />
+                    <span>{isEn ? 'Application Instructions' : 'আবেদন পদ্ধতি'}</span>
+                  </span>
+                  <span className="font-mono font-bold text-slate-700 text-3xs">
+                    {selectedJobForDetails.companyName || 'AL EMARAH PROPERTIES LIMITED'}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-700 leading-relaxed font-medium">
+                  {isEn 
+                    ? 'Interested candidates are requested to send their updated CV via the "Apply Online" button or directly to our official email / hotline.'
+                    : 'আগ্রহী প্রার্থীদের হালনাগাদ CV সরাসরি অনলাইনে সাবমিট করার জন্য অথবা আমাদের অফিসিয়াল ই-মেইল ঠিকানায় পাঠানোর জন্য অনুরোধ করা হচ্ছে।'}
+                </p>
+                <div className="pt-2 border-t border-emerald-200/60 flex flex-wrap items-center gap-3 text-xs text-gray-800">
+                  <div className="flex items-center space-x-1.5 font-mono">
+                    <span className="font-bold text-gray-500">{isEn ? 'Email:' : 'ই-মেইল:'}</span>
+                    <a href={`mailto:${selectedJobForDetails.contactEmail || 'alemarah.officialbd@gmail.com'}`} className="hover:underline font-bold text-[#006231]">
+                      {selectedJobForDetails.contactEmail || 'alemarah.officialbd@gmail.com'}
+                    </a>
+                  </div>
+                  <span className="text-gray-300">•</span>
+                  <div className="flex items-center space-x-1.5 font-mono">
+                    <span className="font-bold text-gray-500">{isEn ? 'Contact:' : 'যোগাযোগ:'}</span>
+                    <a href="tel:01816233013" className="hover:underline font-bold text-slate-900">
+                      {selectedJobForDetails.contactPhone || '01816-233013 / 01918-646575'}
+                    </a>
+                  </div>
+                </div>
+                <div className="text-3xs text-emerald-800 font-bold tracking-wide pt-1 border-t border-emerald-200/40">
+                  {isEn ? 'AL EMARAH PROPERTIES LIMITED • Trust • Transparency • Partnership' : 'AL EMARAH PROPERTIES LIMITED • বিশ্বস্ততা • স্বচ্ছতা • অংশীদারিত্ব'}
+                </div>
+              </div>
             </div>
 
             {/* Footer Action */}
