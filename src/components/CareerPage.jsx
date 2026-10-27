@@ -65,12 +65,10 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
   // Departments List
   const departments = useMemo(() => {
     const list = [
-      { id: 'all', labelBn: 'সকল বিভাগ', labelEn: 'All Departments' },
-      { id: 'Administration', labelBn: 'প্রশাসন ও মানবসম্পদ', labelEn: 'Administration & HR' },
-      { id: 'Engineering', labelBn: 'প্রকৌশল ও নির্মাণ', labelEn: 'Engineering & Construction' },
-      { id: 'Sales', labelBn: 'সেলস ও মার্কেটিং', labelEn: 'Sales & Marketing' },
-      { id: 'Accounts', labelBn: 'হিসাব ও অর্থায়ন', labelEn: 'Accounts & Finance' },
-      { id: 'Branding', labelBn: 'ব্র্যান্ডিং ও মিডিয়া', labelEn: 'Branding & Media' }
+      { id: 'all', labelBn: 'সকল বিভাগ (০২)', labelEn: 'All Departments (02)' },
+      { id: 'PR', labelBn: 'জনসংযোগ ও পিআর', labelEn: 'Public Relations (PR)' },
+      { id: 'Administration', labelBn: 'হিসাব ও প্রশাসন', labelEn: 'Accounts & Administration' },
+      { id: 'Sales', labelBn: 'মার্কেটিং ও সেলস', labelEn: 'Marketing & Sales' }
     ];
     return list;
   }, []);
@@ -83,7 +81,8 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
         const dLower = selectedDepartment.toLowerCase();
         const matchesDept = 
           job.departmentEn.toLowerCase().includes(dLower) ||
-          job.departmentBn.includes(selectedDepartment);
+          job.departmentBn.includes(selectedDepartment) ||
+          (selectedDepartment === 'PR' && (job.departmentEn.toLowerCase().includes('public relations') || job.departmentBn.includes('জনসংযোগ')));
         if (!matchesDept) return false;
       }
       // Search query

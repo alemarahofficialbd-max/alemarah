@@ -73,6 +73,79 @@ export const jobsData = [
       "Mobile phone allowance and official communication perks",
       "Ethical, transparent, and supportive family work culture",
       "Performance-driven career growth and appraisal trajectory"
+    ]  },
+  {
+    id: "job-public-relations-officer",
+    titleBn: "Public Relations Officer (জনসংযোগ কর্মকর্তা)",
+    titleEn: "Public Relations Officer (PRO)",
+    companyName: "Al-Imarah Properties",
+    departmentBn: "জনসংযোগ ও মার্কেটিং",
+    departmentEn: "Public Relations & Marketing",
+    locationBn: "১ম তলা, স্কাই ভিউ হনোলাস্ক সেন্টার, পুরানা পল্টন, ঢাকা",
+    locationEn: "1st Floor, Sky View Honolask Centre, Purana Paltan, Dhaka",
+    vacancyBn: "০১ জন",
+    vacancyEn: "01 Position",
+    employmentTypeBn: "ফুলটাইম (Full-time)",
+    employmentTypeEn: "Full-time",
+    experienceBn: "মার্কেটিং এক্সিকিউটিভ বা পিআর অফিসার হিসেবে পূর্ব অভিজ্ঞতা অগ্রাধিকারযোগ্য",
+    experienceEn: "Prior experience as Marketing Executive or PR Officer is highly preferred",
+    educationBn: "এইচএসসি (HSC) অথবা যেকোনো বিষয়ে স্নাতক / সমমান ডিগ্রি",
+    educationEn: "HSC (Higher Secondary Certificate) or higher degree in any discipline",
+    salaryBn: "আলোচনা সাপেক্ষে (অভিজ্ঞতা ও দক্ষতার ভিত্তিতে)",
+    salaryEn: "Negotiable (Based on experience and skill set)",
+    deadlineBn: "৩০ নভেম্বর, ২০২৬",
+    deadlineEn: "30 November, 2026",
+    status: "active",
+    badgeBn: "নতুন নিয়োগ",
+    badgeEn: "New Opening",
+    isFeatured: true,
+    mottoBn: "বিশ্বস্ততা • স্বচ্ছতা • অংশীদারিত্ব",
+    mottoEn: "Trust • Transparency • Partnership",
+    contactEmail: "alemarah.officialbd@gmail.com",
+    contactPhone: "01816-233013 / 01918-646575",
+    overviewBn: "প্রতিষ্ঠানের ব্র্যান্ড ইমেজ ও গ্রাহক সম্পর্ক উন্নয়ন, মার্কেটিং কার্যক্রমে গতিশীলতা এবং পেশাদারিত্বের সাথে আল-ইমারাহ প্রোপার্টিজের প্রতিনিধিত্ব করার জন্য একজন উদ্যমী ও সুবক্তা জনসংযোগ কর্মকর্তা (Public Relations Officer) নিয়োগ দেওয়া হবে।",
+    overviewEn: "Al-Imarah Properties is looking for a dynamic, energetic, and articulate Public Relations Officer to join our team. The ideal candidate will be responsible for managing client relationships, driving marketing efforts, and representing the brand with professionalism.",
+    responsibilitiesBn: [
+      "গ্রাহকদের সাথে আন্তরিক ও সুদৃঢ় সম্পর্ক স্থাপন, নিয়মিত যোগাযোগ এবং প্রতিষ্ঠানের ব্র্যান্ড ইমেজ তুলে ধরা।",
+      "মার্কেটিং টিম ও সেলস প্রমোশনের সাথে সমন্বয় করে নতুন গ্রাহক ও বিনিয়োগকারীদের কাছে প্রজেক্ট উপস্থাপন।",
+      "অফিসিয়াল ক্লায়েন্ট মিটিং ও সাইট ভিজিটে গ্রাহকদের আন্তরিকভাবে দিকনির্দেশনা ও সেবা প্রদান।",
+      "ডিজিটাল ও অফলাইন জনসংযোগ কার্যক্রমে ব্র্যান্ডের পেশাদারিত্ব বজায় রাখা।",
+      "দৈনিক ক্লায়েন্ট ফিডব্যাক ও ফলোআপ রিপোর্ট প্রস্তুত করে ম্যানেজমেন্টকে অবহিত রাখা।"
+    ],
+    responsibilitiesEn: [
+      "Manage and nurture client relationships, ensuring excellent brand representation and communication.",
+      "Collaborate with marketing and sales teams to drive campaigns and engage prospective property buyers.",
+      "Attend client meetings and coordinate guided project site visits with professional etiquette.",
+      "Maintain active, positive PR and articulate the company's Islamic Shariah-compliant real estate values.",
+      "Prepare regular client interaction feedback and update management on pipeline progress."
+    ],
+    requirementsBn: [
+      "শিক্ষাগত যোগ্যতা: এইচএসসি (HSC) অথবা যেকোনো বিষয়ে উচ্চতর ডিগ্রি।",
+      "ভাষাগত দক্ষতা: বাংলায় চমৎকার ও শুদ্ধ উচ্চারণ, মার্জিত বাচনভঙ্গি ও প্রাতিষ্ঠানিক আচরণে পারদর্শিতা।",
+      "কারিগরি দক্ষতা: কম্পিউটারে মৌলিক জ্ঞান (MS Office, ইন্টারনেট ব্রাউজিং ও ইমেইল যোগাযোগ)।",
+      "অভিজ্ঞতা: মার্কেটিং এক্সিকিউটিভ বা পাবলিক রিলেশনস (PR) অফিসার হিসেবে পূর্ব অভিজ্ঞতা সম্পন্ন প্রার্থীদের অগ্রাধিকার দেওয়া হবে।",
+      "চটপটে ব্যক্তিত্ব, আকর্ষণীয় উপস্থাপনা কৌশল এবং যেকোনো পরিস্থিতি মানিয়ে নেওয়ার সক্ষমতা।"
+    ],
+    requirementsEn: [
+      "Educational Background: HSC (Higher Secondary Certificate) or higher degree in any discipline.",
+      "Language Proficiency: Fluency in spoken and written Bengali with excellent articulate speaking skills and formal demeanor.",
+      "Technical Skills: Basic computer literacy (MS Office, Internet Browsing, Email Communication).",
+      "Experience: Prior experience as a Marketing Executive or Public Relations (PR) Officer is highly preferred.",
+      "Dynamic interpersonal energy, presentable corporate outlook, and high adaptability."
+    ],
+    benefitsBn: [
+      "মাসিক বেতন: আলোচনা সাপেক্ষে (অভিজ্ঞতা ও দক্ষতার ওপর ভিত্তি করে আকর্ষণীয় প্যাকেজ)",
+      "বছরে ২টি পূর্ণাঙ্গ উৎসব বোনাস ও পারফরম্যান্স ইনসেন্টিভ",
+      "পেশাদার, সম্মানজনক ও ক্যারিয়ার গ্রোথ-বান্ধব অফিস কর্মপরিবেশ",
+      "মোবাইল ফোন ভাতা ও প্রাতিষ্ঠানিক অন্যান্য সুযোগ-সুবিধা",
+      "আল-ইমারাহ পরিবারে দীর্ঘমেয়াদী সম্মানজনক ক্যারিয়ার গঠনের সুযোগ"
+    ],
+    benefitsEn: [
+      "Salary: Negotiable (Competitive package based on experience and skill set)",
+      "Two festival bonuses annually plus attractive performance incentives",
+      "Professional and growth-oriented corporate work environment",
+      "Official mobile phone allowance and communication perks",
+      "Long-term career appraisal and executive advancement trajectory"
     ]
   }
 ];
