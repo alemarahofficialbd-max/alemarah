@@ -25,8 +25,60 @@ import {
   PhoneCall, 
   AlertCircle,
   Copy,
-  FolderOpen
+  FolderOpen,
+  FileSpreadsheet,
+  Megaphone,
+  Globe,
+  FolderCheck,
+  HeartHandshake,
+  Presentation,
+  Award,
+  MessageSquare,
+  Languages,
+  Laptop,
+  Mail,
+  Gift
 } from 'lucide-react';
+
+// Dynamic Icon Resolvers for Job Details Sections
+const getJobResponsibilityIcon = (jobId, index) => {
+  if (jobId === 'job-accounts-admin-officer') {
+    const icons = [FileSpreadsheet, Megaphone, Globe, TrendingUp, FolderCheck];
+    return icons[index] || CheckCircle2;
+  }
+  if (jobId === 'job-public-relations-officer') {
+    const icons = [HeartHandshake, Megaphone, Presentation, Award, MessageSquare];
+    return icons[index] || CheckCircle2;
+  }
+  const fallbackIcons = [FileSpreadsheet, Megaphone, Globe, TrendingUp, FolderCheck, HeartHandshake, Presentation, Award];
+  return fallbackIcons[index % fallbackIcons.length] || CheckCircle2;
+};
+
+const getJobRequirementIcon = (jobId, index) => {
+  if (jobId === 'job-accounts-admin-officer') {
+    const icons = [GraduationCap, FileSpreadsheet, Globe, Laptop, Mail, ShieldCheck];
+    return icons[index] || Check;
+  }
+  if (jobId === 'job-public-relations-officer') {
+    const icons = [GraduationCap, Languages, Laptop, Briefcase, Sparkles];
+    return icons[index] || Check;
+  }
+  const fallbackIcons = [GraduationCap, Languages, Laptop, Mail, ShieldCheck, Briefcase, Sparkles];
+  return fallbackIcons[index % fallbackIcons.length] || Check;
+};
+
+const getJobBenefitIcon = (jobId, index) => {
+  if (jobId === 'job-accounts-admin-officer') {
+    const icons = [DollarSign, Gift, PhoneCall, HeartHandshake, TrendingUp];
+    return icons[index] || Sparkles;
+  }
+  if (jobId === 'job-public-relations-officer') {
+    const icons = [DollarSign, Gift, Building2, PhoneCall, TrendingUp];
+    return icons[index] || Sparkles;
+  }
+  const fallbackIcons = [DollarSign, Gift, PhoneCall, HeartHandshake, TrendingUp, Building2];
+  return fallbackIcons[index % fallbackIcons.length] || Sparkles;
+};
 import { jobsData, careerPillars } from '../data/jobsData';
 import { saveJobApplication, findJobApplication, fetchJobApplicationsFromSupabase } from '../data/managementStore';
 
@@ -686,15 +738,18 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
                     </div>
                   </div>
 
-                  <ul className="space-y-3 text-xs sm:text-sm text-gray-700">
-                    {(isEn ? selectedJobForDetails.responsibilitiesEn : selectedJobForDetails.responsibilitiesBn).map((resp, i) => (
-                      <li key={i} className="flex items-start space-x-3">
-                        <span className="w-5 h-5 rounded-full bg-emerald-100 text-[#006231] font-bold text-3xs flex items-center justify-center shrink-0 mt-0.5">
-                          {i + 1}
-                        </span>
-                        <span className="leading-relaxed">{resp}</span>
-                      </li>
-                    ))}
+                  <ul className="space-y-2.5 text-xs sm:text-sm text-gray-700">
+                    {(isEn ? selectedJobForDetails.responsibilitiesEn : selectedJobForDetails.responsibilitiesBn).map((resp, i) => {
+                      const RespIcon = getJobResponsibilityIcon(selectedJobForDetails.id, i);
+                      return (
+                        <li key={i} className="flex items-start space-x-3.5 p-3 rounded-2xl bg-gray-50/70 hover:bg-emerald-50/50 border border-gray-100 hover:border-emerald-200/80 transition-all group">
+                          <div className="w-8 h-8 rounded-xl bg-emerald-100/90 text-[#006231] group-hover:bg-[#006231] group-hover:text-white flex items-center justify-center shrink-0 mt-0.5 transition-colors shadow-2xs">
+                            <RespIcon className="w-4 h-4" />
+                          </div>
+                          <span className="leading-relaxed text-gray-800 font-medium pt-1">{resp}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
 
@@ -717,13 +772,18 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
                     <span>{isEn ? selectedJobForDetails.educationEn : selectedJobForDetails.educationBn}</span>
                   </div>
 
-                  <ul className="space-y-3 text-xs sm:text-sm text-gray-700">
-                    {(isEn ? selectedJobForDetails.requirementsEn : selectedJobForDetails.requirementsBn).map((req, i) => (
-                      <li key={i} className="flex items-start space-x-3">
-                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                        <span className="leading-relaxed">{req}</span>
-                      </li>
-                    ))}
+                  <ul className="space-y-2.5 text-xs sm:text-sm text-gray-700">
+                    {(isEn ? selectedJobForDetails.requirementsEn : selectedJobForDetails.requirementsBn).map((req, i) => {
+                      const ReqIcon = getJobRequirementIcon(selectedJobForDetails.id, i);
+                      return (
+                        <li key={i} className="flex items-start space-x-3.5 p-3 rounded-2xl bg-gray-50/70 hover:bg-blue-50/50 border border-gray-100 hover:border-blue-200/80 transition-all group">
+                          <div className="w-8 h-8 rounded-xl bg-blue-100/90 text-blue-700 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center shrink-0 mt-0.5 transition-colors shadow-2xs">
+                            <ReqIcon className="w-4 h-4" />
+                          </div>
+                          <span className="leading-relaxed text-gray-800 font-medium pt-1">{req}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
 
@@ -741,13 +801,18 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
                     </div>
                   </div>
 
-                  <ul className="space-y-3 text-xs sm:text-sm text-gray-700">
-                    {(isEn ? selectedJobForDetails.benefitsEn : selectedJobForDetails.benefitsBn).map((ben, i) => (
-                      <li key={i} className="flex items-start space-x-3">
-                        <Sparkles className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
-                        <span className="leading-relaxed">{ben}</span>
-                      </li>
-                    ))}
+                  <ul className="space-y-2.5 text-xs sm:text-sm text-gray-700">
+                    {(isEn ? selectedJobForDetails.benefitsEn : selectedJobForDetails.benefitsBn).map((ben, i) => {
+                      const BenIcon = getJobBenefitIcon(selectedJobForDetails.id, i);
+                      return (
+                        <li key={i} className="flex items-start space-x-3.5 p-3 rounded-2xl bg-gray-50/70 hover:bg-purple-50/50 border border-gray-100 hover:border-purple-200/80 transition-all group">
+                          <div className="w-8 h-8 rounded-xl bg-purple-100/90 text-purple-700 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center shrink-0 mt-0.5 transition-colors shadow-2xs">
+                            <BenIcon className="w-4 h-4" />
+                          </div>
+                          <span className="leading-relaxed text-gray-800 font-medium pt-1">{ben}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               </div>
@@ -834,9 +899,15 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
                 </div>
 
                 {/* Company Values */}
-                <div className="bg-emerald-50/60 rounded-3xl p-5 border border-emerald-200/70 text-center space-y-2">
-                  <Building2 className="w-6 h-6 text-[#006231] mx-auto" />
-                  <div className="font-black text-xs text-gray-900">
+                <div className="bg-emerald-50/60 rounded-3xl p-6 border border-emerald-200/70 text-center space-y-3">
+                  <div className="bg-white rounded-2xl py-2 px-4 inline-flex items-center justify-center shadow-xs border border-emerald-100">
+                    <img 
+                      src="/alemarah_logo_header.svg" 
+                      alt="Al-Emarah Properties" 
+                      className="h-10 sm:h-11 w-auto object-contain"
+                    />
+                  </div>
+                  <div className="font-black text-xs text-gray-900 tracking-wide">
                     {selectedJobForDetails.companyName || 'AL EMARAH PROPERTIES LIMITED'}
                   </div>
                   <div className="text-3xs text-[#006231] font-bold tracking-wide">
