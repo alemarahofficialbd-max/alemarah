@@ -75,7 +75,8 @@ import {
   hashPassword,
   isHashedPassword,
   deleteJobApplication,
-  updateJobApplicationStatus
+  updateJobApplicationStatus,
+  updateJobApplication
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -220,6 +221,17 @@ export default function ManagementDashboard({
   // FORM STATES
   // -------------------------------------------------------------
   // 1. New Client Form
+  // Job Application Interview Scheduling & Status State
+  const [selectedAppForInterview, setSelectedAppForInterview] = useState(null);
+  const [interviewForm, setInterviewForm] = useState({
+    status: '',
+    interviewDate: '',
+    interviewTime: '',
+    interviewLocation: '',
+    requiredDocuments: '',
+    adminNotes: ''
+  });
+
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const emptyUnitRow = () => ({
     projectId: data.projects[0]?.id || '',
@@ -2909,7 +2921,7 @@ export default function ManagementDashboard({
                   <div className="divide-y divide-slate-100 overflow-x-auto">
                     {data.jobApplications.map((app) => (
                       <div key={app.id} className="p-4 sm:p-5 hover:bg-slate-50/70 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                        <div className="space-y-1.5 flex-1">
+                        <div className="space-y-2 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-sm font-black text-slate-900">{app.applicantName}</span>
                             <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-[#006231] font-bold text-3xs border border-emerald-200">
@@ -2919,8 +2931,14 @@ export default function ManagementDashboard({
                               {app.id}
                             </span>
                             <span className="text-3xs text-slate-400">{app.date}</span>
-                            <span className="px-2 py-0.5 rounded text-3xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                              {app.status || 'নতুন আবেদন'}
+                            <span className={`px-2.5 py-0.5 rounded-full text-3xs font-black ${
+                              (app.status || '').includes('ইন্টারভিউ') || (app.status || '').includes('নির্বাচিত')
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                : (app.status || '').includes('দুঃখিত')
+                                ? 'bg-red-50 text-red-700 border border-red-200'
+                                : 'bg-amber-100 text-amber-800 border border-amber-200'
+                            }`}>
+                              {app.status || 'নতুন আবেদন (Under Review)'}
                             </span>
                           </div>
 
@@ -2949,6 +2967,20 @@ export default function ManagementDashboard({
                             )}
                           </div>
 
+                          {/* Scheduled Interview Highlight */}
+                          {app.interviewDate && (
+                            <div className="bg-emerald-50/90 p-2.5 rounded-xl border border-emerald-200 text-xs flex flex-wrap items-center gap-x-3 gap-y-1 text-emerald-900 font-bold">
+                              <span className="flex items-center space-x-1 text-[#006231]">
+                                <Calendar className="w-3.5 h-3.5" />
+                                <span>ইন্টারভিউ: {app.interviewDate} ({app.interviewTime || 'সকাল ১১:০০ টা'})</span>
+                              </span>
+                              <span className="text-gray-300">•</span>
+                              <span className="text-3xs text-emerald-800 font-normal truncate max-w-sm">
+                                স্থান: {app.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}
+                              </span>
+                            </div>
+                          )}
+
                           {app.coverNote && (
                             <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 italic">
                               "{app.coverNote}"
@@ -2958,6 +2990,26 @@ export default function ManagementDashboard({
 
                         {/* Actions */}
                         <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          {/* Schedule Interview & Status Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedAppForInterview(app);
+                              setInterviewForm({
+                                status: app.status || 'ইন্টারভিউয়ের জন্য নির্বাচিত (Shortlisted)',
+                                interviewDate: app.interviewDate || '২০২৬-১১-০৫',
+                                interviewTime: app.interviewTime || 'সকাল ১১:০০ টা',
+                                interviewLocation: app.interviewLocation || 'আল-ইমারাহ প্রোপার্টিজ লিমিটেড, হেড অফিস, পুরানা পল্টন, ঢাকা',
+                                requiredDocuments: app.requiredDocuments || 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
+                                adminNotes: app.adminNotes || 'নির্ধারিত সময়ের ১৫ মিনিট পূর্বে উপস্থিত থাকার অনুরোধ করা হচ্ছে।'
+                              });
+                            }}
+                            className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center space-x-1 shadow-2xs cursor-pointer active:scale-95"
+                          >
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>ইন্টারভিউ ও স্ট্যাটাস</span>
+                          </button>
+
                           {app.cvLink && (
                             <a
                               href={app.cvLink}
@@ -2970,11 +3022,17 @@ export default function ManagementDashboard({
                             </a>
                           )}
 
+                          {/* Smart WhatsApp Button */}
                           <a
-                            href={`https://wa.me/88${(app.phone || '').replace(/[^0-9]/g, '')}`}
+                            href={`https://wa.me/88${(app.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                              app.interviewDate
+                                ? `আসসালামু আলাইকুম ${app.applicantName},\n\nআল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${app.jobTitle || app.submittedPosition}" পদের জন্য আপনার চাকরির আবেদনটি শর্টলিস্টেড হয়েছে।\n\n📅 সাক্ষাৎকারের তারিখ: ${app.interviewDate}\n⏰ সময়: ${app.interviewTime || 'সকাল ১১:০০ টা'}\n📍 স্থান: ${app.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}\n📄 সঙ্গে আনতে হবে: ${app.requiredDocuments || 'মূল সনদপত্র, ২ কপি ছবি ও সিভি'}${app.adminNotes ? `\n\nবিশেষ নির্দেশনা: ${app.adminNotes}` : ''}\n\nট্র্যাকিং নম্বর: ${app.id}\nওয়েবসাইটে স্ট্যাটাস দেখুন: https://www.alemarahproperties.com/#careers\n\nধন্যবাদ,\nরিক্রুটমেন্ট প্যানেল\nআল-ইমারাহ প্রোপার্টিজ লিমিটেড`
+                                : `আসসালামু আলাইকুম ${app.applicantName}, আল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${app.jobTitle || app.submittedPosition}" পদে আপনার আবেদন (আইডি: ${app.id}) আমাদের রিক্রুটমেন্ট প্যানেলে পর্যালোচনাধীন রয়েছে।`
+                            )}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="px-3.5 py-1.5 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-bold flex items-center space-x-1 shadow-2xs cursor-pointer"
+                            className="px-3.5 py-1.5 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-bold flex items-center space-x-1 shadow-2xs cursor-pointer active:scale-95"
+                            title="WhatsApp-এ মেসেজ পাঠান"
                           >
                             <span>WhatsApp</span>
                           </a>
@@ -6303,6 +6361,174 @@ export default function ManagementDashboard({
               <LogOut className="w-4 h-4" />
               <span>সিস্টেম থেকে লগআউট করুন</span>
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* INTERVIEW SCHEDULING & STATUS UPDATE MODAL                */}
+      {/* ========================================================= */}
+      {selectedAppForInterview && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-slate-100 max-h-[92vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+              <div>
+                <div className="inline-flex items-center space-x-1.5 px-3 py-0.5 rounded-full bg-purple-50 text-purple-700 text-3xs font-bold uppercase tracking-wider mb-1">
+                  <Calendar className="w-3 h-3 text-purple-600" />
+                  <span>ইন্টারভিউ কল ও স্ট্যাটাস কন্ট্রোল</span>
+                </div>
+                <h3 className="text-lg font-black text-slate-900">
+                  {selectedAppForInterview.applicantName} — {selectedAppForInterview.jobTitle || 'Accounts & Admin'}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  ট্র্যাকিং আইডি: <span className="font-mono font-bold text-slate-700">{selectedAppForInterview.id}</span> • মোবাইল: <span className="font-bold">{selectedAppForInterview.phone}</span>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedAppForInterview(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <div className="space-y-4 text-xs">
+              {/* Status Selector */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  আবেদনের বর্তমান স্ট্যাটাস *
+                </label>
+                <select
+                  value={interviewForm.status}
+                  onChange={(e) => setInterviewForm(prev => ({ ...prev, status: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]"
+                >
+                  <option value="নতুন আবেদন (Under Review)">🟡 নতুন আবেদন (Under Review)</option>
+                  <option value="ইন্টারভিউয়ের জন্য নির্বাচিত (Shortlisted)">🟢 ইন্টারভিউয়ের জন্য নির্বাচিত (Shortlisted)</option>
+                  <option value="চূড়ান্ত নির্বাচিত (Selected)">🔵 চূড়ান্ত নির্বাচিত (Selected)</option>
+                  <option value="দুঃখিত, এই দফায় নির্বাচিত হননি (Not Selected)">🔴 দুঃখিত, এই দফায় নির্বাচিত হননি (Not Selected)</option>
+                </select>
+              </div>
+
+              {/* Date & Time */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    সাক্ষাৎকারের তারিখ (Interview Date)
+                  </label>
+                  <input
+                    type="text"
+                    value={interviewForm.interviewDate}
+                    onChange={(e) => setInterviewForm(prev => ({ ...prev, interviewDate: e.target.value }))}
+                    placeholder="যেমন: ৫ নভেম্বর, ২০২৬ বা 2026-11-05"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    সাক্ষাৎকারের সময় (Time)
+                  </label>
+                  <input
+                    type="text"
+                    value={interviewForm.interviewTime}
+                    onChange={(e) => setInterviewForm(prev => ({ ...prev, interviewTime: e.target.value }))}
+                    placeholder="যেমন: সকাল ১১:০০ টা"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]"
+                  />
+                </div>
+              </div>
+
+              {/* Interview Location */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  সাক্ষাৎকারের স্থান / ঠিকানা (Venue)
+                </label>
+                <input
+                  type="text"
+                  value={interviewForm.interviewLocation}
+                  onChange={(e) => setInterviewForm(prev => ({ ...prev, interviewLocation: e.target.value }))}
+                  placeholder="যেমন: আল-ইমারাহ প্রোপার্টিজ লিমিটেড, হেড অফিস, পুরানা পল্টন, ঢাকা"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]"
+                />
+              </div>
+
+              {/* Required Documents */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  যা যা সঙ্গে আনতে হবে (Required Documents)
+                </label>
+                <input
+                  type="text"
+                  value={interviewForm.requiredDocuments}
+                  onChange={(e) => setInterviewForm(prev => ({ ...prev, requiredDocuments: e.target.value }))}
+                  placeholder="মূল সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]"
+                />
+              </div>
+
+              {/* Special Note */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  এইচআর বিশেষ নির্দেশনা / নোট (Optional)
+                </label>
+                <textarea
+                  rows={2}
+                  value={interviewForm.adminNotes}
+                  onChange={(e) => setInterviewForm(prev => ({ ...prev, adminNotes: e.target.value }))}
+                  placeholder="যেমন: নির্ধারিত সময়ের ১৫ মিনিট পূর্বে উপস্থিত থাকার অনুরোধ করা হচ্ছে।"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]"
+                ></textarea>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedAppForInterview(null)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-100 cursor-pointer"
+                >
+                  বাতিল
+                </button>
+
+                <div className="w-full sm:w-auto flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateJobApplication(selectedAppForInterview.id, interviewForm);
+                      // Trigger update
+                      const updated = getManagementData();
+                      setData(updated);
+                      setSelectedAppForInterview(null);
+                      alert('ইন্টারভিউ শিডিউল ও স্ট্যাটাস সফলভাবে সংরক্ষিত হয়েছে!');
+                    }}
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs shadow-md transition-all cursor-pointer active:scale-95"
+                  >
+                    সংরক্ষণ করুন
+                  </button>
+
+                  <a
+                    href={`https://wa.me/88${(selectedAppForInterview.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                      `আসসালামু আলাইকুম ${selectedAppForInterview.applicantName},\n\nআল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${selectedAppForInterview.jobTitle || selectedAppForInterview.submittedPosition}" পদের জন্য আপনার চাকরির আবেদনটি শর্টলিস্টেড হয়েছে।\n\n📅 সাক্ষাৎকারের তারিখ: ${interviewForm.interviewDate || 'শিগগিরই নির্ধারণ করা হবে'}\n⏰ সময়: ${interviewForm.interviewTime || 'সকাল ১১:০০ টা'}\n📍 স্থান: ${interviewForm.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}\n📄 সঙ্গে আনতে হবে: ${interviewForm.requiredDocuments || 'মূল সনদপত্র, ২ কপি ছবি ও সিভি'}${interviewForm.adminNotes ? `\n\nবিশেষ নির্দেশনা: ${interviewForm.adminNotes}` : ''}\n\nট্র্যাকিং নম্বর: ${selectedAppForInterview.id}\nওয়েবসাইটে স্ট্যাটাস দেখুন: https://www.alemarahproperties.com/#careers\n\nধন্যবাদ,\nরিক্রুটমেন্ট প্যানেল\nআল-ইমারাহ প্রোপার্টিজ লিমিটেড`
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => {
+                      updateJobApplication(selectedAppForInterview.id, interviewForm);
+                      const updated = getManagementData();
+                      setData(updated);
+                      setSelectedAppForInterview(null);
+                    }}
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center space-x-1"
+                  >
+                    <span>সংরক্ষণ ও WhatsApp পাঠান</span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

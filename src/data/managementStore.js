@@ -591,12 +591,18 @@ export const saveInquiry = (inquiry) => {
 export const saveJobApplication = (application) => {
   try {
     const current = getManagementData();
+    const cleanId = application.id || ('AL-JOB-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000));
     const newApp = {
-      id: application.id || JOB--,
       date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       timestamp: new Date().toISOString(),
-      status: 'নতুন আবেদন (New)',
-      ...application
+      status: 'নতুন আবেদন (Under Review)',
+      interviewDate: '',
+      interviewTime: '',
+      interviewLocation: 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা',
+      requiredDocuments: 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি',
+      adminNotes: '',
+      ...application,
+      id: cleanId
     };
     const updated = {
       ...current,
@@ -639,6 +645,38 @@ export const updateJobApplicationStatus = (appId, newStatus) => {
   } catch (e) {
     console.error('Error updating job application status:', e);
   }
+};
+
+// Full update for job application (status, interview schedule, venue, required docs, admin notes)
+export const updateJobApplication = (appId, updates) => {
+  try {
+    const current = getManagementData();
+    const updated = {
+      ...current,
+      jobApplications: (current.jobApplications || []).map(a => 
+        a.id === appId ? { ...a, ...updates, updatedAt: new Date().toISOString() } : a
+      )
+    };
+    saveManagementData(updated);
+    return updated;
+  } catch (e) {
+    console.error('Error updating job application:', e);
+  }
+};
+
+// Search / lookup application by tracking ID or phone number
+export const findJobApplication = (query) => {
+  if (!query) return null;
+  const q = query.trim().toLowerCase();
+  const digits = q.replace(/[^0-9]/g, '');
+  const current = getManagementData();
+  const list = current.jobApplications || [];
+  return list.find(a => {
+    const matchId = a.id && a.id.toLowerCase() === q;
+    const cleanPhone = (a.phone || '').replace(/[^0-9]/g, '');
+    const matchPhone = digits.length >= 8 && cleanPhone.includes(digits);
+    return matchId || matchPhone;
+  }) || null;
 };
 
 // Auto sync on app load

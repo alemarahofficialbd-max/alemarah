@@ -28,7 +28,7 @@ import {
   FolderOpen
 } from 'lucide-react';
 import { jobsData, careerPillars } from '../data/jobsData';
-import { saveJobApplication } from '../data/managementStore';
+import { saveJobApplication, findJobApplication } from '../data/managementStore';
 
 export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
   const isEn = lang === 'en';
@@ -57,6 +57,10 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedApplication, setSubmittedApplication] = useState(null);
   const [copiedId, setCopiedId] = useState(false);
+  const [showTrackModal, setShowTrackModal] = useState(false);
+  const [trackQuery, setTrackQuery] = useState('');
+  const [trackResult, setTrackResult] = useState(null);
+  const [trackHasSearched, setTrackHasSearched] = useState(false);
 
   // Departments List
   const departments = useMemo(() => {
@@ -155,11 +159,18 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
 
     setIsSubmitting(true);
     setTimeout(() => {
+      const cleanId = 'AL-JOB-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
       const payload = {
         ...formData,
-        submittedPosition: formData.jobTitle || 'General Application',
+        id: cleanId,
+        submittedPosition: formData.jobTitle || 'Accounts & Administration Officer',
         status: 'নতুন আবেদন (Under Review)',
-        appliedDateBn: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })
+        appliedDateBn: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+        interviewDate: '',
+        interviewTime: '',
+        interviewLocation: 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা',
+        requiredDocuments: 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
+        adminNotes: ''
       };
       const saved = saveJobApplication(payload);
       setIsSubmitting(false);
@@ -186,9 +197,22 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
 
   const handleCopyId = (id) => {
     if (!id) return;
-    navigator.clipboard?.writeText(id);
-    setCopiedId(true);
-    setTimeout(() => setCopiedId(false), 2000);
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(id);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = id;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2500);
+    } catch (err) {
+      console.error("Failed to copy", err);
+    }
   };
 
   return (
@@ -225,10 +249,10 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
           </p>
 
           {/* Quick CTA Actions */}
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a 
               href="#openings" 
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-sm shadow-md shadow-[#006231]/25 hover:opacity-95 transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95"
+              className="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#006231]/25 hover:opacity-95 transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95"
             >
               <span>{isEn ? 'Explore Open Positions' : 'বর্তমান পদসমূহ দেখুন'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -236,10 +260,23 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
 
             <button
               onClick={() => handleOpenApplyModal(null)}
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 font-bold text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95 shadow-2xs"
+              className="w-full sm:w-auto px-5 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95 shadow-2xs"
             >
               <FileText className="w-4 h-4 text-[#006231]" />
               <span>{isEn ? 'Drop Your CV (General)' : 'যেকোনো পদে সিভি জমা দিন'}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setShowTrackModal(true);
+                setTrackQuery('');
+                setTrackResult(null);
+                setTrackHasSearched(false);
+              }}
+              className="w-full sm:w-auto px-5 py-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-[#006231] font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95 shadow-2xs"
+            >
+              <Search className="w-4 h-4 text-[#006231]" />
+              <span>{isEn ? 'Track Application Status' : 'আবেদনের অগ্রগতি ট্র্যাক করুন'}</span>
             </button>
           </div>
         </div>
@@ -1099,23 +1136,36 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
             </div>
 
             {/* Tracking ID Box */}
-            <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200 text-center space-y-1">
-              <span className="text-3xs text-gray-500 uppercase font-bold block">
-                {isEn ? 'Application Tracking Number' : 'আবেদন ট্র্যাকিং নম্বর'}
+            <div className="bg-emerald-50/80 p-4 rounded-2xl border border-emerald-300 text-center space-y-1.5 shadow-2xs">
+              <span className="text-3xs text-emerald-800 uppercase font-bold block">
+                {isEn ? 'Application Tracking Number' : 'আপনার অফিসিয়াল আবেদন ট্র্যাকিং নম্বর'}
               </span>
-              <div className="flex items-center justify-center space-x-2">
-                <span className="font-mono text-base font-black text-[#006231]">
-                  {submittedApplication.id}
+              <div className="flex items-center justify-center space-x-2.5">
+                <span className="font-mono text-lg font-black text-[#006231] tracking-wide select-all bg-white px-3 py-1 rounded-xl border border-emerald-200">
+                  {submittedApplication.id || 'AL-JOB-2026-8419'}
                 </span>
                 <button
                   type="button"
-                  onClick={() => handleCopyId(submittedApplication.id)}
-                  className="p-1.5 rounded-lg bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-100 cursor-pointer"
+                  onClick={() => handleCopyId(submittedApplication.id || 'AL-JOB-2026-8419')}
+                  className="px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100 cursor-pointer flex items-center space-x-1.5 shadow-2xs transition-all active:scale-95"
                   title="কপি করুন"
                 >
-                  {copiedId ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedId ? (
+                    <>
+                      <Check className="w-4 h-4 text-emerald-600" />
+                      <span className="text-xs font-black text-emerald-700">কপি হয়েছে! ✓</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 text-[#006231]" />
+                      <span className="text-xs font-bold text-[#006231]">কপি</span>
+                    </>
+                  )}
                 </button>
               </div>
+              <p className="text-3xs text-gray-500">
+                এই ট্র্যাকিং নম্বরটি সংরক্ষণ করুন। পরবর্তীতে ইন্টারভিউ শিডিউল ও স্ট্যাটাস ট্র্যাক করতে প্রয়োজন হবে।
+              </p>
             </div>
 
             <div className="text-3xs text-gray-500 leading-relaxed bg-gray-50 p-3 rounded-xl border border-gray-100">
@@ -1152,6 +1202,203 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
             >
               {isEn ? 'Close Window' : 'ঠিক আছে, সম্পন্ন করুন'}
             </button>
+          </div>
+        </div>
+      )}
+      {/* ========================================================= */}
+      {/* MODAL 4: TRACK APPLICATION STATUS & INTERVIEW LETTER      */}
+      {/* ========================================================= */}
+      {showTrackModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-gray-100 max-h-[92vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-gray-100 pb-4">
+              <div>
+                <div className="inline-flex items-center space-x-1.5 px-3 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-bold uppercase tracking-wider mb-1.5">
+                  <Sparkles className="w-3 h-3 text-[#006231]" />
+                  <span>{isEn ? 'Career Portal' : 'ক্যারিয়ার পোর্টাল ট্র্যাকিং'}</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-black text-gray-900">
+                  {isEn ? 'Track Application Status' : 'আবেদনের স্ট্যাটাস ও ইন্টারভিউ শিডিউল'}
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {isEn ? 'Enter your Tracking ID or Mobile number' : 'আপনার ট্র্যাকিং নম্বর (যেমন: AL-JOB-2026-...) বা মোবাইল নম্বর দিন'}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowTrackModal(false)}
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Search Box */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!trackQuery.trim()) return;
+                const res = findJobApplication(trackQuery.trim());
+                setTrackResult(res);
+                setTrackHasSearched(true);
+              }}
+              className="flex gap-2"
+            >
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
+                <input
+                  type="text"
+                  value={trackQuery}
+                  onChange={(e) => setTrackQuery(e.target.value)}
+                  placeholder={isEn ? 'Tracking ID or Phone Number...' : 'যেমন: AL-JOB-2026-XXXX বা মোবাইল নম্বর'}
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]"
+                />
+              </div>
+              <button
+                type="submit"
+                className="px-5 py-2.5 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs shadow-md transition-all cursor-pointer shrink-0 active:scale-95"
+              >
+                {isEn ? 'Check Status' : 'খুঁজুন'}
+              </button>
+            </form>
+
+            {/* Results */}
+            {trackHasSearched && (
+              <div className="space-y-4 pt-1">
+                {trackResult ? (
+                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-200 space-y-4 animate-fadeIn">
+                    {/* Applicant Header */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 pb-3">
+                      <div>
+                        <span className="text-3xs text-gray-400 uppercase font-bold block">আবেদনকারী</span>
+                        <h4 className="text-base font-black text-gray-900">{trackResult.applicantName}</h4>
+                        <p className="text-xs text-gray-600 font-medium">{trackResult.jobTitle || trackResult.submittedPosition}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-3xs text-gray-400 uppercase font-bold block">আবেদনের তারিখ</span>
+                        <span className="text-xs font-mono font-bold text-gray-700">{trackResult.date || trackResult.appliedDateBn}</span>
+                      </div>
+                    </div>
+
+                    {/* Tracking ID with Copy */}
+                    <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200">
+                      <div>
+                        <span className="text-3xs text-gray-400 uppercase font-bold block">ট্র্যাকিং নম্বর</span>
+                        <span className="font-mono text-sm font-black text-[#006231]">{trackResult.id}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyId(trackResult.id)}
+                        className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs flex items-center space-x-1 cursor-pointer transition-all"
+                      >
+                        {copiedId ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            <span className="text-emerald-700 font-black">কপি হয়েছে! ✓</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>কপি</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Status Display */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200">
+                        <span className="text-xs font-bold text-gray-700">বর্তমান স্ট্যাটাস:</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-black ${
+                          (trackResult.status || '').includes('ইন্টারভিউ') || (trackResult.status || '').includes('নির্বাচিত')
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                            : (trackResult.status || '').includes('দুঃখিত')
+                            ? 'bg-red-50 text-red-700 border border-red-200'
+                            : 'bg-amber-100 text-amber-800 border border-amber-200'
+                        }`}>
+                          {trackResult.status || 'নতুন আবেদন (Under Review)'}
+                        </span>
+                      </div>
+
+                      {/* If Interview Scheduled */}
+                      {(trackResult.interviewDate || (trackResult.status || '').includes('ইন্টারভিউ')) ? (
+                        <div className="bg-emerald-50/80 rounded-2xl p-4 sm:p-5 border border-emerald-200 space-y-3">
+                          <div className="flex items-center space-x-2 text-[#006231] font-black text-sm border-b border-emerald-200 pb-2">
+                            <Calendar className="w-4 h-4 text-[#006231]" />
+                            <span>অফিসিয়াল সাক্ষাৎকার / ইন্টারভিউ নোটিশ</span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div className="bg-white p-3 rounded-xl border border-emerald-100">
+                              <span className="text-3xs text-gray-400 uppercase font-bold block">তারিখ ও সময়</span>
+                              <span className="font-black text-gray-900 text-sm">
+                                {trackResult.interviewDate} {trackResult.interviewTime ? `— ${trackResult.interviewTime}` : ''}
+                              </span>
+                            </div>
+                            <div className="bg-white p-3 rounded-xl border border-emerald-100">
+                              <span className="text-3xs text-gray-400 uppercase font-bold block">স্থান / ঠিকানা</span>
+                              <span className="font-bold text-gray-900 leading-snug">
+                                {trackResult.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="bg-white p-3 rounded-xl border border-emerald-100 text-xs space-y-1">
+                            <span className="text-3xs text-emerald-700 uppercase font-bold block">যা যা সাথে আনতে হবে:</span>
+                            <p className="text-gray-800 font-medium">
+                              {trackResult.requiredDocuments || 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত'}
+                            </p>
+                          </div>
+
+                          {trackResult.adminNotes && (
+                            <div className="bg-amber-50/80 p-3 rounded-xl border border-amber-200 text-xs space-y-0.5">
+                              <span className="text-3xs text-amber-800 uppercase font-bold block">এইচআর নির্দেশনা / নোট:</span>
+                              <p className="text-gray-800">{trackResult.adminNotes}</p>
+                            </div>
+                          )}
+
+                          <div className="pt-1 flex flex-wrap items-center gap-2">
+                            <a
+                              href="https://wa.me/8801816233013"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex-1 py-2 px-3 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold text-xs flex items-center justify-center space-x-1 shadow-2xs"
+                            >
+                              <span>WhatsApp যোগাযোগ</span>
+                            </a>
+                            <a
+                              href="tel:01816233013"
+                              className="flex-1 py-2 px-3 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs flex items-center justify-center space-x-1 shadow-2xs"
+                            >
+                              <PhoneCall className="w-3.5 h-3.5" />
+                              <span>অফিসে কল</span>
+                            </a>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-amber-50/80 p-4 rounded-xl border border-amber-200 text-xs text-amber-900 leading-relaxed space-y-1">
+                          <p className="font-bold flex items-center space-x-1.5">
+                            <Clock className="w-3.5 h-3.5 text-amber-600" />
+                            <span>আবেদন বর্তমানে পর্যালোচনাধীন রয়েছে</span>
+                          </p>
+                          <p className="text-amber-800 text-3xs">
+                            আপনার আবেদনটি আমাদের রিক্রুটমেন্ট প্যানেল দ্বারা পর্যালোচনা করা হচ্ছে। প্রাথমিক বাছাইয়ে নির্বাচিত হলে আপনার মোবাইল নম্বর অথবা হোয়াটসঅ্যাপে সরাসরি ইন্টারভিউয়ের তারিখ ও সময় জানানো হবে।
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-red-50 p-5 rounded-2xl border border-red-200 text-center space-y-2">
+                    <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
+                    <h4 className="text-sm font-black text-red-800">কোনো তথ্য পাওয়া যায়নি</h4>
+                    <p className="text-xs text-red-600">
+                      আপনার ট্র্যাকিং নম্বর (যেমন: AL-JOB-2026-XXXX) বা আবেদনকালে দেওয়া মোবাইল নম্বরটি সঠিকভাবে প্রদান করুন।
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
