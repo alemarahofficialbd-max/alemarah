@@ -6331,15 +6331,15 @@ export default function ManagementDashboard({
                 </div>
               </div>
             ) : isSuperAdmin ? (
-              /* Executive VIP Super Admin Digital ID Card */
-              <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white rounded-3xl p-5 sm:p-7 shadow-xl border border-slate-800 relative overflow-hidden space-y-4">
+              /* Executive VIP Super Admin Digital ID Card - Clean White */
+              <div className="bg-white text-slate-800 rounded-3xl p-5 sm:p-7 shadow-xs border border-slate-200/90 relative overflow-hidden space-y-4">
                 {/* Background decorative watermark */}
                 <div className="absolute -right-6 -bottom-6 w-40 h-40 opacity-5 pointer-events-none">
-                  <img src="/alemarah_favicon.svg" alt="" className="w-full h-full object-contain filter invert" />
+                  <img src="/alemarah_favicon.svg" alt="" className="w-full h-full object-contain" />
                 </div>
 
                 <div className="flex items-center space-x-4 relative z-10">
-                  <div className="w-16 h-16 rounded-2xl bg-white p-2.5 shadow-md flex items-center justify-center shrink-0 border border-slate-200/80">
+                  <div className="w-16 h-16 rounded-2xl bg-slate-50 p-2.5 shadow-xs flex items-center justify-center shrink-0 border border-slate-200/80">
                     <img 
                       src="/alemarah_favicon.svg" 
                       alt="Al-Emarah" 
@@ -6348,28 +6348,28 @@ export default function ManagementDashboard({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg sm:text-xl font-black text-white truncate">
+                      <h3 className="text-lg sm:text-xl font-black text-slate-900 truncate">
                         {admin?.name || 'প্রধান নির্বাহী ও সুপার অ্যাডমিন'}
                       </h3>
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white text-amber-500 shadow-sm shrink-0" title="সুপার অ্যাডমিন">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-50 text-amber-500 border border-amber-200/80 shadow-2xs shrink-0" title="সুপার অ্যাডমিন">
                         <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
                       </span>
                     </div>
-                    <p className="text-xs text-emerald-400 font-bold mt-0.5">
+                    <p className="text-xs text-[#006231] font-bold mt-0.5">
                       প্রধান নির্বাহী • সেন্ট্রাল অ্যাডমিন প্যানেল
                     </p>
-                    <p className="text-3xs text-slate-300 font-mono mt-1 truncate">
+                    <p className="text-3xs text-slate-500 font-mono mt-1 truncate">
                       {admin?.email || 'alemarah.officialbd@gmail.com'} • 01816233013
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs relative z-10">
-                  <div className="flex items-center space-x-1.5 text-slate-300 font-semibold text-2xs">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs relative z-10">
+                  <div className="flex items-center space-x-1.5 text-slate-600 font-semibold text-2xs">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>সিস্টেম পারমিশন: সম্পূর্ণ ৭টি মডিউল সক্রিয়</span>
                   </div>
-                  <span className="text-3xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono font-bold tracking-wider">
+                  <span className="text-3xs px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#006231] border border-emerald-200 font-mono font-bold tracking-wider">
                     MASTER ACCESS
                   </span>
                 </div>
