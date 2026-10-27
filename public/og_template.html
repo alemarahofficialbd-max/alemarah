@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      background: #FFFFFF;
+      font-family: 'Hind Siliguri', 'Outfit', sans-serif;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 64px;
+    }
+
+    /* Luxury border & ambient background */
+    .bg-accent-left {
+      position: absolute;
+      top: -120px;
+      left: -120px;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(142, 191, 64, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
+      pointer-events: none;
+    }
+
+    .bg-accent-right {
+      position: absolute;
+      bottom: -150px;
+      right: -100px;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(0, 98, 49, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+      pointer-events: none;
+    }
+
+    .outer-frame {
+      position: absolute;
+      inset: 18px;
+      border: 1.5px solid rgba(0, 98, 49, 0.25);
+      border-radius: 28px;
+      pointer-events: none;
+    }
+
+    .inner-frame {
+      position: absolute;
+      inset: 24px;
+      border: 1px dashed rgba(142, 191, 64, 0.4);
+      border-radius: 22px;
+      pointer-events: none;
+    }
+
+    /* Top Strip */
+    .top-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      background: #F0FDF4;
+      border: 1.5px solid #BBF7D0;
+      border-radius: 9999px;
+      color: #006231;
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: 0.5px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      background: #8EBF40;
+      border-radius: 50%;
+    }
+
+    .shariah-tag {
+      font-size: 16px;
+      color: #4B5563;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* Middle Centerpiece (Logo & Motto) */
+    .hero-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      margin-top: -10px;
+    }
+
+    .logo-img {
+      height: 145px;
+      width: auto;
+      object-fit: contain;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.06));
+    }
+
+    .slogan-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: #006231;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+
+    .sub-slogan {
+      font-size: 20px;
+      font-weight: 600;
+      color: #374151;
+      letter-spacing: 0.5px;
+      max-width: 850px;
+      line-height: 1.5;
+    }
+
+    /* Bottom Pillar Badges */
+    .bottom-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+      padding-top: 18px;
+      border-top: 1.5px solid #F3F4F6;
+    }
+
+    .features-list {
+      display: flex;
+      gap: 16px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1F2937;
+    }
+
+    .feature-icon {
+      color: #006231;
+      font-size: 18px;
+    }
+
+    .url-tag {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      color: #006231;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-accent-left"></div>
+  <div class="bg-accent-right"></div>
+  <div class="outer-frame"></div>
+  <div class="inner-frame"></div>
+
+  <!-- Top bar -->
+  <div class="top-strip">
+    <div class="badge-pill">
+      <span class="dot"></span>
+      <span>আল-ইমারাহ প্রোপার্টিজ লিমিটেড</span>
+    </div>
+    <div class="shariah-tag">
+      <span>★ সুদমুক্ত ও শতভাগ শরীয়াহ্ সম্মত আবাসন</span>
+    </div>
+  </div>
+
+  <!-- Main Center (Official Logo & Taglines) -->
+  <div class="hero-center">
+    <img src="alemarah_logo_header.svg" class="logo-img" alt="Al-Emarah Properties Limited">
+    <h1 class="slogan-title">বিশ্বস্ততা • স্বচ্ছতা • অংশীদারিত্ব</h1>
+    <p class="sub-slogan">পরিকল্পিত উন্নয়ন, আস্থার সঙ্গে সম্পদ সৃষ্টি | আধুনিক আবাসিক ও বাণিজ্যিক প্রকল্প এবং ক্যারিয়ার পোর্টাল</p>
+  </div>
+
+  <!-- Bottom strip -->
+  <div class="bottom-strip">
+    <div class="features-list">
+      <div class="feature-item">
+        <span class="feature-icon">🏢</span>
+        <span>আবাসিক ও শেয়ার প্রজেক্ট</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">💼</span>
+        <span>চলমান চাকরির সার্কুলার</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">📍</span>
+        <span>পুরানা পল্টন, ঢাকা</span>
+      </div>
+    </div>
+
+    <div class="url-tag">
+      www.alemarahproperties.com
+    </div>
+  </div>
+</body>
+</html>
