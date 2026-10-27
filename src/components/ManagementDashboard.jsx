@@ -84,7 +84,8 @@ import {
   updateJobApplicationStatus,
   updateJobApplication,
   syncFromSupabase,
-  fetchJobApplicationsFromSupabase
+  fetchJobApplicationsFromSupabase,
+  deleteProjectFromSupabase
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -959,6 +960,7 @@ export default function ManagementDashboard({
           ...prev,
           projects: prev.projects.filter(p => p.id !== projId)
         }));
+        deleteProjectFromSupabase(projId);
         triggerAlert(`প্রজেক্ট "${projName}" সফলভাবে মুছে ফেলা হয়েছে!`);
       }
     );
@@ -3036,13 +3038,10 @@ export default function ManagementDashboard({
                           className="sm:hidden space-y-0.5 cursor-pointer min-w-0 flex-1" 
                           onClick={() => setSelectedAppForDetails(app)}
                         >
-                          {/* Line 1: Candidate Name (Big, Bold, Black) */}
+                          {/* Line 1: Candidate Name */}
                           <div className="flex items-center gap-1.5 leading-tight">
                             <span className="text-xs font-black text-slate-900 truncate">
-                              {app.applicantName}
-                            </span>
-                            <span className="font-mono text-3xs text-slate-400 font-bold shrink-0">
-                              ({app.id})
+                              {app.applicantName || app.name}
                             </span>
                           </div>
 

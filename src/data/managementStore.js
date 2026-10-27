@@ -1,6 +1,6 @@
 import { supabase, supabaseAdmin } from '../lib/supabaseClient';
 
-const STORAGE_KEY = 'alemarah_management_store_v4';
+const STORAGE_KEY = 'alemarah_management_store_v5';
 
 // -------------------------------------------------------------
 // Password hashing (Web Crypto PBKDF2-SHA256) — runs entirely in the
@@ -51,35 +51,7 @@ export const verifyPassword = async (plainText, stored) => {
 };
 
 export const initialManagementData = {
-  projects: [
-    {
-      id: 'al-quds-tower',
-      name: 'আল কুদস টাওয়ার',
-      nameEn: 'Al Quds Tower',
-      location: 'সাইনবোর্ড - সানারপাড়, ঢাকা',
-      progress: 68,
-      currentStage: '৭ম তলা ছাদ ঢালাই ও অভ্যন্তরীণ ব্রিকওয়ার্ক',
-      budget: 85000000, // ৳ ৮,৫০,০০,০০০
-      type: 'residential', // 'residential' | 'share' | 'commercial'
-      totalFloors: 10,
-      unitsPerFloor: 2,
-      units: [
-        '৭ম তলা, ফ্ল্যাট ৭-এ (১২৬৫ বর্গফুট)',
-        '৭ম তলা, ফ্ল্যাট ৭-বি (১২৬৫ বর্গফুট)',
-        '৬ষ্ঠ তলা, ফ্ল্যাট ৬-এ (১২৬৫ বর্গফুট)',
-        '৬ষ্ঠ তলা, ফ্ল্যাট ৬-বি (১২৬৫ বর্গফুট)',
-        '৫ম তলা, ফ্ল্যাট ৫-এ (১২৬৫ বর্গফুট)',
-        '৫ম তলা, ফ্ল্যাট ৫-বি (১২৬৫ বর্গফুট)',
-        '৪র্থ তলা, ফ্ল্যাট ৪-এ (১২৬৫ বর্গফুট)',
-        '৪র্থ তলা, ফ্ল্যাট ৪-বি (১২৬৫ বর্গফুট)',
-        '৩য় তলা, ফ্ল্যাট ৩-এ (১২৬৫ বর্গফুট)',
-        '৩য় তলা, ফ্ল্যাট ৩-বি (১২৬৫ বর্গফুট)',
-        '২য় তলা, ফ্ল্যাট ২-এ (১২৬৫ বর্গফুট)',
-        '২য় তলা, ফ্ল্যাট ২-বি (১২৬৫ বর্গফুট)'
-      ],
-      expenses: []
-    }
-  ],
+  projects: [],
   clients: [],
   superAdmin: {
     id: 'SUPER-ADMIN-01',
@@ -111,11 +83,73 @@ export const initialManagementData = {
   ],
   directors: [],
   inquiries: [],
-  // Customer identity (phone + password + status) is canonical here.
-  // A customer can own multiple units — see `clients`, each unit record
-  // carries a `customerId` pointing back to this array.
   customers: [],
-  jobApplications: []
+  jobApplications: [
+    {
+      id: "AL-JOB-2026-10001",
+      name: "Md Kamrul Islam",
+      applicantName: "Md Kamrul Islam",
+      date: "২৭ অক্টোবর, ২০২৬",
+      appliedDateBn: "২৭ অক্টোবর, ২০২৬",
+      email: "kamrulislam3276@yahoo.com",
+      phone: "01856416900",
+      jobId: "job-public-relations-officer",
+      jobTitle: "জনসংযোগ কর্মকর্তা (PRO)",
+      submittedPosition: "জনসংযোগ কর্মকর্তা (PRO)",
+      education: "BA (Hons) in English",
+      currentCompany: "Govt. Saadat College, Tangail",
+      experienceYears: "4 months",
+      expectedSalary: "30,000",
+      district: "55/B Noakhali Tower, Purana Paltan, Dhaka",
+      coverNote: "",
+      status: "নতুন আবেদন",
+      adminNotes: "",
+      interviewDate: "",
+      interviewTime: "",
+      interviewLocation: "আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা",
+      requiredDocuments: "মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)",
+      cvFile: {
+        url: "https://tlsvuljssxuwewrsfhue.supabase.co/storage/v1/object/public/resumes/candidates/cv_AL-JOB-2026-10001_1793095613525.pdf",
+        name: "CV Kamrul Islam 76.pdf",
+        size: 191707,
+        type: "application/pdf"
+      },
+      cvLink: "",
+      timestamp: "2026-10-27T10:06:59.068Z"
+    },
+    {
+      id: "AL-JOB-2026-10002",
+      name: "Md Kamrul Islam",
+      applicantName: "Md Kamrul Islam",
+      date: "২৭ অক্টোবর, ২০২৬",
+      appliedDateBn: "২৭ অক্টোবর, ২০২৬",
+      email: "kamrulislam3276@yahoo.com",
+      phone: "01856416900",
+      jobId: "job-accounts-admin-officer",
+      jobTitle: "হিসাব ও প্রশাসন কর্মকর্তা",
+      submittedPosition: "হিসাব ও প্রশাসন কর্মকর্তা",
+      education: "BA(Hons) English",
+      currentCompany: "Govt. Saadat College, Tangail",
+      experienceYears: "4 months",
+      expectedSalary: "30000",
+      district: "55/B Noakhali Tower, Purana Paltan, Dhaka",
+      coverNote: "",
+      status: "নতুন আবেদন",
+      adminNotes: "",
+      interviewDate: "",
+      interviewTime: "",
+      interviewLocation: "আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা",
+      requiredDocuments: "মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)",
+      cvFile: {
+        url: "https://tlsvuljssxuwewrsfhue.supabase.co/storage/v1/object/public/resumes/candidates/cv_AL-JOB-2026-10002_1793095801371.pdf",
+        name: "CV Kamrul Islam 76.pdf",
+        size: 191707,
+        type: "application/pdf"
+      },
+      cvLink: "",
+      timestamp: "2026-10-27T10:10:02.561Z"
+    }
+  ]
 };
 
 // Build a stable customer id from a phone number so repeated migrations
@@ -507,8 +541,8 @@ export const syncFromSupabase = async () => {
       updated.directors = [...remoteDirs, ...extraLocalDirs];
     }
 
-    if (projectsRes.data && projectsRes.data.length > 0) {
-      const remoteProjects = projectsRes.data.map(p => {
+    if (projectsRes.data) {
+      updated.projects = projectsRes.data.map(p => {
         const localProj = (current.projects || []).find(x => x.id === p.id);
         const expensesFromRemote = (p.expenses || []).map(e => ({
           id: e.id,
@@ -528,12 +562,10 @@ export const syncFromSupabase = async () => {
           totalFloors: localProj?.totalFloors || 10,
           unitsPerFloor: localProj?.unitsPerFloor || 2,
           handoverDate: localProj?.handoverDate || 'ডিসেম্বর ২০২৮',
-          units: (p.units && Array.isArray(p.units) && p.units.length > 0) ? p.units : (localProj?.units || []),
+          units: localProj?.units || [],
           expenses: expensesFromRemote.length > 0 ? expensesFromRemote : (localProj?.expenses || [])
         };
       });
-      const extraLocalProjects = (current.projects || []).filter(lp => !projectsRes.data.some(p => p.id === lp.id));
-      updated.projects = [...remoteProjects, ...extraLocalProjects];
     }
 
     if (clientsRes.data && clientsRes.data.length > 0) {
@@ -916,4 +948,15 @@ export const formatBDT = (num) => {
   if (num === undefined || num === null) return '৳ ০';
   const val = Number(num) || 0;
   return '৳ ' + val.toLocaleString('bn-BD');
+};
+
+// Delete a project and its expenses from Supabase Cloud
+export const deleteProjectFromSupabase = async (projId) => {
+  try {
+    if (!projId) return;
+    await supabase.from('project_expenses').delete().eq('project_id', projId);
+    await supabase.from('projects').delete().eq('id', projId);
+  } catch (err) {
+    console.error('Error deleting project from Supabase:', err);
+  }
 };
