@@ -2966,21 +2966,21 @@ export default function ManagementDashboard({
               </div>
 
               {/* 3. Job Applications & Candidate CVs Section */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden mt-6">
-                <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-50 to-white">
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs mt-6 overflow-visible">
+                <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-100 flex items-center justify-center shrink-0">
                       <Briefcase className="w-5 h-5 text-[#006231]" />
                     </div>
                     <div>
                       <h4 className="text-base font-black text-slate-900 flex items-center space-x-2">
-                        <span>ক্যারিয়ার পোর্টাল: চাকরির প্রাপ্ত আবেদন ও সিভি তালিকা</span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-3xs font-black">
-                          {(data.jobApplications || []).length} জন আবেদনকারী
+                        <span>চাকরির আবেদন ও সিভি</span>
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-3xs font-bold">
+                          {(data.jobApplications || []).length} জন
                         </span>
                       </h4>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        ওয়েবসাইট থেকে জমাকৃত সকল আবেদনকারীর তথ্য, যোগাযোগের নম্বর, শিক্ষাগত যোগ্যতা ও জীবনবৃত্তান্ত (CV)
+                        অনলাইন চাকরির আবেদন ও প্রার্থীদের সিভি তালিকা
                       </p>
                     </div>
                   </div>
@@ -2999,7 +2999,7 @@ export default function ManagementDashboard({
                     title="ক্লাউড থেকে নতুন আবেদন সিঙ্ক করুন"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isSyncingJobs ? 'animate-spin text-emerald-700' : 'text-[#006231]'}`} />
-                    <span>{isSyncingJobs ? 'সিঙ্ক হচ্ছে...' : 'ক্লাউড থেকে নতুন আবেদন রিফ্রেশ করুন'}</span>
+                    <span>{isSyncingJobs ? 'সিঙ্ক হচ্ছে...' : 'রিফ্রেশ করুন'}</span>
                   </button>
                 </div>
 
@@ -3092,7 +3092,11 @@ export default function ManagementDashboard({
                                 />
                                 <div 
                                   onClick={(e) => e.stopPropagation()} 
-                                  className="absolute right-0 top-full mt-1.5 w-52 bg-white rounded-2xl shadow-xl border border-slate-200 py-1.5 z-30 animate-fadeIn text-xs"
+                                  className={`absolute right-0 w-52 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 animate-fadeIn text-xs ${
+                                    appIdx >= data.jobApplications.length - 2 && data.jobApplications.length > 1
+                                      ? 'bottom-full mb-1.5'
+                                      : 'top-full mt-1.5'
+                                  }`}
                                 >
                                   {/* 1. Interview & Status */}
                                   <button
