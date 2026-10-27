@@ -1576,36 +1576,38 @@ ${getJobShareUrl(shareJob.id)}`
               </p>
             </div>
 
-            {/* Tracking ID Box */}
-            <div className="bg-emerald-50/80 p-4 rounded-2xl border border-emerald-300 text-center space-y-1.5 shadow-2xs">
-              <span className="text-3xs text-emerald-800 uppercase font-bold block">
-                {isEn ? 'Application Tracking Number' : 'আপনার অফিসিয়াল আবেদন ট্র্যাকিং নম্বর'}
-              </span>
-              <div className="flex items-center justify-center space-x-2.5">
-                <span className="font-mono text-lg font-black text-[#006231] tracking-wide select-all bg-white px-3 py-1 rounded-xl border border-emerald-200">
+            {/* Tracking ID (Clean, compact & without outer box) */}
+            <div className="py-1 space-y-1.5 text-center">
+              <div className="inline-flex items-center justify-center gap-2 flex-wrap">
+                <span className="text-xs text-gray-600 font-medium">
+                  {isEn ? 'Tracking No:' : 'ট্র্যাকিং নম্বর:'}
+                </span>
+                <span className="font-mono text-sm sm:text-base font-black text-[#006231] tracking-wider select-all bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
                   {submittedApplication.id || 'AL-JOB-2026-8419'}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleCopyId(submittedApplication.id || 'AL-JOB-2026-8419')}
-                  className="px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100 cursor-pointer flex items-center space-x-1.5 shadow-2xs transition-all active:scale-95"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-emerald-100 text-gray-700 hover:text-[#006231] text-xs font-bold cursor-pointer transition-all active:scale-95 border border-gray-200/80"
                   title="কপি করুন"
                 >
                   {copiedId ? (
                     <>
-                      <Check className="w-4 h-4 text-emerald-600" />
-                      <span className="text-xs font-black text-emerald-700">কপি হয়েছে! ✓</span>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700 text-3xs font-black">কপি হয়েছে!</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="w-4 h-4 text-[#006231]" />
-                      <span className="text-xs font-bold text-[#006231]">কপি</span>
+                      <Copy className="w-3.5 h-3.5 text-[#006231]" />
+                      <span className="text-3xs font-bold text-[#006231]">কপি</span>
                     </>
                   )}
                 </button>
               </div>
-              <p className="text-3xs text-gray-500">
-                এই ট্র্যাকিং নম্বরটি সংরক্ষণ করুন। পরবর্তীতে ইন্টারভিউ শিডিউল ও স্ট্যাটাস ট্র্যাক করতে প্রয়োজন হবে।
+              <p className="text-3xs text-gray-400">
+                {isEn
+                  ? 'Keep this tracking number for future interview and status updates.'
+                  : 'পরবর্তীতে ইন্টারভিউ শিডিউল ও স্ট্যাটাস ট্র্যাক করতে নম্বরটি সংরক্ষণ করুন।'}
               </p>
             </div>
 
