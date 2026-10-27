@@ -368,17 +368,7 @@ export const syncToSupabase = async (data) => {
       }
     }
 
-    // 4. Sync Customers (login identity, shared across a customer's units)
-    if (data.customers && data.customers.length > 0) {
-      const customerRows = data.customers.map(cust => ({
-        id: cust.id,
-        name: cust.name || '',
-        phone: cust.phone || '',
-        password: cust.password || 'password123',
-        status: cust.status || 'সক্রিয় (Active)'
-      }));
-      await supabase.from('customers').upsert(customerRows, { onConflict: 'id' });
-    }
+    // 4. Sync Customers (login identity - saved locally and via clients table)
 
     // 4b. Sync Client Units & Payment History
     if (data.clients && data.clients.length > 0) {
@@ -430,13 +420,11 @@ export const syncToSupabase = async (data) => {
 // Background sync from Supabase
 export const syncFromSupabase = async () => {
   try {
-    const [adminsRes, directorsRes, projectsRes, clientsRes, inquiriesRes, customersRes] = await Promise.all([
+    const [adminsRes, directorsRes, projectsRes, clientsRes] = await Promise.all([
       supabase.from('admins').select('*'),
       supabase.from('directors').select('*'),
       supabase.from('projects').select('*, expenses:project_expenses(*)'),
-      supabase.from('clients').select('*, paymentHistory:client_payments(*)'),
-      supabase.from('inquiries').select('*'),
-      supabase.from('customers').select('*')
+      supabase.from('clients').select('*, paymentHistory:client_payments(*)')
     ]);
 
     // If tables do not exist yet, return gracefully
