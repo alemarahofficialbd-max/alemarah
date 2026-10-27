@@ -1618,31 +1618,10 @@ ${getJobShareUrl(shareJob.id)}`
                 : 'বাছাইকৃত প্রার্থীদের মোবাইল বা ইমেইলের মাধ্যমে প্রাথমিক সাক্ষাৎকারের জন্য ডাকা হবে।'}
             </div>
 
-            {/* Direct Instant Action Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center gap-2.5">
-              <a
-                href={`https://wa.me/8801816233013?text=${encodeURIComponent(`আসসালামু আলাইকুম। আমি আল-ইমারাহ প্রপার্টিজের "${submittedApplication.submittedPosition || submittedApplication.jobTitle || 'Accounts & Admin'}" পদে আবেদন করেছি। আমার ট্র্যাকিং আইডি: ${submittedApplication.id}। আমার মোবাইল: ${submittedApplication.phone}।`)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold text-xs flex items-center justify-center space-x-1.5 transition-all shadow-sm"
-              >
-                <span>হোয়াটসঅ্যাপে সিভি ফরোয়ার্ড করুন</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-
-              <a
-                href={`mailto:alemarah.officialbd@gmail.com?subject=${encodeURIComponent(`Job Application - ${submittedApplication.submittedPosition || submittedApplication.jobTitle} - ${submittedApplication.id}`)}&body=${encodeURIComponent(`আবেদনকারীর নাম: ${submittedApplication.applicantName || ''}\nমোবাইল: ${submittedApplication.phone || ''}\nট্র্যাকিং আইডি: ${submittedApplication.id}\nসিভি ড্রাইভ লিঙ্ক: ${submittedApplication.cvLink || ''}\n`)}`}
-                className="w-full py-2.5 px-4 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs flex items-center justify-center space-x-1.5 transition-all shadow-sm"
-              >
-                <span>ইমেইলে পাঠান</span>
-                <Send className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
             <button
               type="button"
               onClick={() => setSubmittedApplication(null)}
-              className="w-full py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs transition-all cursor-pointer border border-gray-200"
+              className="w-full py-3 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs transition-all cursor-pointer shadow-md active:scale-95"
             >
               {isEn ? 'Close Window' : 'ঠিক আছে, সম্পন্ন করুন'}
             </button>
