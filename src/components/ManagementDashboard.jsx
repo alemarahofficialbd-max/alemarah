@@ -1594,24 +1594,12 @@ export default function ManagementDashboard({
               className="relative cursor-pointer rounded-full p-0 border-0 bg-transparent focus:outline-none transition-transform hover:scale-105 active:scale-95 block"
               title="ম্যানেজমেন্ট মেনু ও প্রোফাইল"
             >
-              <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs ring-2 shadow-xs overflow-hidden ${
-                isSuperAdmin 
-                  ? 'bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/60' 
-                  : isDirector
-                    ? 'bg-gradient-to-tr from-[#006231] to-emerald-600 text-white ring-emerald-400/60'
-                    : 'bg-gradient-to-tr from-slate-700 to-slate-900 text-white ring-slate-300'
-              }`}>
-                {isSuperAdmin ? (
-                  <Crown className="w-4 h-4 text-amber-200" />
-                ) : isDirector ? (
-                  loggedInDirector?.image ? (
-                    <img src={loggedInDirector.image} alt={loggedInDirector.name} className="w-full h-full object-cover object-top" />
-                  ) : (
-                    <Award className="w-4 h-4 text-white" />
-                  )
-                ) : (
-                  <ShieldCheck className="w-4 h-4 text-white" />
-                )}
+              <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center p-1.5 ring-2 ring-slate-200/80 shadow-xs overflow-hidden">
+                <img 
+                  src="/alemarah_favicon.svg" 
+                  alt="Al-Emarah" 
+                  className="w-full h-full object-contain" 
+                />
               </div>
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
             </button>
@@ -1630,57 +1618,17 @@ export default function ManagementDashboard({
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
-              isSuperAdmin 
-                ? 'bg-amber-50 text-amber-900 border-amber-200/80' 
-                : isDirector
-                  ? 'bg-emerald-50 text-[#006231] border-emerald-200/80'
-                  : 'bg-slate-100 text-slate-800 border-slate-200'
-            }`}>
-              {isSuperAdmin ? (
-                <>
-                  <Crown className="w-3.5 h-3.5 text-amber-600" />
-                  <span>সুপার অ্যাডমিন মাস্টার এক্সেস</span>
-                </>
-              ) : isDirector ? (
-                <>
-                  <Award className="w-3.5 h-3.5 text-[#006231]" />
-                  <span>বোর্ড ডিরেক্টর ও শেয়ারহোল্ডার</span>
-                </>
-              ) : (
-                <>
-                  <ShieldCheck className="w-3.5 h-3.5 text-slate-600" />
-                  <span>{admin?.role || 'কর্মকর্তা প্যানেল'}</span>
-                </>
-              )}
-            </div>
-
             <button
               type="button"
               onClick={() => setIsProfileOpen(true)}
-              className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all cursor-pointer"
+              className="w-9 h-9 rounded-full bg-white hover:bg-slate-50 border border-slate-200/90 shadow-2xs hover:shadow-xs flex items-center justify-center p-1.5 transition-all cursor-pointer active:scale-95 shrink-0"
               title="ইউজার প্রোফাইল ও মেনু"
             >
-              <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center text-3xs font-black">
-                {isSuperAdmin ? (
-                  <div className="w-full h-full bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white flex items-center justify-center">
-                    <Crown className="w-3.5 h-3.5 text-amber-200" />
-                  </div>
-                ) : isDirector ? (
-                  loggedInDirector?.image ? (
-                    <img src={loggedInDirector.image} alt={loggedInDirector.name} className="w-full h-full object-cover object-top" />
-                  ) : (
-                    <div className="w-full h-full bg-[#006231] text-white flex items-center justify-center font-bold">
-                      {loggedInDirector?.name?.slice(0, 1)}
-                    </div>
-                  )
-                ) : (
-                  <div className="w-full h-full bg-slate-700 text-white flex items-center justify-center">
-                    <ShieldCheck className="w-3.5 h-3.5 text-white" />
-                  </div>
-                )}
-              </div>
-              <span className="hidden lg:inline">{isDirector ? (loggedInDirector?.name || admin?.name) : (admin?.name || 'অ্যাডমিন')}</span>
+              <img 
+                src="/alemarah_favicon.svg" 
+                alt="Al-Emarah" 
+                className="w-full h-full object-contain" 
+              />
             </button>
             <button
               onClick={onNavigateHome}
