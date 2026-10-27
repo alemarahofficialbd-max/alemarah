@@ -2669,30 +2669,22 @@ export default function ManagementDashboard({
                   className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 shrink-0"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>কর্মকর্তা যুক্ত করুন</span>
+                  <span>কর্মকর্তা / অ্যাডমিন যুক্ত করুন</span>
                 </button>
               </div>
 
               {/* 1. Board of Directors Access & Login Credentials Section */}
               <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
                       <Crown className="w-4 h-4 text-amber-500" />
                       <span>বোর্ড অব ডিরেক্টরস ({directorsList.length})</span>
                     </h4>
                     <p className="text-2xs text-slate-500 mt-0.5">
-                      পরিচালকদের পোর্টাল লগইন ও অ্যাক্সেস
+                      পরিচালকদের পোর্টাল লগইন ও অ্যাক্সেস কন্ট্রোল
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenAddTeam('director')}
-                    className="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold border border-amber-200 cursor-pointer self-start sm:self-auto flex items-center space-x-1"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                    <span>+ এক্সেস দিন</span>
-                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
