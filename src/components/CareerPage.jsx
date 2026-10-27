@@ -87,6 +87,7 @@ const getJobBenefitIcon = (jobId, index) => {
 };
 import { jobsData, careerPillars } from '../data/jobsData';
 import { saveJobApplication, findJobApplication, fetchJobApplicationsFromSupabase } from '../data/managementStore';
+import { supabase } from '../lib/supabaseClient';
 
 export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
   const isEn = lang === 'en';
@@ -108,6 +109,7 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
     experienceYears: '',
     currentCompany: '',
     expectedSalary: '',
+    rawFile: null,
     cvFile: null,
     cvLink: '',
     coverNote: ''
@@ -217,8 +219,43 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
 
     setIsSubmitting(true);
     const cleanId = 'AL-JOB-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+    
+    // Attempt Direct Supabase Storage Bucket Upload (Cloud CDN)
+    let finalCvFile = formData.cvFile;
+    if (formData.rawFile) {
+      try {
+        const fileExt = (formData.rawFile.name || 'cv.pdf').split('.').pop();
+        const safeName = `cv_${cleanId}_${Date.now()}.${fileExt}`;
+        const filePath = `candidates/${safeName}`;
+
+        const { data: uploadData, error: uploadErr } = await supabase.storage
+          .from('resumes')
+          .upload(filePath, formData.rawFile, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+        if (!uploadErr && uploadData) {
+          const { data: urlData } = supabase.storage.from('resumes').getPublicUrl(filePath);
+          if (urlData && urlData.publicUrl) {
+            // Blazing-fast CDN URL: store lightweight object without heavy base64!
+            finalCvFile = {
+              name: formData.rawFile.name,
+              size: formData.rawFile.size,
+              type: formData.rawFile.type || 'application/pdf',
+              url: urlData.publicUrl
+            };
+          }
+        }
+      } catch (storageErr) {
+        console.warn('Storage bucket upload fallback:', storageErr);
+      }
+    }
+
+    const { rawFile, ...cleanedFormData } = formData;
     const payload = {
-      ...formData,
+      ...cleanedFormData,
+      cvFile: finalCvFile,
       id: cleanId,
       submittedPosition: formData.jobTitle || 'Accounts & Administration Officer',
       status: 'নতুন আবেদন (Under Review)',
@@ -1160,7 +1197,7 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
 
                     <button
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, cvFile: null }))}
+                      onClick={() => setFormData(prev => ({ ...prev, cvFile: null, rawFile: null }))}
                       className="p-2 rounded-xl text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
                       title={isEn ? 'Remove File' : 'ফাইলটি বাদ দিন'}
                     >
@@ -1185,6 +1222,7 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
                         reader.onload = (event) => {
                           setFormData(prev => ({
                             ...prev,
+                            rawFile: file,
                             cvFile: {
                               name: file.name,
                               size: file.size,

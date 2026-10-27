@@ -231,33 +231,51 @@ export default function ManagementDashboard({
   const [interviewSuccessModal, setInterviewSuccessModal] = useState(null);
   const [isSyncingJobs, setIsSyncingJobs] = useState(false);
 
-  // Download or View CV Helpers
+  // Download or View CV Helpers (Supports both Supabase Storage CDN URL and Base64)
   const handleDownloadCv = (cvFile) => {
-    if (!cvFile || !cvFile.dataUrl) return;
-    const link = document.createElement('a');
-    link.href = cvFile.dataUrl;
-    link.download = cvFile.name || 'Candidate_CV.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (!cvFile) return;
+    if (cvFile.url) {
+      const link = document.createElement('a');
+      link.href = cvFile.url;
+      link.download = cvFile.name || 'Candidate_CV.pdf';
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+    if (cvFile.dataUrl) {
+      const link = document.createElement('a');
+      link.href = cvFile.dataUrl;
+      link.download = cvFile.name || 'Candidate_CV.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   const handleViewCv = (cvFile) => {
-    if (!cvFile || !cvFile.dataUrl) return;
-    try {
-      const parts = cvFile.dataUrl.split(';base64,');
-      const contentType = parts[0].replace('data:', '') || 'application/pdf';
-      const raw = window.atob(parts[1]);
-      const rawLength = raw.length;
-      const uInt8Array = new Uint8Array(rawLength);
-      for (let i = 0; i < rawLength; ++i) {
-        uInt8Array[i] = raw.charCodeAt(i);
+    if (!cvFile) return;
+    if (cvFile.url) {
+      window.open(cvFile.url, '_blank');
+      return;
+    }
+    if (cvFile.dataUrl) {
+      try {
+        const parts = cvFile.dataUrl.split(';base64,');
+        const contentType = parts[0].replace('data:', '') || 'application/pdf';
+        const raw = window.atob(parts[1]);
+        const rawLength = raw.length;
+        const uInt8Array = new Uint8Array(rawLength);
+        for (let i = 0; i < rawLength; ++i) {
+          uInt8Array[i] = raw.charCodeAt(i);
+        }
+        const blob = new Blob([uInt8Array], { type: contentType });
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+      } catch (e) {
+        handleDownloadCv(cvFile);
       }
-      const blob = new Blob([uInt8Array], { type: contentType });
-      const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, '_blank');
-    } catch (e) {
-      handleDownloadCv(cvFile);
     }
   };
   const [interviewForm, setInterviewForm] = useState({
@@ -3076,7 +3094,7 @@ export default function ManagementDashboard({
                           </button>
 
                           {/* Direct CV File view or Google Drive Link */}
-                          {app.cvFile && app.cvFile.dataUrl ? (
+                          {app.cvFile && (app.cvFile.url || app.cvFile.dataUrl) ? (
                             <button
                               type="button"
                               onClick={() => handleViewCv(app.cvFile)}
@@ -6834,7 +6852,7 @@ export default function ManagementDashboard({
                   <span>জীবনবৃত্তান্ত ও সিভি (Curriculum Vitae)</span>
                 </h4>
 
-                {selectedAppForDetails.cvFile && selectedAppForDetails.cvFile.dataUrl ? (
+                {selectedAppForDetails.cvFile && (selectedAppForDetails.cvFile.url || selectedAppForDetails.cvFile.dataUrl) ? (
                   <div className="bg-white p-4 rounded-xl border border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
                     <div className="flex items-center space-x-3 overflow-hidden">
                       <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#006231] flex items-center justify-center shrink-0">
