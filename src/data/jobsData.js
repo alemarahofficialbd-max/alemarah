@@ -1,7 +1,7 @@
 export const jobsData = [
   {
     id: "job-accounts-admin-officer",
-    titleBn: "Accounts & Administration Officer (হিসাব ও প্রশাসন কর্মকর্তা)",
+    titleBn: "হিসাব ও প্রশাসন কর্মকর্তা",
     titleEn: "Accounts & Administration Officer",
     companyName: "AL EMARAH PROPERTIES LIMITED",
     departmentBn: "হিসাব ও প্রশাসন",
@@ -76,7 +76,7 @@ export const jobsData = [
     ]  },
   {
     id: "job-public-relations-officer",
-    titleBn: "Public Relations Officer (জনসংযোগ কর্মকর্তা)",
+    titleBn: "জনসংযোগ কর্মকর্তা (PRO)",
     titleEn: "Public Relations Officer (PRO)",
     companyName: "Al-Imarah Properties",
     departmentBn: "জনসংযোগ ও মার্কেটিং",
