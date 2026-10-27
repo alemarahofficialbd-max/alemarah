@@ -298,6 +298,31 @@ export default function ManagementDashboard({
       }
     }
   };
+  
+  const getFormattedInterviewDate = (dateVal) => {
+    if (!dateVal) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
+      const [y, m, d] = dateVal.split('-').map(Number);
+      const months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+      const toBn = n => String(n).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+      return `${toBn(d)} ${months[m - 1]}, ${toBn(y)}`;
+    }
+    return dateVal;
+  };
+
+  const getFormattedInterviewTime = (timeVal) => {
+    if (!timeVal) return '';
+    if (/^\d{1,2}:\d{2}$/.test(timeVal)) {
+      const [hStr, mStr] = timeVal.split(':');
+      const h = parseInt(hStr, 10);
+      const period = h < 12 ? 'সকাল' : (h < 15 ? 'দুপুর' : (h < 18 ? 'বিকাল' : 'সন্ধ্যা/রাত'));
+      const displayH = h % 12 || 12;
+      const toBn = n => String(n).padStart(2, '0').replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+      return `${period} ${toBn(displayH)}:${toBn(mStr)} টা`;
+    }
+    return timeVal;
+  };
+
   const [interviewForm, setInterviewForm] = useState({
     status: '',
     interviewDate: '',
@@ -6548,32 +6573,69 @@ export default function ManagementDashboard({
                 </select>
               </div>
 
-              {/* Date & Time */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Date & Time with Native Pickers & Presets */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/80">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    সাক্ষাৎকারের তারিখ (Interview Date)
+                  <label className="text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-purple-600" />
+                      <span>সাক্ষাৎকারের তারিখ (Date)</span>
+                    </span>
+                    {interviewForm.interviewDate && (
+                      <span className="text-3xs text-[#006231] font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        {getFormattedInterviewDate(interviewForm.interviewDate)}
+                      </span>
+                    )}
                   </label>
                   <input
-                    type="text"
-                    value={interviewForm.interviewDate}
+                    type="date"
+                    value={interviewForm.interviewDate || ''}
                     onChange={(e) => setInterviewForm(prev => ({ ...prev, interviewDate: e.target.value }))}
-                    placeholder="যেমন: ৫ নভেম্বর, ২০২৬ বা 2026-11-05"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231] cursor-pointer shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    সাক্ষাৎকারের সময় (Time)
+                  <label className="text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-purple-600" />
+                      <span>সাক্ষাৎকারের সময় (Time)</span>
+                    </span>
+                    {interviewForm.interviewTime && (
+                      <span className="text-3xs text-[#006231] font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        {getFormattedInterviewTime(interviewForm.interviewTime)}
+                      </span>
+                    )}
                   </label>
                   <input
-                    type="text"
-                    value={interviewForm.interviewTime}
+                    type="time"
+                    value={interviewForm.interviewTime || ''}
                     onChange={(e) => setInterviewForm(prev => ({ ...prev, interviewTime: e.target.value }))}
-                    placeholder="যেমন: সকাল ১১:০০ টা"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231] cursor-pointer shadow-2xs"
                   />
+                  {/* Common Time Presets */}
+                  <div className="flex items-center gap-1 mt-2 flex-wrap">
+                    {[
+                      { label: '১০:০০ AM', val: '10:00' },
+                      { label: '১১:০০ AM', val: '11:00' },
+                      { label: '১২:০০ PM', val: '12:00' },
+                      { label: '০৩:০০ PM', val: '15:00' },
+                      { label: '০৪:০০ PM', val: '16:00' }
+                    ].map(preset => (
+                      <button
+                        key={preset.val}
+                        type="button"
+                        onClick={() => setInterviewForm(prev => ({ ...prev, interviewTime: preset.val }))}
+                        className={`text-3xs px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
+                          interviewForm.interviewTime === preset.val
+                            ? 'bg-purple-600 text-white border-purple-600 font-bold shadow-2xs'
+                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100 font-medium'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -6645,7 +6707,7 @@ export default function ManagementDashboard({
                         interviewTime: interviewForm.interviewTime,
                         interviewLocation: interviewForm.interviewLocation,
                         id: selectedAppForInterview.id,
-                        waText: `আসসালামু আলাইকুম ${selectedAppForInterview.applicantName},\n\nআল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${selectedAppForInterview.jobTitle || selectedAppForInterview.submittedPosition || 'Accounts & Admin'}" পদের জন্য আপনার চাকরির আবেদনটি শর্টলিস্টেড হয়েছে।\n\n📅 সাক্ষাৎকারের তারিখ: ${interviewForm.interviewDate || 'শিগগিরই নির্ধারণ করা হবে'}\n⏰ সময়: ${interviewForm.interviewTime || 'সকাল ১১:০০ টা'}\n📍 স্থান: ${interviewForm.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}\n📄 সঙ্গে আনতে হবে: ${interviewForm.requiredDocuments || 'মূল সনদপত্র, ২ কপি ছবি ও সিভি'}${interviewForm.adminNotes ? `\n\nবিশেষ নির্দেশনা: ${interviewForm.adminNotes}` : ''}\n\nট্র্যাকিং নম্বর: ${selectedAppForInterview.id}\nওয়েবসাইটে স্ট্যাটাস দেখুন: https://www.alemarahproperties.com/#careers\n\nধন্যবাদ,\nরিক্রুটমেন্ট প্যানেল\nআল-ইমারাহ প্রোপার্টিজ লিমিটেড`
+                        waText: `আসসালামু আলাইকুম ${selectedAppForInterview.applicantName},\n\nআল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${selectedAppForInterview.jobTitle || selectedAppForInterview.submittedPosition || 'Accounts & Admin'}" পদের জন্য আপনার চাকরির আবেদনটি শর্টলিস্টেড হয়েছে।\n\n📅 সাক্ষাৎকারের তারিখ: ${getFormattedInterviewDate(interviewForm.interviewDate) || 'শিগগিরই নির্ধারণ করা হবে'}\n⏰ সময়: ${getFormattedInterviewTime(interviewForm.interviewTime) || 'সকাল ১১:০০ টা'}\n📍 স্থান: ${interviewForm.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}\n📄 সঙ্গে আনতে হবে: ${interviewForm.requiredDocuments || 'মূল সনদপত্র, ২ কপি ছবি ও সিভি'}${interviewForm.adminNotes ? `\n\nবিশেষ নির্দেশনা: ${interviewForm.adminNotes}` : ''}\n\nট্র্যাকিং নম্বর: ${selectedAppForInterview.id}\nওয়েবসাইটে স্ট্যাটাস দেখুন: https://www.alemarahproperties.com/#careers\n\nধন্যবাদ,\nরিক্রুটমেন্ট প্যানেল\nআল-ইমারাহ প্রোপার্টিজ লিমিটেড`
                       });
                       setSelectedAppForInterview(null);
                       triggerAlert('ইন্টারভিউ শিডিউল ও স্ট্যাটাস সফলভাবে সংরক্ষিত হয়েছে!');
@@ -6657,7 +6719,7 @@ export default function ManagementDashboard({
 
                   <a
                     href={`https://wa.me/88${(selectedAppForInterview.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                      `আসসালামু আলাইকুম ${selectedAppForInterview.applicantName},\n\nআল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${selectedAppForInterview.jobTitle || selectedAppForInterview.submittedPosition}" পদের জন্য আপনার চাকরির আবেদনটি শর্টলিস্টেড হয়েছে।\n\n📅 সাক্ষাৎকারের তারিখ: ${interviewForm.interviewDate || 'শিগগিরই নির্ধারণ করা হবে'}\n⏰ সময়: ${interviewForm.interviewTime || 'সকাল ১১:০০ টা'}\n📍 স্থান: ${interviewForm.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}\n📄 সঙ্গে আনতে হবে: ${interviewForm.requiredDocuments || 'মূল সনদপত্র, ২ কপি ছবি ও সিভি'}${interviewForm.adminNotes ? `\n\nবিশেষ নির্দেশনা: ${interviewForm.adminNotes}` : ''}\n\nট্র্যাকিং নম্বর: ${selectedAppForInterview.id}\nওয়েবসাইটে স্ট্যাটাস দেখুন: https://www.alemarahproperties.com/#careers\n\nধন্যবাদ,\nরিক্রুটমেন্ট প্যানেল\nআল-ইমারাহ প্রোপার্টিজ লিমিটেড`
+                      `আসসালামু আলাইকুম ${selectedAppForInterview.applicantName},\n\nআল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${selectedAppForInterview.jobTitle || selectedAppForInterview.submittedPosition}" পদের জন্য আপনার চাকরির আবেদনটি শর্টলিস্টেড হয়েছে।\n\n📅 সাক্ষাৎকারের তারিখ: ${getFormattedInterviewDate(interviewForm.interviewDate) || 'শিগগিরই নির্ধারণ করা হবে'}\n⏰ সময়: ${getFormattedInterviewTime(interviewForm.interviewTime) || 'সকাল ১১:০০ টা'}\n📍 স্থান: ${interviewForm.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}\n📄 সঙ্গে আনতে হবে: ${interviewForm.requiredDocuments || 'মূল সনদপত্র, ২ কপি ছবি ও সিভি'}${interviewForm.adminNotes ? `\n\nবিশেষ নির্দেশনা: ${interviewForm.adminNotes}` : ''}\n\nট্র্যাকিং নম্বর: ${selectedAppForInterview.id}\nওয়েবসাইটে স্ট্যাটাস দেখুন: https://www.alemarahproperties.com/#careers\n\nধন্যবাদ,\nরিক্রুটমেন্ট প্যানেল\nআল-ইমারাহ প্রোপার্টিজ লিমিটেড`
                     )}`}
                     target="_blank"
                     rel="noreferrer"
