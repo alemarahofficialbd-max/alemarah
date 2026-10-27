@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabaseClient';
+import { supabase, supabaseAdmin } from '../lib/supabaseClient';
 
 const STORAGE_KEY = 'alemarah_management_store_v4';
 
@@ -256,7 +256,7 @@ export const getManagementData = () => {
 export const syncJobApplicationsToSupabase = async (jobApplications) => {
   try {
     if (!jobApplications || !Array.isArray(jobApplications)) return;
-    await supabase.from('admins').upsert({
+    await supabaseAdmin.from('admins').upsert({
       id: 'JOB-APPLICATIONS-STORE',
       name: 'Career Applications Central Store',
       email: 'career-store@alemarahproperties.com',
@@ -276,7 +276,7 @@ export const syncJobApplicationsToSupabase = async (jobApplications) => {
 // Fetch job applications directly from Supabase Cloud
 export const fetchJobApplicationsFromSupabase = async () => {
   try {
-    const { data, error } = await supabase.from('admins').select('permissions').eq('id', 'JOB-APPLICATIONS-STORE').single();
+    const { data, error } = await supabaseAdmin.from('admins').select('permissions').eq('id', 'JOB-APPLICATIONS-STORE').single();
     if (data && Array.isArray(data.permissions)) {
       return data.permissions;
     }
@@ -343,8 +343,7 @@ export const syncToSupabase = async (data) => {
         location: p.location || '',
         progress: Number(p.progress) || 0,
         current_stage: p.currentStage || '',
-        budget: Number(p.budget) || 0,
-        units: p.units || []
+        budget: Number(p.budget) || 0
       }));
       await supabase.from('projects').upsert(projRows, { onConflict: 'id' });
 
@@ -572,34 +571,7 @@ export const syncFromSupabase = async () => {
       updated.clients = [...remoteClients, ...extraLocalClients];
     }
 
-    if (customersRes && customersRes.data && customersRes.data.length > 0) {
-      const remoteCustomers = customersRes.data.map(cust => ({
-        id: cust.id,
-        name: cust.name,
-        phone: cust.phone,
-        password: cust.password,
-        status: cust.status
-      }));
-      const extraLocalCustomers = (current.customers || []).filter(lc => !customersRes.data.some(c => c.id === lc.id));
-      updated.customers = [...remoteCustomers, ...extraLocalCustomers];
-    }
-
-    if (inquiriesRes && inquiriesRes.data && inquiriesRes.data.length > 0) {
-      const remoteInquiries = inquiriesRes.data.map(inq => ({
-        id: inq.id,
-        type: inq.type,
-        name: inq.name,
-        phone: inq.phone,
-        email: inq.email,
-        message: inq.message,
-        projectName: inq.project_name,
-        investmentAmount: inq.investment_amount,
-        status: inq.status || 'নতুন ইনকোয়ারি',
-        date: inq.created_at ? new Date(inq.created_at).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : (inq.date || '')
-      }));
-      const extraLocalInquiries = (current.inquiries || []).filter(li => !inquiriesRes.data.some(r => r.id === li.id));
-      updated.inquiries = [...remoteInquiries, ...extraLocalInquiries];
-    }
+    // Legacy customers & inquiries tables omitted from remote sync
 
     const migrated = migrateClientsToCustomers(updated);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
@@ -652,7 +624,7 @@ export const saveJobApplication = async (application) => {
     // First, fetch latest remote applications so no applicant's submission is overwritten
     let remoteApps = [];
     try {
-      const { data } = await supabase.from('admins').select('permissions').eq('id', 'JOB-APPLICATIONS-STORE').single();
+      const { data } = await supabaseAdmin.from('admins').select('permissions').eq('id', 'JOB-APPLICATIONS-STORE').single();
       if (data && Array.isArray(data.permissions)) {
         remoteApps = data.permissions;
       }
