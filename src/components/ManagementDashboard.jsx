@@ -225,6 +225,7 @@ export default function ManagementDashboard({
   // 1. New Client Form
   // Job Application Interview Scheduling & Status State
   const [selectedAppForInterview, setSelectedAppForInterview] = useState(null);
+  const [interviewSuccessModal, setInterviewSuccessModal] = useState(null);
   const [isSyncingJobs, setIsSyncingJobs] = useState(false);
   const [interviewForm, setInterviewForm] = useState({
     status: '',
@@ -6517,13 +6518,23 @@ export default function ManagementDashboard({
                 <div className="w-full sm:w-auto flex items-center space-x-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      updateJobApplication(selectedAppForInterview.id, interviewForm);
-                      // Trigger update
+                    onClick={async () => {
+                      await updateJobApplication(selectedAppForInterview.id, interviewForm);
                       const updated = getManagementData();
                       setData(updated);
+                      setInterviewSuccessModal({
+                        name: selectedAppForInterview.applicantName,
+                        phone: selectedAppForInterview.phone,
+                        jobTitle: selectedAppForInterview.jobTitle || selectedAppForInterview.submittedPosition || 'Accounts & Administration Officer',
+                        status: interviewForm.status,
+                        interviewDate: interviewForm.interviewDate,
+                        interviewTime: interviewForm.interviewTime,
+                        interviewLocation: interviewForm.interviewLocation,
+                        id: selectedAppForInterview.id,
+                        waText: `আসসালামু আলাইকুম ${selectedAppForInterview.applicantName},\n\nআল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${selectedAppForInterview.jobTitle || selectedAppForInterview.submittedPosition || 'Accounts & Admin'}" পদের জন্য আপনার চাকরির আবেদনটি শর্টলিস্টেড হয়েছে।\n\n📅 সাক্ষাৎকারের তারিখ: ${interviewForm.interviewDate || 'শিগগিরই নির্ধারণ করা হবে'}\n⏰ সময়: ${interviewForm.interviewTime || 'সকাল ১১:০০ টা'}\n📍 স্থান: ${interviewForm.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}\n📄 সঙ্গে আনতে হবে: ${interviewForm.requiredDocuments || 'মূল সনদপত্র, ২ কপি ছবি ও সিভি'}${interviewForm.adminNotes ? `\n\nবিশেষ নির্দেশনা: ${interviewForm.adminNotes}` : ''}\n\nট্র্যাকিং নম্বর: ${selectedAppForInterview.id}\nওয়েবসাইটে স্ট্যাটাস দেখুন: https://www.alemarahproperties.com/#careers\n\nধন্যবাদ,\nরিক্রুটমেন্ট প্যানেল\nআল-ইমারাহ প্রোপার্টিজ লিমিটেড`
+                      });
                       setSelectedAppForInterview(null);
-                      alert('ইন্টারভিউ শিডিউল ও স্ট্যাটাস সফলভাবে সংরক্ষিত হয়েছে!');
+                      triggerAlert('ইন্টারভিউ শিডিউল ও স্ট্যাটাস সফলভাবে সংরক্ষিত হয়েছে!');
                     }}
                     className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs shadow-md transition-all cursor-pointer active:scale-95"
                   >
@@ -6548,6 +6559,80 @@ export default function ManagementDashboard({
                   </a>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* CUSTOM LUXURY SUCCESS CONFIRMATION MODAL                  */}
+      {/* ========================================================= */}
+      {interviewSuccessModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center space-y-5 shadow-2xl border border-emerald-100">
+            {/* Animated Icon */}
+            <div className="w-16 h-16 rounded-full bg-emerald-100 text-[#006231] mx-auto flex items-center justify-center shadow-inner">
+              <Check className="w-8 h-8 stroke-[3]" />
+            </div>
+
+            {/* Headline */}
+            <div className="space-y-1">
+              <div className="inline-block px-3 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-bold uppercase tracking-wider">
+                সফলভাবে সংরক্ষিত হয়েছে
+              </div>
+              <h3 className="text-xl font-black text-slate-900">
+                ইন্টারভিউ শিডিউল ও স্ট্যাটাস আপডেট সম্পন্ন!
+              </h3>
+              <p className="text-xs text-slate-500">
+                তথ্যগুলো সফলভাবে সিস্টেমে ও কেন্দ্রীয় ক্লাউড ডাটাবেজে সংরক্ষিত হয়েছে।
+              </p>
+            </div>
+
+            {/* Summary Details Box */}
+            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left space-y-2 text-xs">
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200">
+                <span className="text-slate-500 font-medium">প্রার্থীর নাম:</span>
+                <span className="font-bold text-slate-900">{interviewSuccessModal.name}</span>
+              </div>
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200">
+                <span className="text-slate-500 font-medium">আবেদনের পদ:</span>
+                <span className="font-bold text-emerald-800">{interviewSuccessModal.jobTitle}</span>
+              </div>
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200">
+                <span className="text-slate-500 font-medium">বর্তমান স্ট্যাটাস:</span>
+                <span className="px-2 py-0.5 rounded text-3xs font-black bg-emerald-100 text-emerald-800">
+                  {interviewSuccessModal.status}
+                </span>
+              </div>
+              {interviewSuccessModal.interviewDate && (
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 font-medium">সাক্ষাৎকারের তারিখ:</span>
+                  <span className="font-black text-[#006231]">
+                    {interviewSuccessModal.interviewDate} {interviewSuccessModal.interviewTime ? `(${interviewSuccessModal.interviewTime})` : ''}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center gap-2.5">
+              <a
+                href={`https://wa.me/88${(interviewSuccessModal.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(interviewSuccessModal.waText)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold text-xs flex items-center justify-center space-x-1.5 transition-all shadow-sm cursor-pointer"
+              >
+                <span>WhatsApp-এ মেসেজ পাঠান</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setInterviewSuccessModal(null)}
+                className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs transition-all cursor-pointer shadow-sm"
+              >
+                ঠিক আছে, সম্পন্ন
+              </button>
             </div>
           </div>
         </div>
