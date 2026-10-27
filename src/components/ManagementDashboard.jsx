@@ -6131,38 +6131,38 @@ export default function ManagementDashboard({
       {/* ========================================================= */}
       {/* FULL SCREEN VIEW: ADMIN PROFILE & SYSTEM CONTROL MENU     */}
       {/* ========================================================= */}
+      {/* 4. FULL SCREEN VIEW: MANAGEMENT & PROFILE CONTROL         */}
+      {/* ========================================================= */}
       {isProfileOpen && (
         <div className="fixed inset-0 z-[80] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none">
-          {/* Top Fullscreen Sticky Header */}
-          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+          {/* Top Sticky Header */}
+          <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
               <button
                 type="button"
                 onClick={() => setIsProfileOpen(false)}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer flex items-center space-x-1 active:scale-95"
                 title="ফিরে যান"
               >
                 <ChevronLeft className="w-5 h-5" />
                 <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
               </button>
-              <div className="flex items-center space-x-2">
-                {isSuperAdmin ? (
-                  <Crown className="w-5 h-5 text-amber-500" />
-                ) : (
-                  <ShieldCheck className="w-5 h-5 text-[#006231]" />
-                )}
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#006231] border border-emerald-200/80 flex items-center justify-center">
+                  <ShieldCheck className="w-4 h-4 text-[#006231]" />
+                </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-slate-900 leading-tight">
                     ম্যানেজমেন্ট ও প্রোফাইল কন্ট্রোল
                   </h3>
-                  <p className="text-3xs text-slate-500">কেন্দ্রীয় অ্যাডমিন প্যানেল ও দ্রুত অ্যাকশন</p>
+                  <p className="text-3xs text-slate-500 font-medium">কেন্দ্রীয় অ্যাডমিন প্যানেল ও দ্রুত অ্যাকশন</p>
                 </div>
               </div>
             </div>
             <button 
               type="button"
               onClick={() => setIsProfileOpen(false)}
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors"
               title="বন্ধ করুন"
             >
               <X className="w-5 h-5" />
@@ -6171,6 +6171,7 @@ export default function ManagementDashboard({
 
           {/* Full Screen Body */}
           <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 max-w-2xl w-full mx-auto space-y-5 pb-36">
+            
             {/* 1. VIP Role Profile Card */}
             {isDirector && loggedInDirector ? (
               <div className="bg-gradient-to-br from-amber-50/70 via-white to-slate-50 rounded-3xl p-5 sm:p-6 border border-amber-200/80 shadow-xs space-y-5">
@@ -6234,7 +6235,7 @@ export default function ManagementDashboard({
                       setIsProfileOpen(false);
                       setSelectedDirectorForCertificate(loggedInDirector);
                     }}
-                    className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-[#CE2028] hover:opacity-95 text-white font-bold text-xs shadow-sm cursor-pointer transition-all"
+                    className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-[#CE2028] hover:opacity-95 text-white font-bold text-xs shadow-sm cursor-pointer transition-all active:scale-95"
                   >
                     <Award className="w-4 h-4 text-amber-200" />
                     <span>শেয়ার সার্টিফিকেট প্রিন্ট</span>
@@ -6245,7 +6246,7 @@ export default function ManagementDashboard({
                       setIsProfileOpen(false);
                       setSelectedDirectorForProfile(loggedInDirector);
                     }}
-                    className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/80 font-bold text-xs shadow-2xs cursor-pointer transition-all"
+                    className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/80 font-bold text-xs shadow-2xs cursor-pointer transition-all active:scale-95"
                   >
                     <Eye className="w-4 h-4 text-[#006231]" />
                     <span>পূর্ণাঙ্গ প্রোফাইল বিবরণ</span>
@@ -6253,32 +6254,46 @@ export default function ManagementDashboard({
                 </div>
               </div>
             ) : isSuperAdmin ? (
-              <div className="bg-gradient-to-br from-amber-500/10 via-white to-red-500/10 rounded-3xl p-5 sm:p-6 border border-amber-300/80 shadow-xs space-y-4">
-                <div className="flex items-center space-x-4">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg ring-4 shadow-sm shrink-0 bg-gradient-to-tr from-amber-500 to-[#CE2028] text-white ring-amber-400/40">
-                    <Crown className="w-7 h-7 text-amber-100" />
+              /* Executive VIP Super Admin Digital ID Card */
+              <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white rounded-3xl p-5 sm:p-7 shadow-xl border border-slate-800 relative overflow-hidden space-y-4">
+                {/* Background decorative watermark */}
+                <div className="absolute -right-6 -bottom-6 w-40 h-40 opacity-5 pointer-events-none">
+                  <img src="/alemarah_favicon.svg" alt="" className="w-full h-full object-contain filter invert" />
+                </div>
+
+                <div className="flex items-center space-x-4 relative z-10">
+                  <div className="w-16 h-16 rounded-2xl bg-white p-2.5 shadow-md flex items-center justify-center shrink-0 border border-slate-200/80">
+                    <img 
+                      src="/alemarah_favicon.svg" 
+                      alt="Al-Emarah" 
+                      className="w-full h-full object-contain" 
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center space-x-2">
-                      <h3 className="text-lg font-black text-slate-900 truncate">
-                        {admin?.name || 'সুপার অ্যাডমিন'}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-lg sm:text-xl font-black text-white truncate">
+                        {admin?.name || 'প্রধান নির্বাহী ও সুপার অ্যাডমিন'}
                       </h3>
-                      <Crown className="w-4 h-4 text-amber-500 shrink-0" />
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-3xs font-extrabold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
+                        <Crown className="w-3 h-3 text-amber-300 mr-1" />
+                        সুপার অ্যাডমিন
+                      </span>
                     </div>
-                    <p className="text-xs text-[#006231] font-bold mt-0.5">
-                      সুপার অ্যাডমিন (Master Admin)
+                    <p className="text-xs text-emerald-400 font-bold mt-0.5">
+                      প্রধান নির্বাহী • সেন্ট্রাল অ্যাডমিন প্যানেল
                     </p>
-                    <p className="text-3xs text-slate-500 font-mono mt-0.5 truncate">
-                      {admin?.email || 'alemarah.officialbd@gmail.com'}
+                    <p className="text-3xs text-slate-300 font-mono mt-1 truncate">
+                      {admin?.email || 'alemarah.officialbd@gmail.com'} • 01816233013
                     </p>
                   </div>
                 </div>
-                <div className="p-3 bg-white/80 rounded-2xl border border-amber-200/60 flex items-center justify-between text-xs font-bold text-slate-700">
-                  <span className="flex items-center space-x-2">
-                    <ShieldCheck className="w-4 h-4 text-[#006231]" />
-                    <span>সিস্টেম পারমিশন: সম্পূর্ণ ৭টি মডিউল</span>
-                  </span>
-                  <span className="text-3xs px-2 py-0.5 rounded-full bg-emerald-100 text-[#006231] font-mono">
+
+                <div className="pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs relative z-10">
+                  <div className="flex items-center space-x-1.5 text-slate-300 font-semibold text-2xs">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>সিস্টেম পারমিশন: সম্পূর্ণ ৭টি মডিউল সক্রিয়</span>
+                  </div>
+                  <span className="text-3xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono font-bold tracking-wider">
                     MASTER ACCESS
                   </span>
                 </div>
@@ -6321,41 +6336,38 @@ export default function ManagementDashboard({
 
             {/* 2. System Settings Quick Access (Super Admin Only) */}
             {isSuperAdmin && (
-              <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-3">
-                <div className="text-3xs font-black uppercase tracking-wider text-slate-400">
-                  সিস্টেম অ্যাকশন ও সিকিউরিটি
-                </div>
-
+              <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs">
                 <button
                   type="button"
                   onClick={() => {
                     setIsProfileOpen(false);
                     navigateToTab('settings');
                   }}
-                  className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200/60 transition-all text-left cursor-pointer group"
+                  className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 hover:bg-emerald-50/70 border border-slate-200/80 hover:border-emerald-200/70 transition-all text-left cursor-pointer group"
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#006231] text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <div className="flex items-center space-x-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#006231] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
                       <Settings className="w-5 h-5" />
                     </div>
-                    <div>
-                      <div className="text-sm font-bold text-slate-900 group-hover:text-[#006231]">
+                    <div className="min-w-0">
+                      <div className="text-sm font-bold text-slate-900 group-hover:text-[#006231] truncate">
                         সিস্টেম সেটিংস ও সিকিউরিটি পিন
                       </div>
-                      <div className="text-3xs text-slate-500 font-medium">
-                        ভাষা পরিবর্তন ও ডিলিট মাস্টার পিন কনফিগারেশন
+                      <div className="text-3xs text-slate-500 font-medium truncate mt-0.5">
+                        ভাষা পরিবর্তন, ডিলিট মাস্টার পিন ও পাসওয়ার্ড কনফিগারেশন
                       </div>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[#006231] group-hover:translate-x-1 transition-all shrink-0 ml-2" />
                 </button>
               </div>
             )}
 
-            {/* 3. All Dashboard Tabs Grid */}
+            {/* 3. All Dashboard Tabs Grid (Modern App Tile Navigation) */}
             <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-3">
-              <div className="text-3xs font-black uppercase tracking-wider text-slate-400">
-                ড্যাশবোর্ডের সকল বিভাগ (দ্রুত নেভিগেশন)
+              <div className="flex items-center justify-between text-3xs font-black uppercase tracking-wider text-slate-400">
+                <span>ড্যাশবোর্ড মডিউল (দ্রুত প্রবেশ)</span>
+                <span className="font-mono text-slate-400">{managementNavItems.length} টি বিভাগ</span>
               </div>
               <div className="grid grid-cols-2 gap-2.5">
                 {managementNavItems.map(item => {
@@ -6369,14 +6381,23 @@ export default function ManagementDashboard({
                         setIsProfileOpen(false);
                         navigateToTab(item.id);
                       }}
-                      className={`p-3.5 rounded-2xl flex items-center space-x-2.5 text-xs font-bold transition-all text-left cursor-pointer ${
+                      className={`p-3.5 rounded-2xl flex items-center justify-between transition-all text-left cursor-pointer active:scale-95 ${
                         isCur 
-                          ? 'bg-[#CE2028] text-white shadow-md shadow-[#CE2028]/25' 
-                          : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/60'
+                          ? 'bg-[#006231] text-white shadow-md shadow-[#006231]/20 border border-emerald-600' 
+                          : 'bg-slate-50/80 hover:bg-slate-100/80 text-slate-800 border border-slate-200/80'
                       }`}
                     >
-                      <ItemIcon className={`w-4 h-4 shrink-0 ${isCur ? 'text-white' : 'text-slate-500'}`} />
-                      <span className="truncate">{item.label}</span>
+                      <div className="flex items-center space-x-2.5 min-w-0">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                          isCur ? 'bg-white/20 text-white' : 'bg-white text-slate-700 shadow-2xs border border-slate-100'
+                        }`}>
+                          <ItemIcon className="w-4 h-4" />
+                        </div>
+                        <span className="text-xs font-bold truncate">{item.label}</span>
+                      </div>
+                      {isCur && (
+                        <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse shrink-0 ml-1.5" />
+                      )}
                     </button>
                   );
                 })}
@@ -6384,25 +6405,38 @@ export default function ManagementDashboard({
             </div>
 
             {/* 4. External Links & Hotline */}
-            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-2">
+            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-2.5">
               <button
                 type="button"
                 onClick={() => {
                   setIsProfileOpen(false);
                   onNavigateHome();
                 }}
-                className="w-full flex items-center space-x-3 px-3.5 py-3 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold transition-colors text-left cursor-pointer border border-slate-100"
+                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold transition-all text-left cursor-pointer border border-slate-100 group"
               >
-                <Home className="w-4 h-4 text-[#CE2028]" />
-                <span>মূল ওয়েবসাইটে ফিরে যান</span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-xl bg-red-50 text-[#CE2028] flex items-center justify-center shrink-0">
+                    <Home className="w-4 h-4 text-[#CE2028]" />
+                  </div>
+                  <span>মূল ওয়েবসাইটে ফিরে যান</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
               </button>
 
               <a
                 href="tel:01918646575"
-                className="w-full flex items-center space-x-3 px-3.5 py-3 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold transition-colors text-left border border-slate-100"
+                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold transition-all text-left border border-slate-100 group"
               >
-                <Phone className="w-4 h-4 text-[#006231]" />
-                <span>সাইট হটলাইনে কল করুন (01918-646575)</span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center shrink-0">
+                    <Phone className="w-4 h-4 text-[#006231]" />
+                  </div>
+                  <div>
+                    <span>সাপোর্ট ও হটলাইন</span>
+                    <span className="block font-mono text-3xs text-slate-500 font-normal">01918-646575</span>
+                  </div>
+                </div>
+                <ExternalLink className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
               </a>
             </div>
 
@@ -6413,10 +6447,10 @@ export default function ManagementDashboard({
                 setIsProfileOpen(false);
                 onLogout();
               }}
-              className="w-full flex items-center justify-center space-x-2 px-4 py-3.5 rounded-2xl bg-red-50 hover:bg-[#CE2028] text-[#CE2028] hover:text-white transition-all text-xs font-bold cursor-pointer border border-red-200/60 shadow-2xs"
+              className="w-full flex items-center justify-center space-x-2 px-4 py-3.5 rounded-2xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white transition-all text-xs font-bold cursor-pointer border border-red-200/80 shadow-2xs active:scale-95 group"
             >
-              <LogOut className="w-4 h-4" />
-              <span>সিস্টেম থেকে লগআউট করুন</span>
+              <LogOut className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+              <span>সিস্টেম থেকে নিরাপদে লগআউট করুন</span>
             </button>
           </div>
         </div>
