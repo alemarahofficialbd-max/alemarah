@@ -783,9 +783,6 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
                       </span>
                     )}
                   </div>
-                  <div className="text-xs font-mono text-gray-500">
-                    {selectedJobForDetails.companyName || 'AL EMARAH PROPERTIES LIMITED'}
-                  </div>
                 </div>
 
                 <h1 className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight leading-snug">
