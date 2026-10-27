@@ -32,7 +32,7 @@ export default function AddProjectModal({
             </div>
             <div>
               <h3 className="font-bold text-base text-slate-900">নতুন প্রজেক্ট যোগ করুন</h3>
-              <p className="text-3xs text-slate-500">প্রজেক্টের বিবরণ, অবস্থান, বাজেট ও কনফিগারেশন</p>
+              <p className="text-3xs text-slate-500">প্রজেক্টের বিবরণ, অবস্থান, বাজেট ও ধরন নির্ধারণ করুন</p>
             </div>
           </div>
         </div>
@@ -50,7 +50,7 @@ export default function AddProjectModal({
         <div className="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
-              <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
                 প্রজেক্টের নাম *
               </label>
               <input
@@ -64,7 +64,7 @@ export default function AddProjectModal({
             </div>
 
             <div>
-              <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
                 লোকেশন / ঠিকানা *
               </label>
               <input
@@ -79,7 +79,7 @@ export default function AddProjectModal({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
                   মোট আনুমানিক বাজেট (টাকা) *
                 </label>
                 <input
@@ -93,7 +93,7 @@ export default function AddProjectModal({
               </div>
 
               <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
                   প্রজেক্টের ধরন / টাইপ *
                 </label>
                 <select
@@ -110,99 +110,6 @@ export default function AddProjectModal({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  মোট তলা / ফ্লোর সংখ্যা
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="40"
-                  value={form.totalFloors}
-                  onChange={(e) => setForm({ ...form, totalFloors: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  বর্তমান অগ্রগতি (%)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={form.progress}
-                  onChange={(e) => setForm({ ...form, progress: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  হস্তান্তর টার্গেট তারিখ
-                </label>
-                <input
-                  type="text"
-                  placeholder="যেমন: ডিসেম্বর ২০২৮"
-                  value={form.handoverDate}
-                  onChange={(e) => setForm({ ...form, handoverDate: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
-                />
-              </div>
-            </div>
-
-            {/* Optional Auto-generation Option */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3">
-              <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.autoGenerateUnits}
-                  onChange={(e) => setForm({ ...form, autoGenerateUnits: e.target.checked })}
-                  className="w-4 h-4 rounded text-[#CE2028] focus:ring-[#CE2028] cursor-pointer"
-                />
-                <span className="text-xs font-bold text-slate-800">
-                  শুরুতেই প্রাথমিক ফ্ল্যাট ড্রাফট তৈরি করতে চান? (অপশনাল)
-                </span>
-              </label>
-
-              {form.autoGenerateUnits ? (
-                <div className="pt-2 border-t border-slate-200/80 space-y-3 animate-fadeIn">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-3xs font-bold text-slate-600 uppercase mb-1">প্রতি তলায় ফ্ল্যাট</label>
-                      <input
-                        type="number"
-                        min="1"
-                        max="8"
-                        value={form.unitsPerFloor}
-                        onChange={(e) => setForm({ ...form, unitsPerFloor: e.target.value })}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-3xs font-bold text-slate-600 uppercase mb-1">ডিফল্ট ফ্ল্যাট সাইজ (বর্গফুট)</label>
-                      <input
-                        type="text"
-                        placeholder="যেমন: 1265"
-                        value={form.defaultUnitSize}
-                        onChange={(e) => setForm({ ...form, defaultUnitSize: e.target.value })}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 outline-none"
-                      />
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-emerald-700 font-medium">
-                    স্বয়ংক্রিয়ভাবে {Math.max(0, ((Number(form.totalFloors) || 10) - 1) * (Number(form.unitsPerFloor) || 2))}টি ফ্ল্যাট (প্রতিটি {form.defaultUnitSize || 1265} বর্গফুট) তৈরি হবে।
-                  </p>
-                </div>
-              ) : (
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  💡 প্রজেক্টটি তৈরি হওয়ার সাথে সাথেই বিস্তারিত প্যানেল খুলে যাবে, যেখান থেকে আপনি যেকোনো সময় নির্দিষ্ট সাইজ অনুযায়ী ফ্ল্যাট, দোকান বা পার্কিং স্লট আলাদাভাবে যুক্ত করতে পারবেন।
-                </p>
-              )}
-            </div>
-
             <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-3 border-t border-slate-100">
               <button
                 type="button"
@@ -215,7 +122,7 @@ export default function AddProjectModal({
                 type="submit"
                 className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#CE2028]/25 hover:opacity-95 transition-all cursor-pointer text-center active:scale-95"
               >
-                প্রজেক্ট তৈরি ও কনফিগার করুন
+                প্রজেক্ট তৈরি করুন
               </button>
             </div>
           </form>
