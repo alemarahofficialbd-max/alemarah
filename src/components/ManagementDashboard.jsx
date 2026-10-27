@@ -65,7 +65,9 @@ import {
   Ruler,
   Tag,
   ExternalLink,
-  RefreshCw
+  RefreshCw,
+  FileCheck,
+  Send
 } from 'lucide-react';
 import {
   formatBDT,
@@ -225,8 +227,39 @@ export default function ManagementDashboard({
   // 1. New Client Form
   // Job Application Interview Scheduling & Status State
   const [selectedAppForInterview, setSelectedAppForInterview] = useState(null);
+  const [selectedAppForDetails, setSelectedAppForDetails] = useState(null);
   const [interviewSuccessModal, setInterviewSuccessModal] = useState(null);
   const [isSyncingJobs, setIsSyncingJobs] = useState(false);
+
+  // Download or View CV Helpers
+  const handleDownloadCv = (cvFile) => {
+    if (!cvFile || !cvFile.dataUrl) return;
+    const link = document.createElement('a');
+    link.href = cvFile.dataUrl;
+    link.download = cvFile.name || 'Candidate_CV.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleViewCv = (cvFile) => {
+    if (!cvFile || !cvFile.dataUrl) return;
+    try {
+      const parts = cvFile.dataUrl.split(';base64,');
+      const contentType = parts[0].replace('data:', '') || 'application/pdf';
+      const raw = window.atob(parts[1]);
+      const rawLength = raw.length;
+      const uInt8Array = new Uint8Array(rawLength);
+      for (let i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+      const blob = new Blob([uInt8Array], { type: contentType });
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } catch (e) {
+      handleDownloadCv(cvFile);
+    }
+  };
   const [interviewForm, setInterviewForm] = useState({
     status: '',
     interviewDate: '',
@@ -3011,6 +3044,17 @@ export default function ManagementDashboard({
 
                         {/* Actions */}
                         <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          {/* View Full Applicant Details Button */}
+                          <button
+                            type="button"
+                            onClick={() => setSelectedAppForDetails(app)}
+                            className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center space-x-1.5 shadow-2xs cursor-pointer active:scale-95"
+                            title="আবেদনকারীর সকল তথ্য ও সিভি দেখুন"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>বিস্তারিত দেখুন</span>
+                          </button>
+
                           {/* Schedule Interview & Status Button */}
                           <button
                             type="button"
@@ -3031,7 +3075,18 @@ export default function ManagementDashboard({
                             <span>ইন্টারভিউ ও স্ট্যাটাস</span>
                           </button>
 
-                          {app.cvLink && (
+                          {/* Direct CV File view or Google Drive Link */}
+                          {app.cvFile && app.cvFile.dataUrl ? (
+                            <button
+                              type="button"
+                              onClick={() => handleViewCv(app.cvFile)}
+                              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center space-x-1 shadow-2xs cursor-pointer active:scale-95"
+                              title="জমাকৃত সিভি সরাসরি দেখুন"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              <span>সিভি দেখুন</span>
+                            </button>
+                          ) : app.cvLink ? (
                             <a
                               href={app.cvLink}
                               target="_blank"
@@ -3039,9 +3094,9 @@ export default function ManagementDashboard({
                               className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center space-x-1 shadow-2xs cursor-pointer"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
-                              <span>সিভি দেখুন</span>
+                              <span>ড্রাইভ সিভি</span>
                             </a>
-                          )}
+                          ) : null}
 
                           {/* Smart WhatsApp Button */}
                           <a
@@ -6633,6 +6688,292 @@ export default function ManagementDashboard({
               >
                 ঠিক আছে, সম্পন্ন
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* APPLICANT FULL DETAILS MODAL                              */}
+      {/* ========================================================= */}
+      {selectedAppForDetails && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-100 max-h-[92vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span className="px-3 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-black uppercase tracking-wider border border-emerald-200">
+                    {selectedAppForDetails.jobTitle || selectedAppForDetails.submittedPosition || 'Accounts & Administration Officer'}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full font-mono text-3xs font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center space-x-1">
+                    <span>আইডি: {selectedAppForDetails.id}</span>
+                  </span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-3xs font-black ${
+                    (selectedAppForDetails.status || '').includes('ইন্টারভিউ') || (selectedAppForDetails.status || '').includes('নির্বাচিত')
+                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                      : (selectedAppForDetails.status || '').includes('দুঃখিত')
+                      ? 'bg-red-50 text-red-700 border border-red-200'
+                      : 'bg-amber-100 text-amber-800 border border-amber-200'
+                  }`}>
+                    {selectedAppForDetails.status || 'নতুন আবেদন (Under Review)'}
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                  {selectedAppForDetails.applicantName}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  আবেদনের তারিখ: {selectedAppForDetails.appliedDateBn || selectedAppForDetails.date}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedAppForDetails(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content Body */}
+            <div className="space-y-5 text-xs sm:text-sm">
+              {/* Section 1: Contact Information */}
+              <div className="bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200/80 space-y-3">
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
+                  <Phone className="w-3.5 h-3.5 text-[#006231]" />
+                  <span>যোগাযোগের তথ্য</span>
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-1">
+                    <span className="text-3xs text-slate-400 block font-bold">মোবাইল নম্বর</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-black text-slate-900 font-mono text-sm">{selectedAppForDetails.phone}</span>
+                      <div className="flex items-center space-x-1">
+                        <a
+                          href={`tel:${selectedAppForDetails.phone}`}
+                          className="p-1.5 rounded-lg bg-emerald-50 text-[#006231] hover:bg-emerald-100 transition-colors"
+                          title="সরাসরি কল করুন"
+                        >
+                          <Phone className="w-3.5 h-3.5" />
+                        </a>
+                        <a
+                          href={`https://wa.me/88${(selectedAppForDetails.phone || '').replace(/[^0-9]/g, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 rounded-lg bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366]/20 transition-colors"
+                          title="WhatsApp-এ চ্যাট করুন"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-1">
+                    <span className="text-3xs text-slate-400 block font-bold">ই-মেইল অ্যাড্রেস</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-slate-800 truncate block">
+                        {selectedAppForDetails.email || 'উল্লেখ নেই'}
+                      </span>
+                      {selectedAppForDetails.email && (
+                        <a
+                          href={`mailto:${selectedAppForDetails.email}`}
+                          className="p-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors shrink-0"
+                          title="ই-মেইল পাঠান"
+                        >
+                          <Mail className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-1 sm:col-span-2">
+                    <span className="text-3xs text-slate-400 block font-bold">বর্তমান জেলা / ঠিকানা</span>
+                    <span className="font-bold text-slate-900 flex items-center space-x-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                      <span>{selectedAppForDetails.district || 'উল্লেখ নেই'}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Educational & Professional Background */}
+              <div className="bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200/80 space-y-3">
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
+                  <Briefcase className="w-3.5 h-3.5 text-blue-600" />
+                  <span>শিক্ষাগত যোগ্যতা ও পূর্ব অভিজ্ঞতা</span>
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-1">
+                    <span className="text-3xs text-slate-400 block font-bold">সর্বোচ্চ শিক্ষাগত যোগ্যতা</span>
+                    <span className="font-black text-slate-900 block">{selectedAppForDetails.education || 'উল্লেখ নেই'}</span>
+                  </div>
+
+                  <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-1">
+                    <span className="text-3xs text-slate-400 block font-bold">কাজের মোট অভিজ্ঞতা</span>
+                    <span className="font-black text-slate-900 block">{selectedAppForDetails.experienceYears || 'উল্লেখ নেই'}</span>
+                  </div>
+
+                  <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-1">
+                    <span className="text-3xs text-slate-400 block font-bold">বর্তমান / সর্বশেষ প্রতিষ্ঠান</span>
+                    <span className="font-bold text-slate-800 block">{selectedAppForDetails.currentCompany || 'উল্লেখ নেই'}</span>
+                  </div>
+
+                  <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-1">
+                    <span className="text-3xs text-slate-400 block font-bold">প্রত্যাশিত মাসিক বেতন</span>
+                    <span className="font-black text-[#006231] block">{selectedAppForDetails.expectedSalary ? `৳ ${selectedAppForDetails.expectedSalary}` : 'আলোচনা সাপেক্ষে'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: CV / Resume (Direct File or Drive Link) */}
+              <div className="bg-emerald-50/70 p-4 sm:p-5 rounded-2xl border border-emerald-200 space-y-3">
+                <h4 className="text-xs font-black text-emerald-950 uppercase tracking-wider flex items-center space-x-1.5">
+                  <FileText className="w-4 h-4 text-[#006231]" />
+                  <span>জীবনবৃত্তান্ত ও সিভি (Curriculum Vitae)</span>
+                </h4>
+
+                {selectedAppForDetails.cvFile && selectedAppForDetails.cvFile.dataUrl ? (
+                  <div className="bg-white p-4 rounded-xl border border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center space-x-3 overflow-hidden">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#006231] flex items-center justify-center shrink-0">
+                        <FileCheck className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-gray-900 truncate">
+                          {selectedAppForDetails.cvFile.name || 'Candidate_CV.pdf'}
+                        </p>
+                        <p className="text-3xs text-gray-500">
+                          সাইজ: {selectedAppForDetails.cvFile.size ? (selectedAppForDetails.cvFile.size / (1024 * 1024)).toFixed(2) + ' MB' : 'সংযুক্ত ফাইল'} • সরাসরি আপলোডকৃত
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleViewCv(selectedAppForDetails.cvFile)}
+                        className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center space-x-1.5 shadow-2xs cursor-pointer active:scale-95"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>সিভি দেখুন</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadCv(selectedAppForDetails.cvFile)}
+                        className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center space-x-1.5 cursor-pointer"
+                        title="ফাইল ডাউনলোড করুন"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>ডাউনলোড</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : selectedAppForDetails.cvLink ? (
+                  <div className="bg-white p-4 rounded-xl border border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center space-x-3 overflow-hidden">
+                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                        <ExternalLink className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-gray-900">গুগল ড্রাইভ / অনলাইন লিঙ্ক</p>
+                        <p className="text-3xs text-gray-500 truncate max-w-sm">{selectedAppForDetails.cvLink}</p>
+                      </div>
+                    </div>
+
+                    <a
+                      href={selectedAppForDetails.cvLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-2xs cursor-pointer shrink-0"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>ড্রাইভ সিভি খুলুন</span>
+                    </a>
+                  </div>
+                ) : (
+                  <div className="bg-white p-3 rounded-xl border border-amber-200 text-amber-800 text-xs">
+                    কোনো সিভি ফাইল বা লিঙ্ক পাওয়া যায়নি।
+                  </div>
+                )}
+              </div>
+
+              {/* Section 4: Cover Note */}
+              {selectedAppForDetails.coverNote && (
+                <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 space-y-1.5">
+                  <span className="text-3xs font-black text-slate-500 uppercase tracking-wider block">
+                    আবেদনকারীর বক্তব্য / কভার নোট:
+                  </span>
+                  <p className="text-xs text-slate-700 leading-relaxed italic bg-white p-3 rounded-xl border border-slate-100">
+                    "{selectedAppForDetails.coverNote}"
+                  </p>
+                </div>
+              )}
+
+              {/* Section 5: Interview Status Details (if scheduled) */}
+              {selectedAppForDetails.interviewDate && (
+                <div className="bg-purple-50/70 p-4 rounded-2xl border border-purple-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-purple-950 uppercase tracking-wide flex items-center space-x-1.5">
+                      <Calendar className="w-4 h-4 text-purple-600" />
+                      <span>নির্ধারিত ইন্টারভিউ শিডিউল</span>
+                    </span>
+                    <span className="text-3xs font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">
+                      {selectedAppForDetails.status}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-purple-950 bg-white p-3 rounded-xl border border-purple-100">
+                    <div>
+                      <span className="text-3xs text-purple-600 block">তারিখ ও সময়:</span>
+                      <strong className="text-xs">{selectedAppForDetails.interviewDate} ({selectedAppForDetails.interviewTime || 'সকাল ১১:০০ টা'})</strong>
+                    </div>
+                    <div>
+                      <span className="text-3xs text-purple-600 block">স্থান:</span>
+                      <strong className="text-xs">{selectedAppForDetails.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}</strong>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <span className="text-3xs text-purple-600 block">প্রয়োজনীয় কাগজপত্র:</span>
+                      <span className="text-xs">{selectedAppForDetails.requiredDocuments || 'মূল সনদপত্র, ২ কপি ছবি ও সিভি'}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer Actions */}
+            <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedAppForDetails(null)}
+                className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-100 cursor-pointer"
+              >
+                বন্ধ করুন
+              </button>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const app = selectedAppForDetails;
+                    setSelectedAppForDetails(null);
+                    setSelectedAppForInterview(app);
+                    setInterviewForm({
+                      status: app.status || 'ইন্টারভিউয়ের জন্য নির্বাচিত (Shortlisted)',
+                      interviewDate: app.interviewDate || '২০২৬-১১-০৫',
+                      interviewTime: app.interviewTime || 'সকাল ১১:০০ টা',
+                      interviewLocation: app.interviewLocation || 'আল-ইমারাহ প্রোপার্টিজ লিমিটেড, হেড অফিস, পুরানা পল্টন, ঢাকা',
+                      requiredDocuments: app.requiredDocuments || 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
+                      adminNotes: app.adminNotes || 'নির্ধারিত সময়ের ১৫ মিনিট পূর্বে উপস্থিত থাকার অনুরোধ করা হচ্ছে।'
+                    });
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md flex items-center space-x-1.5 cursor-pointer active:scale-95"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>ইন্টারভিউ শিডিউল ও স্ট্যাটাস পরিবর্তন</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

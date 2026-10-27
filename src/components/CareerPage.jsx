@@ -37,7 +37,13 @@ import {
   Languages,
   Laptop,
   Mail,
-  Gift
+  Gift,
+  UploadCloud,
+  FileCheck,
+  Trash2,
+  Paperclip,
+  Eye,
+  Download
 } from 'lucide-react';
 
 // Dynamic Icon Resolvers for Job Details Sections
@@ -102,6 +108,7 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
     experienceYears: '',
     currentCompany: '',
     expectedSalary: '',
+    cvFile: null,
     cvLink: '',
     coverNote: ''
   });
@@ -194,10 +201,10 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
     if (!formData.district.trim()) {
       errors.district = isEn ? 'District / address required' : 'বর্তমান জেলা বা ঠিকানা লিখুন';
     }
-    if (!formData.cvLink.trim()) {
-      errors.cvLink = isEn ? 'CV / Resume link is required' : 'সিভি বা বায়োডাটার লিঙ্ক (Google Drive / Dropbox) প্রদান করুন';
-    } else if (!formData.cvLink.startsWith('http://') && !formData.cvLink.startsWith('https://')) {
-      errors.cvLink = isEn ? 'Please provide a valid URL starting with https://' : 'সঠিক লিঙ্ক দিন (যেমন: https://drive.google.com/...)';
+    if (!formData.cvFile && !formData.cvLink.trim()) {
+      errors.cv = isEn ? 'Please upload your CV file or provide a Drive link' : 'আপনার সিভি ফাইল সরাসরি আপলোড করুন অথবা ড্রাইভ লিঙ্ক প্রদান করুন';
+    } else if (formData.cvLink.trim() && !formData.cvLink.startsWith('http://') && !formData.cvLink.startsWith('https://')) {
+      errors.cv = isEn ? 'Please provide a valid URL starting with https://' : 'সঠিক লিঙ্ক দিন (যেমন: https://drive.google.com/...)';
     }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -242,6 +249,7 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
       experienceYears: '',
       currentCompany: '',
       expectedSalary: '',
+      cvFile: null,
       cvLink: '',
       coverNote: ''
     });
@@ -1119,23 +1127,113 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
                 </div>
               </div>
 
-              {/* Resume / CV Link */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center justify-between">
-                  <span>{isEn ? 'Google Drive / Dropbox CV Link *' : 'সিভি / বায়োডাটার ড্রাইভ লিঙ্ক *'}</span>
-                  <span className="text-3xs text-slate-500 font-normal">{isEn ? 'Must be public viewable' : 'শেয়ারিং পারমিশন "Anyone with link" রাখুন'}</span>
+              {/* Direct CV File Upload / Drive Link */}
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-gray-700 flex items-center justify-between">
+                  <span className="flex items-center space-x-1.5">
+                    <FileText className="w-3.5 h-3.5 text-[#006231]" />
+                    <span>{isEn ? 'Upload CV / Resume (Direct File) *' : 'সিভি / জীবনবৃত্তান্ত জমা দিন (সরাসরি ফাইল আপলোড) *'}</span>
+                  </span>
+                  <span className="text-3xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold">
+                    {isEn ? 'PDF, DOCX, Image' : 'PDF, DOCX বা ছবি'}
+                  </span>
                 </label>
-                <div className="relative">
-                  <ExternalLink className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type="url"
-                    value={formData.cvLink}
-                    onChange={(e) => setFormData(prev => ({ ...prev, cvLink: e.target.value }))}
-                    placeholder="https://drive.google.com/file/d/..."
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl border ${formErrors.cvLink ? 'border-red-500 bg-red-50/30' : 'border-gray-200 bg-gray-50'} text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]`}
-                  />
+
+                {formData.cvFile ? (
+                  /* Uploaded File Pill Card */
+                  <div className="p-3.5 rounded-2xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center space-x-3 overflow-hidden">
+                      <div className="w-10 h-10 rounded-xl bg-[#006231] text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <FileCheck className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-gray-900 truncate">
+                          {formData.cvFile.name}
+                        </p>
+                        <p className="text-3xs text-gray-500 flex items-center space-x-1.5 mt-0.5">
+                          <span>{(formData.cvFile.size / (1024 * 1024)).toFixed(2)} MB</span>
+                          <span>•</span>
+                          <span className="text-[#006231] font-bold">সফলভাবে সংযুক্ত হয়েছে</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, cvFile: null }))}
+                      className="p-2 rounded-xl text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+                      title={isEn ? 'Remove File' : 'ফাইলটি বাদ দিন'}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  /* File Dropzone / Picker */
+                  <label className="border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-emerald-50/30 hover:bg-emerald-50/60 rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center text-center cursor-pointer transition-all group">
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files && e.target.files[0];
+                        if (!file) return;
+                        if (file.size > 5 * 1024 * 1024) {
+                          alert(isEn ? 'File size must be under 5 MB' : 'ফাইলের সাইজ সর্বোচ্চ ৫ মেগাবাইট (5 MB) হতে হবে।');
+                          return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          setFormData(prev => ({
+                            ...prev,
+                            cvFile: {
+                              name: file.name,
+                              size: file.size,
+                              type: file.type || 'application/pdf',
+                              dataUrl: event.target.result
+                            }
+                          }));
+                          if (formErrors.cv) {
+                            setFormErrors(prev => ({ ...prev, cv: '' }));
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+                    <div className="w-11 h-11 rounded-2xl bg-white group-hover:scale-105 text-[#006231] shadow-2xs flex items-center justify-center mb-2 transition-transform">
+                      <UploadCloud className="w-6 h-6 stroke-[2]" />
+                    </div>
+                    <span className="text-xs font-black text-gray-800">
+                      {isEn ? 'Click to select or upload CV from device' : 'এখানে ক্লিক করে ডিভাইস থেকে সরাসরি সিভি ফাইল আপলোড করুন'}
+                    </span>
+                    <span className="text-3xs text-gray-500 mt-1">
+                      {isEn ? 'Supported: PDF, Word (DOCX) or Image (Max 5MB)' : 'সাপোর্টেড ফরম্যাট: PDF, Word (DOCX) বা ছবি (সর্বোচ্চ ৫ মেগাবাইট)'}
+                    </span>
+                  </label>
+                )}
+
+                {/* Alternative Drive Link toggle/input */}
+                <div className="pt-1">
+                  <div className="flex items-center space-x-2 text-3xs text-gray-400 mb-1.5">
+                    <span className="h-px bg-gray-200 flex-1"></span>
+                    <span>{isEn ? 'OR paste Google Drive / Dropbox link (Alternative)' : 'অথবা গুগল ড্রাইভ / ড্রপবক্স লিঙ্ক দিন (বিকল্প)'}</span>
+                    <span className="h-px bg-gray-200 flex-1"></span>
+                  </div>
+                  <div className="relative">
+                    <ExternalLink className="w-3.5 h-3.5 text-gray-400 absolute left-3.5 top-3" />
+                    <input
+                      type="url"
+                      value={formData.cvLink}
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, cvLink: e.target.value }));
+                        if (formErrors.cv) setFormErrors(prev => ({ ...prev, cv: '' }));
+                      }}
+                      placeholder="https://drive.google.com/file/d/..."
+                      className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231]"
+                    />
+                  </div>
                 </div>
-                {formErrors.cvLink && <p className="text-3xs text-red-600 mt-0.5">{formErrors.cvLink}</p>}
+
+                {formErrors.cv && <p className="text-3xs text-red-600 mt-0.5">{formErrors.cv}</p>}
               </div>
 
               {/* Cover Note */}

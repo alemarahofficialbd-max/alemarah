@@ -769,16 +769,32 @@ if (typeof window !== 'undefined') {
   }, 1200);
 }
 
-// Save data to localStorage and sync to Supabase
+// Save data to localStorage and sync to Supabase (Resilient to file size quotas)
 export const saveManagementData = (data) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.warn('LocalStorage quota warning, trimming heavy base64 files for local cache:', e);
+    try {
+      const trimmed = {
+        ...data,
+        jobApplications: (data.jobApplications || []).map(a => {
+          if (a.cvFile && a.cvFile.dataUrl && a.cvFile.dataUrl.length > 300000) {
+            return { ...a, cvFile: { ...a.cvFile, dataUrl: '' } };
+          }
+          return a;
+        })
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+    } catch (_) {}
+  }
+
+  try {
     window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: data }));
-    
-    // Background cloud sync
+    // Background cloud sync with FULL data including complete CV files
     syncToSupabase(data);
   } catch (e) {
-    console.error('Error saving management data to localStorage:', e);
+    console.error('Error syncing management data:', e);
   }
 };
 
