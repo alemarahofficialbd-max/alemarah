@@ -87,7 +87,7 @@ const getJobBenefitIcon = (jobId, index) => {
   return fallbackIcons[index % fallbackIcons.length] || Sparkles;
 };
 import { jobsData, careerPillars } from '../data/jobsData';
-import { saveJobApplication, findJobApplication, fetchJobApplicationsFromSupabase } from '../data/managementStore';
+import { saveJobApplication, findJobApplication, fetchJobApplicationsFromSupabase, getManagementData, generateNextJobId } from '../data/managementStore';
 import { supabase, uploadResumeToStorage } from '../lib/supabaseClient';
 
 export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
@@ -295,7 +295,8 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    const cleanId = 'AL-JOB-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+    const currentStore = getManagementData();
+    const cleanId = generateNextJobId(currentStore?.jobApplications || []);
     
     // Attempt Direct Supabase Storage Bucket Upload (Cloud CDN)
     let finalCvFile = formData.cvFile;
@@ -1583,11 +1584,11 @@ ${getJobShareUrl(shareJob.id)}`
                   {isEn ? 'Tracking No:' : 'ট্র্যাকিং নম্বর:'}
                 </span>
                 <span className="font-mono text-sm sm:text-base font-black text-[#006231] tracking-wider select-all bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
-                  {submittedApplication.id || 'AL-JOB-2026-8419'}
+                  {submittedApplication.id || 'AL-JOB-2026-1001'}
                 </span>
                 <button
                   type="button"
-                  onClick={() => handleCopyId(submittedApplication.id || 'AL-JOB-2026-8419')}
+                  onClick={() => handleCopyId(submittedApplication.id || 'AL-JOB-2026-1001')}
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-emerald-100 text-gray-700 hover:text-[#006231] text-xs font-bold cursor-pointer transition-all active:scale-95 border border-gray-200/80"
                   title="কপি করুন"
                 >

@@ -603,11 +603,49 @@ export const saveInquiry = (inquiry) => {
   }
 };
 
+
+// Generate clean sequential job application ID starting from AL-JOB-YYYY-1001
+export const generateNextJobId = (existingApps = []) => {
+  const currentYear = new Date().getFullYear();
+  const prefix = `AL-JOB-${currentYear}-`;
+  let maxSeq = 1000;
+
+  (existingApps || []).forEach(app => {
+    if (app && app.id && typeof app.id === 'string' && app.id.startsWith(prefix)) {
+      const numPart = parseInt(app.id.replace(prefix, ''), 10);
+      if (!isNaN(numPart) && numPart >= 1000 && numPart < 90000) {
+        if (numPart > maxSeq) {
+          maxSeq = numPart;
+        }
+      }
+    }
+  });
+
+  return `${prefix}${maxSeq + 1}`;
+};
+
 // Save career job application from the public website (Local + Supabase Cloud)
 export const saveJobApplication = async (application) => {
   try {
     const current = getManagementData();
-    const cleanId = application.id || ('AL-JOB-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000));
+
+    // 1. First, fetch latest remote applications from Supabase Cloud
+    let remoteApps = [];
+    try {
+      const { data } = await supabaseAdmin.from('admins').select('permissions').eq('id', 'JOB-APPLICATIONS-STORE').single();
+      if (data && Array.isArray(data.permissions)) {
+        remoteApps = data.permissions;
+      }
+    } catch (_) {}
+
+    // 2. Build existing application list to find highest sequence ID
+    const appMap = new Map();
+    (current.jobApplications || []).forEach(a => { if (a && a.id) appMap.set(a.id, a); });
+    remoteApps.forEach(a => { if (a && a.id) appMap.set(a.id, a); });
+
+    const allExisting = Array.from(appMap.values());
+    const cleanId = application.id || generateNextJobId(allExisting);
+
     const newApp = {
       date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       timestamp: new Date().toISOString(),
@@ -620,32 +658,19 @@ export const saveJobApplication = async (application) => {
       ...application,
       id: cleanId
     };
-    
-    // First, fetch latest remote applications so no applicant's submission is overwritten
-    let remoteApps = [];
-    try {
-      const { data } = await supabaseAdmin.from('admins').select('permissions').eq('id', 'JOB-APPLICATIONS-STORE').single();
-      if (data && Array.isArray(data.permissions)) {
-        remoteApps = data.permissions;
-      }
-    } catch (_) {}
 
-    const appMap = new Map();
-    (current.jobApplications || []).forEach(a => { if (a && a.id) appMap.set(a.id, a); });
-    remoteApps.forEach(a => { if (a && a.id) appMap.set(a.id, a); });
     appMap.set(newApp.id, newApp);
-
     const mergedList = Array.from(appMap.values());
     const updated = {
       ...current,
       jobApplications: mergedList
     };
-    
+
     saveManagementData(updated);
-    
+
     // Push directly to Supabase cloud store so Admin on ANY device sees it in real time
     await syncJobApplicationsToSupabase(mergedList);
-    
+
     return newApp;
   } catch (e) {
     console.error('Error saving job application:', e);
