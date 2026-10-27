@@ -6352,9 +6352,8 @@ export default function ManagementDashboard({
                       <h3 className="text-lg sm:text-xl font-black text-white truncate">
                         {admin?.name || 'প্রধান নির্বাহী ও সুপার অ্যাডমিন'}
                       </h3>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-3xs font-extrabold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
-                        <Crown className="w-3 h-3 text-amber-300 mr-1" />
-                        সুপার অ্যাডমিন
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white text-amber-500 shadow-sm shrink-0" title="সুপার অ্যাডমিন">
+                        <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
                       </span>
                     </div>
                     <p className="text-xs text-emerald-400 font-bold mt-0.5">
