@@ -43,7 +43,8 @@ import {
   Trash2,
   Paperclip,
   Eye,
-  Download
+  Download,
+  Share2
 } from 'lucide-react';
 
 // Dynamic Icon Resolvers for Job Details Sections
@@ -87,7 +88,7 @@ const getJobBenefitIcon = (jobId, index) => {
 };
 import { jobsData, careerPillars } from '../data/jobsData';
 import { saveJobApplication, findJobApplication, fetchJobApplicationsFromSupabase } from '../data/managementStore';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, uploadResumeToStorage } from '../lib/supabaseClient';
 
 export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
   const isEn = lang === 'en';
@@ -122,6 +123,82 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
   const [trackQuery, setTrackQuery] = useState('');
   const [trackResult, setTrackResult] = useState(null);
   const [trackHasSearched, setTrackHasSearched] = useState(false);
+
+  // Job Sharing & Unique URL State
+  const [shareJob, setShareJob] = useState(null);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  // Sync URL hash for direct job linking & deep linking
+  useEffect(() => {
+    const parseJobFromUrl = () => {
+      try {
+        const hash = window.location.hash || '';
+        let targetId = null;
+        if (hash.includes('job=')) {
+          const match = hash.match(/job=([^&]+)/);
+          if (match) targetId = match[1];
+        } else if (hash.includes('job-')) {
+          const match = hash.match(/job-[a-z0-9-]+/i);
+          if (match) targetId = match[0];
+        }
+
+        if (targetId) {
+          const found = jobsData.find(j => j.id === targetId);
+          if (found) {
+            setSelectedJobForDetails(found);
+          }
+        }
+      } catch (_) {}
+    };
+
+    parseJobFromUrl();
+    window.addEventListener('hashchange', parseJobFromUrl);
+    return () => window.removeEventListener('hashchange', parseJobFromUrl);
+  }, []);
+
+  const handleOpenJobDetails = (job) => {
+    setSelectedJobForDetails(job);
+    try {
+      const newHash = `#careers?job=${job.id}`;
+      window.history.pushState({ page: 'careers', job: job.id }, '', `${window.location.pathname}${newHash}`);
+    } catch (_) {}
+  };
+
+  const handleCloseJobDetails = () => {
+    setSelectedJobForDetails(null);
+    try {
+      window.history.pushState({ page: 'careers' }, '', `${window.location.pathname}#careers`);
+    } catch (_) {}
+  };
+
+  const getJobShareUrl = (jobId) => {
+    if (typeof window === 'undefined') return '';
+    return `${window.location.origin}${window.location.pathname}#careers?job=${jobId}`;
+  };
+
+  const handleShareJob = (job) => {
+    setShareCopied(false);
+    setShareJob(job);
+  };
+
+  const handleCopyShareUrl = (jobId) => {
+    const url = getJobShareUrl(jobId);
+    if (!url) return;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url);
+      } else {
+        const t = document.createElement('textarea');
+        t.value = url;
+        document.body.appendChild(t);
+        t.select();
+        document.execCommand('copy');
+        document.body.removeChild(t);
+      }
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2500);
+    } catch (_) {}
+  };
 
   // Departments List
   const departments = useMemo(() => {
@@ -228,24 +305,15 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
         const safeName = `cv_${cleanId}_${Date.now()}.${fileExt}`;
         const filePath = `candidates/${safeName}`;
 
-        const { data: uploadData, error: uploadErr } = await supabase.storage
-          .from('resumes')
-          .upload(filePath, formData.rawFile, {
-            cacheControl: '3600',
-            upsert: true
-          });
-
-        if (!uploadErr && uploadData) {
-          const { data: urlData } = supabase.storage.from('resumes').getPublicUrl(filePath);
-          if (urlData && urlData.publicUrl) {
-            // Blazing-fast CDN URL: store lightweight object without heavy base64!
-            finalCvFile = {
-              name: formData.rawFile.name,
-              size: formData.rawFile.size,
-              type: formData.rawFile.type || 'application/pdf',
-              url: urlData.publicUrl
-            };
-          }
+        const cdnUrl = await uploadResumeToStorage(formData.rawFile, cleanId);
+        if (cdnUrl) {
+          // Blazing-fast CDN URL: store lightweight object without heavy base64!
+          finalCvFile = {
+            name: formData.rawFile.name,
+            size: formData.rawFile.size,
+            type: formData.rawFile.type || 'application/pdf',
+            url: cdnUrl
+          };
         }
       } catch (storageErr) {
         console.warn('Storage bucket upload fallback:', storageErr);
@@ -568,14 +636,25 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
 
                   {/* Actions Bar */}
                   <div className="relative z-10 pt-5 mt-5 border-t border-gray-100 flex items-center justify-between gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedJobForDetails(job)}
-                      className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-all cursor-pointer flex items-center space-x-1"
-                    >
-                      <span>{isEn ? 'View Details' : 'বিস্তারিত বিবরণ'}</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenJobDetails(job)}
+                        className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-all cursor-pointer flex items-center space-x-1"
+                      >
+                        <span>{isEn ? 'View Details' : 'বিস্তারিত বিবরণ'}</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleShareJob(job)}
+                        className="p-2.5 rounded-xl bg-gray-100 hover:bg-emerald-50 text-gray-600 hover:text-[#006231] transition-all cursor-pointer border border-gray-200"
+                        title={isEn ? 'Share Job' : 'শেয়ার করুন'}
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </button>
+                    </div>
 
                     <button
                       type="button"
@@ -636,7 +715,7 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
             <div className="flex items-center space-x-3">
               <button
                 type="button"
-                onClick={() => setSelectedJobForDetails(null)}
+                onClick={handleCloseJobDetails}
                 className="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs flex items-center space-x-1.5 transition-all cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -658,6 +737,16 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
             <div className="flex items-center space-x-2.5">
               <button
                 type="button"
+                onClick={() => handleShareJob(selectedJobForDetails)}
+                className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-emerald-50 text-gray-700 hover:text-[#006231] font-bold text-xs flex items-center space-x-1.5 border border-gray-200 transition-all cursor-pointer"
+                title={isEn ? 'Share Job' : 'শেয়ার করুন'}
+              >
+                <Share2 className="w-3.5 h-3.5 text-[#006231]" />
+                <span className="hidden sm:inline">{isEn ? 'Share' : 'শেয়ার করুন'}</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => handleOpenApplyModal(selectedJobForDetails)}
                 className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
               >
@@ -667,7 +756,7 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
 
               <button
                 type="button"
-                onClick={() => setSelectedJobForDetails(null)}
+                onClick={handleCloseJobDetails}
                 className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
                 title={isEn ? 'Close' : 'বন্ধ করুন'}
               >
@@ -944,21 +1033,16 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
                 </div>
 
                 {/* Company Values */}
-                <div className="bg-emerald-50/60 rounded-3xl p-6 border border-emerald-200/70 text-center space-y-3">
-                  <div className="bg-white rounded-2xl py-2 px-4 inline-flex items-center justify-center shadow-xs border border-emerald-100">
-                    <img 
-                      src="/alemarah_logo_header.svg" 
-                      alt="Al-Emarah Properties" 
-                      className="h-10 sm:h-11 w-auto object-contain"
-                    />
-                  </div>
-                  <div className="font-black text-xs text-gray-900 tracking-wide">
-                    {selectedJobForDetails.companyName || 'AL EMARAH PROPERTIES LIMITED'}
-                  </div>
-                  <div className="text-3xs text-[#006231] font-bold tracking-wide">
+                <div className="bg-emerald-50/60 rounded-3xl p-6 border border-emerald-200/70 text-center space-y-2.5">
+                  <img 
+                    src="/alemarah_logo_header.svg" 
+                    alt="Al-Emarah Properties Limited" 
+                    className="h-12 sm:h-14 w-auto mx-auto object-contain drop-shadow-2xs"
+                  />
+                  <div className="text-xs text-[#006231] font-black tracking-wide pt-1">
                     {selectedJobForDetails.mottoBn || 'বিশ্বস্ততা • স্বচ্ছতা • অংশীদারিত্ব'}
                   </div>
-                  <div className="text-3xs text-gray-500">
+                  <div className="text-3xs text-gray-600 font-medium">
                     {selectedJobForDetails.locationBn || 'পুরানা পল্টন, ঢাকা'}
                   </div>
                 </div>
@@ -970,25 +1054,178 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
           <footer className="sticky bottom-0 z-30 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-lg">
             <button
               type="button"
-              onClick={() => setSelectedJobForDetails(null)}
+              onClick={handleCloseJobDetails}
               className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold text-xs hover:bg-gray-100 cursor-pointer"
             >
               {isEn ? 'Close & Return' : 'ফিরে যান'}
             </button>
 
-            <button
-              type="button"
-              onClick={() => handleOpenApplyModal(selectedJobForDetails)}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>{isEn ? 'Apply for this Job' : 'এই পদে আবেদন করুন'}</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={() => handleShareJob(selectedJobForDetails)}
+                className="px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-emerald-50 text-gray-700 hover:text-[#006231] font-bold text-xs flex items-center space-x-1.5 transition-all cursor-pointer"
+              >
+                <Share2 className="w-3.5 h-3.5 text-[#006231]" />
+                <span>{isEn ? 'Share Job' : 'শেয়ার করুন'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleOpenApplyModal(selectedJobForDetails)}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>{isEn ? 'Apply for this Job' : 'এই পদে আবেদন করুন'}</span>
+              </button>
+            </div>
           </footer>
         </div>
       )}
 
-            {/* ========================================================= */}
+                  {/* ========================================================= */}
+      {/* MODAL: JOB SHARE MODAL (UNIQUE URL & 1-CLICK SHARING)     */}
+      {/* ========================================================= */}
+      {shareJob && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 space-y-5 shadow-2xl border border-emerald-100">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-gray-100 pb-3.5">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center">
+                  <Share2 className="w-4 h-4 text-[#006231]" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-gray-900">
+                    {isEn ? 'Share Job Opening' : 'নিয়োগ বিজ্ঞপ্তি শেয়ার করুন'}
+                  </h3>
+                  <p className="text-3xs text-gray-500">
+                    {isEn ? 'Direct link to this specific circular' : 'এই চাকরির সরাসরি লিংক ও সোশ্যাল শেয়ারিং'}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShareJob(null)}
+                className="p-1.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Job Summary Banner */}
+            <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100 space-y-1">
+              <span className="text-3xs font-bold text-[#006231] uppercase tracking-wide">
+                {isEn ? shareJob.departmentEn : shareJob.departmentBn}
+              </span>
+              <h4 className="text-sm font-black text-gray-900">
+                {isEn ? shareJob.titleEn : shareJob.titleBn}
+              </h4>
+              <p className="text-3xs text-gray-500">
+                {shareJob.companyName || 'Al-Imarah Properties'} • {isEn ? shareJob.locationEn : shareJob.locationBn}
+              </p>
+            </div>
+
+            {/* Direct Copy Link Box */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-700 block">
+                {isEn ? 'Direct Shareable URL' : 'চাকরির সরাসরি ইউনিক লিংক'}
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={getJobShareUrl(shareJob.id)}
+                  className="flex-1 px-3 py-2 text-xs font-mono bg-gray-50 border border-gray-200 rounded-xl text-gray-700 select-all focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleCopyShareUrl(shareJob.id)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer shrink-0 ${
+                    shareCopied 
+                      ? 'bg-emerald-600 text-white shadow-xs' 
+                      : 'bg-[#006231] hover:bg-[#0A4D27] text-white shadow-xs'
+                  }`}
+                >
+                  {shareCopied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>{isEn ? 'Copied!' : 'কপি হয়েছে'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>{isEn ? 'Copy' : 'কপি'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* 1-Click Social Share Buttons */}
+            <div className="space-y-2 pt-2">
+              <span className="text-3xs font-bold text-gray-400 uppercase tracking-wider block">
+                {isEn ? 'Quick Share To' : 'এক ক্লিকে সোশ্যাল শেয়ার করুন'}
+              </span>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                {/* WhatsApp */}
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    `💼 আল-ইমারাহ প্রোপার্টিজ লিমিটেডে নতুন নিয়োগ বিজ্ঞপ্তি!
+
+📌 পদ: ${isEn ? shareJob.titleEn : shareJob.titleBn}
+🏢 প্রতিষ্ঠান: ${shareJob.companyName || 'আল-ইমারাহ প্রোপার্টিজ'}
+📍 কর্মস্থল: ${isEn ? shareJob.locationEn : shareJob.locationBn}
+⏰ শেষ সময়: ${isEn ? shareJob.deadlineEn : shareJob.deadlineBn}
+
+বিস্তারিত দেখুন ও সরাসরি অনলাইনে আবেদন করুন:
+${getJobShareUrl(shareJob.id)}`
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2.5 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#128C7E] font-bold text-xs flex items-center justify-center space-x-1.5 border border-[#25D366]/30 transition-all cursor-pointer"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>WhatsApp</span>
+                </a>
+
+                {/* Facebook */}
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getJobShareUrl(shareJob.id))}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center space-x-1.5 border border-blue-200 transition-all cursor-pointer"
+                >
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>Facebook</span>
+                </a>
+              </div>
+
+              {/* Native Device Share (Mobile support) */}
+              {typeof navigator !== 'undefined' && navigator.share && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.share({
+                      title: isEn ? shareJob.titleEn : shareJob.titleBn,
+                      text: `আল-ইমারাহ প্রোপার্টিজে ক্যারিয়ার সুযোগ: ${isEn ? shareJob.titleEn : shareJob.titleBn}`,
+                      url: getJobShareUrl(shareJob.id)
+                    }).catch(() => {});
+                  }}
+                  className="w-full mt-1.5 py-2 px-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>{isEn ? 'More Sharing Options' : 'ডিভাইসের অন্যান্য অ্যাপে শেয়ার করুন'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
       {/* MODAL 2: APPLY ONLINE FORM MODAL                          */}
       {/* ========================================================= */}
       {selectedJobForApply && (

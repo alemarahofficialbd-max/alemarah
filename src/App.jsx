@@ -90,10 +90,15 @@ export default function App() {
 
   const [currentPage, setCurrentPage] = useState(() => {
     try {
-      const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details'];
-      const hash = window.location.hash.replace('#', '');
+      const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details', 'careers'];
+      const rawHash = window.location.hash.replace('#', '');
+      const hash = rawHash.split('?')[0].split('&')[0];
       const hasAdmin = Boolean(localStorage.getItem('alemarah_admin_session'));
       const hasClient = Boolean(localStorage.getItem('alemarah_client_session'));
+
+      if (rawHash.startsWith('careers') || rawHash.startsWith('job-')) {
+        return 'careers';
+      }
 
       if (hash && validPages.includes(hash)) {
         if (hash === 'management') return hasAdmin ? 'management' : 'login';
@@ -165,8 +170,9 @@ export default function App() {
 
   // Synchronize browser history and hash navigation (back/forward button support & refresh retention)
   useEffect(() => {
-    const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details'];
-    const initialHash = window.location.hash.replace('#', '');
+    const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details', 'careers'];
+    const rawHash = window.location.hash.replace('#', '');
+    const initialHash = rawHash.split('?')[0].split('&')[0];
     
     const hasAdmin = Boolean(localStorage.getItem('alemarah_admin_session'));
     const hasClient = Boolean(localStorage.getItem('alemarah_client_session'));
@@ -174,7 +180,9 @@ export default function App() {
 
     let resolvedPage = 'home';
 
-    if (initialHash && validPages.includes(initialHash)) {
+    if (rawHash.startsWith('careers') || rawHash.startsWith('job-')) {
+      resolvedPage = 'careers';
+    } else if (initialHash && validPages.includes(initialHash)) {
       if (initialHash === 'management') {
         resolvedPage = hasAdmin ? 'management' : 'login';
       } else if (initialHash === 'dashboard') {
@@ -202,8 +210,18 @@ export default function App() {
 
     const handlePopState = (event) => {
       const pageFromState = event.state?.page;
-      const hash = window.location.hash.replace('#', '');
-      const targetPage = pageFromState || (hash && validPages.includes(hash) ? hash : 'home');
+      const rawHash = window.location.hash.replace('#', '');
+      const hash = rawHash.split('?')[0].split('&')[0];
+      let targetPage = pageFromState;
+      if (!targetPage) {
+        if (rawHash.startsWith('careers') || rawHash.startsWith('job-')) {
+          targetPage = 'careers';
+        } else if (hash && validPages.includes(hash)) {
+          targetPage = hash;
+        } else {
+          targetPage = 'home';
+        }
+      }
       setCurrentPage(targetPage);
       try {
         localStorage.setItem('alemarah_current_page', targetPage);
