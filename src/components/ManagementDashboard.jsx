@@ -235,8 +235,8 @@ export default function ManagementDashboard({
   // Clean Job Title and Status Formatters (Pure Bengali, No Clutter/English brackets)
   const formatCleanJobTitle = (title) => {
     if (!title) return 'হিসাব ও প্রশাসন কর্মকর্তা';
-    if (title.includes('হিসাব') || title.includes('Accounts')) return 'হিসাব ও প্রশাসন কর্মকর্তা';
-    if (title.includes('জনসংযোগ') || title.includes('Public Relations') || title.includes('PRO')) return 'জনসংযোগ কর্মকর্তা (PRO)';
+    if (title.includes('হিসাব') || title.includes('Accounts')) return 'হিসাব ও প্রশাসন';
+    if (title.includes('জনসংযোগ') || title.includes('Public Relations') || title.includes('PRO')) return 'জনসংযোগ (PRO)';
     if (title.includes('Drop CV') || title.includes('সাধারণ')) return 'সাধারণ আবেদন';
     return title.replace(/\([^)]*\)/g, '').trim();
   };
@@ -3036,41 +3036,43 @@ export default function ManagementDashboard({
                   </div>
                 ) : (
                   <div className="divide-y divide-slate-100">
-                    {data.jobApplications.map((app) => (
+                    {data.jobApplications.map((app, appIdx) => (
                       <div 
                         key={app.id} 
-                        className="p-4 sm:p-5 hover:bg-slate-50/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative"
+                        className={`p-3 sm:p-4 hover:bg-slate-50/80 transition-colors flex items-center justify-between gap-2.5 relative ${openActionMenuId === app.id ? 'z-30' : 'z-10'}`}
                       >
-                        {/* Left: Minimal, Clean, Unboxed Information */}
+                        {/* Left: Strict 2-Line Mobile Optimized Layout */}
                         <div 
-                          className="space-y-1 cursor-pointer flex-1" 
+                          className="space-y-0.5 cursor-pointer min-w-0 flex-1" 
                           onClick={() => setSelectedAppForDetails(app)}
                         >
-                          <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
-                            <span className="text-sm sm:text-base font-black text-slate-900 hover:text-[#006231] transition-colors">
+                          {/* Line 1: Name + Role */}
+                          <div className="flex items-center gap-1.5 sm:gap-2 leading-tight">
+                            <span className="text-xs sm:text-sm font-black text-slate-900 hover:text-[#006231] transition-colors truncate max-w-[130px] sm:max-w-none">
                               {app.applicantName}
                             </span>
-                            <span className="text-slate-300 hidden sm:inline">•</span>
-                            <span className="text-xs font-bold text-[#006231]">
+                            <span className="text-slate-300">•</span>
+                            <span className="text-3xs sm:text-xs font-bold text-[#006231] truncate max-w-[120px] sm:max-w-none">
                               {formatCleanJobTitle(app.jobTitle || app.submittedPosition)}
                             </span>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500 font-medium">
-                            <span className="font-mono text-slate-600 font-bold">
+                          {/* Line 2: ID + Phone + Status (+ Date on desktop) */}
+                          <div className="flex items-center gap-1.5 sm:gap-2 text-3xs sm:text-xs text-slate-500 font-medium leading-tight truncate">
+                            <span className="font-mono text-slate-700 font-bold shrink-0">
                               {app.id}
                             </span>
                             <span>•</span>
-                            <span>
+                            <span className="shrink-0 flex items-center gap-0.5 text-slate-600">
+                              <Phone className="w-2.5 h-2.5 text-[#006231] shrink-0" />
+                              <span>{app.phone}</span>
+                            </span>
+                            <span className="hidden md:inline">•</span>
+                            <span className="hidden md:inline text-slate-400">
                               {app.appliedDateBn || app.date}
                             </span>
                             <span>•</span>
-                            <span className="flex items-center space-x-1 text-slate-700">
-                              <Phone className="w-3 h-3 text-[#006231]" />
-                              <span>{app.phone}</span>
-                            </span>
-                            <span>•</span>
-                            <span className={`inline-flex items-center space-x-1 font-bold ${
+                            <span className={`inline-flex items-center gap-1 font-bold shrink-0 ${
                               (app.status || '').includes('ইন্টারভিউ') || (app.status || '').includes('নির্বাচিত')
                                 ? 'text-emerald-700'
                                 : (app.status || '').includes('দুঃখিত') || (app.status || '').includes('হননি')
@@ -3083,15 +3085,15 @@ export default function ManagementDashboard({
                           </div>
                         </div>
 
-                        {/* Right: Only "বিস্তারিত দেখুন" button + 3-Dot Dropdown Menu */}
-                        <div className="flex items-center space-x-2 shrink-0 self-end sm:self-center">
+                        {/* Right: Compact "বিস্তারিত" button + 3-Dot Dropdown Menu in same line */}
+                        <div className="flex items-center gap-1.5 shrink-0">
                           <button
                             type="button"
                             onClick={() => setSelectedAppForDetails(app)}
-                            className="px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer active:scale-95 border border-blue-200/80 shadow-2xs"
+                            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-3xs sm:text-xs font-bold flex items-center gap-1 transition-all cursor-pointer active:scale-95 border border-blue-200/80 shadow-2xs"
                           >
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>বিস্তারিত দেখুন</span>
+                            <Eye className="w-3.5 h-3.5 shrink-0" />
+                            <span>বিস্তারিত</span>
                           </button>
 
                           {/* 3-Dot Options Button */}
