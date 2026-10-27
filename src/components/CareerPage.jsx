@@ -295,8 +295,10 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    const remoteApps = await fetchJobApplicationsFromSupabase();
     const currentStore = getManagementData();
-    const cleanId = generateNextJobId(currentStore?.jobApplications || []);
+    const baseList = remoteApps && remoteApps.length > 0 ? remoteApps : (currentStore?.jobApplications || []);
+    const cleanId = generateNextJobId(baseList);
     
     // Attempt Direct Supabase Storage Bucket Upload (Cloud CDN)
     let finalCvFile = formData.cvFile;
@@ -1661,21 +1663,22 @@ ${getJobShareUrl(shareJob.id)}`
               onSubmit={async (e) => {
                 e.preventDefault();
                 if (!trackQuery.trim()) return;
-                let res = findJobApplication(trackQuery.trim());
-                if (!res) {
-                  // Fallback: fetch directly from Supabase Cloud
-                  const remoteApps = await fetchJobApplicationsFromSupabase();
-                  const q = trackQuery.trim().toLowerCase();
-                  const digits = q.replace(/[^0-9]/g, '');
-                  res = remoteApps.find(a => {
-                    const matchId = a.id && a.id.toLowerCase() === q;
-                    const cleanPhone = (a.phone || '').replace(/[^0-9]/g, '');
-                    const matchPhone = digits.length >= 8 && cleanPhone.includes(digits);
-                    return matchId || matchPhone;
-                  }) || null;
-                }
+                setIsSearching(true);
+                // Fetch directly from live Supabase Cloud store
+                const remoteApps = await fetchJobApplicationsFromSupabase();
+                const currentStore = getManagementData();
+                const allApps = remoteApps && remoteApps.length > 0 ? remoteApps : (currentStore.jobApplications || []);
+                const q = trackQuery.trim().toLowerCase();
+                const digits = q.replace(/[^0-9]/g, '');
+                const res = allApps.find(a => {
+                  const matchId = a.id && a.id.toLowerCase() === q;
+                  const cleanPhone = (a.phone || '').replace(/[^0-9]/g, '');
+                  const matchPhone = digits.length >= 8 && cleanPhone.includes(digits);
+                  return matchId || matchPhone;
+                }) || null;
                 setTrackResult(res);
                 setTrackHasSearched(true);
+                setIsSearching(false);
               }}
               className="flex gap-2"
             >

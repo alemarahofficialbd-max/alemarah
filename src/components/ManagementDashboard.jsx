@@ -260,6 +260,7 @@ export default function ManagementDashboard({
       return {
         label: 'নির্বাচিত হননি',
         bg: 'bg-red-50 text-red-700 border-red-200/80',
+        textColor: 'text-red-600',
         dot: 'bg-red-500'
       };
     }
@@ -267,6 +268,7 @@ export default function ManagementDashboard({
       return {
         label: 'চূড়ান্ত নির্বাচিত',
         bg: 'bg-blue-50 text-blue-700 border-blue-200/80',
+        textColor: 'text-blue-600',
         dot: 'bg-blue-600'
       };
     }
@@ -274,12 +276,14 @@ export default function ManagementDashboard({
       return {
         label: 'ইন্টারভিউ শিডিউল্ড',
         bg: 'bg-emerald-50 text-[#006231] border-emerald-200/80',
+        textColor: 'text-emerald-700',
         dot: 'bg-emerald-500'
       };
     }
     return {
       label: 'নতুন আবেদন',
       bg: 'bg-amber-50 text-amber-700 border-amber-200/80',
+      textColor: 'text-amber-700',
       dot: 'bg-amber-500 animate-pulse'
     };
   };
@@ -3027,16 +3031,31 @@ export default function ManagementDashboard({
                         key={app.id} 
                         className={`p-3 sm:p-4 hover:bg-slate-50/80 transition-colors flex items-center justify-between gap-3 relative ${openActionMenuId === app.id ? 'z-30' : 'z-10'}`}
                       >
-                        {/* Mobile View: Exactly 2 clean lines (Line 1: Name, Line 2: Applied Pod) */}
+                        {/* Mobile View: Exactly 2 clean lines (Line 1: Name, Line 2: Applied Pod & Status) */}
                         <div 
                           className="sm:hidden space-y-0.5 cursor-pointer min-w-0 flex-1" 
                           onClick={() => setSelectedAppForDetails(app)}
                         >
-                          <div className="text-xs font-black text-slate-900 truncate">
-                            {app.applicantName}
+                          {/* Line 1: Candidate Name (Big, Bold, Black) */}
+                          <div className="flex items-center gap-1.5 leading-tight">
+                            <span className="text-xs font-black text-slate-900 truncate">
+                              {app.applicantName}
+                            </span>
+                            <span className="font-mono text-3xs text-slate-400 font-bold shrink-0">
+                              ({app.id})
+                            </span>
                           </div>
-                          <div className="text-3xs font-bold text-[#006231] truncate">
-                            {formatCleanJobTitle(app.jobTitle || app.submittedPosition)}
+
+                          {/* Line 2: Pod (Smaller, Subtle Subtitle) + Status Dot */}
+                          <div className="flex items-center gap-1.5 leading-tight text-3xs text-slate-500 font-medium">
+                            <span className="truncate max-w-[125px]">
+                              {formatCleanJobTitle(app.jobTitle || app.submittedPosition)}
+                            </span>
+                            <span className="text-slate-300">•</span>
+                            <span className={`inline-flex items-center gap-1 font-bold shrink-0 ${statusBadge.textColor}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${statusBadge.dot}`}></span>
+                              <span>{statusBadge.label}</span>
+                            </span>
                           </div>
                         </div>
 
@@ -6666,6 +6685,9 @@ export default function ManagementDashboard({
                       const updated = await updateJobApplication(selectedAppForInterview.id, interviewForm);
                       if (updated) setData(updated);
                       else setData(getManagementData());
+                      if (selectedAppForDetails && selectedAppForDetails.id === selectedAppForInterview.id) {
+                        setSelectedAppForDetails(prev => ({ ...prev, ...interviewForm }));
+                      }
                       setInterviewSuccessModal({
                         name: selectedAppForInterview.applicantName,
                         phone: selectedAppForInterview.phone,

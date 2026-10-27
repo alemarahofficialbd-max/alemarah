@@ -635,7 +635,7 @@ export const saveJobApplication = async (application) => {
 
     // 2. Base existing applications on authoritative cloud store
     const baseList = remoteApps.length > 0 ? remoteApps : (current.jobApplications || []);
-    const cleanId = application.id || generateNextJobId(baseList);
+    const cleanId = generateNextJobId(baseList);
 
     const newApp = {
       date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
