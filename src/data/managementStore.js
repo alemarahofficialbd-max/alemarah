@@ -677,6 +677,25 @@ export const saveJobApplication = async (application) => {
   }
 };
 
+
+// Delete team member from local store and Supabase Cloud
+export const deleteTeamMember = async (id) => {
+  try {
+    const current = getManagementData();
+    const updatedTeam = (current.managementTeam || []).filter(m => m.id !== id);
+    const updated = {
+      ...current,
+      managementTeam: updatedTeam
+    };
+    saveManagementData(updated);
+    await supabaseAdmin.from('admins').delete().eq('id', id);
+    return true;
+  } catch (err) {
+    console.error('Error deleting admin from Supabase:', err);
+    return false;
+  }
+};
+
 // Delete job application from management (Local + Supabase Cloud)
 export const deleteJobApplication = async (appId) => {
   try {

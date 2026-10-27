@@ -79,6 +79,7 @@ import {
   hashPassword,
   isHashedPassword,
   deleteJobApplication,
+  deleteTeamMember,
   updateJobApplicationStatus,
   updateJobApplication,
   syncFromSupabase
@@ -1167,11 +1168,10 @@ export default function ManagementDashboard({
     requestProtectedDelete(
       `অ্যাডমিন/কর্মকর্তা "${name}" অপসারণ`,
       `আপনি কি নিশ্চিতভাবে "${name}"-কে অপসারণ করতে চান? অনুমতি দিতে মাস্টার পিন লিখুন।`,
-      () => {
-        updateStore((prev) => ({
-          ...prev,
-          managementTeam: prev.managementTeam.filter(m => m.id !== id)
-        }));
+      async () => {
+        await deleteTeamMember(id);
+        const updated = getManagementData();
+        setData(updated);
         triggerAlert(`${name}-কে সফলভাবে অপসারণ করা হয়েছে।`);
       }
     );
@@ -2654,11 +2654,11 @@ export default function ManagementDashboard({
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
                     <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center space-x-2">
                       <ShieldCheck className="w-5 h-5 text-[#006231]" />
-                      <span>কেন্দ্রীয় অ্যাডমিন ও ইউজার রোল ম্যানেজমেন্ট</span>
+                      <span>অ্যাডমিন ও ইউজার রোল</span>
                     </h3>
                   </div>
                   <p className="text-xs text-slate-500 mt-1">
-                    সুপার অ্যাডমিন দ্বারা পরিচালিত — সকল কর্মকর্তা, দায়িত্ব, রোল ও অ্যাক্সেস পারমিশন কন্ট্রোল প্যানেল
+                    কর্মকর্তা ও দায়িত্ব নির্ধারণ প্যানেল
                   </p>
                 </div>
                 <button
@@ -2667,7 +2667,7 @@ export default function ManagementDashboard({
                   className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CE2028] to-[#991B1B] text-white font-bold text-xs shadow-md shadow-[#CE2028]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 shrink-0"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>+ নতুন কর্মকর্তা / অ্যাডমিন যুক্ত করুন</span>
+                  <span>কর্মকর্তা যুক্ত করুন</span>
                 </button>
               </div>
 
@@ -2677,10 +2677,10 @@ export default function ManagementDashboard({
                   <div>
                     <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
                       <Crown className="w-4 h-4 text-amber-500" />
-                      <span>বোর্ড অব ডিরেক্টরস ও সিস্টেম লগইন এক্সেস ({directorsList.length})</span>
+                      <span>বোর্ড অব ডিরেক্টরস ({directorsList.length})</span>
                     </h4>
                     <p className="text-2xs text-slate-500 mt-0.5">
-                      সম্মানিত বোর্ড পরিচালকদের পোর্টাল লগইন ক্রেডেনশিয়াল ও অ্যাডমিন অ্যাক্সেস পারমিশন
+                      পরিচালকদের পোর্টাল লগইন ও অ্যাক্সেস
                     </p>
                   </div>
                   <button
@@ -2689,7 +2689,7 @@ export default function ManagementDashboard({
                     className="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold border border-amber-200 cursor-pointer self-start sm:self-auto flex items-center space-x-1"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                    <span>+ ডিরেক্টর এক্সেস দিন</span>
+                    <span>+ এক্সেস দিন</span>
                   </button>
                 </div>
 
@@ -2800,10 +2800,10 @@ export default function ManagementDashboard({
                   <div>
                     <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
                       <HardHat className="w-4 h-4 text-[#006231]" />
-                      <span>কর্মকর্তা ও সাব-অ্যাডমিনদের তালিকা ({officerTeam.length})</span>
+                      <span>কর্মকর্তা ও সাব-অ্যাডমিন ({officerTeam.length})</span>
                     </h4>
                     <p className="text-2xs text-slate-500 mt-0.5">
-                      সুপার অ্যাডমিনের অধীনে প্রতিটি কর্মকর্তার দায়িত্ব ও পারমিশন
+                      কর্মকর্তাদের তালিকা ও পারমিশন কন্ট্রোল
                     </p>
                   </div>
                 </div>
