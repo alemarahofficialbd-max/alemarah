@@ -1952,7 +1952,7 @@ export default function ManagementDashboard({
             <div className="lg:col-span-5 bg-white p-4 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-800 flex items-center space-x-1.5">
                     <DollarSign className="w-5 h-5 text-[#006231]" />
                     <span>পেমেন্ট বা টাকা জমার নতুন এন্ট্রি</span>
                   </h3>
@@ -2000,7 +2000,7 @@ export default function ManagementDashboard({
                 <form onSubmit={handleReceivePayment} className="space-y-4">
                   {/* Step 1: Filter By Project */}
                   <div>
-                    <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                    <label className="block text-2xs font-semibold text-slate-600 mb-1">
                       ১. প্রজেক্ট নির্বাচন করুন (ফিল্টার)
                     </label>
                     <select
@@ -2015,7 +2015,7 @@ export default function ManagementDashboard({
                           setPaymentForm(prev => ({ ...prev, clientId: '' }));
                         }
                       }}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-normal text-slate-800 outline-none focus:ring-1 focus:ring-[#006231] focus:border-[#006231]"
                     >
                       <option value="all">সকল প্রজেক্টের কাস্টমার ({data.clients.length} জন)</option>
                       {data.projects.map(p => {
@@ -2031,7 +2031,7 @@ export default function ManagementDashboard({
 
                   {/* Step 2: Customer Selection Dropdown */}
                   <div>
-                    <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                    <label className="block text-2xs font-semibold text-slate-600 mb-1">
                       ২. কাস্টমার নির্বাচন করুন *
                     </label>
                     <select
@@ -2045,7 +2045,7 @@ export default function ManagementDashboard({
                           amount: matched?.nextDueAmount ? String(matched.nextDueAmount) : prev.amount
                         }));
                       }}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] cursor-pointer"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-normal text-slate-800 outline-none focus:ring-1 focus:ring-[#006231] focus:border-[#006231] cursor-pointer"
                       required
                     >
                       <option value="">-- কাস্টমার নির্বাচন করুন --</option>
@@ -2099,7 +2099,7 @@ export default function ManagementDashboard({
                   </div>
 
                 <div>
-                  <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
                     জমার টাকার পরিমাণ *
                   </label>
                   <input
@@ -2107,7 +2107,7 @@ export default function ManagementDashboard({
                     placeholder="যেমন: 600000"
                     value={paymentForm.amount}
                     onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:ring-1 focus:ring-[#006231] focus:border-[#006231]"
                     required
                   />
                   {paymentForm.amount && (
@@ -2126,25 +2126,25 @@ export default function ManagementDashboard({
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                    <label className="block text-2xs font-semibold text-slate-600 mb-1">
                       জমার তারিখ
                     </label>
                     <input
                       type="date"
                       value={paymentForm.date}
                       onChange={(e) => setPaymentForm({ ...paymentForm, date: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028] cursor-pointer"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-normal text-slate-800 outline-none focus:ring-1 focus:ring-[#006231] focus:border-[#006231] cursor-pointer"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                    <label className="block text-2xs font-semibold text-slate-600 mb-1">
                       পেমেন্ট মাধ্যম
                     </label>
                     <select
                       value={paymentForm.method}
                       onChange={(e) => setPaymentForm({ ...paymentForm, method: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-normal text-slate-800 outline-none focus:ring-1 focus:ring-[#006231] focus:border-[#006231]"
                     >
                       <option value="ব্যাংক ডিপোজিট">ব্যাংক ডিপোজিট</option>
                       <option value="বিকাশ">বিকাশ</option>
@@ -2159,7 +2159,7 @@ export default function ManagementDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
                     রসিদ নম্বর বা নোট (ঐচ্ছিক)
                   </label>
                   <input
@@ -2167,13 +2167,13 @@ export default function ManagementDashboard({
                     placeholder="যেমন: ব্যাংক চালান #৮২০১"
                     value={paymentForm.note}
                     onChange={(e) => setPaymentForm({ ...paymentForm, note: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-normal text-slate-800 outline-none focus:ring-1 focus:ring-[#006231] focus:border-[#006231]"
                   />
                 </div>
 
                   <button
                     type="submit"
-                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-900/20 hover:opacity-95 transition-all cursor-pointer flex items-center justify-center space-x-1.5 active:scale-95"
+                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-emerald-900/20 hover:opacity-95 transition-all cursor-pointer flex items-center justify-center space-x-1.5 active:scale-95"
                   >
                     <Check className="w-4 h-4" />
                     <span>জমা নিশ্চিত করুন ও এন্ট্রি দিন</span>
@@ -2493,7 +2493,7 @@ export default function ManagementDashboard({
               {/* Add New Short Expense Form */}
               <form onSubmit={handleAddExpense} className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-1 items-end">
                 <div className="sm:col-span-2">
-                  <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
                     খরচের পর্যায় / বিবরণ (যেমন: ১ম-৫ম তলা ঢালাই) *
                   </label>
                   <input
@@ -2507,7 +2507,7 @@ export default function ManagementDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
                     খরচের পরিমাণ *
                   </label>
                   <input
@@ -3890,7 +3890,7 @@ export default function ManagementDashboard({
                   className="space-y-3 pt-1"
                 >
                   <div>
-                    <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                    <label className="block text-2xs font-semibold text-slate-600 mb-1">
                       বর্তমান পিন লিখুন
                     </label>
                     <input
@@ -3908,7 +3908,7 @@ export default function ManagementDashboard({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                      <label className="block text-2xs font-semibold text-slate-600 mb-1">
                         নতুন পিন (কমপক্ষে ৪ সংখ্যা)
                       </label>
                       <input
@@ -3924,7 +3924,7 @@ export default function ManagementDashboard({
                       />
                     </div>
                     <div>
-                      <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                      <label className="block text-2xs font-semibold text-slate-600 mb-1">
                         নতুন পিন নিশ্চিত করুন
                       </label>
                       <input
@@ -4032,7 +4032,7 @@ export default function ManagementDashboard({
 
             <form onSubmit={handleVerifyAndExecuteDelete} className="space-y-3.5">
               <div>
-                <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                <label className="block text-2xs font-semibold text-slate-600 mb-1">
                   মাস্টার পিন দিন (ডিফল্ট: 7788) *
                 </label>
                 <input
@@ -4188,7 +4188,7 @@ export default function ManagementDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
                   পরিচালকের পূর্ণ নাম *
                 </label>
                 <input
@@ -4203,7 +4203,7 @@ export default function ManagementDashboard({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
                     বোর্ড পদবি / ভূমিকা *
                   </label>
                   <select
@@ -4231,7 +4231,7 @@ export default function ManagementDashboard({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
                     বিনিয়োগকৃত মূলধন *
                   </label>
                   <input
@@ -4245,7 +4245,7 @@ export default function ManagementDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
                     শেয়ার শতাংশ (%) *
                   </label>
                   <input
@@ -4262,7 +4262,7 @@ export default function ManagementDashboard({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
                     পরিচালকের মোবাইল নম্বর
                   </label>
                   <input
@@ -4275,7 +4275,7 @@ export default function ManagementDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-3xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
                     ইমেইল (ঐচ্ছিক)
                   </label>
                   <input
