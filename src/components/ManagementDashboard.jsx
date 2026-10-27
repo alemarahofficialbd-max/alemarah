@@ -83,7 +83,8 @@ import {
   deleteTeamMember,
   updateJobApplicationStatus,
   updateJobApplication,
-  syncFromSupabase
+  syncFromSupabase,
+  fetchJobApplicationsFromSupabase
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -2953,10 +2954,25 @@ export default function ManagementDashboard({
                     type="button"
                     onClick={async () => {
                       setIsSyncingJobs(true);
-                      await syncFromSupabase();
-                      const latest = getManagementData();
-                      setData(latest);
-                      setIsSyncingJobs(false);
+                      try {
+                        const cloudApps = await fetchJobApplicationsFromSupabase();
+                        const current = getManagementData();
+                        const updated = {
+                          ...current,
+                          jobApplications: cloudApps
+                        };
+                        try {
+                          localStorage.setItem('alemarah_management_data_v1', JSON.stringify(updated));
+                        } catch (_) {}
+                        setData(updated);
+                        triggerAlert('ক্লাউড থেকে চাকরির আবেদন সফলভাবে আপডেট করা হয়েছে।');
+                      } catch (err) {
+                        console.error('Sync error:', err);
+                        await syncFromSupabase();
+                        setData(getManagementData());
+                      } finally {
+                        setIsSyncingJobs(false);
+                      }
                     }}
                     className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006231] border border-emerald-200 text-xs font-bold flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs transition-all active:scale-95 shrink-0"
                     title="ক্লাউড থেকে নতুন আবেদন সিঙ্ক করুন"
@@ -7114,11 +7130,15 @@ export default function ManagementDashboard({
                     setIsDeletingApp(true);
                     const appId = appToDelete.id;
                     const applicantName = appToDelete.applicantName;
-                    await deleteJobApplication(appId);
-                    const updated = getManagementData();
-                    setData(updated);
+                    const updated = await deleteJobApplication(appId);
+                    if (updated) {
+                      setData(updated);
+                    } else {
+                      const latest = getManagementData();
+                      setData(latest);
+                    }
                     setAppToDelete(null);
-                    triggerAlert(`"${applicantName}"-এর আবেদনটি সফলভাবে মুছে ফেলা হয়েছে।`);
+                    triggerAlert(`"${applicantName}"-এর আবেদনটি ডাটাবেজ থেকে স্থায়ীভাবে মুছে ফেলা হয়েছে।`);
                   } catch (err) {
                     console.error('Delete error:', err);
                     triggerAlert('আবেদন মুছে ফেলতে সমস্যা হয়েছে।');

@@ -408,7 +408,7 @@ export const syncToSupabase = async (data) => {
     }
 
     // 5. Cloud Sync Job Applications
-    if (data.jobApplications && Array.isArray(data.jobApplications) && data.jobApplications.length > 0) {
+    if (data.jobApplications && Array.isArray(data.jobApplications)) {
       await syncJobApplicationsToSupabase(data.jobApplications);
     }
   } catch (err) {
@@ -468,15 +468,10 @@ export const syncFromSupabase = async () => {
           status: a.status
         }));
 
-      // Cloud Sync: Retrieve all public job applications from Supabase
+      // Cloud Sync: Retrieve authoritative job applications from Supabase Cloud
       const jobStoreRow = adminsRes.data.find(a => a.id === 'JOB-APPLICATIONS-STORE');
       if (jobStoreRow && Array.isArray(jobStoreRow.permissions)) {
-        const remoteApps = jobStoreRow.permissions;
-        const localApps = current.jobApplications || [];
-        const appMap = new Map();
-        localApps.forEach(app => { if (app && app.id) appMap.set(app.id, app); });
-        remoteApps.forEach(app => { if (app && app.id) appMap.set(app.id, app); });
-        updated.jobApplications = Array.from(appMap.values());
+        updated.jobApplications = jobStoreRow.permissions;
       }
     }
 
@@ -638,13 +633,9 @@ export const saveJobApplication = async (application) => {
       }
     } catch (_) {}
 
-    // 2. Build existing application list to find highest sequence ID
-    const appMap = new Map();
-    (current.jobApplications || []).forEach(a => { if (a && a.id) appMap.set(a.id, a); });
-    remoteApps.forEach(a => { if (a && a.id) appMap.set(a.id, a); });
-
-    const allExisting = Array.from(appMap.values());
-    const cleanId = application.id || generateNextJobId(allExisting);
+    // 2. Base existing applications on authoritative cloud store
+    const baseList = remoteApps.length > 0 ? remoteApps : (current.jobApplications || []);
+    const cleanId = application.id || generateNextJobId(baseList);
 
     const newApp = {
       date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
@@ -659,16 +650,18 @@ export const saveJobApplication = async (application) => {
       id: cleanId
     };
 
-    appMap.set(newApp.id, newApp);
-    const mergedList = Array.from(appMap.values());
+    const mergedList = [newApp, ...baseList.filter(a => a && a.id !== newApp.id)];
     const updated = {
       ...current,
       jobApplications: mergedList
     };
 
-    saveManagementData(updated);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: updated }));
+    } catch (_) {}
 
-    // Push directly to Supabase cloud store so Admin on ANY device sees it in real time
+    // Direct sync to Supabase cloud store
     await syncJobApplicationsToSupabase(mergedList);
 
     return newApp;
@@ -699,17 +692,49 @@ export const deleteTeamMember = async (id) => {
 // Delete job application from management (Local + Supabase Cloud)
 export const deleteJobApplication = async (appId) => {
   try {
+    // 1. Fetch live remote list from Supabase Cloud
+    let cloudList = [];
+    try {
+      const { data } = await supabaseAdmin
+        .from('admins')
+        .select('permissions')
+        .eq('id', 'JOB-APPLICATIONS-STORE')
+        .single();
+      if (data && Array.isArray(data.permissions)) {
+        cloudList = data.permissions;
+      }
+    } catch (fetchErr) {
+      console.warn('Could not fetch cloud list during delete, using local:', fetchErr);
+    }
+
     const current = getManagementData();
-    const updatedList = (current.jobApplications || []).filter(a => a.id !== appId);
+    const sourceList = cloudList.length > 0 ? cloudList : (current.jobApplications || []);
+    const updatedList = sourceList.filter(a => a && a.id !== appId);
+
+    // 2. Direct atomic upsert to Supabase Cloud
+    await syncJobApplicationsToSupabase(updatedList);
+
+    // 3. Update localStorage directly with the authoritative list
     const updated = {
       ...current,
       jobApplications: updatedList
     };
-    saveManagementData(updated);
-    await syncJobApplicationsToSupabase(updatedList);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    } catch (_) {}
+
+    window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: updated }));
     return updated;
   } catch (e) {
     console.error('Error deleting job application:', e);
+    const current = getManagementData();
+    const fallbackList = (current.jobApplications || []).filter(a => a && a.id !== appId);
+    const updated = { ...current, jobApplications: fallbackList };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: updated }));
+    } catch (_) {}
+    return updated;
   }
 };
 
