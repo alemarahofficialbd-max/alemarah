@@ -64,7 +64,8 @@ import {
   Bath,
   Ruler,
   Tag,
-  ExternalLink
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
 import {
   formatBDT,
@@ -76,7 +77,8 @@ import {
   isHashedPassword,
   deleteJobApplication,
   updateJobApplicationStatus,
-  updateJobApplication
+  updateJobApplication,
+  syncFromSupabase
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -223,6 +225,7 @@ export default function ManagementDashboard({
   // 1. New Client Form
   // Job Application Interview Scheduling & Status State
   const [selectedAppForInterview, setSelectedAppForInterview] = useState(null);
+  const [isSyncingJobs, setIsSyncingJobs] = useState(false);
   const [interviewForm, setInterviewForm] = useState({
     status: '',
     interviewDate: '',
@@ -2909,6 +2912,23 @@ export default function ManagementDashboard({
                       </p>
                     </div>
                   </div>
+
+                  {/* Cloud Sync Refresh Button */}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setIsSyncingJobs(true);
+                      await syncFromSupabase();
+                      const latest = getManagementData();
+                      setData(latest);
+                      setIsSyncingJobs(false);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006231] border border-emerald-200 text-xs font-bold flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs transition-all active:scale-95 shrink-0"
+                    title="ক্লাউড থেকে নতুন আবেদন সিঙ্ক করুন"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isSyncingJobs ? 'animate-spin text-emerald-700' : 'text-[#006231]'}`} />
+                    <span>{isSyncingJobs ? 'সিঙ্ক হচ্ছে...' : 'ক্লাউড থেকে নতুন আবেদন রিফ্রেশ করুন'}</span>
+                  </button>
                 </div>
 
                 {(!data.jobApplications || data.jobApplications.length === 0) ? (

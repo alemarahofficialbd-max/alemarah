@@ -28,7 +28,7 @@ import {
   FolderOpen
 } from 'lucide-react';
 import { jobsData, careerPillars } from '../data/jobsData';
-import { saveJobApplication, findJobApplication } from '../data/managementStore';
+import { saveJobApplication, findJobApplication, fetchJobApplicationsFromSupabase } from '../data/managementStore';
 
 export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
   const isEn = lang === 'en';
@@ -152,47 +152,48 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
     return Object.keys(errors).length === 0;
   };
 
-  // Submit Application
-  const handleSubmitApplication = (e) => {
+  // Submit Application (Cloud Synced to Supabase)
+  const handleSubmitApplication = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      const cleanId = 'AL-JOB-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
-      const payload = {
-        ...formData,
-        id: cleanId,
-        submittedPosition: formData.jobTitle || 'Accounts & Administration Officer',
-        status: 'নতুন আবেদন (Under Review)',
-        appliedDateBn: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
-        interviewDate: '',
-        interviewTime: '',
-        interviewLocation: 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা',
-        requiredDocuments: 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
-        adminNotes: ''
-      };
-      const saved = saveJobApplication(payload);
-      setIsSubmitting(false);
-      setSelectedJobForApply(null);
-      setSubmittedApplication(saved || payload);
+    const cleanId = 'AL-JOB-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+    const payload = {
+      ...formData,
+      id: cleanId,
+      submittedPosition: formData.jobTitle || 'Accounts & Administration Officer',
+      status: 'নতুন আবেদন (Under Review)',
+      appliedDateBn: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      interviewDate: '',
+      interviewTime: '',
+      interviewLocation: 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা',
+      requiredDocuments: 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
+      adminNotes: ''
+    };
+    
+    // Save locally and push to Supabase cloud
+    const saved = await saveJobApplication(payload);
+    
+    setIsSubmitting(false);
+    setSelectedJobForApply(null);
+    setSubmittedApplication(saved || payload);
 
-      // Reset form
-      setFormData({
-        jobId: '',
-        jobTitle: '',
-        applicantName: '',
-        phone: '',
-        email: '',
-        district: '',
-        education: '',
-        experienceYears: '',
-        currentCompany: '',
-        expectedSalary: '',
-        cvLink: '',
-        coverNote: ''
-      });
-    }, 700);
+    // Reset form
+    setFormData({
+      jobId: '',
+      jobTitle: '',
+      applicantName: '',
+      phone: '',
+      email: '',
+      district: '',
+      education: '',
+      experienceYears: '',
+      currentCompany: '',
+      expectedSalary: '',
+      cvLink: '',
+      coverNote: ''
+    });
   };
 
   const handleCopyId = (id) => {
@@ -1235,10 +1236,22 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
 
             {/* Search Box */}
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 if (!trackQuery.trim()) return;
-                const res = findJobApplication(trackQuery.trim());
+                let res = findJobApplication(trackQuery.trim());
+                if (!res) {
+                  // Fallback: fetch directly from Supabase Cloud
+                  const remoteApps = await fetchJobApplicationsFromSupabase();
+                  const q = trackQuery.trim().toLowerCase();
+                  const digits = q.replace(/[^0-9]/g, '');
+                  res = remoteApps.find(a => {
+                    const matchId = a.id && a.id.toLowerCase() === q;
+                    const cleanPhone = (a.phone || '').replace(/[^0-9]/g, '');
+                    const matchPhone = digits.length >= 8 && cleanPhone.includes(digits);
+                    return matchId || matchPhone;
+                  }) || null;
+                }
                 setTrackResult(res);
                 setTrackHasSearched(true);
               }}
