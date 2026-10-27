@@ -12,8 +12,7 @@ import {
   ChevronRight, 
   ShieldCheck, 
   Compass, 
-  Coins,
-  Briefcase
+  Coins
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -54,7 +53,6 @@ export default function Navbar({
     { id: 'investment', label: t.nav.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ ও শেয়ার'), shortLabel: lang === 'en' ? 'Invest' : 'বিনিয়োগ', icon: Coins },
     { id: 'why-us', label: t.nav.whyUs, shortLabel: lang === 'en' ? 'Why Us' : 'কেন আমরা', icon: ShieldCheck },
     { id: 'about', label: t.nav.about, shortLabel: lang === 'en' ? 'About' : 'আমাদের', icon: Compass },
-    { id: 'careers', label: t.nav.careers || (lang === 'en' ? 'Careers' : 'ক্যারিয়ার'), shortLabel: lang === 'en' ? 'Jobs' : 'ক্যারিয়ার', icon: Briefcase },
     { id: 'contact', label: t.nav.contact, shortLabel: t.nav.contact, icon: Phone }
   ];
 
