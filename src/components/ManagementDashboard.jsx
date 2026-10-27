@@ -6560,29 +6560,7 @@ export default function ManagementDashboard({
                     onChange={(e) => setInterviewForm(prev => ({ ...prev, interviewTime: e.target.value }))}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-[#006231]/20 focus:border-[#006231] cursor-pointer shadow-2xs"
                   />
-                  {/* Common Time Presets */}
-                  <div className="flex items-center gap-1 mt-2 flex-wrap">
-                    {[
-                      { label: '১০:০০ AM', val: '10:00' },
-                      { label: '১১:০০ AM', val: '11:00' },
-                      { label: '১২:০০ PM', val: '12:00' },
-                      { label: '০৩:০০ PM', val: '15:00' },
-                      { label: '০৪:০০ PM', val: '16:00' }
-                    ].map(preset => (
-                      <button
-                        key={preset.val}
-                        type="button"
-                        onClick={() => setInterviewForm(prev => ({ ...prev, interviewTime: preset.val }))}
-                        className={`text-3xs px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
-                          interviewForm.interviewTime === preset.val
-                            ? 'bg-purple-600 text-white border-purple-600 font-bold shadow-2xs'
-                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100 font-medium'
-                        }`}
-                      >
-                        {preset.label}
-                      </button>
-                    ))}
-                  </div>
+
                 </div>
               </div>
 
