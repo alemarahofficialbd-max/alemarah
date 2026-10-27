@@ -12,7 +12,8 @@ import {
   ChevronRight, 
   ShieldCheck, 
   Compass, 
-  Coins
+  Coins,
+  Briefcase
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -51,10 +52,14 @@ export default function Navbar({
     { id: 'home', label: t.nav.home, shortLabel: t.nav.home, icon: Home },
     { id: 'projects', label: t.nav.projects, shortLabel: t.nav.projects, icon: Building2 },
     { id: 'investment', label: t.nav.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ ও শেয়ার'), shortLabel: lang === 'en' ? 'Invest' : 'বিনিয়োগ', icon: Coins },
-    { id: 'why-us', label: t.nav.whyUs, shortLabel: lang === 'en' ? 'Why Us' : 'কেন আমরা', icon: ShieldCheck },
-    { id: 'about', label: t.nav.about, shortLabel: lang === 'en' ? 'About' : 'আমাদের', icon: Compass },
+    { id: 'why-us', label: t.nav.whyUs, shortLabel: lang === 'en' ? 'Why Us' : 'কেন আল-ইমারাহ', icon: ShieldCheck },
+    { id: 'about', label: t.nav.about, shortLabel: lang === 'en' ? 'About' : 'আমাদের সম্পর্কে', icon: Compass },
+    { id: 'careers', label: t.nav.careers || (lang === 'en' ? 'Careers' : 'ক্যারিয়ার'), shortLabel: lang === 'en' ? 'Jobs' : 'ক্যারিয়ার', icon: Briefcase },
     { id: 'contact', label: t.nav.contact, shortLabel: t.nav.contact, icon: Phone }
   ];
+
+  // Mobile bottom dock bar strictly has 6 items to avoid wrapping onto a 2nd row
+  const bottomNavLinks = navLinks.filter(item => item.id !== 'careers');
 
   const handleNavClick = (pageId) => {
     setMobileMenuOpen(false);
@@ -329,10 +334,10 @@ export default function Navbar({
         </div>
       )}
 
-      {/* Floating Bottom Navigation Bar for Phone View (Exact 6 items as requested) */}
+      {/* Floating Bottom Navigation Bar for Phone View (Exact 6 core items without wrapping) */}
       <nav className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 py-1.5 px-1 z-40 lg:hidden shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
         <div className="grid grid-cols-6 items-center max-w-lg mx-auto">
-          {navLinks.map((item) => {
+          {bottomNavLinks.map((item) => {
             const IconComponent = item.icon;
             const isActive = currentPage === item.id;
             return (
