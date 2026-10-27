@@ -760,19 +760,51 @@ export const updateJobApplicationStatus = async (appId, newStatus) => {
 // Full update for job application (status, interview schedule, venue, required docs, admin notes)
 export const updateJobApplication = async (appId, updates) => {
   try {
+    // 1. Fetch live remote list from Supabase Cloud
+    let cloudList = [];
+    try {
+      const { data } = await supabaseAdmin
+        .from('admins')
+        .select('permissions')
+        .eq('id', 'JOB-APPLICATIONS-STORE')
+        .single();
+      if (data && Array.isArray(data.permissions)) {
+        cloudList = data.permissions;
+      }
+    } catch (_) {}
+
     const current = getManagementData();
-    const updatedList = (current.jobApplications || []).map(a => 
-      a.id === appId ? { ...a, ...updates, updatedAt: new Date().toISOString() } : a
+    const sourceList = cloudList.length > 0 ? cloudList : (current.jobApplications || []);
+    const updatedList = sourceList.map(a => 
+      a && a.id === appId ? { ...a, ...updates, updatedAt: new Date().toISOString() } : a
     );
+
+    // 2. Direct atomic upsert to Supabase Cloud
+    await syncJobApplicationsToSupabase(updatedList);
+
+    // 3. Update localStorage directly
     const updated = {
       ...current,
       jobApplications: updatedList
     };
-    saveManagementData(updated);
-    await syncJobApplicationsToSupabase(updatedList);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    } catch (_) {}
+
+    window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: updated }));
     return updated;
   } catch (e) {
     console.error('Error updating job application:', e);
+    const current = getManagementData();
+    const updatedList = (current.jobApplications || []).map(a => 
+      a && a.id === appId ? { ...a, ...updates, updatedAt: new Date().toISOString() } : a
+    );
+    const updated = { ...current, jobApplications: updatedList };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: updated }));
+    } catch (_) {}
+    return updated;
   }
 };
 

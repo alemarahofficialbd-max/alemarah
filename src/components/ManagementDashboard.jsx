@@ -248,10 +248,40 @@ export default function ManagementDashboard({
 
   const formatCleanStatus = (status) => {
     if (!status) return 'নতুন আবেদন';
-    if (status.includes('ইন্টারভিউ') || status.includes('Shortlist')) return 'ইন্টারভিউয়ের জন্য নির্বাচিত';
-    if (status.includes('চূড়ান্ত') || status.includes('Selected')) return 'চূড়ান্ত নির্বাচিত';
     if (status.includes('দুঃখিত') || status.includes('Not Selected') || status.includes('হননি')) return 'নির্বাচিত হননি';
+    if (status.includes('চূড়ান্ত') || (status.includes('Selected') && !status.includes('Not'))) return 'চূড়ান্ত নির্বাচিত';
+    if (status.includes('ইন্টারভিউ') || status.includes('Shortlist')) return 'ইন্টারভিউয়ের জন্য নির্বাচিত';
     return 'নতুন আবেদন';
+  };
+
+  const getStatusBadge = (rawStatus) => {
+    const s = rawStatus || '';
+    if (s.includes('দুঃখিত') || s.includes('Not Selected') || s.includes('হননি')) {
+      return {
+        label: 'নির্বাচিত হননি',
+        bg: 'bg-red-50 text-red-700 border-red-200/80',
+        dot: 'bg-red-500'
+      };
+    }
+    if (s.includes('চূড়ান্ত') || (s.includes('Selected') && !s.includes('Not'))) {
+      return {
+        label: 'চূড়ান্ত নির্বাচিত',
+        bg: 'bg-blue-50 text-blue-700 border-blue-200/80',
+        dot: 'bg-blue-600'
+      };
+    }
+    if (s.includes('ইন্টারভিউ') || s.includes('Shortlist')) {
+      return {
+        label: 'ইন্টারভিউ শিডিউল্ড',
+        bg: 'bg-emerald-50 text-[#006231] border-emerald-200/80',
+        dot: 'bg-emerald-500'
+      };
+    }
+    return {
+      label: 'নতুন আবেদন',
+      bg: 'bg-amber-50 text-amber-700 border-amber-200/80',
+      dot: 'bg-amber-500 animate-pulse'
+    };
   };
 
   const [openActionMenuId, setOpenActionMenuId] = useState(null);
@@ -2990,53 +3020,65 @@ export default function ManagementDashboard({
                   </div>
                 ) : (
                   <div className="divide-y divide-slate-100">
-                    {data.jobApplications.map((app, appIdx) => (
+                    {data.jobApplications.map((app, appIdx) => {
+                      const statusBadge = getStatusBadge(app.status);
+                      return (
                       <div 
                         key={app.id} 
-                        className={`p-3 sm:p-4 hover:bg-slate-50/80 transition-colors flex items-center justify-between gap-2.5 relative ${openActionMenuId === app.id ? 'z-30' : 'z-10'}`}
+                        className={`p-3 sm:p-4 hover:bg-slate-50/80 transition-colors flex items-center justify-between gap-3 relative ${openActionMenuId === app.id ? 'z-30' : 'z-10'}`}
                       >
-                        {/* Left: Strict 2-Line Mobile Optimized Layout */}
+                        {/* Mobile View: Exactly 2 clean lines (Line 1: Name, Line 2: Applied Pod) */}
                         <div 
-                          className="space-y-0.5 cursor-pointer min-w-0 flex-1" 
+                          className="sm:hidden space-y-0.5 cursor-pointer min-w-0 flex-1" 
+                          onClick={() => setSelectedAppForDetails(app)}
+                        >
+                          <div className="text-xs font-black text-slate-900 truncate">
+                            {app.applicantName}
+                          </div>
+                          <div className="text-3xs font-bold text-[#006231] truncate">
+                            {formatCleanJobTitle(app.jobTitle || app.submittedPosition)}
+                          </div>
+                        </div>
+
+                        {/* Desktop View: Full details with clear name, role, ID, phone, date */}
+                        <div 
+                          className="hidden sm:block space-y-1 cursor-pointer min-w-0 flex-1" 
                           onClick={() => setSelectedAppForDetails(app)}
                         >
                           {/* Line 1: Name + Role */}
-                          <div className="flex items-center gap-1.5 sm:gap-2 leading-tight">
-                            <span className="text-xs sm:text-sm font-black text-slate-900 hover:text-[#006231] transition-colors truncate max-w-[130px] sm:max-w-none">
+                          <div className="flex items-center gap-2 leading-tight">
+                            <span className="text-sm font-black text-slate-900 hover:text-[#006231] transition-colors truncate">
                               {app.applicantName}
                             </span>
                             <span className="text-slate-300">•</span>
-                            <span className="text-3xs sm:text-xs font-bold text-[#006231] truncate max-w-[120px] sm:max-w-none">
+                            <span className="text-xs font-bold text-[#006231] truncate">
                               {formatCleanJobTitle(app.jobTitle || app.submittedPosition)}
                             </span>
                           </div>
 
-                          {/* Line 2: ID + Phone + Status (+ Date on desktop) */}
-                          <div className="flex items-center gap-1.5 sm:gap-2 text-3xs sm:text-xs text-slate-500 font-medium leading-tight truncate">
+                          {/* Line 2: ID + Phone + Date */}
+                          <div className="flex items-center gap-2 text-xs text-slate-500 font-medium leading-tight truncate">
                             <span className="font-mono text-slate-700 font-bold shrink-0">
                               {app.id}
                             </span>
                             <span>•</span>
-                            <span className="shrink-0 flex items-center gap-0.5 text-slate-600">
-                              <Phone className="w-2.5 h-2.5 text-[#006231] shrink-0" />
+                            <span className="shrink-0 flex items-center gap-1 text-slate-600">
+                              <Phone className="w-3 h-3 text-[#006231] shrink-0" />
                               <span>{app.phone}</span>
                             </span>
-                            <span className="hidden md:inline">•</span>
-                            <span className="hidden md:inline text-slate-400">
+                            <span>•</span>
+                            <span className="text-slate-400 shrink-0">
                               {app.appliedDateBn || app.date}
                             </span>
-                            <span>•</span>
-                            <span className={`inline-flex items-center gap-1 font-bold shrink-0 ${
-                              (app.status || '').includes('ইন্টারভিউ') || (app.status || '').includes('নির্বাচিত')
-                                ? 'text-emerald-700'
-                                : (app.status || '').includes('দুঃখিত') || (app.status || '').includes('হননি')
-                                ? 'text-red-600'
-                                : 'text-amber-700'
-                            }`}>
-                              <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                              <span>{formatCleanStatus(app.status)}</span>
-                            </span>
                           </div>
+                        </div>
+
+                        {/* Desktop Status Pill (Prominent outside badge so status is visible immediately from outside) */}
+                        <div className="hidden sm:flex items-center shrink-0">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 shadow-2xs ${statusBadge.bg}`}>
+                            <span className={`w-2 h-2 rounded-full ${statusBadge.dot}`}></span>
+                            <span>{statusBadge.label}</span>
+                          </span>
                         </div>
 
                         {/* Right: Compact "বিস্তারিত" button + 3-Dot Dropdown Menu in same line */}
@@ -3175,7 +3217,8 @@ export default function ManagementDashboard({
                           </div>
                         </div>
                       </div>
-                    ))}
+                    );
+                    })}
                   </div>
                 )}
               </div>
@@ -6620,9 +6663,9 @@ export default function ManagementDashboard({
                   <button
                     type="button"
                     onClick={async () => {
-                      await updateJobApplication(selectedAppForInterview.id, interviewForm);
-                      const updated = getManagementData();
-                      setData(updated);
+                      const updated = await updateJobApplication(selectedAppForInterview.id, interviewForm);
+                      if (updated) setData(updated);
+                      else setData(getManagementData());
                       setInterviewSuccessModal({
                         name: selectedAppForInterview.applicantName,
                         phone: selectedAppForInterview.phone,
@@ -6648,10 +6691,10 @@ export default function ManagementDashboard({
                     )}`}
                     target="_blank"
                     rel="noreferrer"
-                    onClick={() => {
-                      updateJobApplication(selectedAppForInterview.id, interviewForm);
-                      const updated = getManagementData();
-                      setData(updated);
+                    onClick={async () => {
+                      const updated = await updateJobApplication(selectedAppForInterview.id, interviewForm);
+                      if (updated) setData(updated);
+                      else setData(getManagementData());
                       setSelectedAppForInterview(null);
                     }}
                     className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center space-x-1"
@@ -7022,7 +7065,7 @@ export default function ManagementDashboard({
                     setSelectedAppForDetails(null);
                     setSelectedAppForInterview(app);
                     setInterviewForm({
-                      status: app.status || 'ইন্টারভিউয়ের জন্য নির্বাচিত (Shortlisted)',
+                      status: formatCleanStatus(app.status),
                       interviewDate: app.interviewDate || '২০২৬-১১-০৫',
                       interviewTime: app.interviewTime || 'সকাল ১১:০০ টা',
                       interviewLocation: app.interviewLocation || 'আল-ইমারাহ প্রোপার্টিজ লিমিটেড, হেড অফিস, পুরানা পল্টন, ঢাকা',
