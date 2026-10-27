@@ -98,3 +98,14 @@
   }
 }
 
+
+@layer utilities {
+  .text-3xs {
+    font-size: 0.625rem !important;
+    line-height: 0.875rem !important;
+  }
+  .text-2xs {
+    font-size: 0.6875rem !important;
+    line-height: 0.9375rem !important;
+  }
+}

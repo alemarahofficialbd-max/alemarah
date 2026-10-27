@@ -6,6 +6,10 @@ export default {
   ],
   theme: {
     extend: {
+      fontSize: {
+        '3xs': ['0.625rem', { lineHeight: '0.875rem' }], // 10px
+        '2xs': ['0.6875rem', { lineHeight: '0.9375rem' }], // 11px
+      },
       colors: {
         brand: {
           red: '#CE2028',
