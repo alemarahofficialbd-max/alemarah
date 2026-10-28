@@ -1546,7 +1546,7 @@ export default function ManagementDashboard({
     { id: 'payments', label: '২. পেমেন্ট ও জমা এন্ট্রি', shortLabel: 'জমা এন্ট্রি', icon: DollarSign },
     { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল', shortLabel: 'প্রজেক্ট', icon: Building2 },
     { id: 'expenses', label: '৪. প্রজেক্ট বাজেট ও খরচ', shortLabel: 'বাজেট ও খরচ', icon: Wallet },
-    { id: 'investments', label: '৫. ইনভেস্টমেন্ট অফার (এগ্রো)', shortLabel: 'ইনভেস্টমেন্ট', icon: TrendingUp },
+    { id: 'investments', label: '৫. ইনভেস্টমেন্ট', shortLabel: 'ইনভেস্টমেন্ট', icon: TrendingUp },
     { id: 'team', label: '৬. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
     { 
       id: 'directors', 
