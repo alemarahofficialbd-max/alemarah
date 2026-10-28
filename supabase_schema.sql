@@ -251,3 +251,26 @@ ALTER TABLE public.investment_offers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.investors ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read/write investment_offers" ON public.investment_offers FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow public read/write investors" ON public.investors FOR ALL USING (true) WITH CHECK (true);
+
+-- ========================================================
+-- 10. STORAGE POLICIES FOR THE 'resumes' BUCKET
+-- ========================================================
+-- Job applicants upload their CV anonymously from the career page, and
+-- the app previously used the service_role key (bypassing RLS entirely)
+-- to do this upload. The service_role key must never run in the browser,
+-- so instead these two policies grant the `anon` key exactly what the
+-- upload flow needs on this one bucket — nothing else, and no delete.
+CREATE POLICY "Public insert resumes" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'resumes');
+CREATE POLICY "Public read resumes" ON storage.objects
+  FOR SELECT USING (bucket_id = 'resumes');
+
+-- ========================================================
+-- IMPORTANT — ONE-TIME MANUAL STEP (cannot be done from this file)
+-- ========================================================
+-- A service_role key was previously hardcoded in src/lib/supabaseClient.js
+-- and shipped in the production browser bundle, which fully bypasses every
+-- RLS policy above. The code no longer uses that key, but the key itself
+-- is still valid until you revoke it. In the Supabase dashboard, go to
+-- Project Settings -> API -> "service_role" and click "Roll" / regenerate
+-- it now. Do not put the new value in any VITE_-prefixed env var.

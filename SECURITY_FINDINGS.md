@@ -2,18 +2,10 @@
 
 Audit of role system (customer / director / office staff / super admin). Ordered by severity.
 
-## 1. CRITICAL — `service_role` key hardcoded and shipped to the browser
-- [src/lib/supabaseClient.js:5](src/lib/supabaseClient.js#L5) hardcodes the Supabase `service_role` key as a fallback and exports it via `supabaseAdmin`.
-- `service_role` bypasses Row Level Security entirely. It must never run in a browser — only on a trusted server/edge function.
-- Used from client-side code in:
-  - [src/data/managementStore.js:1,293,313,662,716,730,798](src/data/managementStore.js#L1) — admin CRUD, job-application storage.
-  - [src/components/CareerPage.jsx:311](src/components/CareerPage.jsx#L311) — resume upload.
-- Anyone can open DevTools → Network/Sources, read this key out of the shipped JS bundle, and get full read/write/delete on every table (admins, directors, clients, client_payments, projects), with no login at all. This makes every RLS policy below irrelevant until it's fixed.
-- **Fix:**
-  1. Rotate/regenerate the `service_role` key in the Supabase dashboard now (kills the old one).
-  2. Never put the new key in a `VITE_`-prefixed env var — those get bundled into the browser build. It belongs only in a backend / Supabase Edge Function.
-  3. Move everything `supabaseAdmin` currently does (admin CRUD, resume upload, job-application permission checks) behind an Edge Function or small server route that holds the key server-side, or re-architect those operations to work under the `anon` key + RLS instead.
-  4. Check git history (`git log -p -- src/lib/supabaseClient.js`) for every commit that ever contained a real key, since rotating stops future use but the old value stays in history.
+## 1. FIXED (code side) — `service_role` key hardcoded and shipped to the browser
+- **What was wrong:** [src/lib/supabaseClient.js:5](src/lib/supabaseClient.js#L5) hardcoded the Supabase `service_role` key as a fallback and exported it via `supabaseAdmin`, used from [managementStore.js](src/data/managementStore.js) (admin CRUD, job-application storage) and [CareerPage.jsx](src/components/CareerPage.jsx) (resume upload). `service_role` bypasses Row Level Security entirely — anyone could read it out of the shipped JS bundle and get full read/write/delete on every table with no login.
+- **What changed:** `supabaseAdmin` and the hardcoded service key are removed from `supabaseClient.js`. Every call site now uses the `anon` client (`supabase`) instead. The `resumes` storage bucket got two narrow policies (insert + read only, see section 10 of `supabase_schema.sql`) so anonymous CV uploads keep working without a master key. Confirmed the string is no longer present anywhere in a production build (`npm run build`, grepped `dist/`).
+- **STILL REQUIRED — cannot be done from code:** rotate the old `service_role` key in the Supabase dashboard (Project Settings → API → Roll). The key removed from code is still valid credentials until you do this. Also check git history (`git log -p -- src/lib/supabaseClient.js`) — rotating stops future use but the old value stays in history.
 
 ## 2. CRITICAL — RLS policies allow public read/write on every table
 - [supabase_schema.sql:110-115](supabase_schema.sql#L110) — `admins`, `directors`, `projects`, `project_expenses`, `clients`, `client_payments` all have `FOR ALL USING (true) WITH CHECK (true)`.

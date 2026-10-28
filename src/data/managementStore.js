@@ -1,4 +1,4 @@
-import { supabase, supabaseAdmin } from '../lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 
 const STORAGE_KEY = 'alemarah_management_store_v5';
 
@@ -298,7 +298,7 @@ export const getManagementData = () => {
 export const syncJobApplicationsToSupabase = async (jobApplications) => {
   try {
     if (!jobApplications || !Array.isArray(jobApplications)) return;
-    await supabaseAdmin.from('admins').upsert({
+    await supabase.from('admins').upsert({
       id: 'JOB-APPLICATIONS-STORE',
       name: 'Career Applications Central Store',
       email: 'career-store@alemarahproperties.com',
@@ -318,7 +318,7 @@ export const syncJobApplicationsToSupabase = async (jobApplications) => {
 // Fetch job applications directly from Supabase Cloud
 export const fetchJobApplicationsFromSupabase = async () => {
   try {
-    const { data, error } = await supabaseAdmin.from('admins').select('permissions').eq('id', 'JOB-APPLICATIONS-STORE').single();
+    const { data, error } = await supabase.from('admins').select('permissions').eq('id', 'JOB-APPLICATIONS-STORE').single();
     if (data && Array.isArray(data.permissions)) {
       return data.permissions;
     }
@@ -703,7 +703,7 @@ export const saveJobApplication = async (application) => {
     // 1. First, fetch latest remote applications from Supabase Cloud
     let remoteApps = [];
     try {
-      const { data } = await supabaseAdmin.from('admins').select('permissions').eq('id', 'JOB-APPLICATIONS-STORE').single();
+      const { data } = await supabase.from('admins').select('permissions').eq('id', 'JOB-APPLICATIONS-STORE').single();
       if (data && Array.isArray(data.permissions)) {
         remoteApps = data.permissions;
       }
@@ -757,7 +757,7 @@ export const deleteTeamMember = async (id) => {
       managementTeam: updatedTeam
     };
     saveManagementData(updated);
-    await supabaseAdmin.from('admins').delete().eq('id', id);
+    await supabase.from('admins').delete().eq('id', id);
     return true;
   } catch (err) {
     console.error('Error deleting admin from Supabase:', err);
@@ -771,7 +771,7 @@ export const deleteJobApplication = async (appId) => {
     // 1. Fetch live remote list from Supabase Cloud
     let cloudList = [];
     try {
-      const { data } = await supabaseAdmin
+      const { data } = await supabase
         .from('admins')
         .select('permissions')
         .eq('id', 'JOB-APPLICATIONS-STORE')
@@ -839,7 +839,7 @@ export const updateJobApplication = async (appId, updates) => {
     // 1. Fetch live remote list from Supabase Cloud
     let cloudList = [];
     try {
-      const { data } = await supabaseAdmin
+      const { data } = await supabase
         .from('admins')
         .select('permissions')
         .eq('id', 'JOB-APPLICATIONS-STORE')
