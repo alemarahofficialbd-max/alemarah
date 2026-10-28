@@ -1,11 +1,11 @@
-# Security / Access Control Findings — 2026-10-28
+# Security / Access Control Findings — 2026-10-28 (updated same day)
 
 Audit of role system (customer / director / office staff / super admin). Ordered by severity.
 
 ## 1. FIXED (code side) — `service_role` key hardcoded and shipped to the browser
 - **What was wrong:** [src/lib/supabaseClient.js:5](src/lib/supabaseClient.js#L5) hardcoded the Supabase `service_role` key as a fallback and exported it via `supabaseAdmin`, used from [managementStore.js](src/data/managementStore.js) (admin CRUD, job-application storage) and [CareerPage.jsx](src/components/CareerPage.jsx) (resume upload). `service_role` bypasses Row Level Security entirely — anyone could read it out of the shipped JS bundle and get full read/write/delete on every table with no login.
 - **What changed:** `supabaseAdmin` and the hardcoded service key are removed from `supabaseClient.js`. Every call site now uses the `anon` client (`supabase`) instead. The `resumes` storage bucket got two narrow policies (insert + read only, see section 10 of `supabase_schema.sql`) so anonymous CV uploads keep working without a master key. Confirmed the string is no longer present anywhere in a production build (`npm run build`, grepped `dist/`).
-- **STILL REQUIRED — cannot be done from code:** rotate the old `service_role` key in the Supabase dashboard (Project Settings → API → Roll). The key removed from code is still valid credentials until you do this. Also check git history (`git log -p -- src/lib/supabaseClient.js`) — rotating stops future use but the old value stays in history.
+- **DONE (2026-10-28):** the project switched to Supabase's new key format (`sb_publishable_...` in `supabaseClient.js`), then the legacy JWT-based `anon`+`service_role` key pair was disabled from the dashboard (API → "Disable JWT-based API keys"). The old leaked `service_role` value is now dead — it cannot be used even though it still appears in old git history/commits.
 
 ## 2. CRITICAL — RLS policies allow public read/write on every table
 - [supabase_schema.sql:110-115](supabase_schema.sql#L110) — `admins`, `directors`, `projects`, `project_expenses`, `clients`, `client_payments` all have `FOR ALL USING (true) WITH CHECK (true)`.
