@@ -201,3 +201,14 @@ CREATE TABLE IF NOT EXISTS public.inquiries (
 ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public insert inquiries" ON public.inquiries FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow authenticated read/manage inquiries" ON public.inquiries FOR ALL USING (true);
+
+-- 8. PROJECT PRICING RATE CARD + PER-SALE PRICE BREAKDOWN
+-- A project is sold either as a fixed "package" (admin types a land price
+-- and a construction price per sale) or by "square feet" (admin picks a
+-- flat from the project's unit catalog and the price is size x rate).
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS price_per_sqft NUMERIC(12, 2) DEFAULT 0;
+
+ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS pricing_mode TEXT DEFAULT 'package'; -- 'package' | 'sqft'
+ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS land_price NUMERIC(15, 2) DEFAULT 0; -- package mode only
+ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS construction_price NUMERIC(15, 2) DEFAULT 0; -- package mode only
+ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS size_sqft NUMERIC(10, 2) DEFAULT 0; -- sqft mode only

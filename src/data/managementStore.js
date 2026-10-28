@@ -377,7 +377,8 @@ export const syncToSupabase = async (data) => {
         location: p.location || '',
         progress: Number(p.progress) || 0,
         current_stage: p.currentStage || '',
-        budget: Number(p.budget) || 0
+        budget: Number(p.budget) || 0,
+        price_per_sqft: Number(p.pricePerSqft) || 0
       }));
       await supabase.from('projects').upsert(projRows, { onConflict: 'id' });
 
@@ -417,7 +418,11 @@ export const syncToSupabase = async (data) => {
         total_price: Number(c.totalPrice) || 0,
         total_paid: Number(c.totalPaid) || 0,
         next_due_date: c.nextDueDate || '',
-        next_due_amount: Number(c.nextDueAmount) || 0
+        next_due_amount: Number(c.nextDueAmount) || 0,
+        pricing_mode: c.pricingMode || 'package',
+        land_price: Number(c.landPrice) || 0,
+        construction_price: Number(c.constructionPrice) || 0,
+        size_sqft: Number(c.sizeSqft) || 0
       }));
       await supabase.from('clients').upsert(clientRows, { onConflict: 'id' });
 

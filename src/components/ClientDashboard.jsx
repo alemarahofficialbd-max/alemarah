@@ -466,7 +466,18 @@ export default function ClientDashboard({
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
                     <div className="text-3xs font-bold text-slate-400 uppercase tracking-wider">মোট চুক্তিভিত্তিক মূল্য</div>
                     <div className="text-base font-black text-slate-900">{formatBDT(client?.totalPrice)}</div>
-                    <div className="text-xs text-slate-500">শতভাগ নিষ্কণ্টক রেজিস্ট্রেশন চুক্তি</div>
+                    {client?.pricingMode === 'sqft' ? (
+                      <div className="text-xs text-slate-500">
+                        {client?.sizeSqft ? `${client.sizeSqft} বর্গফুট` : ''} {project?.pricePerSqft ? `× ৳${project.pricePerSqft}/বর্গফুট` : ''}
+                      </div>
+                    ) : (client?.landPrice || client?.constructionPrice) ? (
+                      <div className="text-xs text-slate-500 space-y-0.5">
+                        <div>জমির মূল্য: <span className="font-semibold text-slate-700">{formatBDT(client.landPrice)}</span></div>
+                        <div>নির্মাণ খরচ: <span className="font-semibold text-slate-700">{formatBDT(client.constructionPrice)}</span></div>
+                      </div>
+                    ) : (
+                      <div className="text-xs text-slate-500">শতভাগ নিষ্কণ্টক রেজিস্ট্রেশন চুক্তি</div>
+                    )}
                   </div>
 
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">

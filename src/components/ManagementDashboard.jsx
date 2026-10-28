@@ -376,6 +376,10 @@ export default function ManagementDashboard({
   const emptyUnitRow = () => ({
     projectId: data.projects[0]?.id || '',
     flatNo: '',
+    pricingMode: 'package', // 'package' | 'sqft'
+    landPrice: '',
+    constructionPrice: '',
+    sizeSqft: '',
     totalPrice: '',
     initialPaid: '',
     nextDueDate: '১৫ নভেম্বর, ২০২৬',
@@ -423,7 +427,8 @@ export default function ManagementDashboard({
     defaultUnitSize: '1265',
     autoGenerateUnits: false,
     handoverDate: 'ডিসেম্বর ২০২৮',
-    customUnitsText: ''
+    customUnitsText: '',
+    pricePerSqft: ''
   });
 
   // Project Master Details & Inventory Management State
@@ -627,6 +632,10 @@ export default function ManagementDashboard({
       projectId: selectedProj.id,
       projectName: selectedProj.name,
       flatNo: unit.flatNo || 'বরাদ্দকৃত ইউনিট',
+      pricingMode: unit.pricingMode || 'package',
+      landPrice: unit.pricingMode === 'sqft' ? 0 : (Number(unit.landPrice) || 0),
+      constructionPrice: unit.pricingMode === 'sqft' ? 0 : (Number(unit.constructionPrice) || 0),
+      sizeSqft: unit.pricingMode === 'sqft' ? (Number(unit.sizeSqft) || 0) : 0,
       totalPrice: Number(unit.totalPrice) || 0,
       totalPaid: initialPaidNum,
       nextDueDate: unit.nextDueDate || '',
@@ -920,6 +929,7 @@ export default function ManagementDashboard({
       totalFloors: Number(projectForm.totalFloors) || 10,
       unitsPerFloor: Number(projectForm.unitsPerFloor) || 2,
       handoverDate: projectForm.handoverDate || 'ডিসেম্বর ২০২৮',
+      pricePerSqft: Number(projectForm.pricePerSqft) || 0,
       units: generatedUnits,
       expenses: []
     };
@@ -941,7 +951,8 @@ export default function ManagementDashboard({
       defaultUnitSize: '1265',
       autoGenerateUnits: false,
       handoverDate: 'ডিসেম্বর ২০২৮',
-      customUnitsText: ''
+      customUnitsText: '',
+      pricePerSqft: ''
     });
 
     // Auto-open project details view immediately

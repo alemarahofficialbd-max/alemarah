@@ -110,6 +110,22 @@ export default function AddProjectModal({
               </div>
             </div>
 
+            <div>
+              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                প্রতি বর্গফুট দাম (টাকা) — স্কয়ারফিট মোডে বিক্রির জন্য
+              </label>
+              <input
+                type="number"
+                placeholder="যেমন: 9500"
+                value={form.pricePerSqft}
+                onChange={(e) => setForm({ ...form, pricePerSqft: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-[#CE2028] focus:border-[#CE2028] transition-all"
+              />
+              <p className="text-3xs text-slate-400 mt-1">
+                কোনো ক্লায়েন্টকে স্কয়ারফিট হিসাবে বিক্রি করলে এই রেট দিয়ে দাম হিসাব হবে (সাইজ × রেট)। প্যাকেজ মূল্যে বিক্রির সময় এটা লাগে না।
+              </p>
+            </div>
+
             <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-3 border-t border-slate-100">
               <button
                 type="button"

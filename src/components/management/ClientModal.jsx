@@ -293,7 +293,17 @@ export default function ClientModal({
                       <div className="space-y-1.5">
                         <select
                           value={unit.flatNo}
-                          onChange={(e) => updateUnit(idx, { flatNo: e.target.value })}
+                          onChange={(e) => {
+                            const flatNo = e.target.value;
+                            if (unit.pricingMode === 'sqft') {
+                              const picked = projectUnits.find(u => u.name === flatNo);
+                              const sqft = picked?.sizeSqft || '';
+                              const rate = Number(selProj?.pricePerSqft) || 0;
+                              updateUnit(idx, { flatNo, sizeSqft: sqft, totalPrice: String((Number(sqft) || 0) * rate) });
+                            } else {
+                              updateUnit(idx, { flatNo });
+                            }
+                          }}
                           className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                           required
                         >
@@ -324,21 +334,128 @@ export default function ClientModal({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        মোট চুক্তি মূল্য *
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="যেমন: 12000000"
-                        value={unit.totalPrice}
-                        onChange={(e) => updateUnit(idx, { totalPrice: e.target.value })}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
-                        required
-                      />
+                  {/* Pricing Mode: Package (fixed land + construction) vs Square Feet (size x rate) */}
+                  <div>
+                    <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      দাম নির্ধারণের ধরন *
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <button
+                        type="button"
+                        onClick={() => updateUnit(idx, { pricingMode: 'package' })}
+                        className={`py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
+                          (unit.pricingMode || 'package') === 'package'
+                            ? 'bg-[#CE2028] text-white border-[#CE2028] shadow-xs'
+                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        প্যাকেজ মূল্য
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const picked = projectUnits.find(u => u.name === unit.flatNo);
+                          updateUnit(idx, {
+                            pricingMode: 'sqft',
+                            sizeSqft: picked?.sizeSqft || unit.sizeSqft || '',
+                            totalPrice: picked?.sizeSqft
+                              ? String(Number(picked.sizeSqft) * (Number(selProj?.pricePerSqft) || 0))
+                              : unit.totalPrice
+                          });
+                        }}
+                        className={`py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
+                          unit.pricingMode === 'sqft'
+                            ? 'bg-[#CE2028] text-white border-[#CE2028] shadow-xs'
+                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        স্কয়ারফিট হিসাবে
+                      </button>
                     </div>
 
+                    {unit.pricingMode === 'sqft' ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            সাইজ (বর্গফুট)
+                          </label>
+                          <input
+                            type="number"
+                            placeholder="যেমন: 1265"
+                            value={unit.sizeSqft}
+                            onChange={(e) => {
+                              const sqft = e.target.value;
+                              const rate = Number(selProj?.pricePerSqft) || 0;
+                              updateUnit(idx, { sizeSqft: sqft, totalPrice: String((Number(sqft) || 0) * rate) });
+                            }}
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                            required
+                          />
+                          <span className="text-[10px] text-slate-500 mt-1 block">
+                            রেট: প্রতি বর্গফুট ৳{Number(selProj?.pricePerSqft) || 0}
+                          </span>
+                        </div>
+                        <div>
+                          <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            মোট দাম (স্বয়ংক্রিয়)
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.totalPrice}
+                            onChange={(e) => updateUnit(idx, { totalPrice: e.target.value })}
+                            className="w-full bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                            required
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            জমির মূল্য *
+                          </label>
+                          <input
+                            type="number"
+                            placeholder="যেমন: 1500000"
+                            value={unit.landPrice}
+                            onChange={(e) => {
+                              const land = e.target.value;
+                              updateUnit(idx, {
+                                landPrice: land,
+                                totalPrice: String((Number(land) || 0) + (Number(unit.constructionPrice) || 0))
+                              });
+                            }}
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            নির্মাণ খরচ *
+                          </label>
+                          <input
+                            type="number"
+                            placeholder="যেমন: 2000000"
+                            value={unit.constructionPrice}
+                            onChange={(e) => {
+                              const construction = e.target.value;
+                              updateUnit(idx, {
+                                constructionPrice: construction,
+                                totalPrice: String((Number(unit.landPrice) || 0) + (Number(construction) || 0))
+                              });
+                            }}
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                            required
+                          />
+                        </div>
+                        <div className="sm:col-span-2 text-2xs font-bold text-slate-600">
+                          মোট প্যাকেজ মূল্য: ৳{(Number(unit.landPrice) || 0) + (Number(unit.constructionPrice) || 0)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         বুকিং মানি / প্রাথমিক জমা
