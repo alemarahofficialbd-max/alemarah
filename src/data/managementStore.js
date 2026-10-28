@@ -982,6 +982,13 @@ if (typeof window !== 'undefined') {
     );
   });
   realtimeChannel.subscribe();
+
+  // If a save's cloud push failed (offline, dropped connection, etc.) the
+  // change is still safe in localStorage, but push it to Supabase again as
+  // soon as the browser is back online instead of waiting for the next edit.
+  window.addEventListener('online', () => {
+    syncToSupabase(getManagementData());
+  });
 }
 
 // Save data to localStorage and sync to Supabase (Resilient to file size quotas)
@@ -1080,5 +1087,17 @@ export const deleteProjectFromSupabase = async (projId) => {
     await supabase.from('projects').delete().eq('id', projId);
   } catch (err) {
     console.error('Error deleting project from Supabase:', err);
+  }
+};
+
+// A locally-deleted expense that was never removed from Supabase comes
+// back the next time this device (or any other) pulls remote data, since
+// the remote row still exists. Delete it there too, not just locally.
+export const deleteExpenseFromSupabase = async (expId) => {
+  try {
+    if (!expId) return;
+    await supabase.from('project_expenses').delete().eq('id', expId);
+  } catch (err) {
+    console.error('Error deleting expense from Supabase:', err);
   }
 };

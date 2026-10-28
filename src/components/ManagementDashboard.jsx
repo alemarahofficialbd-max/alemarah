@@ -85,7 +85,8 @@ import {
   updateJobApplication,
   syncFromSupabase,
   fetchJobApplicationsFromSupabase,
-  deleteProjectFromSupabase
+  deleteProjectFromSupabase,
+  deleteExpenseFromSupabase
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -1155,6 +1156,7 @@ export default function ManagementDashboard({
             return p;
           })
         }));
+        deleteExpenseFromSupabase(expId);
         triggerAlert(`খরচের এন্ট্রি সফলভাবে মুছে ফেলা হয়েছে!`);
       }
     );
