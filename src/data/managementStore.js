@@ -265,6 +265,7 @@ export const fetchJobApplicationsFromSupabase = async () => {
 
 // Background async sync to Supabase
 export const syncToSupabase = async (data) => {
+  const failedTables = [];
   try {
     if (!data) return;
 
@@ -290,7 +291,8 @@ export const syncToSupabase = async (data) => {
         nominee_phone: d.nomineePhone || '',
         theme: d.theme || 'emerald'
       }));
-      await supabase.from('directors').upsert(dirRows, { onConflict: 'id' });
+      const { error: dirErr } = await supabase.from('directors').upsert(dirRows, { onConflict: 'id' });
+      if (dirErr) { console.error('Cloud sync failed: directors', dirErr); failedTables.push('directors'); }
     }
 
     // 2. Sync Admins & Team
@@ -308,7 +310,8 @@ export const syncToSupabase = async (data) => {
         permissions: a.permissions || ['all'],
         status: a.status || 'সক্রিয় (Active)'
       }));
-      await supabase.from('admins').upsert(adminRows, { onConflict: 'id' });
+      const { error: adminErr } = await supabase.from('admins').upsert(adminRows, { onConflict: 'id' });
+      if (adminErr) { console.error('Cloud sync failed: admins', adminErr); failedTables.push('admins'); }
     }
 
     // 3. Sync Projects
@@ -324,7 +327,8 @@ export const syncToSupabase = async (data) => {
         price_per_sqft: Number(p.pricePerSqft) || 0,
         units: p.units || []
       }));
-      await supabase.from('projects').upsert(projRows, { onConflict: 'id' });
+      const { error: projErr } = await supabase.from('projects').upsert(projRows, { onConflict: 'id' });
+      if (projErr) { console.error('Cloud sync failed: projects', projErr); failedTables.push('projects'); }
 
       // 3b. Sync Project Expenses
       const allExpenses = [];
@@ -342,7 +346,8 @@ export const syncToSupabase = async (data) => {
         }
       });
       if (allExpenses.length > 0) {
-        await supabase.from('project_expenses').upsert(allExpenses, { onConflict: 'id' });
+        const { error: expErr } = await supabase.from('project_expenses').upsert(allExpenses, { onConflict: 'id' });
+        if (expErr) { console.error('Cloud sync failed: project_expenses', expErr); failedTables.push('project_expenses'); }
       }
     }
 
@@ -368,7 +373,8 @@ export const syncToSupabase = async (data) => {
         construction_price: Number(c.constructionPrice) || 0,
         size_sqft: Number(c.sizeSqft) || 0
       }));
-      await supabase.from('clients').upsert(clientRows, { onConflict: 'id' });
+      const { error: clientErr } = await supabase.from('clients').upsert(clientRows, { onConflict: 'id' });
+      if (clientErr) { console.error('Cloud sync failed: clients', clientErr); failedTables.push('clients'); }
 
       // 4c. Sync Payments
       const allPayments = [];
@@ -386,7 +392,8 @@ export const syncToSupabase = async (data) => {
         }
       });
       if (allPayments.length > 0) {
-        await supabase.from('client_payments').upsert(allPayments, { onConflict: 'id' });
+        const { error: payErr } = await supabase.from('client_payments').upsert(allPayments, { onConflict: 'id' });
+        if (payErr) { console.error('Cloud sync failed: client_payments', payErr); failedTables.push('client_payments'); }
       }
     }
 
@@ -409,7 +416,8 @@ export const syncToSupabase = async (data) => {
         director_tier_min_investment: Number(o.directorTierMinInvestment) || 0,
         director_tier_recurring: Boolean(o.directorTierRecurring)
       }));
-      await supabase.from('investment_offers').upsert(offerRows, { onConflict: 'id' });
+      const { error: offerErr } = await supabase.from('investment_offers').upsert(offerRows, { onConflict: 'id' });
+      if (offerErr) { console.error('Cloud sync failed: investment_offers', offerErr); failedTables.push('investment_offers'); }
     }
     if (data.investors && data.investors.length > 0) {
       const investorRows = data.investors.map(inv => ({
@@ -423,7 +431,8 @@ export const syncToSupabase = async (data) => {
         cycle_end_date: inv.cycleEndDate || '',
         status: inv.status || 'সক্রিয় (Active)'
       }));
-      await supabase.from('investors').upsert(investorRows, { onConflict: 'id' });
+      const { error: investorErr } = await supabase.from('investors').upsert(investorRows, { onConflict: 'id' });
+      if (investorErr) { console.error('Cloud sync failed: investors', investorErr); failedTables.push('investors'); }
     }
 
     // 7. Sync Customer identities (phone+password shared across their units)
@@ -435,7 +444,8 @@ export const syncToSupabase = async (data) => {
         password: cust.password || 'password123',
         status: cust.status || 'সক্রিয় (Active)'
       }));
-      await supabase.from('customers').upsert(customerRows, { onConflict: 'id' });
+      const { error: custErr } = await supabase.from('customers').upsert(customerRows, { onConflict: 'id' });
+      if (custErr) { console.error('Cloud sync failed: customers', custErr); failedTables.push('customers'); }
     }
 
     // 8. Sync public-site inquiries/leads
@@ -452,10 +462,18 @@ export const syncToSupabase = async (data) => {
         message: inq.message || '',
         status: inq.status || 'নতুন (New)'
       }));
-      await supabase.from('inquiries').upsert(inquiryRows, { onConflict: 'id' });
+      const { error: inqErr } = await supabase.from('inquiries').upsert(inquiryRows, { onConflict: 'id' });
+      if (inqErr) { console.error('Cloud sync failed: inquiries', inqErr); failedTables.push('inquiries'); }
+    }
+
+    if (failedTables.length > 0 && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('alemarah_sync_failed', { detail: { tables: failedTables } }));
     }
   } catch (err) {
     console.log('Supabase sync notice (offline or pending tables):', err?.message || err);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('alemarah_sync_failed', { detail: { tables: ['unknown'], error: err?.message || String(err) } }));
+    }
   }
 };
 

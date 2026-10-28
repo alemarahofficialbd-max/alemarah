@@ -216,6 +216,16 @@ export default function ManagementDashboard({
     return () => unsubscribe();
   }, []);
 
+  // Warn when a background cloud save silently fails (data stays local-only)
+  useEffect(() => {
+    const onSyncFailed = (e) => {
+      const tables = (e.detail?.tables || []).join(', ');
+      triggerAlert(`⚠️ ক্লাউডে সেভ ব্যর্থ হয়েছে (${tables}) — ইন্টারনেট চেক করে আবার চেষ্টা করুন, নাহলে এই পরিবর্তন অন্য ডিভাইসে দেখাবে না।`);
+    };
+    window.addEventListener('alemarah_sync_failed', onSyncFailed);
+    return () => window.removeEventListener('alemarah_sync_failed', onSyncFailed);
+  }, []);
+
   const updateStore = (updater) => {
     const currentData = getManagementData();
     const updated = typeof updater === 'function' ? updater(currentData) : updater;
@@ -1089,6 +1099,10 @@ export default function ManagementDashboard({
 
   const handleAddExpense = (e) => {
     e.preventDefault();
+    if (!isSuperAdmin && !(admin?.permissions || []).includes('expenses')) {
+      alert('এই কাজের অনুমতি নেই।');
+      return;
+    }
     const expAmount = Number(expenseForm.amount);
     if (!expenseForm.title || !expAmount || expAmount <= 0) {
       alert('খরচের খাত এবং টাকার পরিমাণ লিখুন।');
@@ -1332,6 +1346,11 @@ export default function ManagementDashboard({
     const currentDirectors = data.directors || [];
     const invAmt = Number(directorForm.investment) || 0;
     const sharePct = Number(directorForm.sharePercentage) || 0;
+    const existingShareTotal = currentDirectors.reduce((acc, d) => acc + (Number(d.sharePercentage) || 0), 0);
+    if (existingShareTotal + sharePct > 100) {
+      alert(`মোট শেয়ার ১০০% অতিক্রম করবে (বর্তমান মোট: ${existingShareTotal}%, নতুন যোগ: ${sharePct}%)। পরিমাণ ঠিক করুন।`);
+      return;
+    }
     const nextIndex = currentDirectors.length + 1;
     const autoFolioNo = `DIR-${String(nextIndex).padStart(3, '0')}`;
 
@@ -1389,6 +1408,10 @@ export default function ManagementDashboard({
   // Handler: Add Capital Installment for a Director
   const handleAddCapitalInstallment = (e) => {
     e.preventDefault();
+    if (!hasDirectorFullAccess) {
+      alert('এই কাজের অনুমতি নেই।');
+      return;
+    }
     if (!capitalDepositTargetDirector) return;
     const amountNum = Number(capitalDepositForm.amount);
     if (!amountNum || amountNum <= 0) {
@@ -1446,6 +1469,10 @@ export default function ManagementDashboard({
   // Handler: Disburse Dividend to a Director
   const handleAddDividendPayout = (e) => {
     e.preventDefault();
+    if (!hasDirectorFullAccess) {
+      alert('এই কাজের অনুমতি নেই।');
+      return;
+    }
     if (!dividendTargetDirector) return;
     const amountNum = Number(dividendForm.amount);
     if (!amountNum || amountNum <= 0) {
