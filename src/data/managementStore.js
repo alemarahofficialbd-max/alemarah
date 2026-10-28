@@ -86,72 +86,7 @@ export const initialManagementData = {
   customers: [],
   investmentOffers: [],
   investors: [],
-  jobApplications: [
-    {
-      id: "AL-JOB-2026-10001",
-      name: "Md Kamrul Islam",
-      applicantName: "Md Kamrul Islam",
-      date: "২৭ অক্টোবর, ২০২৬",
-      appliedDateBn: "২৭ অক্টোবর, ২০২৬",
-      email: "kamrulislam3276@yahoo.com",
-      phone: "01856416900",
-      jobId: "job-public-relations-officer",
-      jobTitle: "জনসংযোগ কর্মকর্তা (PRO)",
-      submittedPosition: "জনসংযোগ কর্মকর্তা (PRO)",
-      education: "BA (Hons) in English",
-      currentCompany: "Govt. Saadat College, Tangail",
-      experienceYears: "4 months",
-      expectedSalary: "30,000",
-      district: "55/B Noakhali Tower, Purana Paltan, Dhaka",
-      coverNote: "",
-      status: "নতুন আবেদন",
-      adminNotes: "",
-      interviewDate: "",
-      interviewTime: "",
-      interviewLocation: "আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা",
-      requiredDocuments: "মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)",
-      cvFile: {
-        url: "https://tlsvuljssxuwewrsfhue.supabase.co/storage/v1/object/public/resumes/candidates/cv_AL-JOB-2026-10001_1793095613525.pdf",
-        name: "CV Kamrul Islam 76.pdf",
-        size: 191707,
-        type: "application/pdf"
-      },
-      cvLink: "",
-      timestamp: "2026-10-27T10:06:59.068Z"
-    },
-    {
-      id: "AL-JOB-2026-10002",
-      name: "Md Kamrul Islam",
-      applicantName: "Md Kamrul Islam",
-      date: "২৭ অক্টোবর, ২০২৬",
-      appliedDateBn: "২৭ অক্টোবর, ২০২৬",
-      email: "kamrulislam3276@yahoo.com",
-      phone: "01856416900",
-      jobId: "job-accounts-admin-officer",
-      jobTitle: "হিসাব ও প্রশাসন কর্মকর্তা",
-      submittedPosition: "হিসাব ও প্রশাসন কর্মকর্তা",
-      education: "BA(Hons) English",
-      currentCompany: "Govt. Saadat College, Tangail",
-      experienceYears: "4 months",
-      expectedSalary: "30000",
-      district: "55/B Noakhali Tower, Purana Paltan, Dhaka",
-      coverNote: "",
-      status: "নতুন আবেদন",
-      adminNotes: "",
-      interviewDate: "",
-      interviewTime: "",
-      interviewLocation: "আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা",
-      requiredDocuments: "মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)",
-      cvFile: {
-        url: "https://tlsvuljssxuwewrsfhue.supabase.co/storage/v1/object/public/resumes/candidates/cv_AL-JOB-2026-10002_1793095801371.pdf",
-        name: "CV Kamrul Islam 76.pdf",
-        size: 191707,
-        type: "application/pdf"
-      },
-      cvLink: "",
-      timestamp: "2026-10-27T10:10:02.561Z"
-    }
-  ]
+  jobApplications: []
 };
 
 // Build a stable customer id from a phone number so repeated migrations
@@ -386,7 +321,8 @@ export const syncToSupabase = async (data) => {
         progress: Number(p.progress) || 0,
         current_stage: p.currentStage || '',
         budget: Number(p.budget) || 0,
-        price_per_sqft: Number(p.pricePerSqft) || 0
+        price_per_sqft: Number(p.pricePerSqft) || 0,
+        units: p.units || []
       }));
       await supabase.from('projects').upsert(projRows, { onConflict: 'id' });
 
@@ -489,6 +425,35 @@ export const syncToSupabase = async (data) => {
       }));
       await supabase.from('investors').upsert(investorRows, { onConflict: 'id' });
     }
+
+    // 7. Sync Customer identities (phone+password shared across their units)
+    if (data.customers && data.customers.length > 0) {
+      const customerRows = data.customers.map(cust => ({
+        id: cust.id,
+        name: cust.name || '',
+        phone: cust.phone || '',
+        password: cust.password || 'password123',
+        status: cust.status || 'সক্রিয় (Active)'
+      }));
+      await supabase.from('customers').upsert(customerRows, { onConflict: 'id' });
+    }
+
+    // 8. Sync public-site inquiries/leads
+    if (data.inquiries && data.inquiries.length > 0) {
+      const inquiryRows = data.inquiries.map(inq => ({
+        id: inq.id,
+        name: inq.name || '',
+        phone: inq.phone || '',
+        email: inq.email || '',
+        project_id: inq.projectId || null,
+        inquiry_type: inq.type || inq.inquiryType || 'site_visit',
+        investment_amount: inq.investmentAmount || '',
+        interested_sector: inq.interestedSector || '',
+        message: inq.message || '',
+        status: inq.status || 'নতুন (New)'
+      }));
+      await supabase.from('inquiries').upsert(inquiryRows, { onConflict: 'id' });
+    }
   } catch (err) {
     console.log('Supabase sync notice (offline or pending tables):', err?.message || err);
   }
@@ -497,11 +462,15 @@ export const syncToSupabase = async (data) => {
 // Background sync from Supabase
 export const syncFromSupabase = async () => {
   try {
-    const [adminsRes, directorsRes, projectsRes, clientsRes] = await Promise.all([
+    const [adminsRes, directorsRes, projectsRes, clientsRes, customersRes, inquiriesRes, offersRes, investorsRes] = await Promise.all([
       supabase.from('admins').select('*'),
       supabase.from('directors').select('*'),
       supabase.from('projects').select('*, expenses:project_expenses(*)'),
-      supabase.from('clients').select('*, paymentHistory:client_payments(*)')
+      supabase.from('clients').select('*, paymentHistory:client_payments(*)'),
+      supabase.from('customers').select('*'),
+      supabase.from('inquiries').select('*'),
+      supabase.from('investment_offers').select('*'),
+      supabase.from('investors').select('*')
     ]);
 
     // If tables do not exist yet, return gracefully
@@ -606,7 +575,8 @@ export const syncFromSupabase = async () => {
           totalFloors: localProj?.totalFloors || 10,
           unitsPerFloor: localProj?.unitsPerFloor || 2,
           handoverDate: localProj?.handoverDate || 'ডিসেম্বর ২০২৮',
-          units: localProj?.units || [],
+          pricePerSqft: Number(p.price_per_sqft) || localProj?.pricePerSqft || 0,
+          units: (p.units && p.units.length > 0) ? p.units : (localProj?.units || []),
           expenses: expensesFromRemote.length > 0 ? expensesFromRemote : (localProj?.expenses || [])
         };
       });
@@ -634,6 +604,10 @@ export const syncFromSupabase = async () => {
           totalPaid: Number(c.total_paid) || 0,
           nextDueDate: c.next_due_date || localClient?.nextDueDate,
           nextDueAmount: Number(c.next_due_amount) || 0,
+          pricingMode: c.pricing_mode || localClient?.pricingMode || 'package',
+          landPrice: Number(c.land_price) || localClient?.landPrice || 0,
+          constructionPrice: Number(c.construction_price) || localClient?.constructionPrice || 0,
+          sizeSqft: Number(c.size_sqft) || localClient?.sizeSqft || 0,
           paymentHistory: paymentsFromRemote.length > 0 ? paymentsFromRemote : (localClient?.paymentHistory || [])
         };
       });
@@ -642,7 +616,67 @@ export const syncFromSupabase = async () => {
       updated.clients = [...remoteClients, ...extraLocalClients];
     }
 
-    // Legacy customers & inquiries tables omitted from remote sync
+    if (customersRes?.data && customersRes.data.length > 0) {
+      const remoteCustomers = customersRes.data.map(cust => {
+        const localCust = (current.customers || []).find(x => x.id === cust.id);
+        return {
+          id: cust.id,
+          name: cust.name || localCust?.name || '',
+          phone: cust.phone || localCust?.phone || '',
+          password: cust.password || localCust?.password || 'password123',
+          status: cust.status || localCust?.status || 'সক্রিয় (Active)',
+          createdAt: localCust?.createdAt || new Date().toISOString()
+        };
+      });
+      const extraLocalCustomers = (current.customers || []).filter(lc => !customersRes.data.some(c => c.id === lc.id));
+      updated.customers = [...remoteCustomers, ...extraLocalCustomers];
+    }
+
+    if (inquiriesRes?.data && inquiriesRes.data.length > 0) {
+      updated.inquiries = inquiriesRes.data.map(inq => ({
+        id: inq.id,
+        name: inq.name,
+        phone: inq.phone,
+        email: inq.email,
+        projectId: inq.project_id,
+        inquiryType: inq.inquiry_type,
+        investmentAmount: inq.investment_amount,
+        interestedSector: inq.interested_sector,
+        message: inq.message,
+        status: inq.status,
+        date: inq.created_at ? new Date(inq.created_at).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
+        timestamp: inq.created_at
+      }));
+    }
+
+    if (offersRes?.data && offersRes.data.length > 0) {
+      updated.investmentOffers = offersRes.data.map(o => ({
+        id: o.id,
+        name: o.name,
+        location: o.location || '',
+        description: o.description || '',
+        minInvestment: Number(o.min_investment) || 0,
+        maxInvestment: Number(o.max_investment) || 0,
+        tenureYears: Number(o.tenure_years) || 0,
+        netProfitPercent: Number(o.net_profit_percent) || 0,
+        directorTierMinInvestment: Number(o.director_tier_min_investment) || 0,
+        directorTierRecurring: Boolean(o.director_tier_recurring)
+      }));
+    }
+
+    if (investorsRes?.data && investorsRes.data.length > 0) {
+      updated.investors = investorsRes.data.map(inv => ({
+        id: inv.id,
+        name: inv.name,
+        phone: inv.phone || '',
+        offerId: inv.offer_id,
+        tier: inv.tier || 'general',
+        investedAmount: Number(inv.invested_amount) || 0,
+        investmentDate: inv.investment_date || '',
+        cycleEndDate: inv.cycle_end_date || '',
+        status: inv.status || 'সক্রিয় (Active)'
+      }));
+    }
 
     const migrated = migrateClientsToCustomers(updated);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));

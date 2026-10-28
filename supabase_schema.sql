@@ -265,6 +265,14 @@ CREATE POLICY "Public insert resumes" ON storage.objects
 CREATE POLICY "Public read resumes" ON storage.objects
   FOR SELECT USING (bucket_id = 'resumes');
 
+-- 11. CUSTOMERS TABLE — RLS was left disabled when this table was added
+-- (see supabase/migrations/0001_customers_and_units.sql); the app now
+-- actively syncs to it (customer login identity, shared across a
+-- customer's multiple units), so it needs the same baseline policy as
+-- every other table here.
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read/write customers" ON public.customers FOR ALL USING (true) WITH CHECK (true);
+
 -- ========================================================
 -- IMPORTANT — ONE-TIME MANUAL STEP (cannot be done from this file)
 -- ========================================================

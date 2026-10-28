@@ -485,7 +485,7 @@ export default function LoginPage({
           {/* Footer security note */}
           <div className="mt-6 pt-5 border-t border-gray-100 flex items-center justify-center space-x-2 text-2xs text-gray-400 font-medium">
             <ShieldCheck className="w-4 h-4 text-[#8EBF40]" />
-            <span>২৫৬-বিট এসএসএল এনক্রিপ্টেড সুরক্ষিত কর্পোরেট পোর্টাল</span>
+            <span>{t?.securityNotice || '২৫৬-বিট এসএসএল এনক্রিপ্টেড সুরক্ষিত কর্পোরেট পোর্টাল'}</span>
           </div>
         </div>
       </div>
