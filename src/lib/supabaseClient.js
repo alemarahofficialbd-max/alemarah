@@ -7,7 +7,10 @@ import { createClient } from '@supabase/supabase-js';
 // and shipped in the production bundle. If you still have the old key,
 // rotate it in the Supabase dashboard (Project Settings -> API) now.
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://tlsvuljssxuwewrsfhue.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsc3Z1bGpzc3h1d2V3cnNmaHVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NjIzODAsImV4cCI6MjEwNzAzODM4MH0.iVEqiTSSi_Bb2tCJnkjX920qcAObhElMPcrBr5Bctto';
+// New-format Supabase "publishable" key (replaces the old anon JWT key).
+// Safe to ship to the browser — same trust level as the old anon key, just
+// individually revocable from the dashboard without rotating the whole JWT secret.
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_AeDYhcqcQF1QJq7fpsAIWw_7hQW0G_a';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
