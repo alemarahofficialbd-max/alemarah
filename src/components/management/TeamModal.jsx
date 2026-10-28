@@ -50,7 +50,7 @@ export default function TeamModal({
               <h3 className="text-base font-bold text-slate-900">
                 {editingTeamMember
                   ? (editingTeamMember.isSuperAdmin ? 'সুপার অ্যাডমিন তথ্য ও পাসওয়ার্ড সম্পাদনা' : 'কর্মকর্তার তথ্য ও পারমিশন সম্পাদনা')
-                  : (teamAddSource === 'director' ? 'বোর্ড ডিরেক্টরকে অ্যাডমিন এক্সেস প্রদান' : 'নতুন কর্মকর্তা / সাব-অ্যাডমিন যুক্ত করুন')}
+                  : (teamAddSource === 'director' ? 'বোর্ড ডিরেক্টরকে অ্যাডমিন এক্সেস প্রদান' : 'নতুন অফিস স্টাফ যুক্ত করুন')}
               </h3>
               <p className="text-3xs text-slate-500">টিম মেম্বার রোল ও অ্যাক্সেস কন্ট্রোল</p>
             </div>

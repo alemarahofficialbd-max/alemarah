@@ -2875,128 +2875,13 @@ export default function ManagementDashboard({
                 </button>
               </div>
 
-              {/* 1. Board of Directors Access & Login Credentials Section */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
-                      <Crown className="w-4 h-4 text-amber-500" />
-                      <span>বোর্ড অব ডিরেক্টরস ({directorsList.length})</span>
-                    </h4>
-                    <p className="text-2xs text-slate-500 mt-0.5">
-                      পরিচালকদের পোর্টাল লগইন ও অ্যাক্সেস কন্ট্রোল
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {directorsList.map((dir, idx) => {
-                    const isDirKeyVisible = Boolean(showAccessKeys[dir.id]);
-                    const teamMatch = (data.managementTeam || []).find(m => m.directorId === dir.id || m.phone === dir.phone);
-                    const hasTeamAccess = Boolean(teamMatch);
-
-                    return (
-                      <div key={dir.id} className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs space-y-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center space-x-2.5 min-w-0">
-                            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
-                              {dir.image ? (
-                                <img src={dir.image} alt={dir.name} className="w-full h-full object-cover object-top" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-slate-600 font-bold text-sm bg-slate-100">
-                                  {dir.name.slice(0, 1)}
-                                </div>
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="font-bold text-slate-900 text-sm truncate">
-                                <span className="text-slate-400 font-mono text-xs mr-1">{idx + 1}.</span>
-                                {dir.name}
-                              </div>
-                              <div className="text-xs text-[#CE2028] font-semibold truncate">{dir.role}</div>
-                              <div className="text-3xs text-slate-400 font-mono">ফোলিও: {dir.folioNo}</div>
-                            </div>
-                          </div>
-
-                          <span className={`px-2 py-0.5 rounded-md text-3xs font-bold shrink-0 ${
-                            hasTeamAccess 
-                              ? 'bg-emerald-50 text-[#006231] border border-emerald-200' 
-                              : 'bg-slate-100 text-slate-600 border border-slate-200'
-                          }`}>
-                            {hasTeamAccess ? 'অ্যাডমিন সক্রিয়' : 'বোর্ড মেম্বার'}
-                          </span>
-                        </div>
-
-                        {/* Login Credentials Box */}
-                        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1.5">
-                          <div className="flex items-center justify-between text-3xs text-slate-500 font-bold">
-                            <span>লগইন আইডি: <span className="font-mono text-slate-900">{dir.phone || dir.id}</span></span>
-                            <button
-                              type="button"
-                              onClick={() => setShowAccessKeys(prev => ({ ...prev, [dir.id]: !prev[dir.id] }))}
-                              className="text-slate-400 hover:text-slate-700 cursor-pointer"
-                              title={isDirKeyVisible ? 'লুকান' : 'দেখুন'}
-                            >
-                              {isDirKeyVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                            </button>
-                          </div>
-                          {isHashedPassword(dir.accessKey) ? (
-                            <div className="text-3xs text-slate-500 pt-0.5">
-                              নিরাপত্তার জন্য পাসওয়ার্ড দেখানো/কপি করা যাবে না
-                            </div>
-                          ) : (
-                            <div className="flex items-center justify-between gap-1 pt-0.5">
-                              <span className="text-3xs text-slate-400">পাসওয়ার্ড:</span>
-                              <code className="font-mono font-bold text-slate-900 text-xs bg-white px-2 py-0.5 rounded border border-slate-200">
-                                {isDirKeyVisible ? (dir.accessKey || 'admin123') : '••••••••'}
-                              </code>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  navigator.clipboard?.writeText(dir.accessKey || 'admin123');
-                                  triggerAlert(`ডিরেক্টর ${dir.name}-এর পাসওয়ার্ড কপি হয়েছে!`);
-                                }}
-                                className="px-2 py-1 rounded bg-white hover:bg-slate-100 text-slate-700 font-bold text-3xs border border-slate-200 inline-flex items-center space-x-1 cursor-pointer transition-colors"
-                                title="পাসওয়ার্ড কপি করুন"
-                              >
-                                <Copy className="w-3 h-3" />
-                                <span>কপি</span>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Action buttons */}
-                        <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
-                          <a
-                            href={`tel:${dir.phone}`}
-                            className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold inline-flex items-center space-x-1"
-                          >
-                            <Phone className="w-3 h-3 text-[#006231]" />
-                            <span>কল</span>
-                          </a>
-                          <button
-                            type="button"
-                            onClick={() => handleGrantDirectorAccess(dir)}
-                            className="px-3 py-1.5 rounded-xl bg-[#006231] hover:bg-[#004d26] text-white text-xs font-bold inline-flex items-center space-x-1 shadow-2xs cursor-pointer"
-                          >
-                            <KeyRound className="w-3 h-3" />
-                            <span>{hasTeamAccess ? 'পারমিশন পরিবর্তন' : 'অ্যাডমিন এক্সেস দিন'}</span>
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 2. Sub-Admins & Officers Section */}
+              {/* Office Staff Section */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
                       <HardHat className="w-4 h-4 text-[#006231]" />
-                      <span>কর্মকর্তা ও সাব-অ্যাডমিন ({officerTeam.length})</span>
+                      <span>অফিস স্টাফ তালিকা ({officerTeam.length})</span>
                     </h4>
                     <p className="text-2xs text-slate-500 mt-0.5">
                       কর্মকর্তাদের তালিকা ও পারমিশন কন্ট্রোল
@@ -3803,6 +3688,20 @@ export default function ManagementDashboard({
                               <Eye className="w-3.5 h-3.5 text-emerald-400" />
                               <span>পূর্ণাঙ্গ প্রোফাইল</span>
                             </button>
+
+                            {isSuperAdmin && (() => {
+                              const hasTeamAccess = (data.managementTeam || []).some(m => m.directorId === dir.id || m.phone === dir.phone);
+                              return (
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); handleGrantDirectorAccess(dir); }}
+                                  className="col-span-2 py-2 px-2.5 rounded-xl bg-[#006231] hover:bg-[#004d26] text-white text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
+                                >
+                                  <KeyRound className="w-3.5 h-3.5" />
+                                  <span>{hasTeamAccess ? 'পারমিশন পরিবর্তন' : 'অ্যাডমিন এক্সেস দিন'}</span>
+                                </button>
+                              );
+                            })()}
                           </div>
                         </div>
                       )}
@@ -3952,6 +3851,21 @@ export default function ManagementDashboard({
                               <Eye className="w-3.5 h-3.5 text-white/80" />
                               <span>হিসাব খাতা</span>
                             </button>
+
+                            {/* 4. Grant/Change Admin Access Button (Super Admin only) */}
+                            {isSuperAdmin && (() => {
+                              const hasTeamAccess = (data.managementTeam || []).some(m => m.directorId === dir.id || m.phone === dir.phone);
+                              return (
+                                <button
+                                  onClick={() => handleGrantDirectorAccess(dir)}
+                                  title="এই ডিরেক্টরকে ম্যানেজমেন্ট প্যানেলের অতিরিক্ত অ্যাডমিন অ্যাক্সেস দিন"
+                                  className="px-2.5 py-1.5 rounded-xl bg-[#006231] hover:bg-[#004d26] text-white font-bold text-2xs cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
+                                >
+                                  <KeyRound className="w-3.5 h-3.5" />
+                                  <span>{hasTeamAccess ? 'পারমিশন পরিবর্তন' : 'অ্যাডমিন এক্সেস'}</span>
+                                </button>
+                              );
+                            })()}
                           </div>
                         </td>
                       </tr>
@@ -6629,7 +6543,7 @@ export default function ManagementDashboard({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center space-x-2">
                       <h3 className="text-lg font-black text-slate-900 truncate">
-                        {admin?.name || 'অফিসার / সাব-অ্যাডমিন'}
+                        {admin?.name || 'অফিস স্টাফ'}
                       </h3>
                     </div>
                     <p className="text-xs text-[#006231] font-bold mt-0.5">
