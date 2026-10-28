@@ -237,8 +237,11 @@ export default function TeamModal({
                 <option value="হেড অফ অ্যাকাউন্টস & ফাইন্যান্স">হেড অফ অ্যাকাউন্টস & ফাইন্যান্স</option>
                 <option value="সেলস অ্যান্ড মার্কেটিং ম্যানেজার">সেলস অ্যান্ড মার্কেটিং ম্যানেজার</option>
                 <option value="আইন ও কমপ্লায়েন্স অফিসার">আইন ও কমপ্লায়েন্স অফিসার</option>
-                <option value="সিনিয়র অ্যাডমিন">সিনিয়র অ্যাডমিন</option>
+                <option value="অফিস স্টাফ">অফিস স্টাফ</option>
               </select>
+              <span className="text-[10px] text-slate-500 mt-1 block">
+                এটা শুধু নাম/পদবী — এতে কোনো access নির্ধারণ হয় না। নিচের পারমিশন চেকবক্সগুলোই ঠিক করে দেয় এই অ্যাকাউন্ট কী কী করতে পারবে।
+              </span>
             </div>
           )}
 
