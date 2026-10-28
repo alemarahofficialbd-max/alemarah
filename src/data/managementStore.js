@@ -938,6 +938,32 @@ if (typeof window !== 'undefined') {
   setTimeout(() => {
     syncFromSupabase();
   }, 1200);
+
+  // Live cross-device sync: whenever any change lands in Supabase (from any
+  // browser/device), re-pull so everyone sees it without a manual refresh.
+  // Debounced since one save can touch several tables at once.
+  let realtimeRefreshTimer = null;
+  const scheduleRealtimeRefresh = () => {
+    clearTimeout(realtimeRefreshTimer);
+    realtimeRefreshTimer = setTimeout(() => {
+      syncFromSupabase();
+    }, 800);
+  };
+
+  const REALTIME_TABLES = [
+    'admins', 'directors', 'projects', 'project_expenses',
+    'clients', 'client_payments', 'customers', 'inquiries',
+    'investment_offers', 'investors'
+  ];
+  const realtimeChannel = supabase.channel('alemarah_live_sync');
+  REALTIME_TABLES.forEach((table) => {
+    realtimeChannel.on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table },
+      scheduleRealtimeRefresh
+    );
+  });
+  realtimeChannel.subscribe();
 }
 
 // Save data to localStorage and sync to Supabase (Resilient to file size quotas)
