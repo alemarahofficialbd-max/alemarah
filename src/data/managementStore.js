@@ -84,6 +84,8 @@ export const initialManagementData = {
   directors: [],
   inquiries: [],
   customers: [],
+  investmentOffers: [],
+  investors: [],
   jobApplications: [
     {
       id: "AL-JOB-2026-10001",
@@ -278,6 +280,12 @@ export const getManagementData = () => {
       if (!parsed.jobApplications) {
         parsed.jobApplications = [];
       }
+      if (!parsed.investmentOffers) {
+        parsed.investmentOffers = [];
+      }
+      if (!parsed.investors) {
+        parsed.investors = [];
+      }
       return migrateClientsToCustomers(parsed);
     }
   } catch (e) {
@@ -449,6 +457,37 @@ export const syncToSupabase = async (data) => {
     // 5. Cloud Sync Job Applications
     if (data.jobApplications && Array.isArray(data.jobApplications)) {
       await syncJobApplicationsToSupabase(data.jobApplications);
+    }
+
+    // 6. Sync Investment Offers (e.g. Agro) & Investors
+    if (data.investmentOffers && data.investmentOffers.length > 0) {
+      const offerRows = data.investmentOffers.map(o => ({
+        id: o.id,
+        name: o.name,
+        location: o.location || '',
+        description: o.description || '',
+        min_investment: Number(o.minInvestment) || 0,
+        max_investment: Number(o.maxInvestment) || 0,
+        tenure_years: Number(o.tenureYears) || 0,
+        net_profit_percent: Number(o.netProfitPercent) || 0,
+        director_tier_min_investment: Number(o.directorTierMinInvestment) || 0,
+        director_tier_recurring: Boolean(o.directorTierRecurring)
+      }));
+      await supabase.from('investment_offers').upsert(offerRows, { onConflict: 'id' });
+    }
+    if (data.investors && data.investors.length > 0) {
+      const investorRows = data.investors.map(inv => ({
+        id: inv.id,
+        name: inv.name,
+        phone: inv.phone || '',
+        offer_id: inv.offerId,
+        tier: inv.tier || 'general',
+        invested_amount: Number(inv.investedAmount) || 0,
+        investment_date: inv.investmentDate || '',
+        cycle_end_date: inv.cycleEndDate || '',
+        status: inv.status || 'সক্রিয় (Active)'
+      }));
+      await supabase.from('investors').upsert(investorRows, { onConflict: 'id' });
     }
   } catch (err) {
     console.log('Supabase sync notice (offline or pending tables):', err?.message || err);

@@ -97,6 +97,8 @@ import AddUnitModal from './management/AddUnitModal';
 import BulkUnitModal from './management/BulkUnitModal';
 import TeamModal from './management/TeamModal';
 import AddProjectModal from './management/AddProjectModal';
+import AddInvestmentOfferModal from './management/AddInvestmentOfferModal';
+import InvestorModal from './management/InvestorModal';
 
 export default function ManagementDashboard({ 
   admin, 
@@ -430,6 +432,29 @@ export default function ManagementDashboard({
     customUnitsText: '',
     pricePerSqft: ''
   });
+
+  // 3b. Investment Offers (e.g. Agro) & Investors — no flats/sqft, just slabs
+  const [isInvestmentOfferModalOpen, setIsInvestmentOfferModalOpen] = useState(false);
+  const emptyInvestmentOfferForm = () => ({
+    name: '',
+    location: '',
+    description: '',
+    minInvestment: '',
+    maxInvestment: '',
+    tenureYears: '3',
+    netProfitPercent: '',
+    directorTierMinInvestment: ''
+  });
+  const [investmentOfferForm, setInvestmentOfferForm] = useState(emptyInvestmentOfferForm);
+  const [selectedOfferForDetails, setSelectedOfferForDetails] = useState(null);
+  const [isInvestorModalOpen, setIsInvestorModalOpen] = useState(false);
+  const emptyInvestorForm = () => ({
+    name: '',
+    phone: '',
+    tier: 'general',
+    investedAmount: ''
+  });
+  const [investorForm, setInvestorForm] = useState(emptyInvestorForm);
 
   // Project Master Details & Inventory Management State
   const [selectedProjectForDetails, setSelectedProjectForDetails] = useState(null);
@@ -961,6 +986,75 @@ export default function ManagementDashboard({
     triggerAlert(`নতুন প্রজেক্ট "${newProj.name}" তৈরি হয়েছে! এখন ফ্ল্যাট, দোকান বা পার্কিং যোগ করুন।`);
   };
 
+  const handleAddInvestmentOffer = (e) => {
+    e.preventDefault();
+    if (!investmentOfferForm.name || !investmentOfferForm.minInvestment || !investmentOfferForm.maxInvestment) {
+      alert('অফারের নাম, সর্বনিম্ন ও সর্বোচ্চ বিনিয়োগ পূরণ করুন।');
+      return;
+    }
+    const newOffer = {
+      id: `offer-${Date.now().toString().slice(-6)}`,
+      name: investmentOfferForm.name,
+      location: investmentOfferForm.location || '',
+      description: investmentOfferForm.description || '',
+      minInvestment: Number(investmentOfferForm.minInvestment) || 0,
+      maxInvestment: Number(investmentOfferForm.maxInvestment) || 0,
+      tenureYears: Number(investmentOfferForm.tenureYears) || 0,
+      netProfitPercent: Number(investmentOfferForm.netProfitPercent) || 0,
+      directorTierMinInvestment: Number(investmentOfferForm.directorTierMinInvestment) || 0,
+      directorTierRecurring: true
+    };
+    updateStore((prev) => ({
+      ...prev,
+      investmentOffers: [...(prev.investmentOffers || []), newOffer]
+    }));
+    setIsInvestmentOfferModalOpen(false);
+    setInvestmentOfferForm(emptyInvestmentOfferForm());
+    setSelectedOfferForDetails(newOffer);
+    triggerAlert(`নতুন ইনভেস্টমেন্ট অফার "${newOffer.name}" তৈরি হয়েছে!`);
+  };
+
+  const handleAddInvestor = (e) => {
+    e.preventDefault();
+    if (!selectedOfferForDetails) return;
+    if (!investorForm.name || !investorForm.phone || !investorForm.investedAmount) {
+      alert('ইনভেস্টরের নাম, ফোন ও বিনিয়োগের পরিমাণ পূরণ করুন।');
+      return;
+    }
+    const offer = selectedOfferForDetails;
+    const tier = investorForm.tier || 'general';
+    const investedAmount = Number(investorForm.investedAmount) || 0;
+    const minAllowed = tier === 'director' ? Number(offer.directorTierMinInvestment) || 0 : Number(offer.minInvestment) || 0;
+    const maxAllowed = tier === 'director' ? null : (Number(offer.maxInvestment) || 0);
+    if (investedAmount < minAllowed || (maxAllowed !== null && investedAmount > maxAllowed)) {
+      alert('বিনিয়োগের পরিমাণ অনুমোদিত সীমার মধ্যে নেই।');
+      return;
+    }
+
+    const today = new Date();
+    const cycleEnd = new Date(today);
+    cycleEnd.setFullYear(cycleEnd.getFullYear() + (Number(offer.tenureYears) || 0));
+
+    const newInvestor = {
+      id: `INV-${Date.now().toString(36).toUpperCase()}`,
+      name: investorForm.name,
+      phone: investorForm.phone,
+      offerId: offer.id,
+      tier,
+      investedAmount,
+      investmentDate: today.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      cycleEndDate: cycleEnd.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      status: 'সক্রিয় (Active)'
+    };
+    updateStore((prev) => ({
+      ...prev,
+      investors: [newInvestor, ...(prev.investors || [])]
+    }));
+    setIsInvestorModalOpen(false);
+    setInvestorForm(emptyInvestorForm());
+    triggerAlert(`ইনভেস্টর "${newInvestor.name}" যোগ হয়েছে!`);
+  };
+
   const handleDeleteProject = (projId, projName) => {
     if (!isSuperAdmin) return;
     requestProtectedDelete(
@@ -1452,7 +1546,8 @@ export default function ManagementDashboard({
     { id: 'payments', label: '২. পেমেন্ট ও জমা এন্ট্রি', shortLabel: 'জমা এন্ট্রি', icon: DollarSign },
     { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল', shortLabel: 'প্রজেক্ট', icon: Building2 },
     { id: 'expenses', label: '৪. প্রজেক্ট বাজেট ও খরচ', shortLabel: 'বাজেট ও খরচ', icon: Wallet },
-    { id: 'team', label: '৫. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
+    { id: 'investments', label: '৫. ইনভেস্টমেন্ট অফার (এগ্রো)', shortLabel: 'ইনভেস্টমেন্ট', icon: TrendingUp },
+    { id: 'team', label: '৬. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
     { 
       id: 'directors', 
       label: isDirector && !hasDirectorFullAccess ? 'ব্যক্তিগত পোর্টফোলিও ও শেয়ার' : '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', 
@@ -2621,6 +2716,121 @@ export default function ManagementDashboard({
                 </table>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ------------------------------------------------------- */}
+        {/* TAB: INVESTMENT OFFERS (e.g. AGRO) — NO FLATS/SQFT       */}
+        {/* ------------------------------------------------------- */}
+        {managementNavItems.some(i => i.id === 'investments') && activeTab === 'investments' && (
+          <div className="space-y-5 animate-fadeIn">
+            {!selectedOfferForDetails ? (
+              <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-sm sm:text-base text-slate-900">ইনভেস্টমেন্ট অফারসমূহ</h3>
+                    <p className="text-3xs text-slate-500">এগ্রো/লাইভস্টক জাতীয় প্রকল্প — ফ্ল্যাট/sqft নেই, শুধু বিনিয়োগ স্ল্যাব</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setInvestmentOfferForm(emptyInvestmentOfferForm()); setIsInvestmentOfferModalOpen(true); }}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#006231] to-[#004d26] text-white font-bold text-xs shadow-md hover:opacity-95 transition-all cursor-pointer inline-flex items-center space-x-1.5"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>নতুন অফার যোগ করুন</span>
+                  </button>
+                </div>
+
+                {(data.investmentOffers || []).length === 0 ? (
+                  <div className="py-10 text-center text-xs text-slate-400">এখনো কোনো ইনভেস্টমেন্ট অফার তৈরি করা হয়নি।</div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {data.investmentOffers.map(offer => {
+                      const offerInvestors = (data.investors || []).filter(inv => inv.offerId === offer.id);
+                      const totalInvested = offerInvestors.reduce((acc, inv) => acc + (Number(inv.investedAmount) || 0), 0);
+                      return (
+                        <button
+                          type="button"
+                          key={offer.id}
+                          onClick={() => setSelectedOfferForDetails(offer)}
+                          className="text-left p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 hover:shadow-md transition-all cursor-pointer space-y-2"
+                        >
+                          <div className="font-bold text-sm text-slate-900">{offer.name}</div>
+                          <div className="text-2xs text-slate-500">{offer.location}</div>
+                          <div className="text-2xs text-slate-600">
+                            ৳{(offer.minInvestment || 0).toLocaleString('bn-BD')} – ৳{(offer.maxInvestment || 0).toLocaleString('bn-BD')} • {offer.tenureYears} বছর • {offer.netProfitPercent}% মুনাফা
+                          </div>
+                          <div className="text-2xs font-bold text-[#006231]">{offerInvestors.length} জন ইনভেস্টর • মোট ৳{totalInvested.toLocaleString('bn-BD')}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedOfferForDetails(null)}
+                      className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <div>
+                      <h3 className="font-bold text-sm sm:text-base text-slate-900">{selectedOfferForDetails.name}</h3>
+                      <p className="text-3xs text-slate-500">
+                        সাধারণ: ৳{(selectedOfferForDetails.minInvestment || 0).toLocaleString('bn-BD')}–৳{(selectedOfferForDetails.maxInvestment || 0).toLocaleString('bn-BD')} • {selectedOfferForDetails.tenureYears} বছর •{' '}
+                        ডিরেক্টর টিয়ার: ৳{(selectedOfferForDetails.directorTierMinInvestment || 0).toLocaleString('bn-BD')}+ (রিকারিং) • মুনাফা {selectedOfferForDetails.netProfitPercent}%
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setInvestorForm(emptyInvestorForm()); setIsInvestorModalOpen(true); }}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#006231] to-[#004d26] text-white font-bold text-xs shadow-md hover:opacity-95 transition-all cursor-pointer inline-flex items-center space-x-1.5"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>নতুন ইনভেস্টর</span>
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-left text-2xs text-slate-400 uppercase border-b border-slate-100">
+                        <th className="py-2 pr-2">নাম</th>
+                        <th className="py-2 pr-2">ফোন</th>
+                        <th className="py-2 pr-2">টিয়ার</th>
+                        <th className="py-2 pr-2">বিনিয়োগ</th>
+                        <th className="py-2 pr-2">তারিখ</th>
+                        <th className="py-2 pr-2">মেয়াদ শেষ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(data.investors || []).filter(inv => inv.offerId === selectedOfferForDetails.id).map(inv => (
+                        <tr key={inv.id} className="border-b border-slate-50">
+                          <td className="py-2 pr-2 font-bold text-slate-800">{inv.name}</td>
+                          <td className="py-2 pr-2 text-slate-600">{inv.phone}</td>
+                          <td className="py-2 pr-2">
+                            <span className={`px-2 py-0.5 rounded-full text-3xs font-bold ${inv.tier === 'director' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-[#006231]'}`}>
+                              {inv.tier === 'director' ? 'ডিরেক্টর' : 'সাধারণ'}
+                            </span>
+                          </td>
+                          <td className="py-2 pr-2 font-bold text-slate-800">{formatBDT(inv.investedAmount)}</td>
+                          <td className="py-2 pr-2 text-slate-500">{inv.investmentDate}</td>
+                          <td className="py-2 pr-2 text-slate-500">{inv.cycleEndDate}{inv.tier === 'director' ? ' (রিকারিং)' : ''}</td>
+                        </tr>
+                      ))}
+                      {(data.investors || []).filter(inv => inv.offerId === selectedOfferForDetails.id).length === 0 && (
+                        <tr><td colSpan={6} className="py-6 text-center text-slate-400">এখনো কোনো ইনভেস্টর যোগ হয়নি।</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -4995,6 +5205,31 @@ export default function ManagementDashboard({
         isSidebarCollapsed={isSidebarCollapsed}
         onClose={() => setIsProjectModalOpen(false)}
         onSubmit={handleAddProject}
+      />
+
+      {/* ========================================================= */}
+      {/* FULL SCREEN VIEW: ADD INVESTMENT OFFER                    */}
+      {/* ========================================================= */}
+      <AddInvestmentOfferModal
+        isOpen={isInvestmentOfferModalOpen}
+        form={investmentOfferForm}
+        setForm={setInvestmentOfferForm}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onClose={() => setIsInvestmentOfferModalOpen(false)}
+        onSubmit={handleAddInvestmentOffer}
+      />
+
+      {/* ========================================================= */}
+      {/* FULL SCREEN VIEW: ADD INVESTOR                            */}
+      {/* ========================================================= */}
+      <InvestorModal
+        isOpen={isInvestorModalOpen}
+        form={investorForm}
+        setForm={setInvestorForm}
+        offer={selectedOfferForDetails}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onClose={() => setIsInvestorModalOpen(false)}
+        onSubmit={handleAddInvestor}
       />
 
       {/* ========================================================= */}

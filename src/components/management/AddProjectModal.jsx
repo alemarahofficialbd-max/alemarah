@@ -105,8 +105,10 @@ export default function AddProjectModal({
                   <option value="commercial">বাণিজ্যিক কমপ্লেক্স / শপিং মল</option>
                   <option value="mixed">মিক্সড ইউজ (আবাসিক ও বাণিজ্যিক)</option>
                   <option value="share">জমি শেয়ার ভিত্তিক ফ্ল্যাট প্রকল্প</option>
-                  <option value="agro">এগ্রো ও লাইভস্টক প্রকল্প</option>
                 </select>
+                <p className="text-3xs text-slate-400 mt-1">
+                  এগ্রো / লাইভস্টক বা বিনিয়োগ-ভিত্তিক অফারের জন্য "ইনভেস্টমেন্ট অফার" সেকশন ব্যবহার করুন — ফ্ল্যাট/sqft এখানে প্রযোজ্য না।
+                </p>
               </div>
             </div>
 

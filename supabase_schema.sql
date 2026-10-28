@@ -212,3 +212,42 @@ ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS pricing_mode TEXT DEFAULT 'p
 ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS land_price NUMERIC(15, 2) DEFAULT 0; -- package mode only
 ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS construction_price NUMERIC(15, 2) DEFAULT 0; -- package mode only
 ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS size_sqft NUMERIC(10, 2) DEFAULT 0; -- sqft mode only
+
+-- 9. INVESTMENT OFFERS (e.g. Agro & Livestock) + INVESTORS
+-- These are NOT property projects: no flats, no sqft. Buyers put in an
+-- amount between min/max for a fixed tenure at a flat net-profit rate.
+-- A separate "director tier" minimum invests with no fixed end date —
+-- it renews every tenure_years cycle instead of closing.
+CREATE TABLE IF NOT EXISTS public.investment_offers (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    location TEXT,
+    description TEXT,
+    min_investment NUMERIC(15, 2) DEFAULT 0,
+    max_investment NUMERIC(15, 2) DEFAULT 0,
+    tenure_years NUMERIC(4, 1) DEFAULT 0,
+    net_profit_percent NUMERIC(5, 2) DEFAULT 0,
+    director_tier_min_investment NUMERIC(15, 2) DEFAULT 0,
+    director_tier_recurring BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.investors (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    phone TEXT,
+    offer_id TEXT REFERENCES public.investment_offers(id) ON DELETE SET NULL,
+    tier TEXT DEFAULT 'general', -- 'general' | 'director'
+    invested_amount NUMERIC(15, 2) DEFAULT 0,
+    investment_date TEXT,
+    cycle_end_date TEXT, -- general tier: fixed maturity; director tier: current cycle's end
+    status TEXT DEFAULT 'সক্রিয় (Active)',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.investment_offers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.investors ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read/write investment_offers" ON public.investment_offers FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public read/write investors" ON public.investors FOR ALL USING (true) WITH CHECK (true);
