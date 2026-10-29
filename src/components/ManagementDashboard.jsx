@@ -86,7 +86,8 @@ import {
   syncFromSupabase,
   fetchJobApplicationsFromSupabase,
   deleteProjectFromSupabase,
-  deleteExpenseFromSupabase
+  deleteExpenseFromSupabase,
+  deleteInvestmentOfferFromSupabase
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -1082,6 +1083,24 @@ export default function ManagementDashboard({
     setIsInvestorModalOpen(false);
     setInvestorForm(emptyInvestorForm());
     triggerAlert(`ইনভেস্টর "${newInvestor.name}" যোগ হয়েছে!`);
+  };
+
+  const handleDeleteInvestmentOffer = (offerId, offerName) => {
+    if (!isSuperAdmin) return;
+    requestProtectedDelete(
+      `ইনভেস্টমেন্ট প্রজেক্ট "${offerName}" মুছে ফেলা`,
+      `আপনি কি নিশ্চিতভাবে "${offerName}" এবং এর সকল ইনভেস্টর তথ্য মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
+      () => {
+        updateStore((prev) => ({
+          ...prev,
+          investmentOffers: (prev.investmentOffers || []).filter(o => o.id !== offerId),
+          investors: (prev.investors || []).filter(inv => inv.offerId !== offerId)
+        }));
+        deleteInvestmentOfferFromSupabase(offerId);
+        if (selectedOfferForDetails?.id === offerId) setSelectedOfferForDetails(null);
+        triggerAlert(`ইনভেস্টমেন্ট প্রজেক্ট "${offerName}" সফলভাবে মুছে ফেলা হয়েছে!`);
+      }
+    );
   };
 
   const handleDeleteProject = (projId, projName) => {
@@ -2795,60 +2814,105 @@ export default function ManagementDashboard({
                     <p className="text-3xs text-slate-400">উপরে বাটনে ক্লিক করে এগ্রো/লাইভস্টক জাতীয় প্রথম প্রজেক্ট যোগ করুন</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {data.investmentOffers.map(offer => {
                       const offerInvestors = (data.investors || []).filter(inv => inv.offerId === offer.id);
                       const totalInvested = offerInvestors.reduce((acc, inv) => acc + (Number(inv.investedAmount) || 0), 0);
                       const generalCount = offerInvestors.filter(inv => inv.tier !== 'director').length;
                       const directorCount = offerInvestors.filter(inv => inv.tier === 'director').length;
-                      const firstDate = offerInvestors
-                        .map(inv => parseBnDate(inv.investmentDate))
-                        .filter(Boolean)
-                        .sort((a, b) => a - b)[0];
-                      const daysRunning = firstDate ? daysBetween(new Date(firstDate), new Date()) : null;
                       return (
-                        <button
-                          type="button"
-                          key={offer.id}
-                          onClick={() => setSelectedOfferForDetails(offer)}
-                          className="text-left rounded-2xl bg-white border border-slate-200/90 hover:border-[#006231]/40 hover:shadow-lg transition-all cursor-pointer overflow-hidden group"
-                        >
-                          <div className="h-1.5 bg-gradient-to-r from-[#006231] to-emerald-400" />
-                          <div className="p-4 space-y-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center shrink-0 group-hover:bg-[#006231] group-hover:text-white transition-colors">
-                                <TrendingUp className="w-5 h-5" />
-                              </div>
-                              {daysRunning !== null && (
-                                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-3xs font-bold shrink-0">
-                                  {daysRunning} দিন চলছে
+                        <div key={offer.id} className="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden">
+                          <div className="p-5 sm:p-6 space-y-4">
+                            {/* Top Header */}
+                            <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-3">
+                              <div className="space-y-1 min-w-0">
+                                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-black border border-emerald-200/60 inline-block">
+                                  ইনভেস্টমেন্ট প্রজেক্ট
                                 </span>
+                                <h4 className="text-base font-bold text-slate-900 truncate">{offer.name}</h4>
+                                {offer.location && (
+                                  <p className="text-2xs text-slate-500 flex items-center space-x-1.5">
+                                    <MapPin className="w-3.5 h-3.5 text-[#006231] shrink-0" />
+                                    <span className="truncate">{offer.location}</span>
+                                  </p>
+                                )}
+                              </div>
+
+                              {isSuperAdmin && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteInvestmentOffer(offer.id, offer.name)}
+                                  className="p-1.5 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+                                  title="প্রজেক্ট মুছে ফেলুন"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
                               )}
                             </div>
-                            <div>
-                              <div className="font-bold text-sm text-slate-900 truncate">{offer.name}</div>
-                              {offer.location && (
-                                <div className="text-3xs text-slate-500 flex items-center space-x-1 mt-0.5">
-                                  <MapPin className="w-3 h-3 shrink-0" />
-                                  <span className="truncate">{offer.location}</span>
+
+                            {/* Specs Grid */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="p-2.5 rounded-xl bg-slate-50/80 border border-slate-100 space-y-0.5">
+                                <div className="text-3xs text-slate-400 font-semibold uppercase tracking-wider">বিনিয়োগ সীমা</div>
+                                <div className="font-bold text-slate-800 text-xs truncate">৳{(offer.minInvestment || 0).toLocaleString('bn-BD')}–৳{(offer.maxInvestment || 0).toLocaleString('bn-BD')}</div>
+                              </div>
+
+                              <div className="p-2.5 rounded-xl bg-slate-50/80 border border-slate-100 space-y-0.5">
+                                <div className="text-3xs text-slate-400 font-semibold uppercase tracking-wider">মেয়াদ ও মুনাফা</div>
+                                <div className="font-bold text-emerald-700 text-xs truncate">{offer.tenureYears} বছর • {offer.netProfitPercent}%</div>
+                              </div>
+
+                              <div className="p-2.5 rounded-xl bg-slate-50/80 border border-slate-100 space-y-0.5">
+                                <div className="text-3xs text-slate-400 font-semibold uppercase tracking-wider">মোট ইনভেস্টর</div>
+                                <div className="font-bold text-slate-800 text-xs truncate">
+                                  {offerInvestors.length} জন ({generalCount} সাধারণ, {directorCount} ডিরেক্টর)
                                 </div>
-                              )}
-                            </div>
-                            <div className="text-3xs text-slate-500">
-                              ৳{(offer.minInvestment || 0).toLocaleString('bn-BD')}–৳{(offer.maxInvestment || 0).toLocaleString('bn-BD')} • {offer.tenureYears} বছর মেয়াদ • {offer.netProfitPercent}% মুনাফা
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                              <div>
-                                <div className="text-base font-black text-[#006231]">{offerInvestors.length}</div>
-                                <div className="text-3xs text-slate-400">জন ইনভেস্টর ({generalCount} সাধারণ, {directorCount} ডিরেক্টর)</div>
                               </div>
-                              <div className="text-right">
-                                <div className="text-sm font-black text-slate-900">{formatBDT(totalInvested)}</div>
-                                <div className="text-3xs text-slate-400">মোট সংগৃহীত</div>
+
+                              <div className="p-2.5 rounded-xl bg-slate-50/80 border border-slate-100 space-y-0.5">
+                                <div className="text-3xs text-slate-400 font-semibold uppercase tracking-wider">মোট সংগৃহীত</div>
+                                <div className="font-bold text-[#006231] text-xs truncate">{formatBDT(totalInvested)}</div>
                               </div>
+                            </div>
+
+                            {/* Direct Offer Hub Access Button */}
+                            <div className="pt-1">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedOfferForDetails(offer)}
+                                className="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-[#006231] text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer group active:scale-98"
+                              >
+                                <TrendingUp className="w-3.5 h-3.5 text-slate-300 group-hover:text-white transition-colors" />
+                                <span>ইনভেস্টমেন্ট হাব</span>
+                                <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-colors" />
+                              </button>
                             </div>
                           </div>
-                        </button>
+
+                          {/* Card Footer */}
+                          <div className="p-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-2xs font-semibold text-slate-500">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedOfferForDetails(offer)}
+                              className="text-slate-700 hover:text-slate-900 font-bold flex items-center space-x-1 cursor-pointer"
+                            >
+                              <Users className="w-3.5 h-3.5 text-blue-600" />
+                              <span>ইনভেস্টর তালিকা ({offerInvestors.length})</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedOfferForDetails(offer);
+                                setInvestorForm(emptyInvestorForm());
+                                setIsInvestorModalOpen(true);
+                              }}
+                              className="text-[#006231] hover:text-[#0A4D27] font-bold flex items-center space-x-1 cursor-pointer"
+                            >
+                              <Plus className="w-3 h-3" />
+                              <span>ইনভেস্টর যুক্ত করুন</span>
+                            </button>
+                          </div>
+                        </div>
                       );
                     })}
                   </div>

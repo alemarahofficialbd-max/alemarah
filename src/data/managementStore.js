@@ -1101,3 +1101,13 @@ export const deleteExpenseFromSupabase = async (expId) => {
     console.error('Error deleting expense from Supabase:', err);
   }
 };
+
+export const deleteInvestmentOfferFromSupabase = async (offerId) => {
+  try {
+    if (!offerId) return;
+    await supabase.from('investors').delete().eq('offer_id', offerId);
+    await supabase.from('investment_offers').delete().eq('id', offerId);
+  } catch (err) {
+    console.error('Error deleting investment offer from Supabase:', err);
+  }
+};
