@@ -419,7 +419,7 @@ export default function LoginPage({
                   type="text"
                   value={identifierInput}
                   onChange={(e) => setIdentifierInput(e.target.value)}
-                  placeholder={loginRole === 'customer' ? '01711223344 বা CLI-88214' : 'alemarah.officialbd@gmail.com বা ০১৭১১...'}
+                  placeholder={loginRole === 'customer' ? 'আপনার মোবাইল নম্বর' : 'ইমেইল অথবা মোবাইল নম্বর'}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 font-medium placeholder-gray-400 focus:ring-2 focus:ring-[#CE2028]/20 focus:border-[#CE2028] outline-none transition-all"
                   required
                 />
