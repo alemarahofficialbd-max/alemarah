@@ -1004,7 +1004,7 @@ export default function ManagementDashboard({
     }
 
     const newProj = {
-      id: `proj-${Date.now().toString().slice(-4)}`,
+      id: `proj-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
       name: projectForm.name,
       location: projectForm.location || 'ঢাকা',
       progress: Number(projectForm.progress) || 10,
