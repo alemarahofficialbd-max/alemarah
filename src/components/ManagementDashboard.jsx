@@ -3904,43 +3904,65 @@ export default function ManagementDashboard({
                               <span>লভ্যাংশ পে</span>
                             </button>
 
-                            {/* 2. Share Certificate Button */}
-                            <button
-                              onClick={() => setSelectedDirectorForCertificate(dir)}
-                              title="শেয়ার সনদপত্র দেখুন ও প্রিন্ট করুন"
-                              className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-2xs border border-amber-200/80 cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
-                            >
-                              <Award className="w-3.5 h-3.5 text-amber-600" />
-                              <span className="hidden sm:inline">শেয়ার সনদ</span>
-                            </button>
+                            {/* 3-Dot menu: share certificate, full profile, admin access */}
+                            <div className="relative">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenActionMenuId(openActionMenuId === dir.id ? null : dir.id);
+                                }}
+                                className="p-1.5 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-slate-200"
+                                title="আরও অপশন"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </button>
 
-                            {/* 3. Full Profile & Ledgers Button */}
-                            <button
-                              onClick={() => {
-                                setSelectedDirectorForProfile(dir);
-                                setDirectorProfileActiveTab('dividends');
-                              }}
-                              title="লভ্যাংশ ভাউচার ও বিস্তারিত প্রোফাইল হিসাব"
-                              className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-2xs cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
-                            >
-                              <Eye className="w-3.5 h-3.5 text-white/80" />
-                              <span>হিসাব খাতা</span>
-                            </button>
-
-                            {/* 4. Grant/Change Admin Access Button (Super Admin only) */}
-                            {isSuperAdmin && (() => {
-                              const hasTeamAccess = (data.managementTeam || []).some(m => m.directorId === dir.id || m.phone === dir.phone);
-                              return (
-                                <button
-                                  onClick={() => handleGrantDirectorAccess(dir)}
-                                  title="এই ডিরেক্টরকে ম্যানেজমেন্ট প্যানেলের অতিরিক্ত অ্যাডমিন অ্যাক্সেস দিন"
-                                  className="px-2.5 py-1.5 rounded-xl bg-[#006231] hover:bg-[#004d26] text-white font-bold text-2xs cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
-                                >
-                                  <KeyRound className="w-3.5 h-3.5" />
-                                  <span>{hasTeamAccess ? 'পারমিশন পরিবর্তন' : 'অ্যাডমিন এক্সেস'}</span>
-                                </button>
-                              );
-                            })()}
+                              {openActionMenuId === dir.id && (
+                                <>
+                                  <div
+                                    className="fixed inset-0 z-20"
+                                    onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
+                                  />
+                                  <div
+                                    onClick={(e) => e.stopPropagation()}
+                                    className={`absolute right-0 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 animate-fadeIn text-xs ${
+                                      idx >= directorsList.length - 2 && directorsList.length > 1 ? 'bottom-full mb-1.5' : 'top-full mt-1.5'
+                                    }`}
+                                  >
+                                    <button
+                                      type="button"
+                                      onClick={() => { setOpenActionMenuId(null); setSelectedDirectorForCertificate(dir); }}
+                                      className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
+                                    >
+                                      <Award className="w-3.5 h-3.5 text-amber-600" />
+                                      <span>শেয়ার সনদ</span>
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => { setOpenActionMenuId(null); setSelectedDirectorForProfile(dir); setDirectorProfileActiveTab('dividends'); }}
+                                      className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
+                                    >
+                                      <Eye className="w-3.5 h-3.5 text-slate-700" />
+                                      <span>হিসাব খাতা</span>
+                                    </button>
+                                    {isSuperAdmin && (() => {
+                                      const hasTeamAccess = (data.managementTeam || []).some(m => m.directorId === dir.id || m.phone === dir.phone);
+                                      return (
+                                        <button
+                                          type="button"
+                                          onClick={() => { setOpenActionMenuId(null); handleGrantDirectorAccess(dir); }}
+                                          className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-[#006231] font-bold transition-colors cursor-pointer"
+                                        >
+                                          <KeyRound className="w-3.5 h-3.5" />
+                                          <span>{hasTeamAccess ? 'পারমিশন পরিবর্তন' : 'অ্যাডমিন এক্সেস'}</span>
+                                        </button>
+                                      );
+                                    })()}
+                                  </div>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </td>
                       </tr>
