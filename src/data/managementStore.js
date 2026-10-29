@@ -484,8 +484,31 @@ export const syncToSupabase = async (data) => {
   }
 };
 
-// Background sync from Supabase
+// Background sync from Supabase. Guarded against overlapping calls: two
+// concurrent runs can each read localStorage before the other has written,
+// so whichever finishes last silently clobbers the other's merge (e.g. the
+// page-load timer and a realtime-triggered refresh firing close together
+// could wipe out a project added in between). If a call arrives while one
+// is already in flight, it's coalesced into a single follow-up run instead
+// of starting a second overlapping one.
+let _syncInFlight = null;
+let _syncRerunQueued = false;
 export const syncFromSupabase = async () => {
+  if (_syncInFlight) {
+    _syncRerunQueued = true;
+    return _syncInFlight;
+  }
+  _syncInFlight = _syncFromSupabaseImpl().finally(() => {
+    _syncInFlight = null;
+    if (_syncRerunQueued) {
+      _syncRerunQueued = false;
+      syncFromSupabase();
+    }
+  });
+  return _syncInFlight;
+};
+
+const _syncFromSupabaseImpl = async () => {
   try {
     const [adminsRes, directorsRes, projectsRes, clientsRes, customersRes, inquiriesRes, offersRes, investorsRes] = await Promise.all([
       supabase.from('admins').select('*'),
@@ -606,6 +629,12 @@ export const syncFromSupabase = async () => {
           expenses: expensesFromRemote.length > 0 ? expensesFromRemote : (localProj?.expenses || [])
         };
       });
+      // Retain any locally added projects that aren't yet in Supabase (e.g.
+      // the cloud insert hasn't landed yet, or briefly failed) -- otherwise
+      // a project you just created disappears the moment a realtime refresh
+      // pulls the remote list and overwrites it wholesale.
+      const extraLocalProjects = (current.projects || []).filter(lp => !projectsRes.data.some(p => p.id === lp.id));
+      updated.projects = [...updated.projects, ...extraLocalProjects];
     }
 
     if (clientsRes.data && clientsRes.data.length > 0) {
@@ -673,6 +702,8 @@ export const syncFromSupabase = async () => {
         date: inq.created_at ? new Date(inq.created_at).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
         timestamp: inq.created_at
       }));
+      const extraLocalInquiries = (current.inquiries || []).filter(li => !inquiriesRes.data.some(inq => inq.id === li.id));
+      updated.inquiries = [...updated.inquiries, ...extraLocalInquiries];
     }
 
     if (offersRes?.data && offersRes.data.length > 0) {
@@ -688,6 +719,8 @@ export const syncFromSupabase = async () => {
         directorTierMinInvestment: Number(o.director_tier_min_investment) || 0,
         directorTierRecurring: Boolean(o.director_tier_recurring)
       }));
+      const extraLocalOffers = (current.investmentOffers || []).filter(lo => !offersRes.data.some(o => o.id === lo.id));
+      updated.investmentOffers = [...updated.investmentOffers, ...extraLocalOffers];
     }
 
     if (investorsRes?.data && investorsRes.data.length > 0) {
@@ -708,6 +741,8 @@ export const syncFromSupabase = async () => {
         nomineeRelation: inv.nominee_relation || '',
         nomineePhone: inv.nominee_phone || ''
       }));
+      const extraLocalInvestors = (current.investors || []).filter(li => !investorsRes.data.some(inv => inv.id === li.id));
+      updated.investors = [...updated.investors, ...extraLocalInvestors];
     }
 
     const migrated = migrateClientsToCustomers(updated);
