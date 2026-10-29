@@ -101,7 +101,25 @@ import AddProjectModal from './management/AddProjectModal';
 import AddInvestmentOfferModal from './management/AddInvestmentOfferModal';
 import InvestorModal from './management/InvestorModal';
 
-export default function ManagementDashboard({ 
+// Investor dates are stored as pre-formatted Bengali display strings
+// (e.g. "২৮ অক্টোবর, ২০২৬"), not ISO — parse one back into a real Date so
+// we can show "কত দিন চলছে / বাকি" instead of just the raw string.
+const BN_MONTHS = { 'জানুয়ারি': 0, 'ফেব্রুয়ারি': 1, 'মার্চ': 2, 'এপ্রিল': 3, 'মে': 4, 'জুন': 5, 'জুলাই': 6, 'আগস্ট': 7, 'সেপ্টেম্বর': 8, 'অক্টোবর': 9, 'নভেম্বর': 10, 'ডিসেম্বর': 11 };
+const parseBnDate = (str) => {
+  if (!str) return null;
+  const latin = String(str).replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d)).replace(',', '');
+  const parts = latin.trim().split(/\s+/);
+  if (parts.length < 3) return null;
+  const day = parseInt(parts[0], 10);
+  const month = BN_MONTHS[parts[1]];
+  const year = parseInt(parts[2], 10);
+  if (Number.isNaN(day) || month === undefined || Number.isNaN(year)) return null;
+  const d = new Date(year, month, day);
+  return Number.isNaN(d.getTime()) ? null : d;
+};
+const daysBetween = (a, b) => (!a || !b) ? null : Math.round((b.setHours(0,0,0,0) - a.setHours(0,0,0,0)) / 86400000);
+
+export default function ManagementDashboard({
   admin, 
   lang = 'bn', 
   setLang,
@@ -2757,8 +2775,8 @@ export default function ManagementDashboard({
               <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-bold text-sm sm:text-base text-slate-900">ইনভেস্টমেন্ট অফারসমূহ</h3>
-                    <p className="text-3xs text-slate-500">এগ্রো/লাইভস্টক জাতীয় প্রকল্প — ফ্ল্যাট/sqft নেই, শুধু বিনিয়োগ স্ল্যাব</p>
+                    <h3 className="font-bold text-sm sm:text-base text-slate-900">ইনভেস্টমেন্ট প্রজেক্টসমূহ</h3>
+                    <p className="text-3xs text-slate-500">এগ্রো/লাইভস্টক জাতীয় প্রজেক্ট — ফ্ল্যাট/sqft নেই, শুধু বিনিয়োগ স্ল্যাব</p>
                   </div>
                   <button
                     type="button"
@@ -2766,100 +2784,196 @@ export default function ManagementDashboard({
                     className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#006231] to-[#004d26] text-white font-bold text-xs shadow-md hover:opacity-95 transition-all cursor-pointer inline-flex items-center space-x-1.5"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>নতুন অফার যোগ করুন</span>
+                    <span>নতুন ইনভেস্টমেন্ট প্রজেক্ট যোগ করুন</span>
                   </button>
                 </div>
 
                 {(data.investmentOffers || []).length === 0 ? (
-                  <div className="py-10 text-center text-xs text-slate-400">এখনো কোনো ইনভেস্টমেন্ট অফার তৈরি করা হয়নি।</div>
+                  <div className="py-14 text-center space-y-2">
+                    <TrendingUp className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
+                    <p className="text-xs font-bold text-slate-600">এখনো কোনো ইনভেস্টমেন্ট প্রজেক্ট তৈরি করা হয়নি</p>
+                    <p className="text-3xs text-slate-400">উপরে বাটনে ক্লিক করে এগ্রো/লাইভস্টক জাতীয় প্রথম প্রজেক্ট যোগ করুন</p>
+                  </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {data.investmentOffers.map(offer => {
                       const offerInvestors = (data.investors || []).filter(inv => inv.offerId === offer.id);
                       const totalInvested = offerInvestors.reduce((acc, inv) => acc + (Number(inv.investedAmount) || 0), 0);
+                      const generalCount = offerInvestors.filter(inv => inv.tier !== 'director').length;
+                      const directorCount = offerInvestors.filter(inv => inv.tier === 'director').length;
+                      const firstDate = offerInvestors
+                        .map(inv => parseBnDate(inv.investmentDate))
+                        .filter(Boolean)
+                        .sort((a, b) => a - b)[0];
+                      const daysRunning = firstDate ? daysBetween(new Date(firstDate), new Date()) : null;
                       return (
                         <button
                           type="button"
                           key={offer.id}
                           onClick={() => setSelectedOfferForDetails(offer)}
-                          className="text-left p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 hover:shadow-md transition-all cursor-pointer space-y-2"
+                          className="text-left rounded-2xl bg-white border border-slate-200/90 hover:border-[#006231]/40 hover:shadow-lg transition-all cursor-pointer overflow-hidden group"
                         >
-                          <div className="font-bold text-sm text-slate-900">{offer.name}</div>
-                          <div className="text-2xs text-slate-500">{offer.location}</div>
-                          <div className="text-2xs text-slate-600">
-                            ৳{(offer.minInvestment || 0).toLocaleString('bn-BD')} – ৳{(offer.maxInvestment || 0).toLocaleString('bn-BD')} • {offer.tenureYears} বছর • {offer.netProfitPercent}% মুনাফা
+                          <div className="h-1.5 bg-gradient-to-r from-[#006231] to-emerald-400" />
+                          <div className="p-4 space-y-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center shrink-0 group-hover:bg-[#006231] group-hover:text-white transition-colors">
+                                <TrendingUp className="w-5 h-5" />
+                              </div>
+                              {daysRunning !== null && (
+                                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-3xs font-bold shrink-0">
+                                  {daysRunning} দিন চলছে
+                                </span>
+                              )}
+                            </div>
+                            <div>
+                              <div className="font-bold text-sm text-slate-900 truncate">{offer.name}</div>
+                              {offer.location && (
+                                <div className="text-3xs text-slate-500 flex items-center space-x-1 mt-0.5">
+                                  <MapPin className="w-3 h-3 shrink-0" />
+                                  <span className="truncate">{offer.location}</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-3xs text-slate-500">
+                              ৳{(offer.minInvestment || 0).toLocaleString('bn-BD')}–৳{(offer.maxInvestment || 0).toLocaleString('bn-BD')} • {offer.tenureYears} বছর মেয়াদ • {offer.netProfitPercent}% মুনাফা
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                              <div>
+                                <div className="text-base font-black text-[#006231]">{offerInvestors.length}</div>
+                                <div className="text-3xs text-slate-400">জন ইনভেস্টর ({generalCount} সাধারণ, {directorCount} ডিরেক্টর)</div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-sm font-black text-slate-900">{formatBDT(totalInvested)}</div>
+                                <div className="text-3xs text-slate-400">মোট সংগৃহীত</div>
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-2xs font-bold text-[#006231]">{offerInvestors.length} জন ইনভেস্টর • মোট ৳{totalInvested.toLocaleString('bn-BD')}</div>
                         </button>
                       );
                     })}
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
+            ) : (() => {
+              const offerInvestors = (data.investors || []).filter(inv => inv.offerId === selectedOfferForDetails.id);
+              const totalInvested = offerInvestors.reduce((acc, inv) => acc + (Number(inv.investedAmount) || 0), 0);
+              const generalInvestors = offerInvestors.filter(inv => inv.tier !== 'director');
+              const directorInvestors = offerInvestors.filter(inv => inv.tier === 'director');
+              const projectedProfit = offerInvestors.reduce((acc, inv) => acc + ((Number(inv.investedAmount) || 0) * (Number(selectedOfferForDetails.netProfitPercent) || 0) / 100), 0);
+              return (
+              <div className="space-y-4">
+                <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedOfferForDetails(null)}
+                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <div>
+                        <h3 className="font-bold text-sm sm:text-base text-slate-900">{selectedOfferForDetails.name}</h3>
+                        <p className="text-3xs text-slate-500 flex items-center space-x-1">
+                          {selectedOfferForDetails.location && (<><MapPin className="w-3 h-3" /><span>{selectedOfferForDetails.location} •</span></>)}
+                          <span>সাধারণ ৳{(selectedOfferForDetails.minInvestment || 0).toLocaleString('bn-BD')}–৳{(selectedOfferForDetails.maxInvestment || 0).toLocaleString('bn-BD')} • {selectedOfferForDetails.tenureYears} বছর • মুনাফা {selectedOfferForDetails.netProfitPercent}% • ডিরেক্টর টিয়ার ৳{(selectedOfferForDetails.directorTierMinInvestment || 0).toLocaleString('bn-BD')}+ (রিকারিং)</span>
+                        </p>
+                      </div>
+                    </div>
                     <button
                       type="button"
-                      onClick={() => setSelectedOfferForDetails(null)}
-                      className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
+                      onClick={() => { setInvestorForm(emptyInvestorForm()); setIsInvestorModalOpen(true); }}
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#006231] to-[#004d26] text-white font-bold text-xs shadow-md hover:opacity-95 transition-all cursor-pointer inline-flex items-center space-x-1.5"
                     >
-                      <ChevronLeft className="w-4 h-4" />
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>নতুন ইনভেস্টর</span>
                     </button>
-                    <div>
-                      <h3 className="font-bold text-sm sm:text-base text-slate-900">{selectedOfferForDetails.name}</h3>
-                      <p className="text-3xs text-slate-500">
-                        সাধারণ: ৳{(selectedOfferForDetails.minInvestment || 0).toLocaleString('bn-BD')}–৳{(selectedOfferForDetails.maxInvestment || 0).toLocaleString('bn-BD')} • {selectedOfferForDetails.tenureYears} বছর •{' '}
-                        ডিরেক্টর টিয়ার: ৳{(selectedOfferForDetails.directorTierMinInvestment || 0).toLocaleString('bn-BD')}+ (রিকারিং) • মুনাফা {selectedOfferForDetails.netProfitPercent}%
-                      </p>
+                  </div>
+
+                  {/* KPI stat row, matching the Projects detail header style */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/60 space-y-1">
+                      <span className="text-3xs text-slate-500 font-bold block uppercase tracking-wide">মোট ইনভেস্টর</span>
+                      <span className="text-lg sm:text-2xl font-mono font-black text-[#006231] block">{offerInvestors.length} জন</span>
+                      <span className="text-[11px] text-slate-500 font-medium block">{generalInvestors.length} সাধারণ, {directorInvestors.length} ডিরেক্টর টিয়ার</span>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                      <span className="text-3xs text-slate-500 font-bold block uppercase tracking-wide">মোট সংগৃহীত বিনিয়োগ</span>
+                      <span className="text-lg sm:text-2xl font-mono font-black text-slate-800 block">{formatBDT(totalInvested)}</span>
+                      <span className="text-[11px] text-slate-500 font-medium block">সকল ইনভেস্টরের সমষ্টি</span>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/60 space-y-1">
+                      <span className="text-3xs text-slate-500 font-bold block uppercase tracking-wide">সম্ভাব্য মোট মুনাফা দায়</span>
+                      <span className="text-lg sm:text-2xl font-mono font-black text-amber-700 block">{formatBDT(projectedProfit)}</span>
+                      <span className="text-[11px] text-slate-500 font-medium block">মেয়াদ শেষে কোম্পানির পরিশোধযোগ্য</span>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-200/60 space-y-1">
+                      <span className="text-3xs text-slate-500 font-bold block uppercase tracking-wide">মেয়াদ</span>
+                      <span className="text-lg sm:text-2xl font-mono font-black text-purple-900 block">{selectedOfferForDetails.tenureYears} বছর</span>
+                      <span className="text-[11px] text-slate-500 font-medium block">মুনাফা হার {selectedOfferForDetails.netProfitPercent}%</span>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => { setInvestorForm(emptyInvestorForm()); setIsInvestorModalOpen(true); }}
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#006231] to-[#004d26] text-white font-bold text-xs shadow-md hover:opacity-95 transition-all cursor-pointer inline-flex items-center space-x-1.5"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>নতুন ইনভেস্টর</span>
-                  </button>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="text-left text-2xs text-slate-400 uppercase border-b border-slate-100">
-                        <th className="py-2 pr-2">নাম</th>
-                        <th className="py-2 pr-2">ফোন</th>
-                        <th className="py-2 pr-2">টিয়ার</th>
-                        <th className="py-2 pr-2">বিনিয়োগ</th>
-                        <th className="py-2 pr-2">তারিখ</th>
-                        <th className="py-2 pr-2">মেয়াদ শেষ</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(data.investors || []).filter(inv => inv.offerId === selectedOfferForDetails.id).map(inv => (
-                        <tr key={inv.id} className="border-b border-slate-50">
-                          <td className="py-2 pr-2 font-bold text-slate-800">{inv.name}</td>
-                          <td className="py-2 pr-2 text-slate-600">{inv.phone}</td>
-                          <td className="py-2 pr-2">
-                            <span className={`px-2 py-0.5 rounded-full text-3xs font-bold ${inv.tier === 'director' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-[#006231]'}`}>
-                              {inv.tier === 'director' ? 'ডিরেক্টর' : 'সাধারণ'}
-                            </span>
-                          </td>
-                          <td className="py-2 pr-2 font-bold text-slate-800">{formatBDT(inv.investedAmount)}</td>
-                          <td className="py-2 pr-2 text-slate-500">{inv.investmentDate}</td>
-                          <td className="py-2 pr-2 text-slate-500">{inv.cycleEndDate}{inv.tier === 'director' ? ' (রিকারিং)' : ''}</td>
+                <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+                  <div className="p-4 sm:p-5 border-b border-slate-100">
+                    <h4 className="text-sm font-bold text-slate-900">ইনভেস্টরগণের হিসাব</h4>
+                    <p className="text-2xs text-slate-500 mt-0.5">প্রতিটি ইনভেস্টরের বিনিয়োগ, কত দিন চলছে এবং মেয়াদ শেষ হতে কত বাকি</p>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="text-left text-2xs text-slate-400 uppercase border-b border-slate-100 bg-slate-50/50">
+                          <th className="py-2.5 px-4">নাম</th>
+                          <th className="py-2.5 px-4">ফোন</th>
+                          <th className="py-2.5 px-4">টিয়ার</th>
+                          <th className="py-2.5 px-4">বিনিয়োগ</th>
+                          <th className="py-2.5 px-4">চলছে</th>
+                          <th className="py-2.5 px-4">বাকি</th>
                         </tr>
-                      ))}
-                      {(data.investors || []).filter(inv => inv.offerId === selectedOfferForDetails.id).length === 0 && (
-                        <tr><td colSpan={6} className="py-6 text-center text-slate-400">এখনো কোনো ইনভেস্টর যোগ হয়নি।</td></tr>
-                      )}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {offerInvestors.map(inv => {
+                          const start = parseBnDate(inv.investmentDate);
+                          const end = parseBnDate(inv.cycleEndDate);
+                          const today = new Date();
+                          const runningDays = start ? daysBetween(new Date(start), new Date(today)) : null;
+                          const remainingDays = end ? daysBetween(new Date(today), new Date(end)) : null;
+                          return (
+                            <tr key={inv.id} className="border-b border-slate-50 hover:bg-slate-50/50">
+                              <td className="py-2.5 px-4 font-bold text-slate-800">{inv.name}</td>
+                              <td className="py-2.5 px-4 text-slate-600 font-mono">{inv.phone}</td>
+                              <td className="py-2.5 px-4">
+                                <span className={`px-2 py-0.5 rounded-full text-3xs font-bold ${inv.tier === 'director' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-[#006231]'}`}>
+                                  {inv.tier === 'director' ? 'ডিরেক্টর' : 'সাধারণ'}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-4 font-bold text-slate-800">{formatBDT(inv.investedAmount)}</td>
+                              <td className="py-2.5 px-4 text-slate-600">{runningDays !== null ? `${runningDays} দিন` : inv.investmentDate}</td>
+                              <td className="py-2.5 px-4">
+                                {inv.tier === 'director' ? (
+                                  <span className="text-purple-700 font-bold text-2xs">রিকারিং</span>
+                                ) : remainingDays !== null ? (
+                                  <span className={`font-bold ${remainingDays <= 30 ? 'text-[#CE2028]' : 'text-slate-600'}`}>
+                                    {remainingDays > 0 ? `${remainingDays} দিন বাকি` : 'মেয়াদ শেষ'}
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-500">{inv.cycleEndDate}</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        {offerInvestors.length === 0 && (
+                          <tr><td colSpan={6} className="py-10 text-center text-slate-400">এখনো কোনো ইনভেস্টর যোগ হয়নি। উপরে '+ নতুন ইনভেস্টর' বাটনে ক্লিক করুন।</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
-            )}
+              );
+            })()}
           </div>
         )}
 
