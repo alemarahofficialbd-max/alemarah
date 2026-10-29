@@ -429,7 +429,9 @@ export const syncToSupabase = async (data) => {
         invested_amount: Number(inv.investedAmount) || 0,
         investment_date: inv.investmentDate || '',
         cycle_end_date: inv.cycleEndDate || '',
-        status: inv.status || 'সক্রিয় (Active)'
+        status: inv.status || 'সক্রিয় (Active)',
+        total_paid: Number(inv.totalPaid) || 0,
+        payout_history: inv.payoutHistory || []
       }));
       const { error: investorErr } = await supabase.from('investors').upsert(investorRows, { onConflict: 'id' });
       if (investorErr) { console.error('Cloud sync failed: investors', investorErr); failedTables.push('investors'); }
@@ -692,7 +694,9 @@ export const syncFromSupabase = async () => {
         investedAmount: Number(inv.invested_amount) || 0,
         investmentDate: inv.investment_date || '',
         cycleEndDate: inv.cycle_end_date || '',
-        status: inv.status || 'সক্রিয় (Active)'
+        status: inv.status || 'সক্রিয় (Active)',
+        totalPaid: Number(inv.total_paid) || 0,
+        payoutHistory: Array.isArray(inv.payout_history) ? inv.payout_history : []
       }));
     }
 

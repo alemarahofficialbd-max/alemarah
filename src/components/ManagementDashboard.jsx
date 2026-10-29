@@ -101,6 +101,7 @@ import TeamModal from './management/TeamModal';
 import AddProjectModal from './management/AddProjectModal';
 import AddInvestmentOfferModal from './management/AddInvestmentOfferModal';
 import InvestorModal from './management/InvestorModal';
+import InvestorPayoutModal from './management/InvestorPayoutModal';
 
 // Investor dates are stored as pre-formatted Bengali display strings
 // (e.g. "২৮ অক্টোবর, ২০২৬"), not ISO — parse one back into a real Date so
@@ -487,6 +488,15 @@ export default function ManagementDashboard({
   const [investorForm, setInvestorForm] = useState(emptyInvestorForm);
   const [investorTierFilter, setInvestorTierFilter] = useState('all'); // 'all' | 'general' | 'director'
   useEffect(() => { setInvestorTierFilter('all'); }, [selectedOfferForDetails?.id]);
+  const [isInvestorPayoutModalOpen, setIsInvestorPayoutModalOpen] = useState(false);
+  const [payoutTargetInvestor, setPayoutTargetInvestor] = useState(null);
+  const emptyInvestorPayoutForm = () => ({
+    amount: '',
+    date: new Date().toISOString().split('T')[0],
+    method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
+    note: ''
+  });
+  const [investorPayoutForm, setInvestorPayoutForm] = useState(emptyInvestorPayoutForm);
 
   // Project Master Details & Inventory Management State
   const [selectedProjectForDetails, setSelectedProjectForDetails] = useState(null);
@@ -1085,6 +1095,44 @@ export default function ManagementDashboard({
     setIsInvestorModalOpen(false);
     setInvestorForm(emptyInvestorForm());
     triggerAlert(`ইনভেস্টর "${newInvestor.name}" যোগ হয়েছে!`);
+  };
+
+  const handleAddInvestorPayout = (e) => {
+    e.preventDefault();
+    if (!isSuperAdmin && !(admin?.permissions || []).includes('investments')) {
+      alert('এই কাজের অনুমতি নেই।');
+      return;
+    }
+    if (!payoutTargetInvestor) return;
+    const amountNum = Number(investorPayoutForm.amount);
+    if (!amountNum || amountNum <= 0) {
+      alert('অনুগ্রহ করে পরিশোধের সঠিক টাকার পরিমাণ লিখুন।');
+      return;
+    }
+    const newPayout = {
+      id: `PAY-${Date.now().toString(36).toUpperCase()}`,
+      amount: amountNum,
+      date: investorPayoutForm.date
+        ? new Date(investorPayoutForm.date).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })
+        : new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      method: investorPayoutForm.method,
+      note: investorPayoutForm.note || ''
+    };
+    updateStore((prev) => ({
+      ...prev,
+      investors: (prev.investors || []).map(inv => {
+        if (inv.id !== payoutTargetInvestor.id) return inv;
+        const history = [newPayout, ...(inv.payoutHistory || [])];
+        return {
+          ...inv,
+          payoutHistory: history,
+          totalPaid: history.reduce((acc, p) => acc + (Number(p.amount) || 0), 0)
+        };
+      })
+    }));
+    setIsInvestorPayoutModalOpen(false);
+    setInvestorPayoutForm(emptyInvestorPayoutForm());
+    triggerAlert(`${payoutTargetInvestor.name}-কে ${formatBDT(amountNum)} পরিশোধ করা হয়েছে!`);
   };
 
   const handleDeleteInvestmentOffer = (offerId, offerName) => {
@@ -2926,6 +2974,7 @@ export default function ManagementDashboard({
               const generalInvestors = offerInvestors.filter(inv => inv.tier !== 'director');
               const directorInvestors = offerInvestors.filter(inv => inv.tier === 'director');
               const projectedProfit = offerInvestors.reduce((acc, inv) => acc + ((Number(inv.investedAmount) || 0) * (Number(selectedOfferForDetails.netProfitPercent) || 0) / 100), 0);
+              const totalPaidOut = offerInvestors.reduce((acc, inv) => acc + (Number(inv.totalPaid) || 0), 0);
               return (
               <div className="space-y-4">
                 <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
@@ -2974,9 +3023,9 @@ export default function ManagementDashboard({
                       <span className="text-[11px] text-slate-500 font-medium block">মেয়াদ শেষে কোম্পানির পরিশোধযোগ্য</span>
                     </div>
                     <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-200/60 space-y-1">
-                      <span className="text-3xs text-slate-500 font-bold block uppercase tracking-wide">মেয়াদ</span>
-                      <span className="text-lg sm:text-2xl font-mono font-black text-purple-900 block">{selectedOfferForDetails.tenureYears} বছর</span>
-                      <span className="text-[11px] text-slate-500 font-medium block">মুনাফা হার {selectedOfferForDetails.netProfitPercent}%</span>
+                      <span className="text-3xs text-slate-500 font-bold block uppercase tracking-wide">মোট পরিশোধিত</span>
+                      <span className="text-lg sm:text-2xl font-mono font-black text-purple-900 block">{formatBDT(totalPaidOut)}</span>
+                      <span className="text-[11px] text-slate-500 font-medium block">বাকি {formatBDT(Math.max(0, projectedProfit - totalPaidOut))}</span>
                     </div>
                   </div>
                 </div>
@@ -3018,6 +3067,8 @@ export default function ManagementDashboard({
                           <th className="py-2.5 px-4">বিনিয়োগ</th>
                           <th className="py-2.5 px-4">চলছে</th>
                           <th className="py-2.5 px-4">বাকি</th>
+                          <th className="py-2.5 px-4">পরিশোধিত</th>
+                          <th className="py-2.5 px-4 text-right">অ্যাকশন</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -3049,11 +3100,26 @@ export default function ManagementDashboard({
                                   <span className="text-slate-500">{inv.cycleEndDate}</span>
                                 )}
                               </td>
+                              <td className="py-2.5 px-4 font-bold text-[#006231]">{formatBDT(inv.totalPaid)}</td>
+                              <td className="py-2.5 px-4 text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setPayoutTargetInvestor(inv);
+                                    setInvestorPayoutForm(emptyInvestorPayoutForm());
+                                    setIsInvestorPayoutModalOpen(true);
+                                  }}
+                                  className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-[#006231] font-bold text-3xs border border-emerald-200 cursor-pointer inline-flex items-center space-x-1"
+                                >
+                                  <Plus className="w-3 h-3" />
+                                  <span>পরিশোধ করুন</span>
+                                </button>
+                              </td>
                             </tr>
                           );
                         })}
                         {offerInvestors.filter(inv => investorTierFilter === 'all' || inv.tier === investorTierFilter || (investorTierFilter === 'general' && inv.tier !== 'director')).length === 0 && (
-                          <tr><td colSpan={6} className="py-10 text-center text-slate-400">
+                          <tr><td colSpan={8} className="py-10 text-center text-slate-400">
                             {offerInvestors.length === 0
                               ? "এখনো কোনো ইনভেস্টর যোগ হয়নি। উপরে '+ নতুন ইনভেস্টর' বাটনে ক্লিক করুন।"
                               : 'এই ফিল্টারে কোনো ইনভেস্টর নেই।'}
@@ -5447,6 +5513,16 @@ export default function ManagementDashboard({
         isSidebarCollapsed={isSidebarCollapsed}
         onClose={() => setIsInvestorModalOpen(false)}
         onSubmit={handleAddInvestor}
+      />
+
+      <InvestorPayoutModal
+        isOpen={isInvestorPayoutModalOpen}
+        targetInvestor={payoutTargetInvestor}
+        form={investorPayoutForm}
+        setForm={setInvestorPayoutForm}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onClose={() => setIsInvestorPayoutModalOpen(false)}
+        onSubmit={handleAddInvestorPayout}
       />
 
       {/* ========================================================= */}

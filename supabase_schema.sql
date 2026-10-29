@@ -252,6 +252,11 @@ ALTER TABLE public.investors ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read/write investment_offers" ON public.investment_offers FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow public read/write investors" ON public.investors FOR ALL USING (true) WITH CHECK (true);
 
+-- Actual payouts made to an investor (profit/principal returned so far),
+-- as opposed to the projected total shown on the offer's KPI cards.
+ALTER TABLE public.investors ADD COLUMN IF NOT EXISTS total_paid NUMERIC(15, 2) DEFAULT 0;
+ALTER TABLE public.investors ADD COLUMN IF NOT EXISTS payout_history JSONB DEFAULT '[]'::jsonb;
+
 -- ========================================================
 -- 10. STORAGE POLICIES FOR THE 'resumes' BUCKET
 -- ========================================================
