@@ -206,6 +206,11 @@ CREATE POLICY "Allow authenticated read/manage inquiries" ON public.inquiries FO
 -- A project is sold either as a fixed "package" (admin types a land price
 -- and a construction price per sale) or by "square feet" (admin picks a
 -- flat from the project's unit catalog and the price is size x rate).
+-- `units` was added to the CREATE TABLE text above at some point, but
+-- CREATE TABLE IF NOT EXISTS never alters an already-existing table, so on
+-- a database where `projects` predates that change the column silently
+-- never got created. Explicit ALTER so this never regresses again.
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS units JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS price_per_sqft NUMERIC(12, 2) DEFAULT 0;
 ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS pricing_mode TEXT DEFAULT 'both'; -- 'package' | 'sqft' | 'both' -- which sale modes this project allows
 
