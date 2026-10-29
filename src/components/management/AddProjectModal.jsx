@@ -114,19 +114,66 @@ export default function AddProjectModal({
 
             <div>
               <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                প্রতি বর্গফুট দাম (টাকা) — স্কয়ারফিট মোডে বিক্রির জন্য
+                দাম নির্ধারণের পদ্ধতি *
               </label>
-              <input
-                type="number"
-                placeholder="যেমন: 9500"
-                value={form.pricePerSqft}
-                onChange={(e) => setForm({ ...form, pricePerSqft: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-[#CE2028] focus:border-[#CE2028] transition-all"
-              />
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, pricingMode: 'package' })}
+                  className={`py-2 px-2 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
+                    form.pricingMode === 'package'
+                      ? 'bg-[#CE2028] text-white border-[#CE2028] shadow-xs'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
+                >
+                  শুধু প্যাকেজ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, pricingMode: 'sqft' })}
+                  className={`py-2 px-2 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
+                    form.pricingMode === 'sqft'
+                      ? 'bg-[#CE2028] text-white border-[#CE2028] shadow-xs'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
+                >
+                  শুধু স্কয়ারফিট
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, pricingMode: 'both' })}
+                  className={`py-2 px-2 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
+                    form.pricingMode === 'both'
+                      ? 'bg-[#CE2028] text-white border-[#CE2028] shadow-xs'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
+                >
+                  দুটোই
+                </button>
+              </div>
               <p className="text-3xs text-slate-400 mt-1">
-                কোনো ক্লায়েন্টকে স্কয়ারফিট হিসাবে বিক্রি করলে এই রেট দিয়ে দাম হিসাব হবে (সাইজ × রেট)। প্যাকেজ মূল্যে বিক্রির সময় এটা লাগে না।
+                এই প্রজেক্টে ক্লায়েন্ট add করার সময় শুধু এই সিলেক্ট করা পদ্ধতি(গুলো)-ই দেখাবে — ভুল মোড বাছার ঝামেলা থাকবে না।
               </p>
             </div>
+
+            {form.pricingMode !== 'package' && (
+              <div>
+                <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  প্রতি বর্গফুট দাম (টাকা) — স্কয়ারফিট মোডে বিক্রির জন্য *
+                </label>
+                <input
+                  type="number"
+                  placeholder="যেমন: 9500"
+                  value={form.pricePerSqft}
+                  onChange={(e) => setForm({ ...form, pricePerSqft: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-[#CE2028] focus:border-[#CE2028] transition-all"
+                  required
+                />
+                <p className="text-3xs text-slate-400 mt-1">
+                  ক্লায়েন্টকে স্কয়ারফিট হিসাবে বিক্রি করলে এই রেট দিয়ে দাম হিসাব হবে (সাইজ × রেট)।
+                </p>
+              </div>
+            )}
 
             <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-3 border-t border-slate-100">
               <button

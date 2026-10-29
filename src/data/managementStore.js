@@ -325,6 +325,7 @@ export const syncToSupabase = async (data) => {
         current_stage: p.currentStage || '',
         budget: Number(p.budget) || 0,
         price_per_sqft: Number(p.pricePerSqft) || 0,
+        pricing_mode: p.pricingMode || 'both',
         units: p.units || []
       }));
       const { error: projErr } = await supabase.from('projects').upsert(projRows, { onConflict: 'id' });
@@ -596,6 +597,7 @@ export const syncFromSupabase = async () => {
           unitsPerFloor: localProj?.unitsPerFloor || 2,
           handoverDate: localProj?.handoverDate || 'ডিসেম্বর ২০২৮',
           pricePerSqft: Number(p.price_per_sqft) || localProj?.pricePerSqft || 0,
+          pricingMode: p.pricing_mode || localProj?.pricingMode || 'both',
           units: (p.units && p.units.length > 0) ? p.units : (localProj?.units || []),
           expenses: expensesFromRemote.length > 0 ? expensesFromRemote : (localProj?.expenses || [])
         };

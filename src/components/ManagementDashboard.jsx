@@ -461,7 +461,8 @@ export default function ManagementDashboard({
     autoGenerateUnits: false,
     handoverDate: 'ডিসেম্বর ২০২৮',
     customUnitsText: '',
-    pricePerSqft: ''
+    pricePerSqft: '',
+    pricingMode: 'both' // 'package' | 'sqft' | 'both'
   });
 
   // 3b. Investment Offers (e.g. Agro) & Investors — no flats/sqft, just slabs
@@ -688,6 +689,11 @@ export default function ManagementDashboard({
     const newUnits = clientForm.units.map((unit, idx) => {
       const selectedProj = data.projects.find(p => p.id === unit.projectId) || data.projects[0];
       const initialPaidNum = Number(unit.initialPaid) || 0;
+      // Enforce the project's allowed pricing mode(s) at save time too, not
+      // just in the form UI -- a stale/mismatched unit.pricingMode never
+      // silently saves the wrong kind of price breakdown.
+      const allowedModes = selectedProj?.pricingMode === 'package' ? ['package'] : selectedProj?.pricingMode === 'sqft' ? ['sqft'] : ['package', 'sqft'];
+      const finalPricingMode = allowedModes.includes(unit.pricingMode) ? unit.pricingMode : allowedModes[0];
       return {
       id: `CLI-${Date.now().toString(36).toUpperCase()}-${idx}-${Math.floor(1000 + Math.random() * 9000)}`,
       customerId: targetCustomer.id,
@@ -699,10 +705,10 @@ export default function ManagementDashboard({
       projectId: selectedProj.id,
       projectName: selectedProj.name,
       flatNo: unit.flatNo || 'বরাদ্দকৃত ইউনিট',
-      pricingMode: unit.pricingMode || 'package',
-      landPrice: unit.pricingMode === 'sqft' ? 0 : (Number(unit.landPrice) || 0),
-      constructionPrice: unit.pricingMode === 'sqft' ? 0 : (Number(unit.constructionPrice) || 0),
-      sizeSqft: unit.pricingMode === 'sqft' ? (Number(unit.sizeSqft) || 0) : 0,
+      pricingMode: finalPricingMode,
+      landPrice: finalPricingMode === 'sqft' ? 0 : (Number(unit.landPrice) || 0),
+      constructionPrice: finalPricingMode === 'sqft' ? 0 : (Number(unit.constructionPrice) || 0),
+      sizeSqft: finalPricingMode === 'sqft' ? (Number(unit.sizeSqft) || 0) : 0,
       totalPrice: Number(unit.totalPrice) || 0,
       totalPaid: initialPaidNum,
       nextDueDate: unit.nextDueDate || '',
@@ -936,6 +942,10 @@ export default function ManagementDashboard({
       alert('প্রজেক্টের নাম ও আনুমানিক বাজেট পূরণ করুন।');
       return;
     }
+    if (projectForm.pricingMode !== 'package' && !projectForm.pricePerSqft) {
+      alert('স্কয়ারফিট মোড অনুমোদিত করায় প্রতি বর্গফুট দাম দিতে হবে।');
+      return;
+    }
 
     // Auto-generate units only if opted-in
     let generatedUnits = [];
@@ -997,6 +1007,7 @@ export default function ManagementDashboard({
       unitsPerFloor: Number(projectForm.unitsPerFloor) || 2,
       handoverDate: projectForm.handoverDate || 'ডিসেম্বর ২০২৮',
       pricePerSqft: Number(projectForm.pricePerSqft) || 0,
+      pricingMode: projectForm.pricingMode || 'both',
       units: generatedUnits,
       expenses: []
     };
@@ -1019,7 +1030,8 @@ export default function ManagementDashboard({
       autoGenerateUnits: false,
       handoverDate: 'ডিসেম্বর ২০২৮',
       customUnitsText: '',
-      pricePerSqft: ''
+      pricePerSqft: '',
+      pricingMode: 'both'
     });
 
     // Auto-open project details view immediately

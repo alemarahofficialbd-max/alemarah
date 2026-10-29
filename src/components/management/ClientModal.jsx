@@ -251,6 +251,8 @@ export default function ClientModal({
               const selProj = projects.find(p => p.id === unit.projectId) || projects[0];
               const projectUnits = (selProj?.units || []).map(u => getUnitData(u));
               const soldUnits = clients.filter(c => c.projectId === selProj?.id).map(c => c.flatNo);
+              const allowedPricingModes = selProj?.pricingMode === 'package' ? ['package'] : selProj?.pricingMode === 'sqft' ? ['sqft'] : ['package', 'sqft'];
+              const effectivePricingMode = allowedPricingModes.includes(unit.pricingMode) ? unit.pricingMode : allowedPricingModes[0];
 
               return (
                 <div key={idx} className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-3 relative">
@@ -295,7 +297,7 @@ export default function ClientModal({
                           value={unit.flatNo}
                           onChange={(e) => {
                             const flatNo = e.target.value;
-                            if (unit.pricingMode === 'sqft') {
+                            if (effectivePricingMode === 'sqft') {
                               const picked = projectUnits.find(u => u.name === flatNo);
                               const sqft = picked?.sizeSqft || '';
                               const rate = Number(selProj?.pricePerSqft) || 0;
@@ -336,44 +338,48 @@ export default function ClientModal({
 
                   {/* Pricing Mode: Package (fixed land + construction) vs Square Feet (size x rate) */}
                   <div>
-                    <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      দাম নির্ধারণের ধরন *
-                    </label>
-                    <div className="grid grid-cols-2 gap-2 mb-2">
-                      <button
-                        type="button"
-                        onClick={() => updateUnit(idx, { pricingMode: 'package' })}
-                        className={`py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
-                          (unit.pricingMode || 'package') === 'package'
-                            ? 'bg-[#CE2028] text-white border-[#CE2028] shadow-xs'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        প্যাকেজ মূল্য
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const picked = projectUnits.find(u => u.name === unit.flatNo);
-                          updateUnit(idx, {
-                            pricingMode: 'sqft',
-                            sizeSqft: picked?.sizeSqft || unit.sizeSqft || '',
-                            totalPrice: picked?.sizeSqft
-                              ? String(Number(picked.sizeSqft) * (Number(selProj?.pricePerSqft) || 0))
-                              : unit.totalPrice
-                          });
-                        }}
-                        className={`py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
-                          unit.pricingMode === 'sqft'
-                            ? 'bg-[#CE2028] text-white border-[#CE2028] shadow-xs'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        স্কয়ারফিট হিসাবে
-                      </button>
-                    </div>
+                    {allowedPricingModes.length > 1 && (
+                      <>
+                        <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                          দাম নির্ধারণের ধরন *
+                        </label>
+                        <div className="grid grid-cols-2 gap-2 mb-2">
+                          <button
+                            type="button"
+                            onClick={() => updateUnit(idx, { pricingMode: 'package' })}
+                            className={`py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
+                              effectivePricingMode === 'package'
+                                ? 'bg-[#CE2028] text-white border-[#CE2028] shadow-xs'
+                                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            প্যাকেজ মূল্য
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const picked = projectUnits.find(u => u.name === unit.flatNo);
+                              updateUnit(idx, {
+                                pricingMode: 'sqft',
+                                sizeSqft: picked?.sizeSqft || unit.sizeSqft || '',
+                                totalPrice: picked?.sizeSqft
+                                  ? String(Number(picked.sizeSqft) * (Number(selProj?.pricePerSqft) || 0))
+                                  : unit.totalPrice
+                              });
+                            }}
+                            className={`py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
+                              effectivePricingMode === 'sqft'
+                                ? 'bg-[#CE2028] text-white border-[#CE2028] shadow-xs'
+                                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            স্কয়ারফিট হিসাবে
+                          </button>
+                        </div>
+                      </>
+                    )}
 
-                    {unit.pricingMode === 'sqft' ? (
+                    {effectivePricingMode === 'sqft' ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">

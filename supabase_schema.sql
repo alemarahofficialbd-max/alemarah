@@ -207,6 +207,7 @@ CREATE POLICY "Allow authenticated read/manage inquiries" ON public.inquiries FO
 -- and a construction price per sale) or by "square feet" (admin picks a
 -- flat from the project's unit catalog and the price is size x rate).
 ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS price_per_sqft NUMERIC(12, 2) DEFAULT 0;
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS pricing_mode TEXT DEFAULT 'both'; -- 'package' | 'sqft' | 'both' -- which sale modes this project allows
 
 ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS pricing_mode TEXT DEFAULT 'package'; -- 'package' | 'sqft'
 ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS land_price NUMERIC(15, 2) DEFAULT 0; -- package mode only
