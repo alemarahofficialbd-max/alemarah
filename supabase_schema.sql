@@ -258,6 +258,14 @@ CREATE POLICY "Allow public read/write investors" ON public.investors FOR ALL US
 ALTER TABLE public.investors ADD COLUMN IF NOT EXISTS total_paid NUMERIC(15, 2) DEFAULT 0;
 ALTER TABLE public.investors ADD COLUMN IF NOT EXISTS payout_history JSONB DEFAULT '[]'::jsonb;
 
+-- Fuller investor profile: one phone number can own multiple investment
+-- slabs (even across different offers), grouped together in the UI by
+-- phone number, same pattern as customers owning multiple flats.
+ALTER TABLE public.investors ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE public.investors ADD COLUMN IF NOT EXISTS nominee_name TEXT;
+ALTER TABLE public.investors ADD COLUMN IF NOT EXISTS nominee_relation TEXT;
+ALTER TABLE public.investors ADD COLUMN IF NOT EXISTS nominee_phone TEXT;
+
 -- ========================================================
 -- 10. STORAGE POLICIES FOR THE 'resumes' BUCKET
 -- ========================================================

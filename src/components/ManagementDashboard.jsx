@@ -102,6 +102,7 @@ import AddProjectModal from './management/AddProjectModal';
 import AddInvestmentOfferModal from './management/AddInvestmentOfferModal';
 import InvestorModal from './management/InvestorModal';
 import InvestorPayoutModal from './management/InvestorPayoutModal';
+import InvestorProfileModal from './management/InvestorProfileModal';
 
 // Investor dates are stored as pre-formatted Bengali display strings
 // (e.g. "২৮ অক্টোবর, ২০২৬"), not ISO — parse one back into a real Date so
@@ -484,7 +485,12 @@ export default function ManagementDashboard({
     name: '',
     phone: '',
     tier: 'general',
-    investedAmount: ''
+    investedAmount: '',
+    address: '',
+    nomineeName: '',
+    nomineeRelation: '',
+    nomineePhone: '',
+    existingInvestorPhone: ''
   });
   const [investorForm, setInvestorForm] = useState(emptyInvestorForm);
   const [investorTierFilter, setInvestorTierFilter] = useState('all'); // 'all' | 'general' | 'director'
@@ -498,6 +504,7 @@ export default function ManagementDashboard({
     note: ''
   });
   const [investorPayoutForm, setInvestorPayoutForm] = useState(emptyInvestorPayoutForm);
+  const [selectedInvestorProfile, setSelectedInvestorProfile] = useState(null);
 
   // Project Master Details & Inventory Management State
   const [selectedProjectForDetails, setSelectedProjectForDetails] = useState(null);
@@ -1098,7 +1105,13 @@ export default function ManagementDashboard({
       investedAmount,
       investmentDate: today.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       cycleEndDate: cycleEnd.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
-      status: 'সক্রিয় (Active)'
+      status: 'সক্রিয় (Active)',
+      address: investorForm.address || '',
+      nomineeName: investorForm.nomineeName || '',
+      nomineeRelation: investorForm.nomineeRelation || '',
+      nomineePhone: investorForm.nomineePhone || '',
+      totalPaid: 0,
+      payoutHistory: []
     };
     updateStore((prev) => ({
       ...prev,
@@ -3092,7 +3105,15 @@ export default function ManagementDashboard({
                           const remainingDays = end ? daysBetween(new Date(today), new Date(end)) : null;
                           return (
                             <tr key={inv.id} className="border-b border-slate-50 hover:bg-slate-50/50">
-                              <td className="py-2.5 px-4 font-bold text-slate-800">{inv.name}</td>
+                              <td className="py-2.5 px-4">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedInvestorProfile(inv)}
+                                  className="font-bold text-slate-800 hover:text-[#006231] hover:underline cursor-pointer"
+                                >
+                                  {inv.name}
+                                </button>
+                              </td>
                               <td className="py-2.5 px-4 text-slate-600 font-mono">{inv.phone}</td>
                               <td className="py-2.5 px-4">
                                 <span className={`px-2 py-0.5 rounded-full text-3xs font-bold ${inv.tier === 'director' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-[#006231]'}`}>
@@ -5522,9 +5543,41 @@ export default function ManagementDashboard({
         form={investorForm}
         setForm={setInvestorForm}
         offer={selectedOfferForDetails}
+        allInvestors={data.investors || []}
         isSidebarCollapsed={isSidebarCollapsed}
         onClose={() => setIsInvestorModalOpen(false)}
         onSubmit={handleAddInvestor}
+      />
+
+      <InvestorProfileModal
+        isOpen={Boolean(selectedInvestorProfile)}
+        investor={selectedInvestorProfile}
+        allInvestors={data.investors || []}
+        allOffers={data.investmentOffers || []}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onClose={() => setSelectedInvestorProfile(null)}
+        onAddPayout={(inv) => {
+          setSelectedInvestorProfile(null);
+          setPayoutTargetInvestor(inv);
+          setInvestorPayoutForm(emptyInvestorPayoutForm());
+          setIsInvestorPayoutModalOpen(true);
+        }}
+        onAddAnotherInvestment={() => {
+          const targetOffer = (data.investmentOffers || []).find(o => o.id === selectedInvestorProfile?.offerId) || selectedOfferForDetails;
+          setSelectedInvestorProfile(null);
+          setSelectedOfferForDetails(targetOffer);
+          setInvestorForm({
+            ...emptyInvestorForm(),
+            existingInvestorPhone: selectedInvestorProfile?.phone || '',
+            name: selectedInvestorProfile?.name || '',
+            phone: selectedInvestorProfile?.phone || '',
+            address: selectedInvestorProfile?.address || '',
+            nomineeName: selectedInvestorProfile?.nomineeName || '',
+            nomineeRelation: selectedInvestorProfile?.nomineeRelation || '',
+            nomineePhone: selectedInvestorProfile?.nomineePhone || ''
+          });
+          setIsInvestorModalOpen(true);
+        }}
       />
 
       <InvestorPayoutModal

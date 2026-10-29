@@ -432,7 +432,11 @@ export const syncToSupabase = async (data) => {
         cycle_end_date: inv.cycleEndDate || '',
         status: inv.status || 'সক্রিয় (Active)',
         total_paid: Number(inv.totalPaid) || 0,
-        payout_history: inv.payoutHistory || []
+        payout_history: inv.payoutHistory || [],
+        address: inv.address || '',
+        nominee_name: inv.nomineeName || '',
+        nominee_relation: inv.nomineeRelation || '',
+        nominee_phone: inv.nomineePhone || ''
       }));
       const { error: investorErr } = await supabase.from('investors').upsert(investorRows, { onConflict: 'id' });
       if (investorErr) { console.error('Cloud sync failed: investors', investorErr); failedTables.push('investors'); }
@@ -698,7 +702,11 @@ export const syncFromSupabase = async () => {
         cycleEndDate: inv.cycle_end_date || '',
         status: inv.status || 'সক্রিয় (Active)',
         totalPaid: Number(inv.total_paid) || 0,
-        payoutHistory: Array.isArray(inv.payout_history) ? inv.payout_history : []
+        payoutHistory: Array.isArray(inv.payout_history) ? inv.payout_history : [],
+        address: inv.address || '',
+        nomineeName: inv.nominee_name || '',
+        nomineeRelation: inv.nominee_relation || '',
+        nomineePhone: inv.nominee_phone || ''
       }));
     }
 

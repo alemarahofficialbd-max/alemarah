@@ -9,11 +9,25 @@ export default function InvestorModal({
   form,
   setForm,
   offer,
+  allInvestors,
   isSidebarCollapsed,
   onClose,
   onSubmit
 }) {
   if (!isOpen || !offer) return null;
+
+  // One person can hold multiple investment slabs (even across different
+  // offers) -- group existing investors by phone so admin can pick a known
+  // person instead of re-typing their identity for every new slab.
+  const knownInvestors = [];
+  const seenPhones = new Set();
+  (allInvestors || []).forEach(inv => {
+    const phone = (inv.phone || '').trim();
+    if (!phone || seenPhones.has(phone)) return;
+    seenPhones.add(phone);
+    knownInvestors.push(inv);
+  });
+  const isExisting = Boolean(form.existingInvestorPhone);
 
   const minAllowed = form.tier === 'director'
     ? Number(offer.directorTierMinInvestment) || 0
@@ -57,6 +71,44 @@ export default function InvestorModal({
       <div className="flex-1 py-6 sm:py-8 px-4 sm:px-6 flex justify-center items-start">
         <div className="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
           <form onSubmit={onSubmit} className="space-y-3.5">
+            {knownInvestors.length > 0 && (
+              <div>
+                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  ইনভেস্টর নির্বাচন
+                </label>
+                <select
+                  value={form.existingInvestorPhone || ''}
+                  onChange={(e) => {
+                    const phone = e.target.value;
+                    if (!phone) {
+                      setForm({ ...form, existingInvestorPhone: '', name: '', phone: '', address: '', nomineeName: '', nomineeRelation: '', nomineePhone: '' });
+                      return;
+                    }
+                    const picked = knownInvestors.find(inv => inv.phone === phone);
+                    setForm({
+                      ...form,
+                      existingInvestorPhone: phone,
+                      name: picked?.name || '',
+                      phone: picked?.phone || '',
+                      address: picked?.address || '',
+                      nomineeName: picked?.nomineeName || '',
+                      nomineeRelation: picked?.nomineeRelation || '',
+                      nomineePhone: picked?.nomineePhone || ''
+                    });
+                  }}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#006231]"
+                >
+                  <option value="">+ নতুন ইনভেস্টর নিবন্ধন করুন</option>
+                  {knownInvestors.map(inv => (
+                    <option key={inv.phone} value={inv.phone}>{inv.name} ({inv.phone})</option>
+                  ))}
+                </select>
+                <span className="text-[10px] text-slate-500 mt-1 block">
+                  বিদ্যমান ইনভেস্টর বেছে নিলে একই ব্যক্তির নামে আরেকটি বিনিয়োগ স্ল্যাব যুক্ত হবে (একই ফোন নম্বর দিয়ে গ্রুপ করা হয়)
+                </span>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
@@ -66,7 +118,8 @@ export default function InvestorModal({
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#006231]"
+                  disabled={isExisting}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#006231] disabled:opacity-60 disabled:cursor-not-allowed"
                   required
                 />
               </div>
@@ -78,8 +131,52 @@ export default function InvestorModal({
                   type="tel"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#006231]"
+                  disabled={isExisting}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#006231] disabled:opacity-60 disabled:cursor-not-allowed"
                   required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                ঠিকানা
+              </label>
+              <input
+                type="text"
+                value={form.address || ''}
+                onChange={(e) => setForm({ ...form, address: e.target.value })}
+                disabled={isExisting}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#006231] disabled:opacity-60 disabled:cursor-not-allowed"
+              />
+            </div>
+
+            <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/70 space-y-2">
+              <div className="text-2xs font-bold text-amber-800 uppercase tracking-wider">মনোনীত নমিনি (ঐচ্ছিক)</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <input
+                  type="text"
+                  placeholder="নমিনির নাম"
+                  value={form.nomineeName || ''}
+                  onChange={(e) => setForm({ ...form, nomineeName: e.target.value })}
+                  disabled={isExisting}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#006231] disabled:opacity-60 disabled:cursor-not-allowed"
+                />
+                <input
+                  type="text"
+                  placeholder="সম্পর্ক (যেমন: স্ত্রী)"
+                  value={form.nomineeRelation || ''}
+                  onChange={(e) => setForm({ ...form, nomineeRelation: e.target.value })}
+                  disabled={isExisting}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#006231] disabled:opacity-60 disabled:cursor-not-allowed"
+                />
+                <input
+                  type="tel"
+                  placeholder="নমিনির মোবাইল"
+                  value={form.nomineePhone || ''}
+                  onChange={(e) => setForm({ ...form, nomineePhone: e.target.value })}
+                  disabled={isExisting}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-[#006231] disabled:opacity-60 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
