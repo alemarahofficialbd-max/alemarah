@@ -485,6 +485,8 @@ export default function ManagementDashboard({
     investedAmount: ''
   });
   const [investorForm, setInvestorForm] = useState(emptyInvestorForm);
+  const [investorTierFilter, setInvestorTierFilter] = useState('all'); // 'all' | 'general' | 'director'
+  useEffect(() => { setInvestorTierFilter('all'); }, [selectedOfferForDetails?.id]);
 
   // Project Master Details & Inventory Management State
   const [selectedProjectForDetails, setSelectedProjectForDetails] = useState(null);
@@ -2980,9 +2982,31 @@ export default function ManagementDashboard({
                 </div>
 
                 <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-                  <div className="p-4 sm:p-5 border-b border-slate-100">
-                    <h4 className="text-sm font-bold text-slate-900">ইনভেস্টরগণের হিসাব</h4>
-                    <p className="text-2xs text-slate-500 mt-0.5">প্রতিটি ইনভেস্টরের বিনিয়োগ, কত দিন চলছে এবং মেয়াদ শেষ হতে কত বাকি</p>
+                  <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">ইনভেস্টরগণের হিসাব</h4>
+                      <p className="text-2xs text-slate-500 mt-0.5">প্রতিটি ইনভেস্টরের বিনিয়োগ, কত দিন চলছে এবং মেয়াদ শেষ হতে কত বাকি</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl w-fit">
+                      {[
+                        { id: 'all', label: 'সব' },
+                        { id: 'general', label: 'সাধারণ' },
+                        { id: 'director', label: 'ডিরেক্টর' }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setInvestorTierFilter(opt.id)}
+                          className={`px-3 py-1.5 rounded-lg text-2xs font-bold transition-all cursor-pointer ${
+                            investorTierFilter === opt.id
+                              ? 'bg-white text-[#006231] shadow-2xs'
+                              : 'text-slate-500 hover:text-slate-800'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
@@ -2997,7 +3021,7 @@ export default function ManagementDashboard({
                         </tr>
                       </thead>
                       <tbody>
-                        {offerInvestors.map(inv => {
+                        {offerInvestors.filter(inv => investorTierFilter === 'all' || inv.tier === investorTierFilter || (investorTierFilter === 'general' && inv.tier !== 'director')).map(inv => {
                           const start = parseBnDate(inv.investmentDate);
                           const end = parseBnDate(inv.cycleEndDate);
                           const today = new Date();
@@ -3028,8 +3052,12 @@ export default function ManagementDashboard({
                             </tr>
                           );
                         })}
-                        {offerInvestors.length === 0 && (
-                          <tr><td colSpan={6} className="py-10 text-center text-slate-400">এখনো কোনো ইনভেস্টর যোগ হয়নি। উপরে '+ নতুন ইনভেস্টর' বাটনে ক্লিক করুন।</td></tr>
+                        {offerInvestors.filter(inv => investorTierFilter === 'all' || inv.tier === investorTierFilter || (investorTierFilter === 'general' && inv.tier !== 'director')).length === 0 && (
+                          <tr><td colSpan={6} className="py-10 text-center text-slate-400">
+                            {offerInvestors.length === 0
+                              ? "এখনো কোনো ইনভেস্টর যোগ হয়নি। উপরে '+ নতুন ইনভেস্টর' বাটনে ক্লিক করুন।"
+                              : 'এই ফিল্টারে কোনো ইনভেস্টর নেই।'}
+                          </td></tr>
                         )}
                       </tbody>
                     </table>
