@@ -189,12 +189,7 @@ export const getManagementData = () => {
             type: p.type || initP?.type || 'residential',
             totalFloors: p.totalFloors || initP?.totalFloors || 10,
             unitsPerFloor: p.unitsPerFloor || initP?.unitsPerFloor || 2,
-            units: p.units && p.units.length > 0 ? p.units : (initP?.units || [
-              '২য় তলা, ফ্ল্যাট ২-এ', '২য় তলা, ফ্ল্যাট ২-বি',
-              '৩য় তলা, ফ্ল্যাট ৩-এ', '৩য় তলা, ফ্ল্যাট ৩-বি',
-              '৪র্থ তলা, ফ্ল্যাট ৪-এ', '৪র্থ তলা, ফ্ল্যাট ৪-বি',
-              '৫ম তলা, ফ্ল্যাট ৫-এ', '৫ম তলা, ফ্ল্যাট ৫-বি'
-            ])
+            units: (p.units && p.units.length > 0) ? p.units : (initP?.units || [])
           };
         });
       }
