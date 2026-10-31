@@ -87,7 +87,8 @@ import {
   fetchJobApplicationsFromSupabase,
   deleteProjectFromSupabase,
   deleteExpenseFromSupabase,
-  deleteInvestmentOfferFromSupabase
+  deleteInvestmentOfferFromSupabase,
+  deleteDirectorFromSupabase
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -1292,6 +1293,27 @@ export default function ManagementDashboard({
           setSelectedProjectForDetails(null);
         }
         triggerAlert(`প্রজেক্ট "${projName}" সফলভাবে কেন্দ্রীয় ডাটাবেজ থেকে মুছে ফেলা হয়েছে!`);
+      }
+    );
+  };
+
+  const handleDeleteDirector = (dirId, dirName) => {
+    if (!isSuperAdmin) return;
+    requestProtectedDelete(
+      `পরিচালক "${dirName}" মুছে ফেলা`,
+      `আপনি কি নিশ্চিতভাবে সম্মানিত পরিচালক "${dirName}"-কে এবং তার সংশ্লিষ্ট সকল রেকর্ড তালিকা থেকে মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
+      async () => {
+        updateStore((prev) => ({
+          ...prev,
+          directors: (prev.directors || []).filter(d => d.id !== dirId),
+          deletedDirectorIds: [...new Set([...(prev.deletedDirectorIds || []), dirId])],
+          managementTeam: (prev.managementTeam || []).filter(m => m.directorId !== dirId && m.id !== dirId)
+        }));
+        await deleteDirectorFromSupabase(dirId);
+        if (selectedDirectorForProfile?.id === dirId) {
+          setSelectedDirectorForProfile(null);
+        }
+        triggerAlert(`পরিচালক "${dirName}" সফলভাবে কেন্দ্রীয় ডাটাবেজ থেকে মুছে ফেলা হয়েছে!`);
       }
     );
   };
@@ -4457,6 +4479,23 @@ export default function ManagementDashboard({
                                         </button>
                                       );
                                     })()}
+
+                                    {/* 6. ডিরেক্টর ডিলিট করুন */}
+                                    {isSuperAdmin && (
+                                      <div className="pt-1 mt-1 border-t border-slate-100">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setOpenActionMenuId(null);
+                                            handleDeleteDirector(dir.id, dir.name);
+                                          }}
+                                          className="w-full px-3.5 py-2 text-left hover:bg-red-50 flex items-center space-x-2.5 text-red-600 font-bold transition-colors cursor-pointer group"
+                                        >
+                                          <Trash2 className="w-4 h-4 text-red-500 shrink-0 group-hover:text-red-700 transition-colors" />
+                                          <span>ডিরেক্টর ডিলিট করুন</span>
+                                        </button>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </>
@@ -5148,6 +5187,20 @@ export default function ManagementDashboard({
                   <Award className="w-4 h-4 text-amber-400" />
                   <span>শেয়ার সনদপত্র</span>
                 </button>
+
+                {isSuperAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDeleteDirector(d.id, d.name);
+                    }}
+                    className="px-3 sm:px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-colors cursor-pointer text-xs font-bold flex items-center space-x-1.5"
+                    title="পরিচালক মুছে ফেলুন"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-400" />
+                    <span className="hidden sm:inline">ডিরেক্টর ডিলিট</span>
+                  </button>
+                )}
 
                 <button
                   type="button"

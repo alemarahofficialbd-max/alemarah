@@ -413,7 +413,9 @@ export const syncToSupabase = async (data) => {
 
     // 1. Sync Directors
     if (data.directors && data.directors.length > 0) {
-      const dirRows = data.directors.map(d => ({
+      const deletedDirSet = new Set(data.deletedDirectorIds || []);
+      const activeDirs = data.directors.filter(d => !deletedDirSet.has(d.id));
+      const dirRows = activeDirs.map(d => ({
         id: d.id,
         name: d.name,
         name_en: d.nameEn || '',
@@ -724,6 +726,9 @@ const _syncFromSupabaseImpl = async () => {
       const cloudDeletedOfferIds = Array.isArray(tombstoneRow?.permissions?.deletedOfferIds)
         ? tombstoneRow.permissions.deletedOfferIds
         : [];
+      const cloudDeletedDirectorIds = Array.isArray(tombstoneRow?.permissions?.deletedDirectorIds)
+        ? tombstoneRow.permissions.deletedDirectorIds
+        : [];
 
       const mergedDeletedProjectIds = Array.from(new Set([
         ...(current.deletedProjectIds || []),
@@ -736,39 +741,48 @@ const _syncFromSupabaseImpl = async () => {
         ...cloudDeletedOfferIds
       ]));
       updated.deletedOfferIds = mergedDeletedOfferIds;
+
+      const mergedDeletedDirectorIds = Array.from(new Set([
+        ...(current.deletedDirectorIds || []),
+        ...cloudDeletedDirectorIds
+      ]));
+      updated.deletedDirectorIds = mergedDeletedDirectorIds;
     }
 
     const deletedProjSet = new Set(updated.deletedProjectIds || []);
+    const deletedDirSet = new Set(updated.deletedDirectorIds || []);
 
     if (directorsRes.data && directorsRes.data.length > 0) {
-      const remoteDirs = directorsRes.data.map(d => {
-        const localDir = (current.directors || []).find(x => x.id === d.id);
-        return {
-          id: d.id,
-          name: d.name,
-          nameEn: d.name_en,
-          role: d.role,
-          roleEn: d.role_en,
-          folioNo: d.folio_no,
-          image: d.image || localDir?.image || null,
-          investment: Number(d.investment) || localDir?.investment || 0,
-          sharePercentage: Number(d.share_percentage) || localDir?.sharePercentage || 0,
-          dividendEarned: Number(d.dividend_earned) || localDir?.dividendEarned || 0,
-          phone: d.phone || localDir?.phone || '',
-          email: d.email || localDir?.email || '',
-          accessKey: localDir?.accessKey || 'admin123',
-          joiningDate: d.joining_date || localDir?.joiningDate || '',
-          status: d.status || localDir?.status || 'সক্রিয় (Active)',
-          nomineeName: d.nominee_name || localDir?.nomineeName || '',
-          nomineeRelation: d.nominee_relation || localDir?.nomineeRelation || '',
-          nomineePhone: d.nominee_phone || localDir?.nomineePhone || '',
-          theme: d.theme || localDir?.theme || 'emerald',
-          installments: localDir?.installments || [],
-          dividendHistory: localDir?.dividendHistory || []
-        };
-      });
-      // Retain any locally added directors that aren't yet in Supabase
-      const extraLocalDirs = (current.directors || []).filter(ld => !directorsRes.data.some(d => d.id === ld.id));
+      const remoteDirs = directorsRes.data
+        .filter(d => !deletedDirSet.has(d.id))
+        .map(d => {
+          const localDir = (current.directors || []).find(x => x.id === d.id);
+          return {
+            id: d.id,
+            name: d.name,
+            nameEn: d.name_en,
+            role: d.role,
+            roleEn: d.role_en,
+            folioNo: d.folio_no,
+            image: d.image || localDir?.image || null,
+            investment: Number(d.investment) || localDir?.investment || 0,
+            sharePercentage: Number(d.share_percentage) || localDir?.sharePercentage || 0,
+            dividendEarned: Number(d.dividend_earned) || localDir?.dividendEarned || 0,
+            phone: d.phone || localDir?.phone || '',
+            email: d.email || localDir?.email || '',
+            accessKey: localDir?.accessKey || 'admin123',
+            joiningDate: d.joining_date || localDir?.joiningDate || '',
+            status: d.status || localDir?.status || 'সক্রিয় (Active)',
+            nomineeName: d.nominee_name || localDir?.nomineeName || '',
+            nomineeRelation: d.nominee_relation || localDir?.nomineeRelation || '',
+            nomineePhone: d.nominee_phone || localDir?.nomineePhone || '',
+            theme: d.theme || localDir?.theme || 'emerald',
+            installments: localDir?.installments || [],
+            dividendHistory: localDir?.dividendHistory || []
+          };
+        });
+      // Retain only locally added directors marked as pending sync, never resurrect deleted ones
+      const extraLocalDirs = (current.directors || []).filter(ld => ld._isPendingSync && !deletedDirSet.has(ld.id) && !directorsRes.data.some(d => d.id === ld.id));
       updated.directors = [...remoteDirs, ...extraLocalDirs];
     }
 
@@ -1378,5 +1392,35 @@ export const deleteInvestmentOfferFromSupabase = async (offerId) => {
     }, { onConflict: 'id' });
   } catch (err) {
     console.error('Error deleting investment offer from Supabase:', err);
+  }
+};
+
+export const deleteDirectorFromSupabase = async (dirId) => {
+  try {
+    if (!dirId) return;
+    await supabase.from('directors').delete().eq('id', dirId);
+
+    const { data: tombstoneRow } = await supabase.from('admins').select('permissions').eq('id', 'SYSTEM-DELETED-IDS').maybeSingle();
+    const currentDeleted = Array.isArray(tombstoneRow?.permissions?.deletedDirectorIds) ? tombstoneRow.permissions.deletedDirectorIds : [];
+    const updatedDeleted = Array.from(new Set([...currentDeleted, dirId]));
+
+    await supabase.from('admins').upsert({
+      id: 'SYSTEM-DELETED-IDS',
+      name: 'System Deleted Records Tombstones',
+      name_en: 'System Tombstones',
+      email: 'tombstones@alemarahproperties.com',
+      phone: '01816233013',
+      role: 'system_tombstones',
+      role_type: 'system_tombstones',
+      access_key: 'system_tombstones',
+      is_super_admin: false,
+      permissions: {
+        ...(tombstoneRow?.permissions || {}),
+        deletedDirectorIds: updatedDeleted
+      },
+      status: 'সক্রিয়'
+    }, { onConflict: 'id' });
+  } catch (err) {
+    console.error('Error deleting director from Supabase:', err);
   }
 };
