@@ -3867,14 +3867,27 @@ export default function ManagementDashboard({
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDirectorForCertificate(loggedInDirector)}
-                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] hover:opacity-95 text-white text-xs font-bold transition-all shadow-md shadow-[#006231]/20 flex items-center space-x-2 cursor-pointer shrink-0 active:scale-95"
-                  >
-                    <ScrollText className="w-4 h-4 text-white" />
-                    <span>শেয়ার সার্টিফিকেট ডাউনলোড / প্রিন্ট</span>
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedDirectorForProfile(loggedInDirector);
+                        setDirectorProfileActiveTab('installments');
+                      }}
+                      className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-md flex items-center space-x-2 cursor-pointer shrink-0 active:scale-95"
+                    >
+                      <Eye className="w-4 h-4 text-emerald-400" />
+                      <span>পূর্ণাঙ্গ প্রোফাইল ও লেজার</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDirectorForCertificate(loggedInDirector)}
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] hover:opacity-95 text-white text-xs font-bold transition-all shadow-md shadow-[#006231]/20 flex items-center space-x-2 cursor-pointer shrink-0 active:scale-95"
+                    >
+                      <ScrollText className="w-4 h-4 text-white" />
+                      <span>শেয়ার সার্টিফিকেট ডাউনলোড / প্রিন্ট</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Director Portfolio Metrics */}
@@ -3978,12 +3991,15 @@ export default function ManagementDashboard({
 
                   return (
                     <div key={dir.id} className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-2xs transition-all">
-                      {/* Compact Clean Header Row - Click to Toggle Expand */}
-                      <div 
-                        onClick={() => setExpandedDirectors(prev => ({ ...prev, [dir.id]: !prev[dir.id] }))}
-                        className="flex items-center justify-between gap-3 cursor-pointer select-none"
-                      >
-                        <div className="flex items-center space-x-2.5 min-w-0 flex-1">
+                      {/* Compact Clean Header Row */}
+                      <div className="flex items-center justify-between gap-2.5 select-none">
+                        <div 
+                          onClick={() => {
+                            setSelectedDirectorForProfile(dir);
+                            setDirectorProfileActiveTab('installments');
+                          }}
+                          className="flex items-center space-x-2.5 min-w-0 flex-1 cursor-pointer group"
+                        >
                           <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
                             {dir.image ? (
                               <img src={dir.image} alt={dir.name} className="w-full h-full object-cover object-top" />
@@ -3994,22 +4010,40 @@ export default function ManagementDashboard({
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="font-bold text-slate-900 text-sm truncate leading-snug">
+                            <div className="font-bold text-slate-900 text-sm truncate leading-snug group-hover:text-[#006231] flex items-center space-x-1">
                               <span className="text-slate-400 font-mono text-xs mr-1">{idx + 1}.</span>
-                              {dir.name}
+                              <span>{dir.name}</span>
+                              <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
                             </div>
                             <div className="text-xs text-[#CE2028] font-semibold truncate mt-0.5">{dir.role}</div>
                           </div>
                         </div>
 
-                        {/* Right: Share % and Expand Arrow */}
-                        <div className="shrink-0 flex items-center space-x-2">
-                          <span className="font-mono text-xs px-2.5 py-1 rounded-lg bg-emerald-50 text-[#006231] font-bold border border-emerald-200">
+                        {/* Right: Profile Button, Share % and Expand Arrow */}
+                        <div className="shrink-0 flex items-center space-x-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedDirectorForProfile(dir);
+                              setDirectorProfileActiveTab('installments');
+                            }}
+                            className="px-2 py-1 rounded-lg bg-slate-900 hover:bg-black text-white text-3xs font-bold flex items-center space-x-1 shadow-2xs active:scale-95 cursor-pointer"
+                            title="প্রোফাইল দেখুন"
+                          >
+                            <Eye className="w-3 h-3 text-emerald-400" />
+                            <span>প্রোফাইল</span>
+                          </button>
+                          <span className="font-mono text-3xs px-2 py-1 rounded-lg bg-emerald-50 text-[#006231] font-bold border border-emerald-200">
                             {dir.sharePercentage}%
                           </span>
-                          <div className={`p-1 rounded-lg bg-slate-100 text-slate-500 transition-transform duration-200 ${isExp ? 'rotate-180 text-[#006231] bg-emerald-50' : ''}`}>
+                          <button
+                            type="button"
+                            onClick={() => setExpandedDirectors(prev => ({ ...prev, [dir.id]: !prev[dir.id] }))}
+                            className={`p-1 rounded-lg bg-slate-100 text-slate-500 transition-transform duration-200 cursor-pointer ${isExp ? 'rotate-180 text-[#006231] bg-emerald-50' : ''}`}
+                            title={isExp ? 'লুকান' : 'বিস্তারিত'}
+                          >
                             <ChevronDown className="w-4 h-4" />
-                          </div>
+                          </button>
                         </div>
                       </div>
 
@@ -4127,7 +4161,7 @@ export default function ManagementDashboard({
                               type="button"
                               onClick={() => {
                                 setSelectedDirectorForProfile(dir);
-                                setDirectorProfileActiveTab('dividends');
+                                setDirectorProfileActiveTab('installments');
                               }}
                               className="py-2 px-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
                             >
@@ -4181,24 +4215,38 @@ export default function ManagementDashboard({
                       </tr>
                     ) : (
                     directorsList.map((dir, idx) => (
-                      <tr key={dir.id} className="hover:bg-slate-50/80 transition-colors">
+                      <tr 
+                        key={dir.id} 
+                        onClick={() => {
+                          setSelectedDirectorForProfile(dir);
+                          setDirectorProfileActiveTab('installments');
+                        }}
+                        className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                      >
                         <td className="py-3 px-3 text-center font-mono font-bold text-slate-400">{idx + 1}</td>
                         <td className="py-3 px-4">
                           <div className="flex items-center space-x-3">
-                            <div className="w-10 h-12 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs">
+                            <div className="w-10 h-12 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs group-hover:border-[#006231]/40 transition-colors">
                               {dir.image ? (
                                 <img src={dir.image} alt={dir.name} className="w-full h-full object-cover object-top" />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs bg-slate-100">
+                                <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs bg-slate-100 group-hover:text-[#006231]">
                                   {dir.name.slice(0, 1)}
                                 </div>
                               )}
                             </div>
                             <div>
-                              <div className="font-bold text-slate-900 text-sm">{dir.name}</div>
+                              <div className="font-bold text-slate-900 text-sm group-hover:text-[#006231] transition-colors flex items-center space-x-1.5">
+                                <span>{dir.name}</span>
+                                <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                              </div>
                               <div className="text-3xs text-[#CE2028] font-bold">{dir.role}</div>
                               {dir.phone && (
-                                <a href={`tel:${dir.phone}`} className="text-3xs text-slate-500 font-mono font-bold hover:text-[#006231] inline-block mt-0.5">
+                                <a 
+                                  href={`tel:${dir.phone}`} 
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-3xs text-slate-500 font-mono font-bold hover:text-[#006231] inline-block mt-0.5"
+                                >
                                   {dir.phone}
                                 </a>
                               )}
@@ -4234,20 +4282,35 @@ export default function ManagementDashboard({
                           )}
                         </td>
                         <td className="py-3 px-4 text-right">
-                          {/* 3-Dot Action Dropdown Menu Containing Capital Deposit, Dividend Pay & More */}
-                          <div className="relative inline-flex items-center justify-end">
+                          <div className="flex items-center justify-end space-x-2">
+                            {/* Direct 1-Click Profile View Button */}
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setOpenActionMenuId(openActionMenuId === dir.id ? null : dir.id);
+                                setSelectedDirectorForProfile(dir);
+                                setDirectorProfileActiveTab('installments');
                               }}
-                              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/90 transition-all cursor-pointer border border-slate-200 shadow-2xs flex items-center space-x-1 active:scale-95"
-                              title="কার্যক্রম ও অপশনসমূহ"
+                              className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center space-x-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                              title="পরিচালকের পূর্ণাঙ্গ প্রোফাইল ও লেজার"
                             >
-                              <span className="hidden sm:inline text-2xs font-bold text-slate-700">অ্যাকশন</span>
-                              <MoreVertical className="w-4 h-4 text-slate-600" />
+                              <Eye className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>প্রোফাইল</span>
                             </button>
+
+                            {/* 3-Dot Action Dropdown Menu Containing Capital Deposit, Dividend Pay & More */}
+                            <div className="relative inline-flex items-center justify-end">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenActionMenuId(openActionMenuId === dir.id ? null : dir.id);
+                                }}
+                                className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/90 transition-all cursor-pointer border border-slate-200 shadow-2xs flex items-center space-x-1 active:scale-95"
+                                title="অন্যান্য অপশনসমূহ"
+                              >
+                                <MoreVertical className="w-4 h-4 text-slate-600" />
+                              </button>
 
                             {openActionMenuId === dir.id && (
                               <>
@@ -4325,11 +4388,11 @@ export default function ManagementDashboard({
                                     {/* 4. হিসাব খাতা ও প্রোফাইল */}
                                     <button
                                       type="button"
-                                      onClick={() => { setOpenActionMenuId(null); setSelectedDirectorForProfile(dir); setDirectorProfileActiveTab('dividends'); }}
+                                      onClick={() => { setOpenActionMenuId(null); setSelectedDirectorForProfile(dir); setDirectorProfileActiveTab('installments'); }}
                                       className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2.5 text-slate-700 font-bold transition-colors cursor-pointer"
                                     >
-                                      <Eye className="w-4 h-4 text-slate-600 shrink-0" />
-                                      <span>হিসাব খাতা ও প্রোফাইল</span>
+                                      <Eye className="w-4 h-4 text-emerald-600 shrink-0" />
+                                      <span>পূর্ণাঙ্গ প্রোফাইল ও লেজার</span>
                                     </button>
 
                                     {/* 5. অ্যাডমিন এক্সেস */}
@@ -4350,6 +4413,7 @@ export default function ManagementDashboard({
                                 </div>
                               </>
                             )}
+                          </div>
                           </div>
                         </td>
                       </tr>
@@ -4702,7 +4766,7 @@ export default function ManagementDashboard({
       {/* MODAL: ADD DIRECTOR                                       */}
       {/* ========================================================= */}
       {isDirectorModalOpen && (
-        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
+        <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[70] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
           {/* Top Sticky Header */}
           <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-3">
