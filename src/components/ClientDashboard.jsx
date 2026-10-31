@@ -474,6 +474,9 @@ export default function ClientDashboard({
                       <div className="text-xs text-slate-500 space-y-0.5">
                         <div>জমির মূল্য: <span className="font-semibold text-slate-700">{formatBDT(client.landPrice)}</span></div>
                         <div>নির্মাণ খরচ: <span className="font-semibold text-slate-700">{formatBDT(client.constructionPrice)}</span></div>
+                        {client?.hasParking && (
+                          <div className="text-purple-700 font-bold text-3xs pt-0.5">✓ প্যাকেজে কার পার্কিং অন্তর্ভুক্ত</div>
+                        )}
                       </div>
                     ) : (
                       <div className="text-xs text-slate-500">শতভাগ নিষ্কণ্টক রেজিস্ট্রেশন চুক্তি</div>
@@ -500,7 +503,13 @@ export default function ClientDashboard({
                     <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-semibold">৩টি বাথরুম</span>
                     <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-semibold">২টি প্রশস্ত বারান্দা</span>
                     <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-semibold">দক্ষিণমুখী আলো-বাতাস</span>
-                    <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-semibold">১টি সংরক্ষিত কার পার্কিং</span>
+                    {client?.hasParking !== undefined ? (
+                      <span className={`px-3 py-1 rounded-xl font-semibold ${client.hasParking ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-slate-100 text-slate-500'}`}>
+                        {client.hasParking ? '১টি সংরক্ষিত কার পার্কিং সহ' : 'কার পার্কিং ছাড়া'}
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-semibold">১টি সংরক্ষিত কার পার্কিং</span>
+                    )}
                   </div>
                 </div>
               </div>

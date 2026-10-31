@@ -411,6 +411,8 @@ export default function ManagementDashboard({
     projectId: data.projects[0]?.id || '',
     flatNo: '',
     pricingMode: 'package', // 'package' | 'sqft'
+    packageIncludes: 'ফ্ল্যাট + ল্যান্ড শেয়ার',
+    hasParking: false,
     landPrice: '',
     constructionPrice: '',
     sizeSqft: '',
@@ -465,7 +467,11 @@ export default function ManagementDashboard({
     handoverDate: 'ডিসেম্বর ২০২৮',
     customUnitsText: '',
     pricePerSqft: '',
-    pricingMode: 'both' // 'package' | 'sqft' | 'both'
+    pricingMode: 'both', // 'package' | 'sqft' | 'both'
+    hasParking: false,
+    landPrice: '',
+    constructionPrice: '',
+    packagePrice: ''
   });
 
   // 3b. Investment Offers (e.g. Agro) & Investors — no flats/sqft, just slabs
@@ -523,6 +529,9 @@ export default function ManagementDashboard({
     sizeSqft: '',
     beds: '৩',
     baths: '৩',
+    hasParking: false,
+    landPrice: '',
+    constructionPrice: '',
     price: '',
     notes: ''
   });
@@ -536,6 +545,9 @@ export default function ManagementDashboard({
     defaultSizeSqft: '1265',
     beds: '৩',
     baths: '৩',
+    hasParking: false,
+    landPrice: '',
+    constructionPrice: '',
     price: ''
   });
 
@@ -715,6 +727,8 @@ export default function ManagementDashboard({
       projectName: selectedProj.name,
       flatNo: unit.flatNo || 'বরাদ্দকৃত ইউনিট',
       pricingMode: finalPricingMode,
+      packageIncludes: unit.packageIncludes || 'ফ্ল্যাট + ল্যান্ড শেয়ার',
+      hasParking: Boolean(unit.hasParking),
       landPrice: finalPricingMode === 'sqft' ? 0 : (Number(unit.landPrice) || 0),
       constructionPrice: finalPricingMode === 'sqft' ? 0 : (Number(unit.constructionPrice) || 0),
       sizeSqft: finalPricingMode === 'sqft' ? (Number(unit.sizeSqft) || 0) : 0,
@@ -879,6 +893,10 @@ export default function ManagementDashboard({
       formattedName = form.unitNo.trim();
     }
 
+    const landNum = Number(form.landPrice) || 0;
+    const constrNum = Number(form.constructionPrice) || 0;
+    const calcPrice = (landNum + constrNum > 0) ? (landNum + constrNum) : (Number(form.price) || 0);
+
     const newUnitObj = {
       id: `unit-${Date.now().toString(36)}-${Math.floor(100 + Math.random() * 900)}`,
       name: formattedName,
@@ -888,7 +906,11 @@ export default function ManagementDashboard({
       sizeSqft: form.sizeSqft ? form.sizeSqft.trim() : '',
       beds: form.beds || '',
       baths: form.baths || '',
-      price: Number(form.price) || 0,
+      packageIncludes: 'ফ্ল্যাট + ল্যান্ড শেয়ার',
+      hasParking: Boolean(form.hasParking),
+      landPrice: landNum,
+      constructionPrice: constrNum,
+      price: calcPrice,
       notes: form.notes ? form.notes.trim() : '',
       status: 'available'
     };
@@ -914,6 +936,9 @@ export default function ManagementDashboard({
       sizeSqft: '',
       beds: '৩',
       baths: '৩',
+      hasParking: false,
+      landPrice: '',
+      constructionPrice: '',
       price: '',
       notes: ''
     });
@@ -968,6 +993,10 @@ export default function ManagementDashboard({
         const letter = unitLetters[u] || `ইউনিট ${u + 1}`;
         const unitNo = `ফ্ল্যাট ${fl}-${letter}`;
         const formattedName = `${floorName}, ${unitNo}${sizeSqft ? ' (' + sizeSqft + ' বর্গফুট)' : ''}`;
+        const landNum = Number(config.landPrice) || 0;
+        const constrNum = Number(config.constructionPrice) || 0;
+        const calcPrice = (landNum + constrNum > 0) ? (landNum + constrNum) : (Number(config.price) || 0);
+
         newUnits.push({
           id: `unit-bulk-${Date.now()}-${fl}-${u}`,
           name: formattedName,
@@ -977,7 +1006,11 @@ export default function ManagementDashboard({
           sizeSqft,
           beds: config.beds || '৩',
           baths: config.baths || '৩',
-          price: Number(config.price) || 0,
+          packageIncludes: 'ফ্ল্যাট + ল্যান্ড শেয়ার',
+          hasParking: Boolean(config.hasParking),
+          landPrice: landNum,
+          constructionPrice: constrNum,
+          price: calcPrice,
           status: 'available'
         });
       }
@@ -1069,6 +1102,11 @@ export default function ManagementDashboard({
       handoverDate: projectForm.handoverDate || 'ডিসেম্বর ২০২৮',
       pricePerSqft: Number(projectForm.pricePerSqft) || 0,
       pricingMode: projectForm.pricingMode || 'both',
+      packageIncludes: 'ফ্ল্যাট + ল্যান্ড শেয়ার',
+      hasParking: Boolean(projectForm.hasParking),
+      landPrice: Number(projectForm.landPrice) || 0,
+      constructionPrice: Number(projectForm.constructionPrice) || 0,
+      packagePrice: (Number(projectForm.landPrice) || 0) + (Number(projectForm.constructionPrice) || 0) || Number(projectForm.packagePrice) || 0,
       units: generatedUnits,
       expenses: []
     };
@@ -1092,7 +1130,11 @@ export default function ManagementDashboard({
       handoverDate: 'ডিসেম্বর ২০২৮',
       customUnitsText: '',
       pricePerSqft: '',
-      pricingMode: 'both'
+      pricingMode: 'both',
+      hasParking: false,
+      landPrice: '',
+      constructionPrice: '',
+      packagePrice: ''
     });
 
     // Auto-open project details view immediately
@@ -6171,8 +6213,20 @@ export default function ManagementDashboard({
                                   </div>
                                 </div>
                               ) : (
-                                <div className="pt-1.5 border-t border-emerald-100/70 font-bold text-xs text-emerald-800 font-mono">
-                                  {u.price > 0 ? `৳ ${formatBDT(u.price)}` : 'মূল্য নির্ধারিত নয়'}
+                                <div className="pt-1.5 border-t border-emerald-100/70 space-y-0.5">
+                                  <div className="flex items-center justify-between font-bold text-xs text-emerald-800 font-mono">
+                                    <span>{u.price > 0 ? `৳ ${formatBDT(u.price)}` : 'মূল্য নির্ধারিত নয়'}</span>
+                                    {u.hasParking && (
+                                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-sans font-bold">
+                                        ✓ পার্কিং সহ
+                                      </span>
+                                    )}
+                                  </div>
+                                  {(u.landPrice > 0 || u.constructionPrice > 0) && (
+                                    <div className="text-[10px] text-slate-500 font-mono">
+                                      জমি: ৳{formatBDT(u.landPrice || 0)} | নির্মাণ: ৳{formatBDT(u.constructionPrice || 0)}
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -6184,13 +6238,20 @@ export default function ManagementDashboard({
                                   <button
                                     type="button"
                                     onClick={() => {
+                                      const land = u.landPrice || activeProj.landPrice || '';
+                                      const constr = u.constructionPrice || activeProj.constructionPrice || '';
+                                      const hasParking = u.hasParking !== undefined ? u.hasParking : (activeProj.hasParking || false);
+                                      const totalP = (Number(land) || 0) + (Number(constr) || 0) || (u.price > 0 ? u.price : '');
                                       setClientForm({
                                         ...emptyClientForm(),
                                         units: [{
                                           ...emptyUnitRow(),
                                           projectId: activeProj.id,
                                           flatNo: u.name,
-                                          totalPrice: u.price > 0 ? String(u.price) : ''
+                                          landPrice: land ? String(land) : '',
+                                          constructionPrice: constr ? String(constr) : '',
+                                          hasParking: Boolean(hasParking),
+                                          totalPrice: totalP ? String(totalP) : ''
                                         }]
                                       });
                                       setIsClientModalOpen(true);

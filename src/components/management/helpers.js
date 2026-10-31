@@ -6,6 +6,10 @@ export const getUnitData = (unit) => {
     const type = unit.type || 'flat';
     const sizeStr = unit.sizeSqft ? `${unit.sizeSqft} বর্গফুট` : '';
     const fallbackName = `${unit.floor ? unit.floor + ', ' : ''}${unit.unitNo || ''}${sizeStr ? ' (' + sizeStr + ')' : ''}`;
+    const landNum = Number(unit.landPrice) || 0;
+    const constrNum = Number(unit.constructionPrice) || 0;
+    const priceNum = Number(unit.price) || (landNum + constrNum > 0 ? landNum + constrNum : 0);
+
     return {
       id: unit.id || `u-${unit.unitNo || Math.random().toString(36).substr(2, 6)}`,
       name: unit.name || fallbackName,
@@ -15,7 +19,11 @@ export const getUnitData = (unit) => {
       sizeSqft: unit.sizeSqft || '',
       beds: unit.beds || '',
       baths: unit.baths || '',
-      price: Number(unit.price) || 0,
+      packageIncludes: unit.packageIncludes || 'ফ্ল্যাট + ল্যান্ড শেয়ার',
+      hasParking: Boolean(unit.hasParking),
+      landPrice: landNum,
+      constructionPrice: constrNum,
+      price: priceNum,
       notes: unit.notes || '',
       status: unit.status || 'available'
     };
@@ -42,6 +50,10 @@ export const getUnitData = (unit) => {
     sizeSqft: size,
     beds: '',
     baths: '',
+    packageIncludes: 'ফ্ল্যাট + ল্যান্ড শেয়ার',
+    hasParking: str.includes('পার্কিং সহ'),
+    landPrice: 0,
+    constructionPrice: 0,
     price: 0,
     notes: '',
     status: 'available'

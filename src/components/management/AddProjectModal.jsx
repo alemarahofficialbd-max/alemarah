@@ -12,6 +12,8 @@ export default function AddProjectModal({
 }) {
   if (!isOpen) return null;
 
+  const totalPackagePrice = (Number(form.landPrice) || 0) + (Number(form.constructionPrice) || 0);
+
   return (
     <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
       {/* Top Sticky Header */}
@@ -156,6 +158,97 @@ export default function AddProjectModal({
               </p>
             </div>
 
+            {/* PACKAGE DETAILS CARD: When package or both is chosen */}
+            {(form.pricingMode === 'package' || form.pricingMode === 'both') && (
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-emerald-50/30 border border-slate-200/90 space-y-3 animate-fadeIn">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/70 pb-2.5">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xs font-bold text-slate-700 uppercase tracking-wider">
+                      প্যাকেজের অন্তর্ভুক্ত:
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-[#006231] text-xs font-bold border border-emerald-200/80">
+                      ফ্ল্যাট + ল্যান্ড শেয়ার
+                    </span>
+                  </div>
+
+                  {/* Tickmark: Car Parking */}
+                  <label className="inline-flex items-center space-x-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(form.hasParking)}
+                      onChange={(e) => setForm({ ...form, hasParking: e.target.checked })}
+                      className="w-4 h-4 rounded text-[#CE2028] border-slate-300 focus:ring-[#CE2028] cursor-pointer"
+                    />
+                    <span className="text-xs font-bold text-slate-800">
+                      {form.hasParking ? '✓ কার পার্কিং সহ' : 'পার্কিং ছাড়া (কার পার্কিং যুক্ত করতে টিক দিন)'}
+                    </span>
+                  </label>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-2xs font-bold text-slate-700 uppercase tracking-wider">
+                      আনুমানিক প্যাকেজ মূল্য বিভাজন (ঐচ্ছিক ডিফল্ট রেট)
+                    </label>
+                    {totalPackagePrice > 0 && (
+                      <span className="text-xs font-extrabold text-[#006231] font-mono">
+                        মোট আনুমানিক: ৳ {totalPackagePrice.toLocaleString('en-IN')}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-3xs font-bold text-slate-500 mb-0.5">
+                        জমির মূল্য / Land Price (টাকা)
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="যেমন: 2000000"
+                        value={form.landPrice || ''}
+                        onChange={(e) => {
+                          const land = e.target.value;
+                          const constr = form.constructionPrice || '';
+                          setForm({
+                            ...form,
+                            landPrice: land,
+                            packagePrice: String((Number(land) || 0) + (Number(constr) || 0))
+                          });
+                        }}
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-[#CE2028] focus:border-[#CE2028]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-3xs font-bold text-slate-500 mb-0.5">
+                        নির্মাণ খরচ / Construction Price (টাকা)
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="যেমন: 2500000"
+                        value={form.constructionPrice || ''}
+                        onChange={(e) => {
+                          const constr = e.target.value;
+                          const land = form.landPrice || '';
+                          setForm({
+                            ...form,
+                            constructionPrice: constr,
+                            packagePrice: String((Number(land) || 0) + (Number(constr) || 0))
+                          });
+                        }}
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-[#CE2028] focus:border-[#CE2028]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-2 text-3xs text-slate-500 leading-relaxed bg-white/70 p-2.5 rounded-xl border border-slate-200/60">
+                    💡 <strong>ফ্ল্যাট ভেদে আলাদা দাম:</strong> একেক ফ্ল্যাটের দাম একেক রকম হতে পারে (যেমন: রাস্তার পাশে এক দাম, ভেতরে আরেক দাম)। তাই এখানে প্রজেক্টের একটি গড় বেস দিয়ে রাখা যাবে, যা পরবর্তীতে ফ্ল্যাট তৈরির সময় বা ক্লায়েন্ট বুকিংয়ের সময় প্রতিটি ফ্ল্যাটে আলাদাভাবে কাস্টমাইজ করা যাবে।
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SQFT RATE: When sqft or both is chosen */}
             {form.pricingMode !== 'package' && (
               <div>
                 <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">

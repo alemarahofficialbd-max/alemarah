@@ -297,8 +297,8 @@ export default function ClientModal({
                           value={unit.flatNo}
                           onChange={(e) => {
                             const flatNo = e.target.value;
+                            const picked = projectUnits.find(u => u.name === flatNo);
                             if (effectivePricingMode === 'sqft') {
-                              const picked = projectUnits.find(u => u.name === flatNo);
                               const sqft = picked?.sizeSqft || unit.sizeSqft || '';
                               const currentRate = Number(unit.ratePerSqft || selProj?.pricePerSqft) || 0;
                               updateUnit(idx, { 
@@ -308,7 +308,17 @@ export default function ClientModal({
                                 totalPrice: currentRate > 0 && sqft ? String(Math.round(Number(sqft) * currentRate)) : unit.totalPrice 
                               });
                             } else {
-                              updateUnit(idx, { flatNo });
+                              const land = picked?.landPrice ? String(picked.landPrice) : (selProj?.landPrice ? String(selProj.landPrice) : unit.landPrice || '');
+                              const constr = picked?.constructionPrice ? String(picked.constructionPrice) : (selProj?.constructionPrice ? String(selProj.constructionPrice) : unit.constructionPrice || '');
+                              const hasParking = picked?.hasParking !== undefined ? picked.hasParking : (selProj?.hasParking !== undefined ? selProj.hasParking : unit.hasParking);
+                              const total = (Number(land) || 0) + (Number(constr) || 0);
+                              updateUnit(idx, { 
+                                flatNo,
+                                landPrice: land,
+                                constructionPrice: constr,
+                                hasParking: Boolean(hasParking),
+                                totalPrice: total > 0 ? String(total) : (picked?.price ? String(picked.price) : unit.totalPrice)
+                              });
                             }
                           }}
                           className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
@@ -450,47 +460,79 @@ export default function ClientModal({
                         </div>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            জমির মূল্য *
-                          </label>
-                          <input
-                            type="number"
-                            placeholder="যেমন: 1500000"
-                            value={unit.landPrice}
-                            onChange={(e) => {
-                              const land = e.target.value;
-                              updateUnit(idx, {
-                                landPrice: land,
-                                totalPrice: String((Number(land) || 0) + (Number(unit.constructionPrice) || 0))
-                              });
-                            }}
-                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
-                            required
-                          />
+                      <div className="space-y-3">
+                        {/* Package Inclusions & Parking Checkbox */}
+                        <div className="p-3 rounded-2xl bg-white border border-slate-200/90 space-y-2">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-2xs font-bold text-slate-500 uppercase tracking-wider">
+                                প্যাকেজের অন্তর্ভুক্ত:
+                              </span>
+                              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-[#006231] text-xs font-bold border border-emerald-200/80">
+                                ফ্ল্যাট + ল্যান্ড শেয়ার
+                              </span>
+                            </div>
+
+                            <label className="inline-flex items-center space-x-2 cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(unit.hasParking)}
+                                onChange={(e) => updateUnit(idx, { hasParking: e.target.checked })}
+                                className="w-4 h-4 rounded text-[#CE2028] border-slate-300 focus:ring-[#CE2028] cursor-pointer"
+                              />
+                              <span className="text-xs font-bold text-slate-800">
+                                {unit.hasParking ? '✓ কার পার্কিং সহ' : 'পার্কিং ছাড়া'}
+                              </span>
+                            </label>
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            নির্মাণ খরচ *
-                          </label>
-                          <input
-                            type="number"
-                            placeholder="যেমন: 2000000"
-                            value={unit.constructionPrice}
-                            onChange={(e) => {
-                              const construction = e.target.value;
-                              updateUnit(idx, {
-                                constructionPrice: construction,
-                                totalPrice: String((Number(unit.landPrice) || 0) + (Number(construction) || 0))
-                              });
-                            }}
-                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
-                            required
-                          />
-                        </div>
-                        <div className="sm:col-span-2 text-2xs font-bold text-slate-600">
-                          মোট প্যাকেজ মূল্য: ৳{(Number(unit.landPrice) || 0) + (Number(unit.constructionPrice) || 0)}
+
+                        {/* Separate Land Price & Construction Price */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                              জমির মূল্য (Land Price) *
+                            </label>
+                            <input
+                              type="number"
+                              placeholder="যেমন: 2000000"
+                              value={unit.landPrice}
+                              onChange={(e) => {
+                                const land = e.target.value;
+                                updateUnit(idx, {
+                                  landPrice: land,
+                                  totalPrice: String((Number(land) || 0) + (Number(unit.constructionPrice) || 0))
+                                });
+                              }}
+                              className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                              নির্মাণ খরচ (Construction Price) *
+                            </label>
+                            <input
+                              type="number"
+                              placeholder="যেমন: 2500000"
+                              value={unit.constructionPrice}
+                              onChange={(e) => {
+                                const construction = e.target.value;
+                                updateUnit(idx, {
+                                  constructionPrice: construction,
+                                  totalPrice: String((Number(unit.landPrice) || 0) + (Number(construction) || 0))
+                                });
+                              }}
+                              className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                              required
+                            />
+                          </div>
+                          <div className="sm:col-span-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-between text-xs font-bold text-[#006231]">
+                            <span>মোট প্যাকেজ মূল্য {unit.hasParking ? '(কার পার্কিং সহ)' : ''}:</span>
+                            <span className="text-sm font-black text-slate-900 font-mono">
+                              ৳ {((Number(unit.landPrice) || 0) + (Number(unit.constructionPrice) || 0)).toLocaleString('en-IN')}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     )}
