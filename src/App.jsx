@@ -56,6 +56,29 @@ import {
   Banknote
 } from 'lucide-react';
 
+// Helper to resolve project from URL hash (e.g. #project-details?id=al-quds-tower or #projects/al-quds-tower)
+const resolveProjectFromHash = (rawHash, projects) => {
+  if (!rawHash) return null;
+  const hash = rawHash.replace(/^#\/?/, '');
+  // 1. Match ?id=al-quds-tower or &id=al-quds-tower
+  const idMatch = hash.match(/[?&]id=([^&]+)/i);
+  if (idMatch && idMatch[1]) {
+    const targetId = decodeURIComponent(idMatch[1]).toLowerCase();
+    const found = projects.find(p => p.id.toLowerCase() === targetId);
+    if (found) return found;
+  }
+  // 2. Match projects/al-quds-tower or project/al-quds-tower or project-details/al-quds-tower
+  if (hash.startsWith('projects/') || hash.startsWith('project/') || hash.startsWith('project-details/')) {
+    const slug = hash.split('/')[1]?.split('?')[0]?.split('&')[0];
+    if (slug) {
+      const targetSlug = decodeURIComponent(slug).toLowerCase();
+      const found = projects.find(p => p.id.toLowerCase() === targetSlug);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+
 export default function App() {
   const [lang, setLang] = useState('bn'); // 'bn' (Bangla) or 'en' (English)
 
@@ -88,6 +111,22 @@ export default function App() {
     }
   });
 
+  const [selectedProject, setSelectedProject] = useState(() => {
+    try {
+      const rawHash = window.location.hash.replace('#', '');
+      const fromHash = resolveProjectFromHash(rawHash, projectsData);
+      if (fromHash) return fromHash;
+
+      const savedProjId = localStorage.getItem('alemarah_selected_project_id');
+      if (savedProjId) {
+        return projectsData.find(p => p.id === savedProjId) || projectsData[0];
+      }
+      return projectsData[0];
+    } catch {
+      return projectsData[0];
+    }
+  });
+
   const [currentPage, setCurrentPage] = useState(() => {
     try {
       const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details', 'careers'];
@@ -98,6 +137,10 @@ export default function App() {
 
       if (rawHash.startsWith('careers') || rawHash.startsWith('job-')) {
         return 'careers';
+      }
+
+      if (rawHash.startsWith('project-details') || rawHash.startsWith('projects/') || rawHash.startsWith('project/')) {
+        return 'project-details';
       }
 
       if (hash && validPages.includes(hash)) {
@@ -119,17 +162,6 @@ export default function App() {
     }
   });
 
-  const [selectedProject, setSelectedProject] = useState(() => {
-    try {
-      const savedProjId = localStorage.getItem('alemarah_selected_project_id');
-      if (savedProjId) {
-        return projectsData.find(p => p.id === savedProjId) || projectsData[0];
-      }
-      return projectsData[0];
-    } catch {
-      return projectsData[0];
-    }
-  });
   const [preselectedProject, setPreselectedProject] = useState(null);
   const [searchFilter, setSearchFilter] = useState(null);
   
@@ -182,6 +214,13 @@ export default function App() {
 
     if (rawHash.startsWith('careers') || rawHash.startsWith('job-')) {
       resolvedPage = 'careers';
+    } else if (rawHash.startsWith('project-details') || rawHash.startsWith('projects/') || rawHash.startsWith('project/')) {
+      resolvedPage = 'project-details';
+      const proj = resolveProjectFromHash(rawHash, projectsData);
+      if (proj) {
+        setSelectedProject(proj);
+        try { localStorage.setItem('alemarah_selected_project_id', proj.id); } catch(e) {}
+      }
     } else if (initialHash && validPages.includes(initialHash)) {
       if (initialHash === 'management') {
         resolvedPage = hasAdmin ? 'management' : 'login';
@@ -205,21 +244,38 @@ export default function App() {
       localStorage.setItem('alemarah_current_page', resolvedPage);
     } catch (e) {}
 
-    const url = resolvedPage === 'home' ? window.location.pathname : `#${resolvedPage}`;
+    let url = resolvedPage === 'home' ? window.location.pathname : `#${resolvedPage}`;
+    if (resolvedPage === 'project-details') {
+      const activeProjId = selectedProject?.id || 'al-quds-tower';
+      url = `#project-details?id=${activeProjId}`;
+    }
     window.history.replaceState({ page: resolvedPage }, '', url);
 
     const handlePopState = (event) => {
       const pageFromState = event.state?.page;
-      const rawHash = window.location.hash.replace('#', '');
-      const hash = rawHash.split('?')[0].split('&')[0];
+      const currentRawHash = window.location.hash.replace('#', '');
+      const hash = currentRawHash.split('?')[0].split('&')[0];
       let targetPage = pageFromState;
       if (!targetPage) {
-        if (rawHash.startsWith('careers') || rawHash.startsWith('job-')) {
+        if (currentRawHash.startsWith('careers') || currentRawHash.startsWith('job-')) {
           targetPage = 'careers';
+        } else if (currentRawHash.startsWith('project-details') || currentRawHash.startsWith('projects/') || currentRawHash.startsWith('project/')) {
+          targetPage = 'project-details';
+          const proj = resolveProjectFromHash(currentRawHash, projectsData);
+          if (proj) {
+            setSelectedProject(proj);
+            try { localStorage.setItem('alemarah_selected_project_id', proj.id); } catch(e) {}
+          }
         } else if (hash && validPages.includes(hash)) {
           targetPage = hash;
         } else {
           targetPage = 'home';
+        }
+      } else if (targetPage === 'project-details') {
+        const proj = resolveProjectFromHash(currentRawHash, projectsData);
+        if (proj) {
+          setSelectedProject(proj);
+          try { localStorage.setItem('alemarah_selected_project_id', proj.id); } catch(e) {}
         }
       }
       setCurrentPage(targetPage);
@@ -231,32 +287,34 @@ export default function App() {
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [selectedProject?.id]);
 
   const isPortalMode = currentPage === 'login' || currentPage === 'dashboard' || currentPage === 'management';
 
   const t = translations[lang];
 
-  const navigateTo = (pageId, addToHistory = true) => {
-    setCurrentPage(pageId);
+  const navigateTo = (targetPath, addToHistory = true) => {
+    const basePageId = targetPath.split('?')[0].split('/')[0];
+    setCurrentPage(basePageId);
     try {
-      localStorage.setItem('alemarah_current_page', pageId);
+      localStorage.setItem('alemarah_current_page', basePageId);
     } catch (e) {}
     if (addToHistory) {
-      const url = pageId === 'home' ? window.location.pathname : `#${pageId}`;
-      window.history.pushState({ page: pageId }, '', url);
+      const url = basePageId === 'home' ? window.location.pathname : `#${targetPath}`;
+      window.history.pushState({ page: basePageId }, '', url);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSelectProject = (project) => {
+    if (!project) return;
     setSelectedProject(project);
     try {
       if (project?.id) {
         localStorage.setItem('alemarah_selected_project_id', project.id);
       }
     } catch {}
-    navigateTo('project-details');
+    navigateTo(`project-details?id=${project.id}`);
   };
 
   const handleOpenBookVisit = (project = null) => {

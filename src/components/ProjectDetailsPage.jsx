@@ -176,17 +176,46 @@ export default function ProjectDetailsPage({
   lang = 'bn', 
   t, 
   onBack, 
-  onSelectProject,
+  onSelectProject, 
   onBookVisit 
 }) {
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImageItem, setSelectedImageItem] = useState(null);
   const [activeMediaTab, setActiveMediaTab] = useState('photos'); // 'photos' or 'floorplan'
+  const [galleryCategory, setGalleryCategory] = useState('all'); // 'all', 'exterior', 'interior'
   const [copiedLink, setCopiedLink] = useState(false);
+
+  // Normalize gallery items into uniform objects with titles & categories
+  const galleryItems = React.useMemo(() => {
+    if (!project?.gallery || project.gallery.length === 0) {
+      return project?.image ? [{ url: project.image, titleBn: project.nameBn, titleEn: project.nameEn, category: 'exterior' }] : [];
+    }
+    return project.gallery.map((item, idx) => {
+      if (typeof item === 'string') {
+        return {
+          url: item,
+          titleBn: idx === 0 ? (project.nameBn || 'মূল স্থাপত্য ভিউ') : `গ্যালারি ফটো ০${idx + 1}`,
+          titleEn: idx === 0 ? (project.nameEn || 'Main Architectural View') : `Gallery Photo ${idx + 1}`,
+          category: 'exterior'
+        };
+      }
+      return item;
+    });
+  }, [project]);
+
+  // Check categories present in this project
+  const hasInterior = galleryItems.some(item => item.category === 'interior');
+  const hasExterior = galleryItems.some(item => item.category === 'exterior');
+
+  const filteredGallery = React.useMemo(() => {
+    if (galleryCategory === 'all') return galleryItems;
+    return galleryItems.filter(item => item.category === galleryCategory);
+  }, [galleryItems, galleryCategory]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setSelectedImage(null);
+    setSelectedImageItem(null);
     setActiveMediaTab('photos');
+    setGalleryCategory('all');
   }, [project]);
 
   if (!project) return null;
@@ -205,17 +234,22 @@ export default function ProjectDetailsPage({
     ready: t.projects.card.statusReady
   };
 
-  const activeDisplayImage = selectedImage || project.image;
+  const currentItem = selectedImageItem || galleryItems[0] || { url: project.image, titleBn: project.nameBn, titleEn: project.nameEn, category: 'exterior' };
+  const activeDisplayImage = activeMediaTab === 'floorplan' && project.floorPlan ? project.floorPlan : currentItem.url;
+  const activeDisplayTitle = activeMediaTab === 'floorplan' 
+    ? (isEn ? 'Approved Architectural Floor Plan' : 'অনুমোদিত আর্কিটেকচারাল ফ্লোর প্ল্যান নকশা')
+    : (isEn ? (currentItem.titleEn || currentItem.titleBn) : (currentItem.titleBn || currentItem.titleEn));
 
   const handleShare = () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}#project-details?id=${project.id}`;
     if (navigator.share) {
       navigator.share({
         title: isEn ? project.nameEn : project.nameBn,
         text: isEn ? project.taglineEn : project.taglineBn,
-        url: window.location.href,
+        url: shareUrl,
       }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(shareUrl);
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2000);
     }
@@ -333,42 +367,117 @@ export default function ProjectDetailsPage({
               )}
 
               {/* Main Image View */}
-              <div className="relative h-72 sm:h-96 md:h-[460px] rounded-2xl overflow-hidden shadow-inner bg-gray-900 group">
+              <div className="relative h-72 sm:h-96 md:h-[480px] rounded-2xl overflow-hidden shadow-inner bg-gray-900 group">
                 <img
-                  src={activeMediaTab === 'floorplan' && project.floorPlan ? project.floorPlan : activeDisplayImage}
-                  alt={isEn ? project.nameEn : project.nameBn}
+                  src={activeDisplayImage}
+                  alt={activeDisplayTitle || (isEn ? project.nameEn : project.nameBn)}
                   className="w-full h-full object-cover transition-all duration-500 group-hover:scale-[1.02]"
                 />
                 
-                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-white">
-                  {activeMediaTab === 'floorplan' ? (isEn ? 'Floor Plan' : 'ফ্লোর প্ল্যান') : (isEn ? 'Architectural View' : 'নান্দনিক স্থাপত্য দৃশ্য')}
+                {/* Top Badge: View type indicator */}
+                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold text-white shadow-md flex items-center space-x-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>{activeMediaTab === 'floorplan' ? (isEn ? 'Floor Plan' : 'ফ্লোর প্ল্যান') : (isEn ? 'Photo Showcase' : 'প্রকল্পের বাস্তব দৃশ্য')}</span>
                 </div>
+
+                {/* Bottom Overlay: Room / View Caption & Label */}
+                {activeDisplayTitle && (
+                  <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 bg-slate-950/80 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/15 text-white flex items-center justify-between gap-3 shadow-lg pointer-events-none">
+                    <div className="flex items-center space-x-2.5 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0 animate-pulse"></span>
+                      <span className="font-bold text-xs sm:text-sm truncate drop-shadow-sm">{activeDisplayTitle}</span>
+                    </div>
+                    {activeMediaTab !== 'floorplan' && currentItem?.category && (
+                      <span className="text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-md bg-white/20 text-emerald-300 shrink-0 uppercase tracking-wider">
+                        {currentItem.category === 'interior' ? (isEn ? 'Interior Design' : 'ইন্টেরিয়র ডিজাইন') : (isEn ? 'Exterior View' : 'এক্সটেরিয়র ভিউ')}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* Thumbnails Gallery Strip */}
-              {activeMediaTab === 'photos' && project.gallery && project.gallery.length > 0 && (
-                <div className="space-y-2">
-                  <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    {isEn ? `Gallery Photos (${project.gallery.length})` : `গ্যালারি ছবিসমূহ (${project.gallery.length}টি)`}
+              {/* Thumbnails Gallery Strip & Category Filter */}
+              {activeMediaTab === 'photos' && galleryItems && galleryItems.length > 0 && (
+                <div className="space-y-3 pt-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-2">
+                    <div className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center space-x-2">
+                      <span>{isEn ? `Gallery Photos (${galleryItems.length})` : `গ্যালারি ছবিসমূহ (${galleryItems.length}টি)`}</span>
+                    </div>
+
+                    {/* Filter Tabs if both Exterior & Interior are present */}
+                    {hasInterior && hasExterior && (
+                      <div className="flex items-center gap-1.5 text-xs font-semibold">
+                        <button
+                          type="button"
+                          onClick={() => setGalleryCategory('all')}
+                          className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                            galleryCategory === 'all'
+                              ? 'bg-gray-900 text-white shadow-2xs'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          {isEn ? `All (${galleryItems.length})` : `সকল ছবি (${galleryItems.length})`}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setGalleryCategory('exterior')}
+                          className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                            galleryCategory === 'exterior'
+                              ? 'bg-[#006231] text-white shadow-2xs'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          {isEn ? 'Exterior' : 'এক্সটেরিয়র'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setGalleryCategory('interior')}
+                          className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                            galleryCategory === 'interior'
+                              ? 'bg-[#CE2028] text-white shadow-2xs'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          {isEn ? 'Interior Design' : 'ইন্টেরিয়র ডিজাইন'}
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2.5">
-                    {project.gallery.map((imgUrl, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setSelectedImage(imgUrl)}
-                        className={`relative aspect-4/3 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
-                          activeDisplayImage === imgUrl
-                            ? 'border-[#CE2028] ring-2 ring-[#CE2028]/30 scale-102'
-                            : 'border-transparent opacity-75 hover:opacity-100'
-                        }`}
-                      >
-                        <img
-                          src={imgUrl}
-                          alt={`Thumbnail ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
+
+                  {/* Thumbnail Cards Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-[380px] overflow-y-auto pr-1">
+                    {filteredGallery.map((item, idx) => {
+                      const isSelected = activeDisplayImage === item.url;
+                      const itemTitle = isEn ? (item.titleEn || item.titleBn) : (item.titleBn || item.titleEn);
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setSelectedImageItem(item)}
+                          className={`group relative rounded-xl overflow-hidden border-2 transition-all cursor-pointer text-left flex flex-col ${
+                            isSelected
+                              ? 'border-[#CE2028] ring-2 ring-[#CE2028]/30 scale-[1.02] shadow-sm'
+                              : 'border-gray-200 opacity-80 hover:opacity-100 hover:border-gray-400'
+                          }`}
+                        >
+                          <div className="aspect-4/3 w-full overflow-hidden bg-gray-100 relative">
+                            <img
+                              src={item.url}
+                              alt={itemTitle}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                            {item.category === 'interior' && (
+                              <span className="absolute top-1 left-1 bg-red-600/90 text-white text-[9px] font-bold px-1.5 py-0.2 rounded shadow-xs">
+                                ইন্টেরিয়র
+                              </span>
+                            )}
+                          </div>
+                          <div className="p-1.5 bg-white text-[10px] font-semibold text-gray-800 truncate border-t border-gray-100 w-full" title={itemTitle}>
+                            {itemTitle}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}

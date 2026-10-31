@@ -54,7 +54,120 @@ export const projectsData = [
     },
     image: "/images/al_quds_tower.webp",
     gallery: [
-      "/images/al_quds_tower.webp"
+      {
+        url: "/images/al_quds_tower.webp",
+        titleBn: "আল কুদস টাওয়ার — মূল বাহ্যিক স্থাপত্য ভিউ (Preview Photo)",
+        titleEn: "Al Quds Tower — Main Exterior Architectural View",
+        category: "exterior"
+      },
+      {
+        url: "/images/al_quds_tower1.webp",
+        titleBn: "আল কুদস টাওয়ার — সড়ক ও দৃষ্টিনন্দন পার্সপেক্টিভ ভিউ",
+        titleEn: "Al Quds Tower — Road & Perspective Architectural View",
+        category: "exterior"
+      },
+      {
+        url: "/images/al_quds_tower_nightmood.webp",
+        titleBn: "আল কুদস টাওয়ার — আকর্ষণীয় নাইট মুড লাইটিং ভিউ",
+        titleEn: "Al Quds Tower — Atmospheric Night Mood Lighting View",
+        category: "exterior"
+      },
+      {
+        url: "/images/interior/01_drawing_room_tv.webp",
+        titleBn: "ড্রয়িং রুম ও সুসজ্জিত টিভি ক্যাবিনেট (Drawing Room TV)",
+        titleEn: "Drawing Room TV Cabinet & Lounge",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/02_main_entry.webp",
+        titleBn: "আবাসিক ইউনিটের মূল প্রবেশদ্বার (Main Apartment Entry)",
+        titleEn: "Main Apartment Entrance & Foyer",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/03_dining_space_1.webp",
+        titleBn: "পারিবারিক ডাইনিং স্পেস ও আলোকসজ্জা (Dining Space 1)",
+        titleEn: "Family Dining Space & Ambient Lighting",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/04_dining_drawing.webp",
+        titleBn: "ডাইনিং ও ড্রয়িং রুম সমন্বিত ভিউ (Dining & Drawing)",
+        titleEn: "Dining & Drawing Combined Spacious View",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/05_dining_space_2.webp",
+        titleBn: "ডাইনিং এরিয়া সাইড অ্যাঙ্গেল ভিউ (Dining Space 2)",
+        titleEn: "Dining Area Side Angle View",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/06_master_bed_01_view_1.webp",
+        titleBn: "মাস্টার বেডরুম ০১ — ভিউ ১ (Master Bed 01)",
+        titleEn: "Master Bedroom 01 — View 1",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/07_master_bed_01_view_2.webp",
+        titleBn: "মাস্টার বেডরুম ০১ — ওয়ার্ডরোব ও উইন্ডো ভিউ (Master Bed 01)",
+        titleEn: "Master Bedroom 01 — Wardrobe & Window View",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/08_master_bed_01_view_3.webp",
+        titleBn: "মাস্টার বেডরুম ০১ — ক্যাবিনেট ও সিলিং ডিজাইন (Master Bed 01)",
+        titleEn: "Master Bedroom 01 — Cabinet & Ceiling Detail",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/09_kitchen_view_1.webp",
+        titleBn: "আধুনিক কিচেন ও কিচেন কেবিনেট ভিউ ১ (Kitchen 1)",
+        titleEn: "Modern Modular Kitchen & Storage Cabinets - View 1",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/10_kitchen_view_2.webp",
+        titleBn: "আধুনিক কিচেন ও কাউন্টারটপ ভিউ ২ (Kitchen 2)",
+        titleEn: "Modern Kitchen & Countertop - View 2",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/11_child_bed_03_view_1.webp",
+        titleBn: "চিলড্রেন / গেস্ট বেডরুম ০৩ — ভিউ ১ (Child Bed 03)",
+        titleEn: "Children / Guest Bedroom 03 — View 1",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/12_child_bed_03_view_2.webp",
+        titleBn: "চিলড্রেন / গেস্ট বেডরুম ০৩ — পড়ার টেবিল ও ক্যাবিনেট (Child Bed 03)",
+        titleEn: "Children / Guest Bedroom 03 — Study & Storage",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/13_master_bed_02_view_1.webp",
+        titleBn: "মাস্টার বেডরুম ০২ — ভিউ ১ (Master Bed 02)",
+        titleEn: "Master Bedroom 02 — View 1",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/14_master_bed_02_view_2.webp",
+        titleBn: "মাস্টার বেডরুম ০২ — আরামদায়ক শয়নকক্ষ ভিউ ২ (Master Bed 02)",
+        titleEn: "Master Bedroom 02 — Cozy Living View 2",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/15_master_bed_02_view_3.webp",
+        titleBn: "মাস্টার বেডরুম ০২ — টিভি ইউনিট ও দেয়াল প্যানেলিং (Master Bed 02)",
+        titleEn: "Master Bedroom 02 — TV Unit & Wall Paneling",
+        category: "interior"
+      },
+      {
+        url: "/images/interior/16_master_bed_02_view_4.webp",
+        titleBn: "মাস্টার বেডরুম ০২ — ড্রয়ার ও লাইটিং ভিউ ৪ (Master Bed 02)",
+        titleEn: "Master Bedroom 02 — Drawers & Lighting View 4",
+        category: "interior"
+      }
     ],
     featuresEn: [
       "Land Area: 17.40 Decimals (100% Clear Title)",
@@ -104,4 +217,150 @@ export const projectsData = [
       ]
     }
   },
+  {
+    id: "barakah-tower-01",
+    nameEn: "Barakah Tower 01",
+    nameBn: "বারাকাহ টাওয়ার ০১",
+    taglineEn: "Planned Housing, An Address for Organized Living.",
+    taglineBn: "পরিকল্পিত আবাসন, সুসংগঠিত জীবনযাপনের ঠিকানা।",
+    status: "ongoing",
+    locationEn: "Purana Paltan / Dhaka Metropolitan",
+    locationBn: "পুরানা পল্টন / ঢাকা মেট্রোপলিটন",
+    areaEn: "Purana Paltan",
+    areaBn: "পুরানা পল্টন",
+    typeEn: "Exclusive Residential Community",
+    typeBn: "পরিকল্পিত আবাসিক টাওয়ার",
+    landAreaEn: "Planned Plot",
+    landAreaBn: "পরিকল্পিত প্লট",
+    beds: 3,
+    baths: 3,
+    sizeSqft: "1,450 - 1,850",
+    handoverEn: "June 2027",
+    handoverBn: "জুন ২০২৭",
+    buildingTypeEn: "G+9 (Ground + 9 Floors)",
+    buildingTypeBn: "জি+৯ (গ্রাউন্ড + ৯ তলা)",
+    totalUnitsEn: "27 Residential Units",
+    totalUnitsBn: "২৭টি আবাসিক ইউনিট",
+    totalFloors: 10,
+    image: "/images/barakah_tower_01.webp",
+    floorPlan: "/images/barakah_01_floor_plan.webp",
+    gallery: [
+      "/images/barakah_tower_01.webp",
+      "/images/barakah_01_floor_plan.webp"
+    ],
+    featuresEn: [
+      "Total 27 exclusive residential apartment units with optimized space management",
+      "Carefully designed safe, practical, and comfortable living ambience",
+      "Rooftop landscaping with family barbecue zone & prayer facility",
+      "Standby generator backing all essential home appliances and common lifts",
+      "Proximity to central commercial hubs with clear adhan acoustic access"
+    ],
+    featuresBn: [
+      "মোট ২৭টি পরিকল্পিত আবাসিক ইউনিট এবং সর্বোচ্চ কার্যকর স্পেস ব্যবস্থাপনা",
+      "নিরাপদ, ব্যবহারিক এবং আরামদায়ক পারিবারিক জীবনযাপনের পরিবেশ",
+      "ছাদে মনোরম ল্যান্ডস্কেপিং, বারবিকিউ জোন ও নামাজের সুব্যবস্থা",
+      "জরুরি প্রয়োজনে সকল ফ্ল্যাটে অটো ব্যাকআপ জেনারেটর ও আধুনিক লিফট",
+      "শহরের কেন্দ্রস্থলের সাথে সহজ যোগাযোগ ও আবাসিক পরিবেশে আজানের ধ্বনি পৌঁছানোর ব্যবস্থা"
+    ],
+    rajukApprovalEn: "Approved Residential Building Plan",
+    rajukApprovalBn: "অনুমোদিত আবাসিক বিল্ডিং প্ল্যান"
+  },
+  {
+    id: "alemarah-shopping-mall",
+    nameEn: "Al Emarah Shopping Mall",
+    nameBn: "আল ইমারাহ শপিং মল",
+    taglineEn: "Modern Commercial Asset & High-Footfall Retail Hub.",
+    taglineBn: "আধুনিক বাণিজ্যিক সম্পদ ও উচ্চ আয়ের রিটেইল কেন্দ্র।",
+    status: "upcoming",
+    locationEn: "22 Ft. Wide Road, Prime Commercial Zone, Dhaka",
+    locationBn: "২২ ফুট প্রশস্ত রাস্তা সংলগ্ন, প্রাইম বাণিজ্যিক জোন, ঢাকা",
+    areaEn: "Commercial Hub",
+    areaBn: "বাণিজ্যিক জোন",
+    typeEn: "Commercial Retail Plaza & Asset Development",
+    typeBn: "বাণিজ্যিক শপিং মল ও রিটেইল স্পেস",
+    landAreaEn: "Commercial Plot",
+    landAreaBn: "বাণিজ্যিক প্লট",
+    beds: 0,
+    baths: 6,
+    sizeSqft: "250 - 5,000",
+    handoverEn: "October 2028",
+    handoverBn: "অক্টোবর ২০২৮",
+    buildingTypeEn: "Multi-Storied Shopping Complex",
+    buildingTypeBn: "বহুতল আধুনিক শপিং কমপ্লেক্স",
+    totalFloors: 10,
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80"
+    ],
+    featuresEn: [
+      "Direct 22-foot wide road frontage for smooth customer vehicular access",
+      "High return on commercial lease and fractional asset ownership",
+      "Escalators, capsule elevators, central AC provision, and firefighting system",
+      "Underground multi-tier automated customer parking",
+      "Security surveillance with central control room and dedicated facility management"
+    ],
+    featuresBn: [
+      "২২ ফুট প্রশস্ত সড়কের সরাসরি সংযোগে সুবিধাজনক গ্রাহক প্রবেশাধিকার",
+      "বাণিজ্যিক দোকান ও শোরুমে আকর্ষণীয় মাসিক ভাড়া ও লভ্যাংশ আয়ের সুযোগ",
+      "এসকেলেটর, ক্যাপসুল লিফট, সেন্ট্রাল এসি প্রভিশন ও অগ্নিনির্বাপক ব্যবস্থা",
+      "বেসমেন্টে সুপ্রশস্ত ও নিরাপদ গ্রাহক পার্কিংয়ের ব্যবস্থা",
+      "সার্বক্ষণিক সিসিটিভি মনিটরিং ও পেশাদার ফ্যাসিলিটি ম্যানেজমেন্ট"
+    ],
+    rajukApprovalEn: "Commercial Sanction & Environmental NOC",
+    rajukApprovalBn: "বাণিজ্যিক ছাড়পত্র ও পরিবেশ অধিদপ্তর অনুমোদন"
+  },
+  {
+    id: "emarah-agro",
+    nameEn: "Emarah Agro Asset Development",
+    nameBn: "ইমারাহ এগ্রো - কৃষি সম্পদ ও কর্মসংস্থান",
+    taglineEn: "Sustainable Agriculture, Dairy Cattle & Economic Wealth Creation.",
+    taglineBn: "টেকসই কৃষি, ডেইরি ক্যাটল ও অংশীদারিত্বের মাধ্যমে সম্পদ সৃষ্টি।",
+    status: "ongoing",
+    locationEn: "Al-Emarah Agro Valley, Dhaka Outskirts",
+    locationBn: "আল-ইমারাহ এগ্রো ভ্যালি, ঢাকা সংলগ্ন",
+    areaEn: "Agro Project",
+    areaBn: "এগ্রো প্রজেক্ট",
+    typeEn: "Agro-Based Asset & Production Initiative",
+    typeBn: "কৃষিভিত্তিক উৎপাদন ও সম্পদ উন্নয়ন",
+    landAreaEn: "Extensive Green Agro Farm",
+    landAreaBn: "সুবিশাল সবুজ এগ্রো খামার",
+    beds: 0,
+    baths: 2,
+    sizeSqft: "Dairy & Livestock Farm",
+    handoverEn: "Active & Income Generating",
+    handoverBn: "চলমান ও আয় উৎপাদক প্রকল্প",
+    buildingTypeEn: "Modern Livestock & Eco-Farming Complex",
+    buildingTypeBn: "আধুনিক ডেইরি ক্যাটল ও এগ্রো কমপ্লেক্স",
+    totalFloors: 1,
+    image: "/images/emarah_agro.jpg",
+    gallery: [
+      "/images/emarah_agro.jpg",
+      "/images/agro_1.webp",
+      "/images/agro_2.webp",
+      "/images/agro_3.webp",
+      "/images/agro_4.webp",
+      "/images/agro_5.webp",
+      "/images/agro_6.webp",
+      "/images/agro_7.webp",
+      "/images/agro_8.webp",
+      "/images/agro_9.webp"
+    ],
+    featuresEn: [
+      "Modern planned dairy cattle, meat cattle fattening, and poultry farming",
+      "Eco-friendly fish cultivation, egg production, and duck breeding",
+      "Converting agriculture into an organized, profitable, and productive economic asset",
+      "Employment creation and potential income generation through participatory ownership",
+      "Starting investment from BDT 1,00,000 under formal written agreement"
+    ],
+    featuresBn: [
+      "আধুনিক ও পরিকল্পিত কৃষি ব্যবস্থাপনায় দুগ্ধ ও মাংসজাত গরু এবং ডেইরি ক্যাটল",
+      "ডিমের মুরগি, হাঁস পালন এবং পরিবেশবান্ধব আধুনিক পদ্ধতিতে মাছ চাষ",
+      "কৃষিকে একটি পরিকল্পিত সম্পদ ও উৎপাদনশীল অর্থনৈতিক কার্যক্রমে রূপান্তর",
+      "কর্মসংস্থান সৃষ্টি এবং অংশীদারিত্বের মাধ্যমে স্থায়ী আয়ের সম্ভাবনা",
+      "সর্বনিম্ন ১,০০,০০০ (এক লক্ষ) টাকা থেকে শুরু অংশীদারিত্বমূলক চুক্তি"
+    ],
+    rajukApprovalEn: "Govt. Livestock & Fisheries Registered Project",
+    rajukApprovalBn: "সরকারি প্রাণিসম্পদ ও মৎস্য অধিদপ্তর নিবন্ধিত"
+  }
 ];
