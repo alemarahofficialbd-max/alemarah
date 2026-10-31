@@ -1092,6 +1092,7 @@ export default function ManagementDashboard({
 
     const newProj = {
       id: `proj-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      _isPendingSync: true,
       name: projectForm.name,
       location: projectForm.location || 'ঢাকা',
       progress: Number(projectForm.progress) || 10,
@@ -1287,7 +1288,10 @@ export default function ManagementDashboard({
           clients: (prev.clients || []).map(c => c.projectId === projId ? { ...c, projectId: null } : c)
         }));
         await deleteProjectFromSupabase(projId);
-        triggerAlert(`প্রজেক্ট "${projName}" সফলভাবে মুছে ফেলা হয়েছে!`);
+        if (selectedProjectForDetails?.id === projId) {
+          setSelectedProjectForDetails(null);
+        }
+        triggerAlert(`প্রজেক্ট "${projName}" সফলভাবে কেন্দ্রীয় ডাটাবেজ থেকে মুছে ফেলা হয়েছে!`);
       }
     );
   };

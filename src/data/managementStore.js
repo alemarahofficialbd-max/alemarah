@@ -72,63 +72,6 @@ export const initialManagementData = {
         "৩য় তলা, ফ্ল্যাট ৩-বি",
         "৭ম তলা, ফ্ল্যাট ৭-বি (১২৬৫ বর্গফুট)"
       ]
-    },
-    {
-      id: "barakah-tower-01",
-      name: "বারাকাহ টাওয়ার ০১",
-      nameEn: "Barakah Tower 01",
-      location: "পুরানা পল্টন / ঢাকা মেট্রোপলিটন",
-      progress: 30,
-      currentStage: "স্ট্রাকচারাল কাস্টিং ও কলাম নির্মাণ",
-      budget: 220000000,
-      pricePerSqft: 3200,
-      pricingMode: "both",
-      type: "residential",
-      totalFloors: 10,
-      unitsPerFloor: 3,
-      units: [
-        "৪র্থ তলা, ফ্ল্যাট ৪-এ",
-        "৪র্থ তলা, ফ্ল্যাট ৪-বি",
-        "৫ম তলা, ফ্ল্যাট ৫-এ"
-      ]
-    },
-    {
-      id: "alemarah-shopping-mall",
-      name: "আল ইমারাহ শপিং মল",
-      nameEn: "Al Emarah Shopping Mall",
-      location: "২২ ফুট প্রশস্ত রাস্তা সংলগ্ন, প্রাইম বাণিজ্যিক জোন, ঢাকা",
-      progress: 5,
-      currentStage: "বাণিজ্যিক লেআউট ও ডিজাইন চূড়ান্তকরণ",
-      budget: 450000000,
-      pricePerSqft: 4500,
-      pricingMode: "both",
-      type: "commercial",
-      totalFloors: 10,
-      unitsPerFloor: 8,
-      units: [
-        "গ্রাউন্ড ফ্লোর - দোকান ০১",
-        "গ্রাউন্ড ফ্লোর - দোকান ০২",
-        "১ম ফ্লোর - কমার্শিয়াল স্পেস"
-      ]
-    },
-    {
-      id: "emarah-agro",
-      name: "ইমারাহ এগ্রো - কৃষি সম্পদ ও কর্মসংস্থান",
-      nameEn: "Emarah Agro Asset Development",
-      location: "আল-ইমারাহ এগ্রো ভ্যালি, ঢাকা সংলগ্ন",
-      progress: 75,
-      currentStage: "উৎপাদন ও ডেইরি ফার্মিং চলমান",
-      budget: 150000000,
-      pricePerSqft: 0,
-      pricingMode: "package",
-      type: "share",
-      totalFloors: 1,
-      unitsPerFloor: 1,
-      units: [
-        "এগ্রো শেয়ার ইউনিট ০১",
-        "এগ্রো শেয়ার ইউনিট ০২",
-        "এগ্রো শেয়ার ইউনিট ০৩"
-      ]
     }
   ],
   clients: [],
@@ -748,7 +691,7 @@ const _syncFromSupabaseImpl = async () => {
       }
       // Filter out system storage from management team display
       updated.managementTeam = adminsRes.data
-        .filter(a => a.id !== 'JOB-APPLICATIONS-STORE')
+        .filter(a => a.id !== 'JOB-APPLICATIONS-STORE' && a.id !== 'SYSTEM-DELETED-IDS')
         .map(a => ({
           id: a.id,
           name: a.name,
@@ -772,7 +715,30 @@ const _syncFromSupabaseImpl = async () => {
           syncJobApplicationsToSupabase(current.jobApplications);
         }
       }
+
+      // Cloud Sync: Retrieve authoritative system tombstones (deleted IDs across all devices)
+      const tombstoneRow = adminsRes.data.find(a => a.id === 'SYSTEM-DELETED-IDS');
+      const cloudDeletedProjectIds = Array.isArray(tombstoneRow?.permissions?.deletedProjectIds)
+        ? tombstoneRow.permissions.deletedProjectIds
+        : [];
+      const cloudDeletedOfferIds = Array.isArray(tombstoneRow?.permissions?.deletedOfferIds)
+        ? tombstoneRow.permissions.deletedOfferIds
+        : [];
+
+      const mergedDeletedProjectIds = Array.from(new Set([
+        ...(current.deletedProjectIds || []),
+        ...cloudDeletedProjectIds
+      ]));
+      updated.deletedProjectIds = mergedDeletedProjectIds;
+
+      const mergedDeletedOfferIds = Array.from(new Set([
+        ...(current.deletedOfferIds || []),
+        ...cloudDeletedOfferIds
+      ]));
+      updated.deletedOfferIds = mergedDeletedOfferIds;
     }
+
+    const deletedProjSet = new Set(updated.deletedProjectIds || []);
 
     if (directorsRes.data && directorsRes.data.length > 0) {
       const remoteDirs = directorsRes.data.map(d => {
@@ -807,9 +773,8 @@ const _syncFromSupabaseImpl = async () => {
     }
 
     if (projectsRes.data) {
-      const deletedIds = new Set(current.deletedProjectIds || []);
       updated.projects = projectsRes.data
-        .filter(p => !deletedIds.has(p.id))
+        .filter(p => !deletedProjSet.has(p.id))
         .map(p => {
           const localProj = (current.projects || []).find(x => x.id === p.id);
           const expensesFromRemote = (p.expenses || []).map(e => ({
@@ -832,14 +797,20 @@ const _syncFromSupabaseImpl = async () => {
             handoverDate: localProj?.handoverDate || 'ডিসেম্বর ২০২৮',
             pricePerSqft: Number(p.price_per_sqft) || localProj?.pricePerSqft || 0,
             pricingMode: p.pricing_mode || localProj?.pricingMode || 'both',
+            packageIncludes: localProj?.packageIncludes || 'ফ্ল্যাট + ল্যান্ড শেয়ার',
+            hasParking: localProj?.hasParking !== undefined ? localProj.hasParking : false,
+            landPrice: localProj?.landPrice || 0,
+            constructionPrice: localProj?.constructionPrice || 0,
             units: (p.units && p.units.length > 0) ? p.units : (localProj?.units || []),
             expenses: expensesFromRemote.length > 0 ? expensesFromRemote : (localProj?.expenses || [])
           };
         });
-      // Retain any locally added projects that aren't yet in Supabase, excluding deleted ones
-      const extraLocalProjects = (current.projects || [])
-        .filter(lp => !deletedIds.has(lp.id) && !projectsRes.data.some(p => p.id === lp.id));
-      updated.projects = [...updated.projects, ...extraLocalProjects];
+
+      // ONLY retain locally added projects that are explicitly marked as pending sync
+      // and NOT in tombstones. Stale projects from localStorage are NEVER resurrected!
+      const pendingLocalProjects = (current.projects || [])
+        .filter(lp => lp._isPendingSync && !deletedProjSet.has(lp.id) && !projectsRes.data.some(p => p.id === lp.id));
+      updated.projects = [...updated.projects, ...pendingLocalProjects];
     }
 
     if (clientsRes.data && clientsRes.data.length > 0) {
@@ -1333,13 +1304,35 @@ export const formatBDT = (num) => {
   return '৳ ' + val.toLocaleString('bn-BD');
 };
 
-// Delete a project and its expenses from Supabase Cloud
+// Delete a project and its expenses from Supabase Cloud and record tombstone
 export const deleteProjectFromSupabase = async (projId) => {
   try {
     if (!projId) return;
     await supabase.from('clients').update({ project_id: null }).eq('project_id', projId);
     await supabase.from('project_expenses').delete().eq('project_id', projId);
     await supabase.from('projects').delete().eq('id', projId);
+
+    // Record tombstone in central database so all other devices purge this project immediately
+    const { data: tombstoneRow } = await supabase.from('admins').select('permissions').eq('id', 'SYSTEM-DELETED-IDS').maybeSingle();
+    const currentDeleted = Array.isArray(tombstoneRow?.permissions?.deletedProjectIds) ? tombstoneRow.permissions.deletedProjectIds : [];
+    const updatedDeleted = Array.from(new Set([...currentDeleted, projId]));
+    
+    await supabase.from('admins').upsert({
+      id: 'SYSTEM-DELETED-IDS',
+      name: 'System Deleted Records Tombstones',
+      name_en: 'System Tombstones',
+      email: 'tombstones@alemarahproperties.com',
+      phone: '01816233013',
+      role: 'system_tombstones',
+      role_type: 'system_tombstones',
+      access_key: 'system_tombstones',
+      is_super_admin: false,
+      permissions: {
+        ...(tombstoneRow?.permissions || {}),
+        deletedProjectIds: updatedDeleted
+      },
+      status: 'সক্রিয়'
+    }, { onConflict: 'id' });
   } catch (err) {
     console.error('Error deleting project from Supabase:', err);
   }
@@ -1362,6 +1355,27 @@ export const deleteInvestmentOfferFromSupabase = async (offerId) => {
     if (!offerId) return;
     await supabase.from('investors').delete().eq('offer_id', offerId);
     await supabase.from('investment_offers').delete().eq('id', offerId);
+
+    const { data: tombstoneRow } = await supabase.from('admins').select('permissions').eq('id', 'SYSTEM-DELETED-IDS').maybeSingle();
+    const currentDeleted = Array.isArray(tombstoneRow?.permissions?.deletedOfferIds) ? tombstoneRow.permissions.deletedOfferIds : [];
+    const updatedDeleted = Array.from(new Set([...currentDeleted, offerId]));
+
+    await supabase.from('admins').upsert({
+      id: 'SYSTEM-DELETED-IDS',
+      name: 'System Deleted Records Tombstones',
+      name_en: 'System Tombstones',
+      email: 'tombstones@alemarahproperties.com',
+      phone: '01816233013',
+      role: 'system_tombstones',
+      role_type: 'system_tombstones',
+      access_key: 'system_tombstones',
+      is_super_admin: false,
+      permissions: {
+        ...(tombstoneRow?.permissions || {}),
+        deletedOfferIds: updatedDeleted
+      },
+      status: 'সক্রিয়'
+    }, { onConflict: 'id' });
   } catch (err) {
     console.error('Error deleting investment offer from Supabase:', err);
   }
