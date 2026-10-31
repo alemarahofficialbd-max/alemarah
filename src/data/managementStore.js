@@ -211,6 +211,28 @@ export const initialManagementData = {
       }
     },
     {
+      id: 'AL-JOB-2026-10002',
+      applicantName: 'MD. KAMRUL ISLAM',
+      phone: '01856416900',
+      email: 'kamrulislam3276@yahoo.com',
+      district: '৫৫/বি (নোয়াখালী টাওয়ার), পুরানা পল্টন, ঢাকা-১০০০',
+      education: 'BA(Hons) English / BBA (ডিপ্লোমা ইন কম্পিউটার)',
+      submittedPosition: 'হিসাব ও প্রশাসন কর্মকর্তা',
+      status: 'নতুন আবেদন',
+      appliedDateBn: '২৭ অক্টোবর, ২০২৬',
+      interviewDate: '',
+      interviewTime: '',
+      interviewLocation: 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা',
+      requiredDocuments: 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
+      adminNotes: 'দ্বিতীয় আবেদন (একই প্রার্থীর হিসাব ও প্রশাসন পদে দ্বিতীয় আবেদন)',
+      cvFile: {
+        name: 'cv_AL-JOB-2026-10002_1793095801371.pdf',
+        size: 191707,
+        type: 'application/pdf',
+        url: 'https://tlsvuljssxuwewrsfhue.supabase.co/storage/v1/object/public/resumes/candidates/cv_AL-JOB-2026-10002_1793095801371.pdf'
+      }
+    },
+    {
       id: 'AL-JOB-2026-1001',
       applicantName: 'Masudur Rahman (Golam Mostofa)',
       phone: '01610422196',
