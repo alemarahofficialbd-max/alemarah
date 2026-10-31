@@ -299,9 +299,14 @@ export default function ClientModal({
                             const flatNo = e.target.value;
                             if (effectivePricingMode === 'sqft') {
                               const picked = projectUnits.find(u => u.name === flatNo);
-                              const sqft = picked?.sizeSqft || '';
-                              const rate = Number(selProj?.pricePerSqft) || 0;
-                              updateUnit(idx, { flatNo, sizeSqft: sqft, totalPrice: String((Number(sqft) || 0) * rate) });
+                              const sqft = picked?.sizeSqft || unit.sizeSqft || '';
+                              const currentRate = Number(unit.ratePerSqft || selProj?.pricePerSqft) || 0;
+                              updateUnit(idx, { 
+                                flatNo, 
+                                sizeSqft: sqft, 
+                                ratePerSqft: unit.ratePerSqft || (selProj?.pricePerSqft ? String(selProj.pricePerSqft) : ''),
+                                totalPrice: currentRate > 0 && sqft ? String(Math.round(Number(sqft) * currentRate)) : unit.totalPrice 
+                              });
                             } else {
                               updateUnit(idx, { flatNo });
                             }
@@ -359,11 +364,14 @@ export default function ClientModal({
                             type="button"
                             onClick={() => {
                               const picked = projectUnits.find(u => u.name === unit.flatNo);
+                              const sqft = picked?.sizeSqft || unit.sizeSqft || '';
+                              const currentRate = Number(unit.ratePerSqft || selProj?.pricePerSqft) || 0;
                               updateUnit(idx, {
                                 pricingMode: 'sqft',
-                                sizeSqft: picked?.sizeSqft || unit.sizeSqft || '',
-                                totalPrice: picked?.sizeSqft
-                                  ? String(Number(picked.sizeSqft) * (Number(selProj?.pricePerSqft) || 0))
+                                sizeSqft: sqft,
+                                ratePerSqft: unit.ratePerSqft || (selProj?.pricePerSqft ? String(selProj.pricePerSqft) : ''),
+                                totalPrice: currentRate > 0 && sqft
+                                  ? String(Math.round(Number(sqft) * currentRate))
                                   : unit.totalPrice
                               });
                             }}
@@ -380,10 +388,10 @@ export default function ClientModal({
                     )}
 
                     {effectivePricingMode === 'sqft' ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                           <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            সাইজ (বর্গফুট)
+                            সাইজ (বর্গফুট) *
                           </label>
                           <input
                             type="number"
@@ -391,27 +399,54 @@ export default function ClientModal({
                             value={unit.sizeSqft}
                             onChange={(e) => {
                               const sqft = e.target.value;
-                              const rate = Number(selProj?.pricePerSqft) || 0;
-                              updateUnit(idx, { sizeSqft: sqft, totalPrice: String((Number(sqft) || 0) * rate) });
+                              const rate = Number(unit.ratePerSqft || selProj?.pricePerSqft) || 0;
+                              updateUnit(idx, { 
+                                sizeSqft: sqft, 
+                                totalPrice: rate > 0 && sqft ? String(Math.round(Number(sqft) * rate)) : unit.totalPrice 
+                              });
                             }}
                             className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
                             required
                           />
-                          <span className="text-[10px] text-slate-500 mt-1 block">
-                            রেট: প্রতি বর্গফুট ৳{Number(selProj?.pricePerSqft) || 0}
+                        </div>
+                        <div>
+                          <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            প্রতি বর্গফুট রেট (টাকা) *
+                          </label>
+                          <input
+                            type="number"
+                            placeholder={selProj?.pricePerSqft ? `বেস: ৳${selProj.pricePerSqft}` : "যেমন: 8500"}
+                            value={unit.ratePerSqft}
+                            onChange={(e) => {
+                              const rate = e.target.value;
+                              const sqft = Number(unit.sizeSqft) || 0;
+                              updateUnit(idx, { 
+                                ratePerSqft: rate, 
+                                totalPrice: rate && sqft > 0 ? String(Math.round(Number(rate) * sqft)) : unit.totalPrice 
+                              });
+                            }}
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                            required
+                          />
+                          <span className="text-[10px] text-slate-500 mt-0.5 block truncate">
+                            (রাস্তার পাশে / ভেতরে রেট)
                           </span>
                         </div>
                         <div>
                           <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            মোট দাম (স্বয়ংক্রিয়)
+                            মোট ফ্ল্যাট মূল্য (টাকা) *
                           </label>
                           <input
                             type="number"
+                            placeholder="মোট মূল্য"
                             value={unit.totalPrice}
                             onChange={(e) => updateUnit(idx, { totalPrice: e.target.value })}
-                            className="w-full bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none focus:border-[#CE2028]"
+                            className="w-full bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 outline-none focus:border-[#CE2028]"
                             required
                           />
+                          <span className="text-[10px] text-emerald-700 font-semibold mt-0.5 block truncate">
+                            স্বয়ংক্রিয় হিসাব (পরিবর্তনযোগ্য)
+                          </span>
                         </div>
                       </div>
                     ) : (

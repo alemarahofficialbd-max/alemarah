@@ -158,20 +158,19 @@ export default function AddProjectModal({
 
             {form.pricingMode !== 'package' && (
               <div>
-                <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  প্রতি বর্গফুট দাম (টাকা) — স্কয়ারফিট মোডে বিক্রির জন্য *
+                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  গড় / বেস প্রতি স্কয়ার ফিট দাম (টাকা) — ঐচ্ছিক
                 </label>
                 <input
                   type="number"
-                  placeholder="যেমন: 9500"
+                  placeholder="যেমন: 8500 (ফাঁকা রাখলেও সমস্যা নেই)"
                   value={form.pricePerSqft}
                   onChange={(e) => setForm({ ...form, pricePerSqft: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-[#CE2028] focus:border-[#CE2028] transition-all"
-                  required
                 />
-                <p className="text-3xs text-slate-400 mt-1">
-                  ক্লায়েন্টকে স্কয়ারফিট হিসাবে বিক্রি করলে এই রেট দিয়ে দাম হিসাব হবে (সাইজ × রেট)।
-                </p>
+                <div className="mt-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 text-3xs leading-relaxed">
+                  💡 <strong>ফ্ল্যাট ভেদে আলাদা রেট:</strong> একেক ফ্ল্যাটের দাম একেক রকম হয় — যেমন রাস্তার পাশের ফ্ল্যাট বা কর্নার ইউনিটে বেশি রেট, আবার ভেতরের ফ্ল্যাটে আলাদা রেট হতে পারে। তাই এখানে পুরো প্রজেক্টের একটিমাত্র ফিক্সড রেট দেওয়া বাধ্যতামূলক নয়। ক্লায়েন্টকে ফ্ল্যাট বরাদ্দ করার সময় প্রতিটি ফ্ল্যাটের নির্দিষ্ট রেট (যেমন: রাস্তার পাশে ১০,৫০০ বা ভেতরে ৮,৫০০) আলাদাভাবে বসাতে পারবেন।
+                </div>
               </div>
             )}
 

@@ -414,6 +414,7 @@ export default function ManagementDashboard({
     landPrice: '',
     constructionPrice: '',
     sizeSqft: '',
+    ratePerSqft: '',
     totalPrice: '',
     initialPaid: '',
     nextDueDate: '১৫ নভেম্বর, ২০২৬',
@@ -716,6 +717,7 @@ export default function ManagementDashboard({
       landPrice: finalPricingMode === 'sqft' ? 0 : (Number(unit.landPrice) || 0),
       constructionPrice: finalPricingMode === 'sqft' ? 0 : (Number(unit.constructionPrice) || 0),
       sizeSqft: finalPricingMode === 'sqft' ? (Number(unit.sizeSqft) || 0) : 0,
+      ratePerSqft: finalPricingMode === 'sqft' ? (Number(unit.ratePerSqft) || 0) : 0,
       totalPrice: Number(unit.totalPrice) || 0,
       totalPaid: initialPaidNum,
       nextDueDate: unit.nextDueDate || '',
@@ -949,10 +951,7 @@ export default function ManagementDashboard({
       alert('প্রজেক্টের নাম ও আনুমানিক বাজেট পূরণ করুন।');
       return;
     }
-    if (projectForm.pricingMode !== 'package' && !projectForm.pricePerSqft) {
-      alert('স্কয়ারফিট মোড অনুমোদিত করায় প্রতি বর্গফুট দাম দিতে হবে।');
-      return;
-    }
+// pricePerSqft is optional; individual flats have their own per-sqft rate
 
     // Auto-generate units only if opted-in
     let generatedUnits = [];
