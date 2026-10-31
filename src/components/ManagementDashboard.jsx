@@ -2818,7 +2818,7 @@ export default function ManagementDashboard({
               </div>
 
               {/* Desktop Table View (Tablets & Desktops) */}
-              <div className="hidden md:block overflow-x-auto">
+              <div className="hidden md:block overflow-x-auto md:overflow-visible min-h-[320px]">
                 <table className="w-full text-left text-xs sm:text-sm">
                   <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 uppercase font-bold text-xs">
                     <tr>
@@ -3882,7 +3882,7 @@ export default function ManagementDashboard({
 
 
             {/* Director Management: Mobile Expandable Cards + Desktop Full Table */}
-            <div className="space-y-3 mt-4 md:space-y-0 md:bg-white md:rounded-3xl md:border md:border-slate-200/90 md:shadow-xs md:overflow-hidden md:mt-6">
+            <div className="space-y-3 mt-4 md:space-y-0 md:bg-white md:rounded-3xl md:border md:border-slate-200/90 md:shadow-xs md:overflow-visible md:mt-6 pb-6">
               <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white md:bg-slate-50/50 rounded-2xl md:rounded-none border border-slate-100 md:border-0 shadow-2xs md:shadow-none">
                 <div>
                   <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
@@ -4091,7 +4091,7 @@ export default function ManagementDashboard({
               </div>
 
               {/* 2. DESKTOP-ONLY VIEW: Full Width Spreadsheet Table */}
-              <div className="hidden md:block overflow-x-auto">
+              <div className="hidden md:block overflow-x-auto md:overflow-visible min-h-[320px]">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-100/70 border-b border-slate-200/80 text-slate-600 font-bold uppercase tracking-wider text-3xs">
                     <tr>
@@ -4167,106 +4167,122 @@ export default function ManagementDashboard({
                           )}
                         </td>
                         <td className="py-3 px-4 text-right">
-                          <div className="inline-flex items-center space-x-1.5 justify-end">
-                            {/* 1. Quick Add Capital Installment Button */}
+                          {/* 3-Dot Action Dropdown Menu Containing Capital Deposit, Dividend Pay & More */}
+                          <div className="relative inline-flex items-center justify-end">
                             <button
-                              onClick={() => {
-                                setCapitalDepositTargetDirector(dir);
-                                setCapitalDepositForm({
-                                  amount: '',
-                                  date: new Date().toISOString().split('T')[0],
-                                  method: 'ব্যাংক চেক',
-                                  receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
-                                  note: 'মূলধনের কিস্তি জমা'
-                                });
-                                setIsCapitalDepositModalOpen(true);
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenActionMenuId(openActionMenuId === dir.id ? null : dir.id);
                               }}
-                              title="ভেঙে ভেঙে বা পরবর্তীতে নতুন মূলধন বিনিয়োগ যোগ করুন"
-                              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006231] font-bold text-2xs border border-emerald-200 cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
+                              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/90 transition-all cursor-pointer border border-slate-200 shadow-2xs flex items-center space-x-1 active:scale-95"
+                              title="কার্যক্রম ও অপশনসমূহ"
                             >
-                              <Plus className="w-3.5 h-3.5 text-[#006231]" />
-                              <span>+ মূলধন জমা</span>
+                              <span className="hidden sm:inline text-2xs font-bold text-slate-700">অ্যাকশন</span>
+                              <MoreVertical className="w-4 h-4 text-slate-600" />
                             </button>
 
-                            {/* 2. Quick Dividend Pay Button */}
-                            <button
-                              onClick={() => {
-                                setDividendTargetDirector(dir);
-                                setDividendForm({
-                                  amount: '',
-                                  date: new Date().toISOString().split('T')[0],
-                                  method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
-                                  voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
-                                  note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
-                                });
-                                setIsDividendModalOpen(true);
-                              }}
-                              title="লভ্যাংশ / ডিভিডেন্ড প্রদান করুন"
-                              className="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold text-2xs border border-purple-200 cursor-pointer shadow-2xs inline-flex items-center space-x-1 transition-all active:scale-95"
-                            >
-                              <TrendingUp className="w-3.5 h-3.5 text-purple-600" />
-                              <span>লভ্যাংশ পে</span>
-                            </button>
+                            {openActionMenuId === dir.id && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-30"
+                                  onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
+                                />
+                                <div
+                                  onClick={(e) => e.stopPropagation()}
+                                  className={`absolute right-0 w-60 bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-1.5 z-40 animate-fadeIn text-xs divide-y divide-slate-100 ${
+                                    idx >= directorsList.length - 2 && directorsList.length > 3 ? 'bottom-full mb-1.5' : 'top-full mt-1.5'
+                                  }`}
+                                >
+                                  {/* Quick Actions Group: Capital Deposit & Dividend Pay */}
+                                  <div className="py-1">
+                                    {/* 1. মূলধন জমা */}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setOpenActionMenuId(null);
+                                        setCapitalDepositTargetDirector(dir);
+                                        setCapitalDepositForm({
+                                          amount: '',
+                                          date: new Date().toISOString().split('T')[0],
+                                          method: 'ব্যাংক চেক',
+                                          receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
+                                          note: 'মূলধনের কিস্তি জমা'
+                                        });
+                                        setIsCapitalDepositModalOpen(true);
+                                      }}
+                                      className="w-full px-3.5 py-2.5 text-left hover:bg-emerald-50/80 flex items-center space-x-2.5 text-[#006231] font-bold transition-colors cursor-pointer group"
+                                    >
+                                      <div className="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-[#006231] shrink-0 group-hover:bg-[#006231] group-hover:text-white transition-colors">
+                                        <Plus className="w-3.5 h-3.5" />
+                                      </div>
+                                      <span>+ মূলধন জমা</span>
+                                    </button>
 
-                            {/* 3-Dot menu: share certificate, full profile, admin access */}
-                            <div className="relative">
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setOpenActionMenuId(openActionMenuId === dir.id ? null : dir.id);
-                                }}
-                                className="p-1.5 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-slate-200"
-                                title="আরও অপশন"
-                              >
-                                <MoreVertical className="w-4 h-4" />
-                              </button>
+                                    {/* 2. লভ্যাংশ পে */}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setOpenActionMenuId(null);
+                                        setDividendTargetDirector(dir);
+                                        setDividendForm({
+                                          amount: '',
+                                          date: new Date().toISOString().split('T')[0],
+                                          method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
+                                          voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
+                                          note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
+                                        });
+                                        setIsDividendModalOpen(true);
+                                      }}
+                                      className="w-full px-3.5 py-2.5 text-left hover:bg-purple-50/80 flex items-center space-x-2.5 text-purple-900 font-bold transition-colors cursor-pointer group"
+                                    >
+                                      <div className="w-6 h-6 rounded-lg bg-purple-100 flex items-center justify-center text-purple-700 shrink-0 group-hover:bg-purple-700 group-hover:text-white transition-colors">
+                                        <TrendingUp className="w-3.5 h-3.5" />
+                                      </div>
+                                      <span>লভ্যাংশ পে</span>
+                                    </button>
+                                  </div>
 
-                              {openActionMenuId === dir.id && (
-                                <>
-                                  <div
-                                    className="fixed inset-0 z-20"
-                                    onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
-                                  />
-                                  <div
-                                    onClick={(e) => e.stopPropagation()}
-                                    className={`absolute right-0 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 animate-fadeIn text-xs ${
-                                      idx >= directorsList.length - 2 && directorsList.length > 1 ? 'bottom-full mb-1.5' : 'top-full mt-1.5'
-                                    }`}
-                                  >
+                                  {/* Secondary Actions Group */}
+                                  <div className="py-1">
+                                    {/* 3. শেয়ার সনদ */}
                                     <button
                                       type="button"
                                       onClick={() => { setOpenActionMenuId(null); setSelectedDirectorForCertificate(dir); }}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
+                                      className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2.5 text-slate-700 font-bold transition-colors cursor-pointer"
                                     >
-                                      <Award className="w-3.5 h-3.5 text-amber-600" />
-                                      <span>শেয়ার সনদ</span>
+                                      <Award className="w-4 h-4 text-amber-600 shrink-0" />
+                                      <span>শেয়ার সনদপত্র</span>
                                     </button>
+
+                                    {/* 4. হিসাব খাতা ও প্রোফাইল */}
                                     <button
                                       type="button"
                                       onClick={() => { setOpenActionMenuId(null); setSelectedDirectorForProfile(dir); setDirectorProfileActiveTab('dividends'); }}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
+                                      className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2.5 text-slate-700 font-bold transition-colors cursor-pointer"
                                     >
-                                      <Eye className="w-3.5 h-3.5 text-slate-700" />
-                                      <span>হিসাব খাতা</span>
+                                      <Eye className="w-4 h-4 text-slate-600 shrink-0" />
+                                      <span>হিসাব খাতা ও প্রোফাইল</span>
                                     </button>
+
+                                    {/* 5. অ্যাডমিন এক্সেস */}
                                     {isSuperAdmin && (() => {
                                       const hasTeamAccess = (data.managementTeam || []).some(m => m.directorId === dir.id || m.phone === dir.phone);
                                       return (
                                         <button
                                           type="button"
                                           onClick={() => { setOpenActionMenuId(null); handleGrantDirectorAccess(dir); }}
-                                          className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-[#006231] font-bold transition-colors cursor-pointer"
+                                          className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2.5 text-[#006231] font-bold transition-colors cursor-pointer"
                                         >
-                                          <KeyRound className="w-3.5 h-3.5" />
+                                          <KeyRound className="w-4 h-4 text-[#006231] shrink-0" />
                                           <span>{hasTeamAccess ? 'পারমিশন পরিবর্তন' : 'অ্যাডমিন এক্সেস'}</span>
                                         </button>
                                       );
                                     })()}
                                   </div>
-                                </>
-                              )}
-                            </div>
+                                </div>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -6719,7 +6735,7 @@ export default function ManagementDashboard({
                     </div>
 
                     {/* Desktop Table View (>= md screens) */}
-                    <div className="hidden md:block overflow-x-auto">
+                    <div className="hidden md:block overflow-x-auto md:overflow-visible min-h-[320px]">
                       <table className="w-full text-left text-xs">
                         <thead>
                           <tr className="border-b border-slate-100 bg-slate-50/70 text-3xs font-extrabold uppercase tracking-wider text-slate-400">
