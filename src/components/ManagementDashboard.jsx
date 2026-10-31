@@ -624,6 +624,7 @@ export default function ManagementDashboard({
 
   // 6. Board Director Form, Profile, Certificate, Capital Deposit, and Dividend Modals
   const [isDirectorModalOpen, setIsDirectorModalOpen] = useState(false);
+  const [editingDirector, setEditingDirector] = useState(null);
   const [expandedDirectors, setExpandedDirectors] = useState({});
   const [selectedDirectorForProfile, setSelectedDirectorForProfile] = useState(null);
   const [selectedDirectorForCertificate, setSelectedDirectorForCertificate] = useState(null);
@@ -1584,6 +1585,71 @@ export default function ManagementDashboard({
     const currentDirectors = data.directors || [];
     const invAmt = Number(directorForm.investment) || 0;
     const sharePct = Number(directorForm.sharePercentage) || 0;
+
+    if (editingDirector) {
+      const otherDirectors = currentDirectors.filter(d => d.id !== editingDirector.id);
+      const otherShareTotal = otherDirectors.reduce((acc, d) => acc + (Number(d.sharePercentage) || 0), 0);
+      if (otherShareTotal + sharePct > 100) {
+        alert(`মোট শেয়ার ১০০% অতিক্রম করবে (অন্যান্য পরিচালকদের মোট: ${otherShareTotal}%, আপনার নির্ধারিত: ${sharePct}%)। পরিমাণ ঠিক করুন।`);
+        return;
+      }
+
+      updateStore((prev) => ({
+        ...prev,
+        directors: (prev.directors || []).map(d => {
+          if (d.id === editingDirector.id) {
+            return {
+              ...d,
+              name: directorForm.name,
+              role: directorForm.role || d.role,
+              image: directorForm.image !== undefined ? directorForm.image : d.image,
+              investment: invAmt,
+              sharePercentage: sharePct,
+              phone: directorForm.phone || d.phone,
+              email: directorForm.email || d.email,
+              nomineeName: directorForm.nomineeName || d.nomineeName,
+              nomineeRelation: directorForm.nomineeRelation || d.nomineeRelation,
+              nomineePhone: directorForm.nomineePhone || d.nomineePhone
+            };
+          }
+          return d;
+        })
+      }));
+
+      if (selectedDirectorForProfile?.id === editingDirector.id) {
+        setSelectedDirectorForProfile(prev => ({
+          ...prev,
+          name: directorForm.name,
+          role: directorForm.role || prev.role,
+          image: directorForm.image !== undefined ? directorForm.image : prev.image,
+          investment: invAmt,
+          sharePercentage: sharePct,
+          phone: directorForm.phone || prev.phone,
+          email: directorForm.email || prev.email,
+          nomineeName: directorForm.nomineeName || prev.nomineeName,
+          nomineeRelation: directorForm.nomineeRelation || prev.nomineeRelation,
+          nomineePhone: directorForm.nomineePhone || prev.nomineePhone
+        }));
+      }
+
+      setIsDirectorModalOpen(false);
+      setEditingDirector(null);
+      setDirectorForm({
+        name: '',
+        image: null,
+        role: 'পরিচালক',
+        investment: '',
+        sharePercentage: '',
+        phone: '',
+        email: '',
+        nomineeName: '',
+        nomineeRelation: '',
+        nomineePhone: ''
+      });
+      triggerAlert(`পরিচালক "${directorForm.name}"-এর তথ্য সফলভাবে আপডেট হয়েছে!`);
+      return;
+    }
+
     const existingShareTotal = currentDirectors.reduce((acc, d) => acc + (Number(d.sharePercentage) || 0), 0);
     if (existingShareTotal + sharePct > 100) {
       alert(`মোট শেয়ার ১০০% অতিক্রম করবে (বর্তমান মোট: ${existingShareTotal}%, নতুন যোগ: ${sharePct}%)। পরিমাণ ঠিক করুন।`);
@@ -1628,6 +1694,7 @@ export default function ManagementDashboard({
     }));
 
     setIsDirectorModalOpen(false);
+    setEditingDirector(null);
     setDirectorForm({
       name: '',
       image: null,
@@ -3889,7 +3956,22 @@ export default function ManagementDashboard({
                 <div className="flex items-center space-x-2">
                   {isSuperAdmin && (
                     <button
-                      onClick={() => setIsDirectorModalOpen(true)}
+                      onClick={() => {
+                        setEditingDirector(null);
+                        setDirectorForm({
+                          name: '',
+                          image: null,
+                          role: 'পরিচালক',
+                          investment: '',
+                          sharePercentage: '',
+                          phone: '',
+                          email: '',
+                          nomineeName: '',
+                          nomineeRelation: '',
+                          nomineePhone: ''
+                        });
+                        setIsDirectorModalOpen(true);
+                      }}
                       className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-[#006231]/20 hover:opacity-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
                     >
                       <Plus className="w-4 h-4" />
@@ -4480,7 +4562,33 @@ export default function ManagementDashboard({
                                       );
                                     })()}
 
-                                    {/* 6. ডিরেক্টর ডিলিট করুন */}
+                                    {/* 6. তথ্য এডিট করুন */}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setOpenActionMenuId(null);
+                                        setEditingDirector(dir);
+                                        setDirectorForm({
+                                          name: dir.name || '',
+                                          image: dir.image || null,
+                                          role: dir.role || 'পরিচালক',
+                                          investment: String(dir.investment || ''),
+                                          sharePercentage: String(dir.sharePercentage || ''),
+                                          phone: dir.phone || '',
+                                          email: dir.email || '',
+                                          nomineeName: dir.nomineeName || '',
+                                          nomineeRelation: dir.nomineeRelation || '',
+                                          nomineePhone: dir.nomineePhone || ''
+                                        });
+                                        setIsDirectorModalOpen(true);
+                                      }}
+                                      className="w-full px-3.5 py-2 text-left hover:bg-blue-50/70 flex items-center space-x-2.5 text-blue-700 font-bold transition-colors cursor-pointer"
+                                    >
+                                      <Edit3 className="w-4 h-4 text-blue-600 shrink-0" />
+                                      <span>তথ্য এডিট করুন</span>
+                                    </button>
+
+                                    {/* 7. ডিরেক্টর ডিলিট করুন */}
                                     {isSuperAdmin && (
                                       <div className="pt-1 mt-1 border-t border-slate-100">
                                         <button
@@ -4867,12 +4975,16 @@ export default function ManagementDashboard({
                 <span className="hidden sm:inline text-xs font-bold">ফিরে যান</span>
               </button>
               <div className="flex items-center space-x-2">
-                <div className="w-9 h-9 rounded-xl bg-red-50 text-[#CE2028] flex items-center justify-center">
-                  <Award className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#006231] flex items-center justify-center">
+                  {editingDirector ? <Edit3 className="w-5 h-5" /> : <Award className="w-5 h-5" />}
                 </div>
                 <div>
-                  <h3 className="font-bold text-base text-slate-900">নতুন বোর্ড ডিরেক্টর এন্ট্রি</h3>
-                  <p className="text-3xs text-slate-500">বোর্ড অব ডিরেক্টরস তালিকায় নতুন শেয়ারহোল্ডার যুক্ত করুন</p>
+                  <h3 className="font-bold text-base text-slate-900">
+                    {editingDirector ? 'পরিচালকের তথ্য সম্পাদনা (Edit Director)' : 'নতুন বোর্ড ডিরেক্টর এন্ট্রি'}
+                  </h3>
+                  <p className="text-3xs text-slate-500">
+                    {editingDirector ? `${editingDirector.name} এর প্রোফাইল ও শেয়ার তথ্য আপডেট করুন` : 'বোর্ড অব ডিরেক্টরস তালিকায় নতুন শেয়ারহোল্ডার যুক্ত করুন'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -4993,7 +5105,7 @@ export default function ManagementDashboard({
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-center">
                   <span className="text-3xs font-bold text-slate-400 uppercase">শেয়ার সার্টিফিকেট / ফোলিও নং</span>
                   <span className="font-mono text-xs font-bold text-[#006231] mt-0.5">
-                    DIR-{String((data.directors || []).length + 1).padStart(3, '0')}
+                    {editingDirector ? (editingDirector.folioNo || editingDirector.id) : `DIR-${String((data.directors || []).length + 1).padStart(3, '0')}`}
                   </span>
                 </div>
               </div>
@@ -5117,7 +5229,7 @@ export default function ManagementDashboard({
                   type="submit"
                   className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#006231]/25 hover:opacity-95 transition-all cursor-pointer text-center active:scale-95"
                 >
-                  সংরক্ষণ করুন
+                  {editingDirector ? 'পরিবর্তন সংরক্ষণ করুন' : 'সংরক্ষণ করুন'}
                 </button>
               </div>
             </form>
@@ -5176,6 +5288,31 @@ export default function ManagementDashboard({
               </div>
 
               <div className="flex items-center space-x-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingDirector(d);
+                    setDirectorForm({
+                      name: d.name || '',
+                      image: d.image || null,
+                      role: d.role || 'পরিচালক',
+                      investment: String(d.investment || ''),
+                      sharePercentage: String(d.sharePercentage || ''),
+                      phone: d.phone || '',
+                      email: d.email || '',
+                      nomineeName: d.nomineeName || '',
+                      nomineeRelation: d.nomineeRelation || '',
+                      nomineePhone: d.nomineePhone || ''
+                    });
+                    setIsDirectorModalOpen(true);
+                  }}
+                  className="px-3 sm:px-4 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 transition-colors cursor-pointer text-xs font-bold flex items-center space-x-1.5"
+                  title="তথ্য এডিট করুন"
+                >
+                  <Edit3 className="w-4 h-4 text-blue-400" />
+                  <span>তথ্য এডিট</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {
