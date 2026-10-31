@@ -270,14 +270,6 @@ export const translations = {
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
             image: "/images/taneem_mahfuj.jpg"
-          },
-          {
-            id: "dir_al_amin",
-            name: "Al Amin Hawlader",
-            role: "Director",
-            organization: "Al-Emarah Properties",
-            education: "Entrepreneur & Director, Al-Emarah Properties",
-            image: "/images/al_amin_hawladar.jpg"
           }
         ]
       },
@@ -1118,14 +1110,6 @@ export const translations = {
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
             image: "/images/taneem_mahfuj.jpg"
-          },
-          {
-            id: "dir_al_amin",
-            name: "আল আমিন হাওলাদার",
-            role: "পরিচালক",
-            organization: "আল-ইমারাহ প্রোপার্টিজ",
-            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
-            image: "/images/al_amin_hawladar.jpg"
           }
         ]
       },

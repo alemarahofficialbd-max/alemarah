@@ -271,8 +271,8 @@ export default function AboutUs({ lang, t }) {
             </p>
           </div>
 
-          {/* Unified Grid: All Executive Committee Members (5 members) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+          {/* Unified Grid: All Executive Committee Members (4 members) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {(t.about.board?.members || []).map((member) => (
               <div 
                 key={member.id}
