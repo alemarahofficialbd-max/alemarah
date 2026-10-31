@@ -1237,12 +1237,14 @@ export default function ManagementDashboard({
     requestProtectedDelete(
       `প্রজেক্ট "${projName}" মুছে ফেলা`,
       `আপনি কি নিশ্চিতভাবে "${projName}" প্রজেক্টটি এবং এর সকল ডাটা মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
-      () => {
+      async () => {
         updateStore((prev) => ({
           ...prev,
-          projects: prev.projects.filter(p => p.id !== projId)
+          projects: (prev.projects || []).filter(p => p.id !== projId),
+          deletedProjectIds: [...new Set([...(prev.deletedProjectIds || []), projId])],
+          clients: (prev.clients || []).map(c => c.projectId === projId ? { ...c, projectId: null } : c)
         }));
-        deleteProjectFromSupabase(projId);
+        await deleteProjectFromSupabase(projId);
         triggerAlert(`প্রজেক্ট "${projName}" সফলভাবে মুছে ফেলা হয়েছে!`);
       }
     );

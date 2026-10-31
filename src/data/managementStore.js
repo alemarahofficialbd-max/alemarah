@@ -347,25 +347,22 @@ export const getManagementData = () => {
           parsed.directors.filter(d => !canonicalDirs.some(c => c.id === d.id))
         );
       }
-      if (!parsed.projects || parsed.projects.length === 0) {
+      if (!parsed.projects) {
         parsed.projects = initialManagementData.projects;
       } else {
-        // Ensure standard company projects exist
-        initialManagementData.projects.forEach(initP => {
-          if (!parsed.projects.some(p => p.id === initP.id)) {
-            parsed.projects.push(initP);
-          }
-        });
-        parsed.projects = parsed.projects.map(p => {
-          const initP = initialManagementData.projects.find(x => x.id === p.id);
-          return {
-            ...p,
-            type: p.type || initP?.type || 'residential',
-            totalFloors: p.totalFloors || initP?.totalFloors || 10,
-            unitsPerFloor: p.unitsPerFloor || initP?.unitsPerFloor || 2,
-            units: (p.units && p.units.length > 0) ? p.units : (initP?.units || [])
-          };
-        });
+        const deletedIds = new Set(parsed.deletedProjectIds || []);
+        parsed.projects = parsed.projects
+          .filter(p => !deletedIds.has(p.id))
+          .map(p => {
+            const initP = initialManagementData.projects.find(x => x.id === p.id);
+            return {
+              ...p,
+              type: p.type || initP?.type || 'residential',
+              totalFloors: p.totalFloors || initP?.totalFloors || 10,
+              unitsPerFloor: p.unitsPerFloor || initP?.unitsPerFloor || 2,
+              units: (p.units && p.units.length > 0) ? p.units : (initP?.units || [])
+            };
+          });
       }
       if (!parsed.superAdmin) {
         parsed.superAdmin = initialManagementData.superAdmin;
@@ -534,15 +531,16 @@ export const syncToSupabase = async (data) => {
 
     // 4. Sync Customers (login identity - saved locally and via clients table)
 
-    // 4b. Sync Client Units & Payment History
+    // 4b. Sync Client Units & Payment History (with FK safety check)
     if (data.clients && data.clients.length > 0) {
+      const validProjectIds = new Set((data.projects || []).map(p => p.id));
       const clientRows = data.clients.map(c => ({
         id: c.id,
         customer_id: c.customerId || null,
         name: c.name,
         phone: c.phone || '',
         password: c.password || 'password123',
-        project_id: c.projectId || null,
+        project_id: (c.projectId && validProjectIds.has(c.projectId)) ? c.projectId : null,
         project_name: c.projectName || '',
         flat_no: c.flatNo || '',
         total_price: Number(c.totalPrice) || 0,
@@ -787,37 +785,38 @@ const _syncFromSupabaseImpl = async () => {
     }
 
     if (projectsRes.data) {
-      updated.projects = projectsRes.data.map(p => {
-        const localProj = (current.projects || []).find(x => x.id === p.id);
-        const expensesFromRemote = (p.expenses || []).map(e => ({
-          id: e.id,
-          title: e.title,
-          amount: Number(e.amount) || 0,
-          date: e.date
-        }));
-        return {
-          id: p.id,
-          name: p.name,
-          nameEn: p.name_en,
-          location: p.location,
-          progress: p.progress,
-          currentStage: p.current_stage,
-          budget: Number(p.budget) || 0,
-          type: localProj?.type || 'residential',
-          totalFloors: localProj?.totalFloors || 10,
-          unitsPerFloor: localProj?.unitsPerFloor || 2,
-          handoverDate: localProj?.handoverDate || 'ডিসেম্বর ২০২৮',
-          pricePerSqft: Number(p.price_per_sqft) || localProj?.pricePerSqft || 0,
-          pricingMode: p.pricing_mode || localProj?.pricingMode || 'both',
-          units: (p.units && p.units.length > 0) ? p.units : (localProj?.units || []),
-          expenses: expensesFromRemote.length > 0 ? expensesFromRemote : (localProj?.expenses || [])
-        };
-      });
-      // Retain any locally added projects that aren't yet in Supabase (e.g.
-      // the cloud insert hasn't landed yet, or briefly failed) -- otherwise
-      // a project you just created disappears the moment a realtime refresh
-      // pulls the remote list and overwrites it wholesale.
-      const extraLocalProjects = (current.projects || []).filter(lp => !projectsRes.data.some(p => p.id === lp.id));
+      const deletedIds = new Set(current.deletedProjectIds || []);
+      updated.projects = projectsRes.data
+        .filter(p => !deletedIds.has(p.id))
+        .map(p => {
+          const localProj = (current.projects || []).find(x => x.id === p.id);
+          const expensesFromRemote = (p.expenses || []).map(e => ({
+            id: e.id,
+            title: e.title,
+            amount: Number(e.amount) || 0,
+            date: e.date
+          }));
+          return {
+            id: p.id,
+            name: p.name,
+            nameEn: p.name_en,
+            location: p.location,
+            progress: p.progress,
+            currentStage: p.current_stage,
+            budget: Number(p.budget) || 0,
+            type: localProj?.type || 'residential',
+            totalFloors: localProj?.totalFloors || 10,
+            unitsPerFloor: localProj?.unitsPerFloor || 2,
+            handoverDate: localProj?.handoverDate || 'ডিসেম্বর ২০২৮',
+            pricePerSqft: Number(p.price_per_sqft) || localProj?.pricePerSqft || 0,
+            pricingMode: p.pricing_mode || localProj?.pricingMode || 'both',
+            units: (p.units && p.units.length > 0) ? p.units : (localProj?.units || []),
+            expenses: expensesFromRemote.length > 0 ? expensesFromRemote : (localProj?.expenses || [])
+          };
+        });
+      // Retain any locally added projects that aren't yet in Supabase, excluding deleted ones
+      const extraLocalProjects = (current.projects || [])
+        .filter(lp => !deletedIds.has(lp.id) && !projectsRes.data.some(p => p.id === lp.id));
       updated.projects = [...updated.projects, ...extraLocalProjects];
     }
 
@@ -1316,6 +1315,7 @@ export const formatBDT = (num) => {
 export const deleteProjectFromSupabase = async (projId) => {
   try {
     if (!projId) return;
+    await supabase.from('clients').update({ project_id: null }).eq('project_id', projId);
     await supabase.from('project_expenses').delete().eq('project_id', projId);
     await supabase.from('projects').delete().eq('id', projId);
   } catch (err) {
