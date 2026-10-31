@@ -296,6 +296,9 @@ export default function App() {
   const navigateTo = (targetPath, addToHistory = true) => {
     const basePageId = targetPath.split('?')[0].split('/')[0];
     setCurrentPage(basePageId);
+    if (basePageId === 'projects' && !targetPath.includes('search=')) {
+      setSearchFilter(null);
+    }
     try {
       localStorage.setItem('alemarah_current_page', basePageId);
     } catch (e) {}
@@ -326,7 +329,7 @@ export default function App() {
 
   const handleSearchFromHero = (filter) => {
     setSearchFilter(filter);
-    navigateTo('projects');
+    navigateTo('projects?search=true');
   };
 
   const handleLoginSuccess = (client) => {
@@ -410,6 +413,7 @@ export default function App() {
               lang={lang}
               t={t}
               searchFilter={searchFilter}
+              onClearSearchFilter={() => setSearchFilter(null)}
               onSelectProject={handleSelectProject}
               onOpenBookVisit={(project) => handleOpenBookVisit(project)}
               featured={true}
@@ -1062,6 +1066,7 @@ export default function App() {
               lang={lang}
               t={t}
               searchFilter={searchFilter}
+              onClearSearchFilter={() => setSearchFilter(null)}
               onSelectProject={handleSelectProject}
               onOpenBookVisit={(project) => handleOpenBookVisit(project)}
               featured={false}

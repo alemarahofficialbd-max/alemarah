@@ -51,7 +51,86 @@ export const verifyPassword = async (plainText, stored) => {
 };
 
 export const initialManagementData = {
-  projects: [],
+  projects: [
+    {
+      id: "al-quds-tower",
+      name: "আল কুদস টাওয়ার",
+      nameEn: "Al Quds Tower",
+      location: "পশ্চিম সানারপাড়, মদিনাবাগ, ৬৬ নং ওয়ার্ড, ডেমরা, ঢাকা",
+      progress: 15,
+      currentStage: "পাইলিং ও ফাউন্ডেশন প্রস্তুতি",
+      budget: 350000000,
+      pricePerSqft: 2800,
+      pricingMode: "both",
+      type: "residential",
+      totalFloors: 14,
+      unitsPerFloor: 6,
+      units: [
+        "২য় তলা, ফ্ল্যাট ২-এ",
+        "২য় তলা, ফ্ল্যাট ২-বি",
+        "৩য় তলা, ফ্ল্যাট ৩-এ",
+        "৩য় তলা, ফ্ল্যাট ৩-বি",
+        "৭ম তলা, ফ্ল্যাট ৭-বি (১২৬৫ বর্গফুট)"
+      ]
+    },
+    {
+      id: "barakah-tower-01",
+      name: "বারাকাহ টাওয়ার ০১",
+      nameEn: "Barakah Tower 01",
+      location: "পুরানা পল্টন / ঢাকা মেট্রোপলিটন",
+      progress: 30,
+      currentStage: "স্ট্রাকচারাল কাস্টিং ও কলাম নির্মাণ",
+      budget: 220000000,
+      pricePerSqft: 3200,
+      pricingMode: "both",
+      type: "residential",
+      totalFloors: 10,
+      unitsPerFloor: 3,
+      units: [
+        "৪র্থ তলা, ফ্ল্যাট ৪-এ",
+        "৪র্থ তলা, ফ্ল্যাট ৪-বি",
+        "৫ম তলা, ফ্ল্যাট ৫-এ"
+      ]
+    },
+    {
+      id: "alemarah-shopping-mall",
+      name: "আল ইমারাহ শপিং মল",
+      nameEn: "Al Emarah Shopping Mall",
+      location: "২২ ফুট প্রশস্ত রাস্তা সংলগ্ন, প্রাইম বাণিজ্যিক জোন, ঢাকা",
+      progress: 5,
+      currentStage: "বাণিজ্যিক লেআউট ও ডিজাইন চূড়ান্তকরণ",
+      budget: 450000000,
+      pricePerSqft: 4500,
+      pricingMode: "both",
+      type: "commercial",
+      totalFloors: 10,
+      unitsPerFloor: 8,
+      units: [
+        "গ্রাউন্ড ফ্লোর - দোকান ০১",
+        "গ্রাউন্ড ফ্লোর - দোকান ০২",
+        "১ম ফ্লোর - কমার্শিয়াল স্পেস"
+      ]
+    },
+    {
+      id: "emarah-agro",
+      name: "ইমারাহ এগ্রো - কৃষি সম্পদ ও কর্মসংস্থান",
+      nameEn: "Emarah Agro Asset Development",
+      location: "আল-ইমারাহ এগ্রো ভ্যালি, ঢাকা সংলগ্ন",
+      progress: 75,
+      currentStage: "উৎপাদন ও ডেইরি ফার্মিং চলমান",
+      budget: 150000000,
+      pricePerSqft: 0,
+      pricingMode: "package",
+      type: "share",
+      totalFloors: 1,
+      unitsPerFloor: 1,
+      units: [
+        "এগ্রো শেয়ার ইউনিট ০১",
+        "এগ্রো শেয়ার ইউনিট ০২",
+        "এগ্রো শেয়ার ইউনিট ০৩"
+      ]
+    }
+  ],
   clients: [],
   superAdmin: {
     id: 'SUPER-ADMIN-01',
@@ -182,6 +261,12 @@ export const getManagementData = () => {
       if (!parsed.projects || parsed.projects.length === 0) {
         parsed.projects = initialManagementData.projects;
       } else {
+        // Ensure standard company projects exist
+        initialManagementData.projects.forEach(initP => {
+          if (!parsed.projects.some(p => p.id === initP.id)) {
+            parsed.projects.push(initP);
+          }
+        });
         parsed.projects = parsed.projects.map(p => {
           const initP = initialManagementData.projects.find(x => x.id === p.id);
           return {

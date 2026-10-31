@@ -18,6 +18,7 @@ export default function Projects({
   lang, 
   t, 
   searchFilter, 
+  onClearSearchFilter,
   onSelectProject, 
   onOpenBookVisit,
   featured = false,
@@ -47,17 +48,16 @@ export default function Projects({
       }
       if (searchFilter.propertyType && searchFilter.propertyType !== 'all') {
         const itemType = (item.typeEn?.toLowerCase() || '') + ' ' + (item.type?.toLowerCase() || '') + ' ' + (item.typeBn?.toLowerCase() || '');
-        if (searchFilter.propertyType === 'commercial' && !itemType.includes('commercial') && !itemType.includes('বাণিজ্যিক')) {
-          return false;
-        }
-        if (searchFilter.propertyType === 'condo' && !itemType.includes('condo')) {
-          return false;
-        }
-        if (searchFilter.propertyType === 'apartment' && (itemType.includes('commercial') || itemType.includes('বাণিজ্যিক'))) {
-          return false;
-        }
-        if (searchFilter.propertyType === 'agro' && !itemType.includes('agro') && !itemType.includes('এগ্রো')) {
-          return false;
+        if (searchFilter.propertyType === 'commercial') {
+          if (!itemType.includes('commercial') && !itemType.includes('বাণিজ্যিক')) return false;
+        } else if (searchFilter.propertyType === 'condo') {
+          if (!itemType.includes('condo')) return false;
+        } else if (searchFilter.propertyType === 'apartment') {
+          if (!itemType.includes('residential') && !itemType.includes('আবাসিক') && !itemType.includes('apartment') && !itemType.includes('ফ্ল্যাট')) {
+            return false;
+          }
+        } else if (searchFilter.propertyType === 'agro') {
+          if (!itemType.includes('agro') && !itemType.includes('এগ্রো')) return false;
         }
       }
     }
@@ -104,10 +104,30 @@ export default function Projects({
             {t.projects.subtitle}
           </p>
 
+          {/* Active Search Filter Banner */}
+          {searchFilter && (
+            <div className="mt-6 mb-2 inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold shadow-xs animate-fadeIn">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span>{lang === 'en' ? 'Filtered view active' : 'অনুসন্ধান ফিল্টার কার্যকর রয়েছে'}</span>
+              <button
+                onClick={() => {
+                  setActiveTab('all');
+                  if (onClearSearchFilter) onClearSearchFilter();
+                }}
+                className="ml-2 px-3 py-1 rounded-xl bg-amber-200/90 hover:bg-amber-300 text-amber-950 font-bold transition-all cursor-pointer"
+              >
+                ✕ {lang === 'en' ? 'Show All Projects' : 'সকল প্রজেক্ট দেখুন'}
+              </button>
+            </div>
+          )}
+
           {/* Category Tabs */}
-          <div className="mt-8 inline-flex p-1.5 rounded-2xl bg-gray-100 border border-gray-200">
+          <div className="mt-6 inline-flex p-1.5 rounded-2xl bg-gray-100 border border-gray-200">
             <button
-              onClick={() => setActiveTab('all')}
+              onClick={() => {
+                setActiveTab('all');
+                if (onClearSearchFilter) onClearSearchFilter();
+              }}
               className={`px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'all'
                   ? 'bg-white text-gray-900 shadow-sm'
@@ -278,10 +298,13 @@ export default function Projects({
               {lang === 'en' ? 'Try adjusting your search filters or view all developments.' : 'ফিল্টার পরিবর্তন করে আবার চেষ্টা করুন অথবা সকল প্রকল্প দেখুন।'}
             </p>
             <button
-              onClick={() => setActiveTab('all')}
-              className="mt-4 px-4 py-2 bg-[#CE2028] text-white text-xs font-bold rounded-lg cursor-pointer"
+              onClick={() => {
+                setActiveTab('all');
+                if (onClearSearchFilter) onClearSearchFilter();
+              }}
+              className="mt-4 px-5 py-2.5 bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer"
             >
-              {lang === 'en' ? 'Reset Filters' : 'ফিল্টার রিসেট করুন'}
+              {lang === 'en' ? 'Reset Filters & Show All' : 'ফিল্টার রিসেট করে সকল ৪টি প্রকল্প দেখুন'}
             </button>
           </div>
         )}
