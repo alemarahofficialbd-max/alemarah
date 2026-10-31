@@ -252,7 +252,7 @@ export default function AboutUs({ lang, t }) {
         {/* ========================================================= */}
         {/* EXECUTIVE COMMITTEE                                      */}
         {/* ========================================================= */}
-        <div id="board-of-directors" className="pt-4 space-y-10">
+        <div id="executive-committee" className="pt-4 space-y-10">
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-[#006231] text-xs font-bold uppercase tracking-wider">
               <Users2 className="w-3.5 h-3.5" />
@@ -271,9 +271,9 @@ export default function AboutUs({ lang, t }) {
             </p>
           </div>
 
-          {/* Unified Grid: All Executive Committee Members */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {(t.about.board?.members || []).map((member, idx) => (
+          {/* Unified Grid: All Executive Committee Members (5 members) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+            {(t.about.board?.members || []).map((member) => (
               <div 
                 key={member.id}
                 className="bg-white rounded-3xl border border-gray-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group"
@@ -290,7 +290,7 @@ export default function AboutUs({ lang, t }) {
                 </div>
 
                 {/* Info */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
                   <div>
                     <div className="inline-block px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-[11px] font-bold tracking-wide mb-2.5">
                       {member.role}
@@ -307,6 +307,96 @@ export default function AboutUs({ lang, t }) {
                     <div className="pt-3 border-t border-gray-100 flex items-start space-x-2 text-[11px] text-gray-600 leading-tight">
                       <GraduationCap className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#006231] shrink-0 mt-0.5 transition-colors" />
                       <span>{member.education}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ========================================================= */}
+        {/* BOARD OF DIRECTORS (FULL 12 DIRECTORS)                   */}
+        {/* ========================================================= */}
+        <div id="board-of-directors" className="pt-8 space-y-10">
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-800 text-xs font-bold uppercase tracking-wider">
+              <UserCheck className="w-3.5 h-3.5 text-[#006231]" />
+              <span>{t.about.boardOfDirectors?.badge || (lang === 'en' ? 'Board of Directors' : 'বোর্ড অব ডিরেক্টরস')}</span>
+            </div>
+
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#231F20] tracking-tight">
+              {t.about.boardOfDirectors?.title || (lang === 'en' ? 'Board of Directors' : 'বোর্ড অব ডিরেক্টরস (Board of Directors)')}
+            </h3>
+
+            <p className="text-xs sm:text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              {t.about.boardOfDirectors?.subtitle || (lang === 'en' 
+                ? 'Distinguished board of directors steering Al-Emarah Properties toward sustainable growth, ethical investments, and excellence.'
+                : 'আল-ইমারাহ প্রোপার্টিজের সামগ্রিক নীতিনির্ধারণ, স্বচ্ছ ব্যবসায়িক সুশাসন ও টেকসই প্রবৃদ্ধি অর্জনে সম্মানিত পরিচালনা পর্ষদ।'
+              )}
+            </p>
+          </div>
+
+          {/* 12 Directors Grid (4 columns desktop, 3 columns tablet, 2 columns mobile) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {(t.about.boardOfDirectors?.members || []).map((member) => (
+              <div 
+                key={member.id}
+                className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group relative"
+              >
+                {/* Serial Badge */}
+                <div className="absolute top-3 right-3 z-10 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-mono font-bold">
+                  #{member.serial}
+                </div>
+
+                {/* Photo Portrait / Placeholder */}
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-slate-200">
+                  {member.image ? (
+                    <>
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-slate-50">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white shadow-sm border border-gray-200 flex items-center justify-center text-slate-400 group-hover:text-[#006231] group-hover:scale-105 transition-all duration-300">
+                        <Users2 className="w-8 h-8 sm:w-10 sm:h-10 stroke-[1.5]" />
+                      </div>
+                      <span className="mt-3 text-[10px] sm:text-[11px] font-medium text-gray-400">
+                        {lang === 'en' ? 'Photo Updating' : 'ছবি সংযোজন প্রক্রিয়াধীন'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-2.5">
+                  <div>
+                    <div className={`inline-block px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-bold tracking-wide mb-2 ${
+                      member.role === 'Chairman' || member.role === 'চেয়ারম্যান'
+                        ? 'bg-red-50 text-[#CE2028] border border-red-100'
+                        : member.role === 'Managing Director' || member.role === 'ব্যবস্থাপনা পরিচালক'
+                        ? 'bg-emerald-50 text-[#006231] border border-emerald-100'
+                        : 'bg-slate-100 text-slate-700'
+                    }`}>
+                      {member.role}
+                    </div>
+                    <h4 className="text-sm sm:text-base md:text-lg font-black text-gray-900 group-hover:text-[#006231] transition-colors leading-snug">
+                      {member.name}
+                    </h4>
+                    <p className="text-[11px] sm:text-xs font-semibold text-[#006231] mt-0.5">
+                      {member.organization || (lang === 'en' ? 'Al-Emarah Properties' : 'আল-ইমারাহ প্রোপার্টিজ')}
+                    </p>
+                  </div>
+
+                  {member.education && (
+                    <div className="pt-2.5 border-t border-gray-100 flex items-start space-x-1.5 text-[10px] sm:text-[11px] text-gray-500 leading-tight">
+                      <GraduationCap className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#006231] shrink-0 mt-0.5 transition-colors" />
+                      <span className="line-clamp-2">{member.education}</span>
                     </div>
                   )}
                 </div>

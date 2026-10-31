@@ -270,6 +270,132 @@ export const translations = {
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
             image: "/images/taneem_mahfuj.jpg"
+          },
+          {
+            id: "dir_al_amin",
+            name: "Al Amin Hawlader",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/al_amin_hawladar.jpg"
+          }
+        ]
+      },
+
+      // Board of Directors (Full 12 Directors)
+      boardOfDirectors: {
+        badge: "Board of Directors",
+        title: "Board of Directors",
+        subtitle: "Distinguished board of directors steering Al-Emarah Properties toward sustainable growth, ethical investments, and excellence.",
+        directorsBadge: "Board Member",
+        members: [
+          {
+            id: "bod_1",
+            serial: "01",
+            name: "Sheikh Fazlul Karim Maroof",
+            role: "Chairman",
+            organization: "Al-Emarah Properties",
+            education: "Graduate, Public Administration, University of Dhaka",
+            image: "/images/chairman.webp"
+          },
+          {
+            id: "bod_2",
+            serial: "02",
+            name: "Talukdar Tariq Masud",
+            role: "Managing Director",
+            organization: "Al-Emarah Properties",
+            education: "BSS Political Science, Govt. Titumir College",
+            image: "/images/managing_director.webp"
+          },
+          {
+            id: "bod_3",
+            serial: "03",
+            name: "Alhaj Mawlana Nur Hossain",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Prominent Islamic Scholar & Entrepreneur",
+            image: "/images/alhaj_mawlana_nur_hossain.jpg"
+          },
+          {
+            id: "bod_4",
+            serial: "04",
+            name: "Taneem Mahfuj",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/taneem_mahfuj.jpg"
+          },
+          {
+            id: "bod_5",
+            serial: "05",
+            name: "Al Amin Hawlader",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/al_amin_hawladar.jpg"
+          },
+          {
+            id: "bod_6",
+            serial: "06",
+            name: "Hijbullah Nahian",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/hijbullah_nahian.jpg"
+          },
+          {
+            id: "bod_7",
+            serial: "07",
+            name: "M M Abbas Uddin",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/abbas_uddin.jpg"
+          },
+          {
+            id: "bod_8",
+            serial: "08",
+            name: "Abu Zar Gifari",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/abu_zar_gifari.jpg"
+          },
+          {
+            id: "bod_9",
+            serial: "09",
+            name: "Md Zunayd Bin Hamid",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/zunayd_bin_hamid.jpg"
+          },
+          {
+            id: "bod_10",
+            serial: "10",
+            name: "Mohammad Shah Alam",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/mohammad_shah_alam.jpg"
+          },
+          {
+            id: "bod_11",
+            serial: "11",
+            name: "MD Nizamul Islam",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: null
+          },
+          {
+            id: "bod_12",
+            serial: "12",
+            name: "MD Masum",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: null
           }
         ]
       },
@@ -992,6 +1118,132 @@ export const translations = {
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
             image: "/images/taneem_mahfuj.jpg"
+          },
+          {
+            id: "dir_al_amin",
+            name: "আল আমিন হাওলাদার",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/al_amin_hawladar.jpg"
+          }
+        ]
+      },
+
+      // Board of Directors (Full 12 Directors)
+      boardOfDirectors: {
+        badge: "বোর্ড অব ডিরেক্টরস",
+        title: "বোর্ড অব ডিরেক্টরস (Board of Directors)",
+        subtitle: "আল-ইমারাহ প্রোপার্টিজের সামগ্রিক নীতিনির্ধারণ, স্বচ্ছ ব্যবসায়িক সুশাসন ও টেকসই প্রবৃদ্ধি অর্জনে সম্মানিত পরিচালনা পর্ষদ।",
+        directorsBadge: "সম্মানিত পরিচালক",
+        members: [
+          {
+            id: "bod_1",
+            serial: "০১",
+            name: "শেখ ফজলুল করীম মারুফ",
+            role: "চেয়ারম্যান",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "স্নাতক, লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়",
+            image: "/images/chairman.webp"
+          },
+          {
+            id: "bod_2",
+            serial: "০২",
+            name: "তালুকদার তারিক মাসউদ",
+            role: "ব্যবস্থাপনা পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "BSS রাষ্ট্রবিজ্ঞান, সরকারি তিতুমীর কলেজ",
+            image: "/images/managing_director.webp"
+          },
+          {
+            id: "bod_3",
+            serial: "০৩",
+            name: "আলহাজ্ব মাওলানা নূর হোসাইন",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "বিশিষ্ট ইসলামি ব্যক্তিত্ব ও উদ্যোক্তা",
+            image: "/images/alhaj_mawlana_nur_hossain.jpg"
+          },
+          {
+            id: "bod_4",
+            serial: "০৪",
+            name: "তানিম মাহফুজ",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/taneem_mahfuj.jpg"
+          },
+          {
+            id: "bod_5",
+            serial: "০৫",
+            name: "আল আমিন হাওলাদার",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/al_amin_hawladar.jpg"
+          },
+          {
+            id: "bod_6",
+            serial: "০৬",
+            name: "হিজবুল্লাহ নাহিয়ান",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/hijbullah_nahian.jpg"
+          },
+          {
+            id: "bod_7",
+            serial: "০৭",
+            name: "এম এম আব্বাস উদ্দিন",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/abbas_uddin.jpg"
+          },
+          {
+            id: "bod_8",
+            serial: "০৮",
+            name: "আবু জর গিফারী",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/abu_zar_gifari.jpg"
+          },
+          {
+            id: "bod_9",
+            serial: "০৯",
+            name: "মোঃ জুনায়েদ বিন হামিদ",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/zunayd_bin_hamid.jpg"
+          },
+          {
+            id: "bod_10",
+            serial: "১০",
+            name: "মোহাম্মদ শাহ আলম",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/mohammad_shah_alam.jpg"
+          },
+          {
+            id: "bod_11",
+            serial: "১১",
+            name: "মোঃ নিজামুল ইসলাম",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: null
+          },
+          {
+            id: "bod_12",
+            serial: "১২",
+            name: "মোঃ মাসুম",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: null
           }
         ]
       },
