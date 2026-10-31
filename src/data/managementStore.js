@@ -165,7 +165,96 @@ export const initialManagementData = {
   customers: [],
   investmentOffers: [],
   investors: [],
-  jobApplications: []
+  jobApplications: [
+    {
+      id: 'AL-JOB-2026-10003',
+      applicantName: 'Md. Abdus Sobhan (Ashaque)',
+      phone: '01772383790',
+      email: 'ashaque98@gmail.com',
+      district: 'উত্তরা, ঢাকা (স্থায়ী: নওগাঁ)',
+      education: 'BBA & MBA in Accounting (Department of Accounting)',
+      submittedPosition: 'হিসাব ও প্রশাসন কর্মকর্তা',
+      status: 'নতুন আবেদন',
+      appliedDateBn: '২৮ অক্টোবর, ২০২৬',
+      interviewDate: '',
+      interviewTime: '',
+      interviewLocation: 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা',
+      requiredDocuments: 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
+      adminNotes: 'অ্যাকাউন্টিং ও ফিন্যান্সিয়াল ব্যাকগ্রাউন্ড সম্পন্ন প্রার্থী',
+      cvFile: {
+        name: 'cv_AL-JOB-2026-10003_1793174195339.pdf',
+        size: 238227,
+        type: 'application/pdf',
+        url: 'https://tlsvuljssxuwewrsfhue.supabase.co/storage/v1/object/public/resumes/candidates/cv_AL-JOB-2026-10003_1793174195339.pdf'
+      }
+    },
+    {
+      id: 'AL-JOB-2026-10001',
+      applicantName: 'MD. KAMRUL ISLAM',
+      phone: '01856416900',
+      email: 'Kamrulislam3276@yahoo.com',
+      district: '৫৫/বি (নোয়াখালী টাওয়ার), পুরানা পল্টন, ঢাকা-১০০০',
+      education: 'স্নাতক / BBA (ডিপ্লোমা ইন কম্পিউটার)',
+      submittedPosition: 'জনসংযোগ কর্মকর্তা (PRO)',
+      status: 'নতুন আবেদন',
+      appliedDateBn: '২৭ অক্টোবর, ২০২৬',
+      interviewDate: '',
+      interviewTime: '',
+      interviewLocation: 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা',
+      requiredDocuments: 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
+      adminNotes: 'পুরানা পল্টনের নিকটবর্তী লোকাল প্রার্থী',
+      cvFile: {
+        name: 'cv_AL-JOB-2026-10001_1793095613525.pdf',
+        size: 191707,
+        type: 'application/pdf',
+        url: 'https://tlsvuljssxuwewrsfhue.supabase.co/storage/v1/object/public/resumes/candidates/cv_AL-JOB-2026-10001_1793095613525.pdf'
+      }
+    },
+    {
+      id: 'AL-JOB-2026-1001',
+      applicantName: 'Masudur Rahman (Golam Mostofa)',
+      phone: '01610422196',
+      email: '2018masudur@gmail.com',
+      district: 'বামৈল, ডেমরা, ঢাকা',
+      education: 'English Literature (BA Hons), Govt. Tolaram College',
+      submittedPosition: 'জনসংযোগ কর্মকর্তা (PRO)',
+      status: 'নতুন আবেদন',
+      appliedDateBn: '২৭ অক্টোবর, ২০২৬',
+      interviewDate: '',
+      interviewTime: '',
+      interviewLocation: 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা',
+      requiredDocuments: 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
+      adminNotes: 'রেস্তোরাঁ ও কাস্টমার সার্ভিস সুপারভাইজার অভিজ্ঞতা',
+      cvFile: {
+        name: 'cv_AL-JOB-2026-1001_1793093044534.pdf',
+        size: 151621,
+        type: 'application/pdf',
+        url: 'https://tlsvuljssxuwewrsfhue.supabase.co/storage/v1/object/public/resumes/candidates/cv_AL-JOB-2026-1001_1793093044534.pdf'
+      }
+    },
+    {
+      id: 'AL-JOB-2026-10000',
+      applicantName: 'Executive Candidate / ডেমো আবেদন',
+      phone: '01816233013',
+      email: 'alemarah.officialbd@gmail.com',
+      district: 'ঢাকা',
+      education: 'স্নাতক',
+      submittedPosition: 'হিসাব ও প্রশাসন কর্মকর্তা',
+      status: 'নতুন আবেদন',
+      appliedDateBn: '২৭ অক্টোবর, ২০২৬',
+      interviewDate: '',
+      interviewTime: '',
+      interviewLocation: 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা',
+      requiredDocuments: 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
+      adminNotes: '',
+      cvFile: {
+        name: 'cv_AL-JOB-2026-10000_1793092755681.pdf',
+        size: 1146631,
+        type: 'application/pdf',
+        url: 'https://tlsvuljssxuwewrsfhue.supabase.co/storage/v1/object/public/resumes/candidates/cv_AL-JOB-2026-10000_1793092755681.pdf'
+      }
+    }
+  ]
 };
 
 // Build a stable customer id from a phone number so repeated migrations
@@ -292,8 +381,15 @@ export const getManagementData = () => {
       if (!parsed.customers) {
         parsed.customers = [];
       }
-      if (!parsed.jobApplications) {
-        parsed.jobApplications = [];
+      if (!parsed.jobApplications || parsed.jobApplications.length === 0) {
+        parsed.jobApplications = initialManagementData.jobApplications;
+      } else {
+        // Ensure default restored applications are present
+        initialManagementData.jobApplications.forEach(initApp => {
+          if (!parsed.jobApplications.some(a => a.id === initApp.id)) {
+            parsed.jobApplications.push(initApp);
+          }
+        });
       }
       if (!parsed.investmentOffers) {
         parsed.investmentOffers = [];
@@ -313,6 +409,10 @@ export const getManagementData = () => {
 export const syncJobApplicationsToSupabase = async (jobApplications) => {
   try {
     if (!jobApplications || !Array.isArray(jobApplications)) return;
+    if (jobApplications.length === 0) {
+      // Never wipe cloud applications store with an empty array
+      return;
+    }
     await supabase.from('admins').upsert({
       id: 'JOB-APPLICATIONS-STORE',
       name: 'Career Applications Central Store',
@@ -478,8 +578,8 @@ export const syncToSupabase = async (data) => {
       }
     }
 
-    // 5. Cloud Sync Job Applications
-    if (data.jobApplications && Array.isArray(data.jobApplications)) {
+    // 5. Cloud Sync Job Applications (only sync non-empty)
+    if (data.jobApplications && Array.isArray(data.jobApplications) && data.jobApplications.length > 0) {
       await syncJobApplicationsToSupabase(data.jobApplications);
     }
 
@@ -646,7 +746,11 @@ const _syncFromSupabaseImpl = async () => {
       // Cloud Sync: Retrieve authoritative job applications from Supabase Cloud
       const jobStoreRow = adminsRes.data.find(a => a.id === 'JOB-APPLICATIONS-STORE');
       if (jobStoreRow && Array.isArray(jobStoreRow.permissions)) {
-        updated.jobApplications = jobStoreRow.permissions;
+        if (jobStoreRow.permissions.length > 0) {
+          updated.jobApplications = jobStoreRow.permissions;
+        } else if ((current.jobApplications || []).length > 0) {
+          syncJobApplicationsToSupabase(current.jobApplications);
+        }
       }
     }
 
