@@ -447,6 +447,7 @@ export default function ManagementDashboard({
 
   // State for Money Receipt Preview & Print modal
   const [selectedReceiptForPrint, setSelectedReceiptForPrint] = useState(null);
+  const [showClientPasswords, setShowClientPasswords] = useState({});
 
   // 3. New Project Form (with Smart Unit Setup)
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -685,7 +686,7 @@ export default function ManagementDashboard({
       id: customerIdFromPhone(clientForm.phone),
       name: clientForm.name,
       phone: clientForm.phone,
-      password: await hashPassword(clientForm.password || 'password123'),
+      password: clientForm.password || 'password123',
       status: 'সক্রিয় (Active)'
     };
     const isNewCustomerRecord = !existingCustomer && !phoneMatch;
@@ -748,6 +749,60 @@ export default function ManagementDashboard({
         ? `"${targetCustomer.name}"-এর জন্য ${newUnits.length}টি ইউনিট সফলভাবে যুক্ত হয়েছে!`
         : `নতুন ক্লায়েন্ট "${targetCustomer.name}" সফলভাবে যুক্ত হয়েছেন!`
     );
+  };
+
+  const handleDeleteClient = async (clientId) => {
+    const clientToDelete = data.clients.find(c => c.id === clientId);
+    if (!clientToDelete) return;
+    const confirmed = window.confirm(`আপনি কি নিশ্চিতভাবে "${clientToDelete.name}"-এর কাস্টমার ও বুকিং রেকর্ডটি মুছে ফেলতে চান?\n\nএটি ক্লাউড ডাটাবেজ থেকেও স্থায়ীভাবে মুছে যাবে।`);
+    if (!confirmed) return;
+
+    // Delete locally
+    updateStore(prev => ({
+      ...prev,
+      clients: prev.clients.filter(c => c.id !== clientId)
+    }));
+
+    // Delete from Supabase
+    try {
+      await supabase.from('client_payments').delete().eq('client_id', clientId);
+      await supabase.from('clients').delete().eq('id', clientId);
+    } catch (err) {
+      console.error('Error deleting client from Supabase:', err);
+    }
+
+    if (selectedClientForProfile?.id === clientId) {
+      setSelectedClientForProfile(null);
+    }
+    triggerAlert(`"${clientToDelete.name}" সফলভাবে মুছে ফেলা হয়েছে!`);
+  };
+
+  const handleUpdateClientPassword = async (clientId, newPassword) => {
+    if (!newPassword || !newPassword.trim()) return;
+    const cleanPass = newPassword.trim();
+
+    updateStore(prev => ({
+      ...prev,
+      clients: prev.clients.map(c => c.id === clientId ? { ...c, password: cleanPass } : c),
+      customers: (prev.customers || []).map(cus => {
+        const clRow = prev.clients.find(c => c.id === clientId);
+        return (cus.id === clRow?.customerId || cus.phone === clRow?.phone) ? { ...cus, password: cleanPass } : cus;
+      })
+    }));
+
+    setSelectedClientForProfile(prev => prev && prev.id === clientId ? { ...prev, password: cleanPass } : prev);
+
+    try {
+      await supabase.from('clients').update({ password: cleanPass }).eq('id', clientId);
+      const targetClient = data.clients.find(c => c.id === clientId);
+      if (targetClient?.phone) {
+        await supabase.from('customers').update({ password: cleanPass }).eq('phone', targetClient.phone);
+      }
+    } catch (e) {
+      console.error('Failed to update client password in Supabase:', e);
+    }
+
+    triggerAlert('পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!');
   };
 
   const handleReceivePayment = (e) => {
@@ -2077,9 +2132,9 @@ export default function ManagementDashboard({
                     title="সম্পূর্ণ প্রোফাইল দেখতে ক্লিক করুন"
                   >
                     <div className="flex items-center space-x-3 min-w-0 flex-1">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs overflow-hidden">
+                      <div className="w-11 h-11 aspect-square rounded-full bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs overflow-hidden">
                         {cl.image ? (
-                          <img src={cl.image} alt={cl.name} className="w-full h-full object-cover" />
+                          <img src={cl.image} alt={cl.name} className="w-full h-full object-cover aspect-square block" />
                         ) : (
                           cl.name ? cl.name.slice(0, 2) : 'গ্রা'
                         )}
@@ -2178,6 +2233,18 @@ export default function ManagementDashboard({
                                 className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#006231] text-[#006231] hover:text-white font-bold text-xs border border-emerald-200 transition-all cursor-pointer active:scale-95"
                               >
                                 + জমা
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteClient(cl.id);
+                                }}
+                                className="p-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 transition-all cursor-pointer active:scale-95"
+                                title="কাস্টমার মুছে ফেলুন"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </td>
@@ -6411,16 +6478,16 @@ export default function ManagementDashboard({
                           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-rose-200 bg-rose-50 text-rose-700 shadow-2xs">
                             <span className="w-2 h-2 rounded-full bg-rose-500"></span>
                             <span className="text-3xs tracking-wider font-extrabold">
-                              নিষ্ক্রিয় (Deactivated)
+                              অ্যাকাউন্টটি বর্তমানে নিষ্ক্রিয় রয়েছে
                             </span>
                           </div>
                         )}
 
                         {/* Client Name & Photo Header */}
                         <div className="flex items-center space-x-3.5 sm:space-x-4">
-                          <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-lg ring-4 ring-emerald-50 shadow-md shrink-0 overflow-hidden">
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-2xl bg-gradient-to-tr from-[#006231] to-[#8EBF40] text-white flex items-center justify-center font-black text-lg ring-4 ring-emerald-50 shadow-md shrink-0 overflow-hidden">
                             {cl.image ? (
-                              <img src={cl.image} alt={cl.name} className="w-full h-full object-cover" />
+                              <img src={cl.image} alt={cl.name} className="w-full h-full object-cover aspect-square block" />
                             ) : (
                               cl.name ? cl.name.slice(0, 2) : 'গ্রা'
                             )}
@@ -6501,75 +6568,109 @@ export default function ManagementDashboard({
                             </button>
                           </div>
 
-                          {/* Password */}
+                          {/* Password with Eye view & Reset/Edit option */}
                           <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
-                            <div className="min-w-0">
-                              <span className="text-[10px] text-slate-400 block font-semibold">পাসওয়ার্ড</span>
-                              <strong className="text-amber-700 font-mono text-xs font-bold truncate block">
-                                {passwordIsHashed ? 'নিরাপত্তার জন্য দেখানো যাবে না' : accountPassword}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between pr-1">
+                                <span className="text-[10px] text-slate-400 font-semibold">পাসওয়ার্ড</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowClientPasswords(prev => ({ ...prev, [cl.id]: !prev[cl.id] }))}
+                                  className="text-slate-500 hover:text-slate-800 text-[10px] font-bold inline-flex items-center space-x-0.5 cursor-pointer"
+                                  title={showClientPasswords[cl.id] ? "পাসওয়ার্ড লুকান" : "পাসওয়ার্ড দেখুন"}
+                                >
+                                  {showClientPasswords[cl.id] ? <EyeOff className="w-3 h-3 text-slate-600" /> : <Eye className="w-3 h-3 text-[#006231]" />}
+                                  <span>{showClientPasswords[cl.id] ? 'লুকান' : 'দেখুন'}</span>
+                                </button>
+                              </div>
+                              <strong className="text-slate-900 font-mono text-xs font-bold truncate block mt-0.5">
+                                {showClientPasswords[cl.id]
+                                  ? (cl.password || 'password123')
+                                  : '••••••••'}
                               </strong>
                             </div>
-                            {!passwordIsHashed && (
+
+                            <div className="flex items-center space-x-1 shrink-0">
                               <button
                                 type="button"
                                 onClick={() => {
-                                  navigator.clipboard?.writeText(accountPassword);
-                                  triggerAlert('পাসওয়ার্ড কপি হয়েছে!');
+                                  const passToCopy = cl.password && !passwordIsHashed ? cl.password : 'password123';
+                                  navigator.clipboard?.writeText(passToCopy);
+                                  triggerAlert(`পাসওয়ার্ড (${passToCopy}) কপি হয়েছে!`);
                                 }}
-                                className="p-1.5 rounded-lg bg-white hover:bg-emerald-50 text-slate-600 hover:text-[#006231] border border-slate-200 text-3xs font-bold inline-flex items-center space-x-1 cursor-pointer transition-colors shrink-0"
+                                className="p-1.5 rounded-lg bg-white hover:bg-emerald-50 text-slate-600 hover:text-[#006231] border border-slate-200 text-3xs font-bold inline-flex items-center space-x-1 cursor-pointer transition-colors"
                                 title="পাসওয়ার্ড কপি করুন"
                               >
                                 <Copy className="w-3.5 h-3.5" />
                                 <span>কপি</span>
                               </button>
-                            )}
-                          </div>
-                        </div>
 
-                        {/* Account Actions: Deactivate / Activate Button & Booking Status with ID */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => handleToggleClientStatus(cl.id)}
-                            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs ${
-                              isDeactivated
-                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                                : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
-                            }`}
-                          >
-                            {isDeactivated ? (
-                              <>
-                                <UserCheck className="w-3.5 h-3.5" />
-                                <span>অ্যাকাউন্ট সক্রিয় করুন (Activate)</span>
-                              </>
-                            ) : (
-                              <>
-                                <UserX className="w-3.5 h-3.5 text-rose-600" />
-                                <span>অ্যাকাউন্ট ডিঅ্যাক্টিভ করুন (Deactivate)</span>
-                              </>
-                            )}
-                          </button>
-
-                          {/* Confirmed / Approved Badge paired with Customer ID on single line */}
-                          <div className="flex items-center gap-2 flex-nowrap">
-                            <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-2xs font-bold text-[#006231] bg-emerald-50 border border-emerald-200 shadow-2xs shrink-0 whitespace-nowrap">
-                              <CheckCircle2 className="w-3 h-3 text-[#006231]" />
-                              <span>অনুমোদিত</span>
-                            </span>
-                            <div className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-2xs font-mono font-bold shadow-2xs shrink-0 whitespace-nowrap">
-                              <span>{cl.id}</span>
                               <button
                                 type="button"
                                 onClick={() => {
-                                  navigator.clipboard?.writeText(cl.id);
-                                  triggerAlert('আইডি কপি হয়েছে!');
+                                  const promptPass = window.prompt(`"${cl.name}"-এর জন্য নতুন পাসওয়ার্ড লিখুন:`, cl.password && !passwordIsHashed ? cl.password : 'password123');
+                                  if (promptPass !== null && promptPass.trim()) {
+                                    handleUpdateClientPassword(cl.id, promptPass.trim());
+                                  }
                                 }}
-                                className="text-slate-400 hover:text-slate-700 cursor-pointer p-0.5 ml-0.5"
-                                title="আইডি কপি করুন"
+                                className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-[#006231] border border-emerald-200 text-3xs font-bold inline-flex items-center space-x-0.5 cursor-pointer transition-colors"
+                                title="পাসওয়ার্ড রিসেট বা পরিবর্তন করুন"
                               >
-                                <Copy className="w-3 h-3" />
+                                <KeyRound className="w-3.5 h-3.5" />
+                                <span>পরিবর্তন</span>
                               </button>
                             </div>
+                          </div>
+                        </div>
+
+                        {/* Account Actions: Deactivate / Activate Button & Delete Customer Button */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1.5 border-t border-slate-100">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {/* Pure Bengali Deactivate / Activate Button */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleClientStatus(cl.id)}
+                              className={`py-2 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs ${
+                                isDeactivated
+                                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                  : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
+                              }`}
+                            >
+                              {isDeactivated ? (
+                                <>
+                                  <UserCheck className="w-3.5 h-3.5" />
+                                  <span>অ্যাকাউন্ট পুনরায় সক্রিয় করুন</span>
+                                </>
+                              ) : (
+                                <>
+                                  <UserX className="w-3.5 h-3.5 text-rose-600" />
+                                  <span>অ্যাকাউন্ট নিষ্ক্রিয় করুন</span>
+                                </>
+                              )}
+                            </button>
+
+                            {/* Delete Customer Button */}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteClient(cl.id)}
+                              className="py-2 px-3.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs active:scale-95"
+                              title="এই কাস্টমার ও বুকিং রেকর্ড মুছে ফেলুন"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-red-600" />
+                              <span>কাস্টমার মুছুন</span>
+                            </button>
+                          </div>
+
+                          {/* Confirmed / Approved Status Badge (CLI-MV... machine ID removed completely) */}
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-flex items-center space-x-1 px-3 py-1.5 rounded-full text-2xs font-bold shadow-2xs shrink-0 whitespace-nowrap ${
+                              isDeactivated 
+                                ? 'text-rose-700 bg-rose-50 border border-rose-200' 
+                                : 'text-[#006231] bg-emerald-50 border border-emerald-200'
+                            }`}>
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>{isDeactivated ? 'নিষ্ক্রিয়' : 'অনুমোদিত ও সক্রিয়'}</span>
+                            </span>
                           </div>
                         </div>
                       </div>
