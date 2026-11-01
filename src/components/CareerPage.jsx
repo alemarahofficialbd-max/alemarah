@@ -44,7 +44,8 @@ import {
   Paperclip,
   Eye,
   Download,
-  Share2
+  Share2,
+  Loader2
 } from 'lucide-react';
 
 // Dynamic Icon Resolvers for Job Details Sections
@@ -122,7 +123,9 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
   const [showTrackModal, setShowTrackModal] = useState(false);
   const [trackQuery, setTrackQuery] = useState('');
   const [trackResult, setTrackResult] = useState(null);
+  const [trackResultsList, setTrackResultsList] = useState([]);
   const [trackHasSearched, setTrackHasSearched] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Job Sharing & Unique URL State
   const [shareJob, setShareJob] = useState(null);
@@ -380,6 +383,73 @@ export default function CareerPage({ lang = 'bn', t, onNavigate = () => {} }) {
       setTimeout(() => setCopiedId(false), 2500);
     } catch (err) {
       console.error("Failed to copy", err);
+    }
+  };
+
+  // Perform robust applicant tracking search (Bangla/English digits, Phone & Tracking ID)
+  const performTrackSearch = async (queryToSearch) => {
+    const rawQ = (queryToSearch !== undefined ? queryToSearch : trackQuery).trim();
+    if (!rawQ) return;
+    setIsSearching(true);
+    setTrackHasSearched(true);
+
+    try {
+      // 1. Fetch live applications from Supabase Cloud
+      const remoteApps = await fetchJobApplicationsFromSupabase();
+      const currentStore = getManagementData();
+
+      // 2. Merge cloud and local store applications without duplicates
+      const appsMap = new Map();
+      (currentStore?.jobApplications || []).forEach(a => { if (a?.id) appsMap.set(a.id, a); });
+      (remoteApps || []).forEach(a => { if (a?.id) appsMap.set(a.id, a); });
+      const allApps = Array.from(appsMap.values());
+
+      // 3. Normalize search query (convert Bengali digits to English digits)
+      const bnToEn = s => String(s || '').replace(/[০-৯]/g, d => '০১২৩৪৫৬৭৮৯'.indexOf(d));
+      const qEn = bnToEn(rawQ).toLowerCase().trim();
+      const qDigits = qEn.replace(/[^0-9]/g, '');
+      const qNormId = qEn.replace(/[^a-z0-9]/g, '');
+
+      // Normalize search phone (strip Bangladesh country prefix +88 / 88)
+      const cleanQPhone = qDigits.startsWith('880') ? qDigits.slice(2) : (qDigits.startsWith('88') ? qDigits.slice(2) : qDigits);
+
+      const matched = allApps.filter(a => {
+        if (!a) return false;
+
+        // A. Phone number comparison
+        const appPhoneDigits = bnToEn(a.phone || '').replace(/[^0-9]/g, '');
+        const cleanAppPhone = appPhoneDigits.startsWith('880') ? appPhoneDigits.slice(2) : (appPhoneDigits.startsWith('88') ? appPhoneDigits.slice(2) : appPhoneDigits);
+
+        if (cleanQPhone.length >= 6) {
+          if (cleanAppPhone === cleanQPhone) return true;
+          if (cleanAppPhone.includes(cleanQPhone) || cleanQPhone.includes(cleanAppPhone)) return true;
+          if (cleanAppPhone.slice(-10) === cleanQPhone.slice(-10)) return true;
+        }
+
+        // B. Application Tracking ID comparison
+        const appIdNorm = (a.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (qNormId.length >= 3) {
+          if (appIdNorm === qNormId) return true;
+          if (appIdNorm.endsWith(qNormId)) return true;
+          if (appIdNorm.includes(qNormId)) return true;
+        }
+
+        // C. Numeric ID / Serial suffix match (e.g. typing '10003' or '2026-10003')
+        if (qDigits.length >= 4 && appIdNorm.endsWith(qDigits)) {
+          return true;
+        }
+
+        return false;
+      });
+
+      setTrackResultsList(matched);
+      setTrackResult(matched.length > 0 ? matched[0] : null);
+    } catch (err) {
+      console.error('Track application error:', err);
+      setTrackResult(null);
+      setTrackResultsList([]);
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -1660,25 +1730,9 @@ ${getJobShareUrl(shareJob.id)}`
 
             {/* Search Box */}
             <form
-              onSubmit={async (e) => {
+              onSubmit={(e) => {
                 e.preventDefault();
-                if (!trackQuery.trim()) return;
-                setIsSearching(true);
-                // Fetch directly from live Supabase Cloud store
-                const remoteApps = await fetchJobApplicationsFromSupabase();
-                const currentStore = getManagementData();
-                const allApps = remoteApps && remoteApps.length > 0 ? remoteApps : (currentStore.jobApplications || []);
-                const q = trackQuery.trim().toLowerCase();
-                const digits = q.replace(/[^0-9]/g, '');
-                const res = allApps.find(a => {
-                  const matchId = a.id && a.id.toLowerCase() === q;
-                  const cleanPhone = (a.phone || '').replace(/[^0-9]/g, '');
-                  const matchPhone = digits.length >= 8 && cleanPhone.includes(digits);
-                  return matchId || matchPhone;
-                }) || null;
-                setTrackResult(res);
-                setTrackHasSearched(true);
-                setIsSearching(false);
+                performTrackSearch();
               }}
               className="flex gap-2"
             >
@@ -1694,11 +1748,45 @@ ${getJobShareUrl(shareJob.id)}`
               </div>
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs shadow-md transition-all cursor-pointer shrink-0 active:scale-95"
+                disabled={isSearching}
+                className="px-5 py-2.5 rounded-xl bg-[#006231] hover:bg-[#0A4D27] text-white font-bold text-xs shadow-md transition-all cursor-pointer shrink-0 active:scale-95 disabled:opacity-50 flex items-center space-x-1.5"
               >
-                {isEn ? 'Check Status' : 'খুঁজুন'}
+                {isSearching ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>খোঁজা হচ্ছে...</span>
+                  </>
+                ) : (
+                  <span>{isEn ? 'Check Status' : 'খুঁজুন'}</span>
+                )}
               </button>
             </form>
+
+            {/* Multiple Applications Found Selector */}
+            {trackResultsList.length > 1 && (
+              <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 space-y-2">
+                <span className="text-3xs text-emerald-800 font-bold uppercase tracking-wider block">
+                  এই নম্বরে একাধিক ({trackResultsList.length} টি) আবেদন পাওয়া গেছে (ক্লিক করে দেখুন):
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {trackResultsList.map((app) => (
+                    <button
+                      key={app.id}
+                      type="button"
+                      onClick={() => setTrackResult(app)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center space-x-1.5 ${
+                        trackResult?.id === app.id
+                          ? 'bg-[#006231] text-white shadow-xs'
+                          : 'bg-white text-gray-700 border border-emerald-200 hover:bg-emerald-100'
+                      }`}
+                    >
+                      <span>{app.jobTitle || app.submittedPosition}</span>
+                      <span className="font-mono text-3xs opacity-80">({app.id})</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Results */}
             {trackHasSearched && (
