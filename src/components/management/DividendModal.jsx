@@ -33,7 +33,7 @@ export default function DividendModal({
             </div>
             <div>
               <h3 className="font-bold text-base text-slate-900">লভ্যাংশ / ডিভিডেন্ড প্রদান এন্ট্রি</h3>
-              <p className="text-3xs text-slate-500">{targetDirector.name} ({targetDirector.sharePercentage}% শেয়ার)</p>
+              <p className="text-3xs text-slate-500">{targetDirector.name} ({(targetDirector.shareCount || targetDirector.sharePercentage || 0)} টি শেয়ার)</p>
             </div>
           </div>
         </div>

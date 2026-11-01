@@ -239,6 +239,17 @@ export default function ManagementDashboard({
     return () => unsubscribe();
   }, []);
 
+  // Ensure managementTeam contains strictly staff members (isolate directors completely)
+  useEffect(() => {
+    const hasDirectorInTeam = (data.managementTeam || []).some(m => m.isDirector || m.directorId);
+    if (hasDirectorInTeam) {
+      updateStore(prev => ({
+        ...prev,
+        managementTeam: (prev.managementTeam || []).filter(m => !m.isDirector && !m.directorId)
+      }));
+    }
+  }, [data.managementTeam]);
+
   // Warn when a background cloud save silently fails (data stays local-only)
   useEffect(() => {
     const onSyncFailed = (e) => {
@@ -625,6 +636,12 @@ export default function ManagementDashboard({
   // 6. Board Director Form, Profile, Certificate, Capital Deposit, and Dividend Modals
   const [isDirectorModalOpen, setIsDirectorModalOpen] = useState(false);
   const [editingDirector, setEditingDirector] = useState(null);
+  const [isDirectorAccessModalOpen, setIsDirectorAccessModalOpen] = useState(false);
+  const [selectedDirectorForAccess, setSelectedDirectorForAccess] = useState(null);
+  const [directorAccessForm, setDirectorAccessForm] = useState({
+    password: '',
+    status: 'সক্রিয় (Active)'
+  });
   const [expandedDirectors, setExpandedDirectors] = useState({});
   const [selectedDirectorForProfile, setSelectedDirectorForProfile] = useState(null);
   const [selectedDirectorForCertificate, setSelectedDirectorForCertificate] = useState(null);
@@ -658,6 +675,7 @@ export default function ManagementDashboard({
     image: null,
     role: 'পরিচালক',
     investment: '',
+    shareCount: '',
     sharePercentage: '',
     phone: '',
     email: '',
@@ -1399,9 +1417,9 @@ export default function ManagementDashboard({
     );
   };
 
-  const handleOpenAddTeam = (source = 'new') => {
+  const handleOpenAddTeam = () => {
     setEditingTeamMember(null);
-    setTeamAddSource(source);
+    setTeamAddSource('new');
     setSelectedDirectorForAccessId(null);
     setTeamForm({
       name: '',
@@ -1409,26 +1427,55 @@ export default function ManagementDashboard({
       email: '',
       role: 'সাইট ইঞ্জিনিয়ার',
       accessKey: 'admin123',
-      permissions: [],
+      permissions: ['projects', 'expenses'],
       directorId: null
     });
     setIsTeamModalOpen(true);
   };
 
-  const handleGrantDirectorAccess = (dir) => {
-    setEditingTeamMember(null);
-    setTeamAddSource('director');
-    setSelectedDirectorForAccessId(dir.id);
-    setTeamForm({
-      name: dir.name,
-      phone: dir.phone || '',
-      email: dir.email || '',
-      role: `বোর্ড ডিরেক্টর (${dir.role})`,
-      accessKey: '',
-      permissions: [],
-      directorId: dir.id
+  const handleOpenDirectorAccess = (dir) => {
+    setSelectedDirectorForAccess(dir);
+    setDirectorAccessForm({
+      password: '',
+      status: dir.status || 'সক্রিয় (Active)'
     });
-    setIsTeamModalOpen(true);
+    setIsDirectorAccessModalOpen(true);
+  };
+
+  const handleSaveDirectorAccess = async (e) => {
+    e.preventDefault();
+    if (!selectedDirectorForAccess) return;
+
+    let updatedAccessKey = selectedDirectorForAccess.accessKey || defaultAccessKeyHash;
+    if (directorAccessForm.password.trim()) {
+      updatedAccessKey = await hashPassword(directorAccessForm.password.trim());
+    }
+
+    updateStore((prev) => ({
+      ...prev,
+      managementTeam: (prev.managementTeam || []).filter(m => m.directorId !== selectedDirectorForAccess.id && m.id !== selectedDirectorForAccess.id),
+      directors: (prev.directors || []).map(d => {
+        if (d.id === selectedDirectorForAccess.id) {
+          return {
+            ...d,
+            accessKey: updatedAccessKey,
+            status: directorAccessForm.status
+          };
+        }
+        return d;
+      })
+    }));
+
+    if (selectedDirectorForProfile?.id === selectedDirectorForAccess.id) {
+      setSelectedDirectorForProfile(prev => ({
+        ...prev,
+        accessKey: updatedAccessKey,
+        status: directorAccessForm.status
+      }));
+    }
+
+    setIsDirectorAccessModalOpen(false);
+    triggerAlert(`পরিচালক "${selectedDirectorForAccess.name}"-এর পোর্টাল লগইন ও পাসওয়ার্ড সংরক্ষিত হয়েছে!`);
   };
 
   const handleOpenEditTeam = (mem) => {
@@ -1577,23 +1624,16 @@ export default function ManagementDashboard({
 
   const handleAddDirector = (e) => {
     e.preventDefault();
-    if (!directorForm.name || !directorForm.investment || !directorForm.sharePercentage) {
-      alert('দয়া করে পরিচালকের নাম, মোট বিনিয়োগ এবং শেয়ার শতাংশ পূরণ করুন।');
+    const shareCountNum = parseInt(directorForm.shareCount || directorForm.sharePercentage, 10) || 0;
+    if (!directorForm.name || !directorForm.investment || shareCountNum <= 0) {
+      alert('দয়া করে পরিচালকের নাম, মোট বিনিয়োগ এবং সঠিক শেয়ার সংখ্যা প্রদান করুন (যেমন: ১০০, ৫০০ ইত্যাদি)।');
       return;
     }
 
     const currentDirectors = data.directors || [];
     const invAmt = Number(directorForm.investment) || 0;
-    const sharePct = Number(directorForm.sharePercentage) || 0;
 
     if (editingDirector) {
-      const otherDirectors = currentDirectors.filter(d => d.id !== editingDirector.id);
-      const otherShareTotal = otherDirectors.reduce((acc, d) => acc + (Number(d.sharePercentage) || 0), 0);
-      if (otherShareTotal + sharePct > 100) {
-        alert(`মোট শেয়ার ১০০% অতিক্রম করবে (অন্যান্য পরিচালকদের মোট: ${otherShareTotal}%, আপনার নির্ধারিত: ${sharePct}%)। পরিমাণ ঠিক করুন।`);
-        return;
-      }
-
       updateStore((prev) => ({
         ...prev,
         directors: (prev.directors || []).map(d => {
@@ -1604,7 +1644,8 @@ export default function ManagementDashboard({
               role: directorForm.role || d.role,
               image: directorForm.image !== undefined ? directorForm.image : d.image,
               investment: invAmt,
-              sharePercentage: sharePct,
+              shareCount: shareCountNum,
+              sharePercentage: shareCountNum,
               phone: directorForm.phone || d.phone,
               email: directorForm.email || d.email,
               nomineeName: directorForm.nomineeName || d.nomineeName,
@@ -1623,7 +1664,8 @@ export default function ManagementDashboard({
           role: directorForm.role || prev.role,
           image: directorForm.image !== undefined ? directorForm.image : prev.image,
           investment: invAmt,
-          sharePercentage: sharePct,
+          shareCount: shareCountNum,
+          sharePercentage: shareCountNum,
           phone: directorForm.phone || prev.phone,
           email: directorForm.email || prev.email,
           nomineeName: directorForm.nomineeName || prev.nomineeName,
@@ -1639,6 +1681,7 @@ export default function ManagementDashboard({
         image: null,
         role: 'পরিচালক',
         investment: '',
+        shareCount: '',
         sharePercentage: '',
         phone: '',
         email: '',
@@ -1650,31 +1693,29 @@ export default function ManagementDashboard({
       return;
     }
 
-    const existingShareTotal = currentDirectors.reduce((acc, d) => acc + (Number(d.sharePercentage) || 0), 0);
-    if (existingShareTotal + sharePct > 100) {
-      alert(`মোট শেয়ার ১০০% অতিক্রম করবে (বর্তমান মোট: ${existingShareTotal}%, নতুন যোগ: ${sharePct}%)। পরিমাণ ঠিক করুন।`);
-      return;
-    }
     const nextIndex = currentDirectors.length + 1;
     const autoFolioNo = `DIR-${String(nextIndex).padStart(3, '0')}`;
 
     const newDirector = {
       id: `DIR-${String(nextIndex).padStart(2, '0')}`,
+      _isPendingSync: true,
       name: directorForm.name,
       role: directorForm.role || 'পরিচালক',
       folioNo: autoFolioNo,
       image: directorForm.image || null,
       investment: invAmt,
-      sharePercentage: sharePct,
+      shareCount: shareCountNum,
+      sharePercentage: shareCountNum,
       dividendEarned: 0,
       phone: directorForm.phone || '01918-646575',
       email: directorForm.email || 'director@alemarahproperties.com',
+      accessKey: defaultAccessKeyHash,
       joiningDate: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       status: 'সক্রিয় (Active)',
       nomineeName: directorForm.nomineeName || 'সংরক্ষিত',
       nomineeRelation: directorForm.nomineeRelation || 'উত্তরাধিকারী',
       nomineePhone: directorForm.nomineePhone || '',
-      theme: 'blue',
+      theme: 'emerald',
       installments: invAmt > 0 ? [
         {
           id: `INS-${nextIndex}-01`,
@@ -1700,6 +1741,7 @@ export default function ManagementDashboard({
       image: null,
       role: 'পরিচালক',
       investment: '',
+      shareCount: '',
       sharePercentage: '',
       phone: '',
       email: '',
@@ -1707,7 +1749,7 @@ export default function ManagementDashboard({
       nomineeRelation: '',
       nomineePhone: ''
     });
-    triggerAlert(`পরিচালক ${newDirector.name} (${newDirector.sharePercentage}% শেয়ার, ফোলিও: ${autoFolioNo}) সফলভাবে যুক্ত হয়েছেন!`);
+    triggerAlert(`পরিচালক ${newDirector.name} (${newDirector.shareCount} টি শেয়ার, ফোলিও: ${autoFolioNo}) সফলভাবে যুক্ত হয়েছেন!`);
   };
 
   // Handler: Add Capital Installment for a Director
@@ -1866,7 +1908,7 @@ export default function ManagementDashboard({
   // Director calculations
   const directorsList = data.directors || [];
   const totalDirectorInvestment = directorsList.reduce((acc, d) => acc + (d.investment || 0), 0);
-  const totalDirectorShares = directorsList.reduce((acc, d) => acc + (d.sharePercentage || 0), 0);
+  const totalDirectorShares = directorsList.reduce((acc, d) => acc + (Number(d.shareCount ?? d.sharePercentage) || 0), 0);
   const totalDirectorDividends = directorsList.reduce((acc, d) => acc + (d.dividendEarned || 0), 0);
 
   // Director full management access check: Super Admin or explicitly permitted in permissions
@@ -3384,7 +3426,7 @@ export default function ManagementDashboard({
             isSuperAdmin: true
           };
 
-          const officerTeam = (data.managementTeam || []).filter(m => !(m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com'));
+          const officerTeam = (data.managementTeam || []).filter(m => !(m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com' || m.isDirector || m.directorId));
 
           return (
             <div className="space-y-6 animate-fadeIn">
@@ -3963,6 +4005,7 @@ export default function ManagementDashboard({
                           image: null,
                           role: 'পরিচালক',
                           investment: '',
+                          shareCount: '',
                           sharePercentage: '',
                           phone: '',
                           email: '',
@@ -4051,7 +4094,7 @@ export default function ManagementDashboard({
                   </div>
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
                     <span className="text-3xs text-slate-500 font-bold block uppercase tracking-wide">শেয়ার অংশীদারিত্ব</span>
-                    <span className="text-lg sm:text-2xl font-mono font-black text-slate-800 block">{loggedInDirector.sharePercentage}%</span>
+                    <span className="text-lg sm:text-2xl font-mono font-black text-slate-800 block">{(loggedInDirector.shareCount || loggedInDirector.sharePercentage || 0).toLocaleString('bn-BD')} টি</span>
                     <span className="text-[11px] text-slate-500 font-medium block">কোম্পানির মোট ইকুইটি শেয়ারের মধ্যে</span>
                   </div>
                   <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/60 space-y-1">
@@ -4119,14 +4162,20 @@ export default function ManagementDashboard({
                 <div>
                   <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
                     <FileSpreadsheet className="w-4 h-4 text-[#006231]" />
-                    <span>পরিচালকগণের মোট বিনিয়োগ ও ১০০% শেয়ার বণ্টন তালিকা</span>
+                    <span>পরিচালকগণের মোট বিনিয়োগ ও শেয়ার বণ্টন তালিকা</span>
                   </h4>
-                  <p className="hidden sm:block text-2xs text-slate-500 mt-0.5">এক নজরে সকল ডিরেক্টরের বিনিয়োগকৃত টাকার অঙ্ক ও শেয়ার অনুপাত</p>
+                  <p className="hidden sm:block text-2xs text-slate-500 mt-0.5">এক নজরে সকল ডিরেক্টরের বিনিয়োগকৃত টাকার অঙ্ক ও মোট শেয়ার সংখ্যা</p>
                 </div>
-                {/* Total capital badge hidden on phone view as requested */}
-                <div className="hidden sm:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-[#006231] font-black text-xs border border-emerald-200 self-start sm:self-auto">
-                  <span>সর্বমোট মূলধন:</span>
-                  <span className="font-mono text-sm">{formatBDT(totalDirectorInvestment)}</span>
+                {/* Total capital & shares badge */}
+                <div className="hidden sm:flex items-center space-x-2 self-start sm:self-auto">
+                  <div className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-800 font-black text-xs border border-slate-200">
+                    <span>মোট শেয়ার:</span>
+                    <span className="font-mono text-sm text-[#006231]">{totalDirectorShares.toLocaleString('bn-BD')} টি</span>
+                  </div>
+                  <div className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-[#006231] font-black text-xs border border-emerald-200">
+                    <span>সর্বমোট মূলধন:</span>
+                    <span className="font-mono text-sm">{formatBDT(totalDirectorInvestment)}</span>
+                  </div>
                 </div>
               </div>
 
@@ -4186,7 +4235,7 @@ export default function ManagementDashboard({
                             <span>প্রোফাইল</span>
                           </button>
                           <span className="font-mono text-3xs px-2 py-1 rounded-lg bg-emerald-50 text-[#006231] font-bold border border-emerald-200">
-                            {dir.sharePercentage}%
+                            {(dir.shareCount || dir.sharePercentage || 0).toLocaleString('bn-BD')} টি শেয়ার
                           </span>
                           <button
                             type="button"
@@ -4321,19 +4370,16 @@ export default function ManagementDashboard({
                               <span>পূর্ণাঙ্গ প্রোফাইল</span>
                             </button>
 
-                            {isSuperAdmin && (() => {
-                              const hasTeamAccess = (data.managementTeam || []).some(m => m.directorId === dir.id || m.phone === dir.phone);
-                              return (
-                                <button
-                                  type="button"
-                                  onClick={(e) => { e.stopPropagation(); handleGrantDirectorAccess(dir); }}
-                                  className="col-span-2 py-2 px-2.5 rounded-xl bg-[#006231] hover:bg-[#004d26] text-white text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
-                                >
-                                  <KeyRound className="w-3.5 h-3.5" />
-                                  <span>{hasTeamAccess ? 'পারমিশন পরিবর্তন' : 'অ্যাডমিন এক্সেস দিন'}</span>
-                                </button>
-                              );
-                            })()}
+                            {isSuperAdmin && (
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); handleOpenDirectorAccess(dir); }}
+                                className="col-span-2 py-2 px-2.5 rounded-xl bg-[#006231] hover:bg-[#004d26] text-white text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
+                              >
+                                <KeyRound className="w-3.5 h-3.5" />
+                                <span>লগইন পাসওয়ার্ড ও এক্সেস</span>
+                              </button>
+                            )}
                           </div>
                         </div>
                       )}
@@ -4352,7 +4398,7 @@ export default function ManagementDashboard({
                       <th className="py-3 px-4">পরিচালকের নাম ও পদবি</th>
                       <th className="py-3 px-4">ফোলিও নং</th>
                       <th className="py-3 px-4">বিনিয়োগকৃত টাকা</th>
-                      <th className="py-3 px-4">শেয়ার অংশীদারিত্ব</th>
+                      <th className="py-3 px-4">মোট শেয়ার সংখ্যা</th>
                       <th className="py-3 px-4 text-right">গৃহীত মোট লভ্যাংশ</th>
                       <th className="py-3 px-4">মনোনীত নমিনি ও মোবাইল</th>
                       <th className="py-3 px-4 text-right">কার্যক্রম ও লভ্যাংশ প্রদান</th>
@@ -4415,8 +4461,8 @@ export default function ManagementDashboard({
                           <div className="text-3xs text-emerald-600 font-medium">পরিশোধিত বিনিয়োগ</div>
                         </td>
                         <td className="py-3 px-4">
-                          <div className="inline-flex items-center px-2.5 py-1 rounded-xl bg-red-50 text-[#CE2028] font-bold text-xs border border-red-200 shadow-2xs font-mono">
-                            <span>{dir.sharePercentage}%</span>
+                          <div className="inline-flex items-center px-2.5 py-1 rounded-xl bg-emerald-50 text-[#006231] font-bold text-xs border border-emerald-200 shadow-2xs font-mono">
+                            <span>{(dir.shareCount || dir.sharePercentage || 0).toLocaleString('bn-BD')} টি শেয়ার</span>
                           </div>
                         </td>
                         <td className="py-3 px-4 text-right">
@@ -4547,20 +4593,17 @@ export default function ManagementDashboard({
                                       <span>পূর্ণাঙ্গ প্রোফাইল ও লেজার</span>
                                     </button>
 
-                                    {/* 5. অ্যাডমিন এক্সেস */}
-                                    {isSuperAdmin && (() => {
-                                      const hasTeamAccess = (data.managementTeam || []).some(m => m.directorId === dir.id || m.phone === dir.phone);
-                                      return (
-                                        <button
-                                          type="button"
-                                          onClick={() => { setOpenActionMenuId(null); handleGrantDirectorAccess(dir); }}
-                                          className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2.5 text-[#006231] font-bold transition-colors cursor-pointer"
-                                        >
-                                          <KeyRound className="w-4 h-4 text-[#006231] shrink-0" />
-                                          <span>{hasTeamAccess ? 'পারমিশন পরিবর্তন' : 'অ্যাডমিন এক্সেস'}</span>
-                                        </button>
-                                      );
-                                    })()}
+                                    {/* 5. পোর্টাল লগইন ও পাসওয়ার্ড */}
+                                    {isSuperAdmin && (
+                                      <button
+                                        type="button"
+                                        onClick={() => { setOpenActionMenuId(null); handleOpenDirectorAccess(dir); }}
+                                        className="w-full px-3.5 py-2 text-left hover:bg-emerald-50/70 flex items-center space-x-2.5 text-[#006231] font-bold transition-colors cursor-pointer"
+                                      >
+                                        <KeyRound className="w-4 h-4 text-[#006231] shrink-0" />
+                                        <span>লগইন পাসওয়ার্ড ও এক্সেস</span>
+                                      </button>
+                                    )}
 
                                     {/* 6. তথ্য এডিট করুন */}
                                     <button
@@ -4573,7 +4616,8 @@ export default function ManagementDashboard({
                                           image: dir.image || null,
                                           role: dir.role || 'পরিচালক',
                                           investment: String(dir.investment || ''),
-                                          sharePercentage: String(dir.sharePercentage || ''),
+                                          shareCount: String(dir.shareCount || dir.sharePercentage || ''),
+                                          sharePercentage: String(dir.shareCount || dir.sharePercentage || ''),
                                           phone: dir.phone || '',
                                           email: dir.email || '',
                                           nomineeName: dir.nomineeName || '',
@@ -5127,15 +5171,16 @@ export default function ManagementDashboard({
 
                 <div>
                   <label className="block text-2xs font-semibold text-slate-600 mb-1">
-                    শেয়ার শতাংশ (%) *
+                    মোট শেয়ার সংখ্যা (টি) *
                   </label>
                   <input
                     type="number"
                     required
-                    step="0.5"
-                    placeholder="যেমন: 5, 10, 20"
-                    value={directorForm.sharePercentage}
-                    onChange={(e) => setDirectorForm({ ...directorForm, sharePercentage: e.target.value })}
+                    min="1"
+                    step="1"
+                    placeholder="যেমন: 100, 500, 1000"
+                    value={directorForm.shareCount ?? directorForm.sharePercentage}
+                    onChange={(e) => setDirectorForm({ ...directorForm, shareCount: e.target.value, sharePercentage: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                   />
                 </div>
@@ -5281,13 +5326,25 @@ export default function ManagementDashboard({
                     <div className="text-3xs text-slate-400 font-mono flex items-center space-x-2">
                       <span>ফোলিও: <strong className="text-white">{d.folioNo}</strong></span>
                       <span>•</span>
-                      <span className="text-amber-300 font-bold">শেয়ার: {d.sharePercentage}%</span>
+                      <span className="text-amber-300 font-bold">শেয়ার: {(d.shareCount || d.sharePercentage || 0).toLocaleString('bn-BD')} টি</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center space-x-2 shrink-0">
+                {isSuperAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenDirectorAccess(d)}
+                    className="px-3 sm:px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 transition-colors cursor-pointer text-xs font-bold flex items-center space-x-1.5"
+                    title="লগইন পাসওয়ার্ড ও এক্সেস"
+                  >
+                    <KeyRound className="w-4 h-4 text-emerald-400" />
+                    <span>লগইন এক্সেস</span>
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={() => {
@@ -5297,7 +5354,8 @@ export default function ManagementDashboard({
                       image: d.image || null,
                       role: d.role || 'পরিচালক',
                       investment: String(d.investment || ''),
-                      sharePercentage: String(d.sharePercentage || ''),
+                      shareCount: String(d.shareCount || d.sharePercentage || ''),
+                      sharePercentage: String(d.shareCount || d.sharePercentage || ''),
                       phone: d.phone || '',
                       email: d.email || '',
                       nomineeName: d.nomineeName || '',
@@ -5404,9 +5462,9 @@ export default function ManagementDashboard({
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
-                  <div className="text-3xs font-medium text-slate-500 uppercase tracking-wide">শেয়ার অংশীদারিত্ব</div>
-                  <div className="text-base sm:text-xl font-bold text-[#CE2028] font-mono">{d.sharePercentage}%</div>
-                  <div className="text-3xs text-red-600 font-medium">কোম্পানির মোট ইকুইটি</div>
+                  <div className="text-3xs font-medium text-slate-500 uppercase tracking-wide">মোট শেয়ার সংখ্যা</div>
+                  <div className="text-base sm:text-xl font-bold text-[#006231] font-mono">{(d.shareCount || d.sharePercentage || 0).toLocaleString('bn-BD')} টি</div>
+                  <div className="text-3xs text-emerald-600 font-medium">কোম্পানির সাধারণ শেয়ার</div>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
@@ -5641,6 +5699,161 @@ export default function ManagementDashboard({
       })()}
 
       {/* ========================================================= */}
+      {/* ========================================================= */}
+      {/* MODAL: DIRECTOR LOGIN CREDENTIALS & PORTAL ACCESS          */}
+      {/* ========================================================= */}
+      {isDirectorAccessModalOpen && selectedDirectorForAccess && (
+        <div className="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn select-none">
+          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-scaleUp">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-[#006231] to-[#0A4D27] p-5 text-white flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center">
+                  <KeyRound className="w-5 h-5 text-emerald-300" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base">পরিচালকের পোর্টাল লগইন ও পাসওয়ার্ড</h3>
+                  <p className="text-3xs text-emerald-100">লগইন আইডি ও এক্সেস কন্ট্রোল</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDirectorAccessModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveDirectorAccess} className="p-6 space-y-4">
+              {/* Director Identity Info */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-xl bg-slate-200 overflow-hidden shrink-0 border border-slate-300">
+                  {selectedDirectorForAccess.image ? (
+                    <img src={selectedDirectorForAccess.image} alt={selectedDirectorForAccess.name} className="w-full h-full object-cover object-top" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center font-bold text-slate-500 bg-slate-100">
+                      {selectedDirectorForAccess.name.slice(0, 1)}
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-slate-900 text-sm truncate">{selectedDirectorForAccess.name}</div>
+                  <div className="text-2xs text-[#CE2028] font-bold">{selectedDirectorForAccess.role} • ফোলিও: {selectedDirectorForAccess.folioNo}</div>
+                  <div className="text-3xs text-[#006231] font-mono font-bold mt-0.5">মোট শেয়ার: {(selectedDirectorForAccess.shareCount || selectedDirectorForAccess.sharePercentage || 0).toLocaleString('bn-BD')} টি</div>
+                </div>
+              </div>
+
+              {/* Login ID Display with copy button */}
+              <div className="space-y-1">
+                <label className="block text-2xs font-bold text-slate-600 uppercase">লগইন আইডি / মোবাইল নম্বর</label>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-100 border border-slate-200 font-mono text-xs font-bold text-slate-800">
+                  <span>{selectedDirectorForAccess.phone || selectedDirectorForAccess.folioNo || selectedDirectorForAccess.id}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(selectedDirectorForAccess.phone || selectedDirectorForAccess.folioNo);
+                      triggerAlert('লগইন আইডি কপি করা হয়েছে!');
+                    }}
+                    className="text-3xs text-[#006231] hover:underline cursor-pointer flex items-center space-x-1"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>কপি</span>
+                  </button>
+                </div>
+                <p className="text-3xs text-slate-400">পরিচালক এই মোবাইল নম্বর বা ফোলিও নম্বর দিয়ে সিস্টেমে সরাসরি লগইন করবেন।</p>
+              </div>
+
+              {/* Password Setting */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="block text-2xs font-bold text-slate-600 uppercase">নতুন পাসওয়ার্ড সেট করুন</label>
+                  <button
+                    type="button"
+                    onClick={() => setDirectorAccessForm(prev => ({ ...prev, password: 'admin123' }))}
+                    className="text-3xs text-[#006231] hover:underline font-bold cursor-pointer"
+                  >
+                    ডিফল্ট (admin123) বসান
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  placeholder="বর্তমান পাসওয়ার্ড অপরিবর্তিত রাখতে ফাঁকা রাখুন"
+                  value={directorAccessForm.password}
+                  onChange={(e) => setDirectorAccessForm({ ...directorAccessForm, password: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-800 outline-none focus:border-[#006231]"
+                />
+                <p className="text-3xs text-slate-500">পরিচালকের জন্য সহজ ও নিরাপদ পাসওয়ার্ড দিন। ডিফল্ট: <span className="font-mono font-bold text-[#006231]">admin123</span></p>
+              </div>
+
+              {/* Portal Status */}
+              <div className="space-y-1">
+                <label className="block text-2xs font-bold text-slate-600 uppercase">লগইন এক্সেস স্ট্যাটাস</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setDirectorAccessForm(prev => ({ ...prev, status: 'সক্রিয় (Active)' }))}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center space-x-1.5 ${
+                      !directorAccessForm.status?.includes('নিষ্ক্রিয়')
+                        ? 'bg-emerald-50 text-[#006231] border border-emerald-300 shadow-xs'
+                        : 'bg-slate-100 text-slate-500 border border-slate-200'
+                    }`}
+                  >
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    <span>সক্রিয় (Active)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDirectorAccessForm(prev => ({ ...prev, status: 'নিষ্ক্রিয় (Inactive)' }))}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center space-x-1.5 ${
+                      directorAccessForm.status?.includes('নিষ্ক্রিয়')
+                        ? 'bg-red-50 text-[#CE2028] border border-red-300 shadow-xs'
+                        : 'bg-slate-100 text-slate-500 border border-slate-200'
+                    }`}
+                  >
+                    <XCircle className="w-3.5 h-3.5" />
+                    <span>নিষ্ক্রিয় (Inactive)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Copy Credentials for sharing */}
+              <button
+                type="button"
+                onClick={() => {
+                  const idText = selectedDirectorForAccess.phone || selectedDirectorForAccess.folioNo;
+                  const passText = directorAccessForm.password.trim() || 'admin123';
+                  const text = `আল-ইমারাহ প্রোপার্টিজ — পরিচালক পোর্টাল লগইন\nনাম: ${selectedDirectorForAccess.name}\nলগইন আইডি/মোবাইল: ${idText}\nফোলিও: ${selectedDirectorForAccess.folioNo}\nপাসওয়ার্ড: ${passText}\nওয়েবসাইট: https://www.alemarahproperties.com/`;
+                  navigator.clipboard.writeText(text);
+                  triggerAlert('লগইন তথ্য সফলভাবে কপি করা হয়েছে!');
+                }}
+                className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+              >
+                <Copy className="w-3.5 h-3.5 text-slate-600" />
+                <span>পরিচালকের লগইন তথ্য এক ক্লিকে কপি করুন</span>
+              </button>
+
+              {/* Submit Buttons */}
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsDirectorAccessModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer"
+                >
+                  বাতিল
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-xs shadow-md shadow-emerald-900/20 hover:opacity-95 transition-all cursor-pointer"
+                >
+                  লগইন তথ্য সংরক্ষণ করুন
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* FULL SCREEN VIEW 2: OFFICIAL SHARE CERTIFICATE DOSSIER    */}
       {/* ========================================================= */}
       {selectedDirectorForCertificate && (() => {
@@ -5789,11 +6002,11 @@ export default function ManagementDashboard({
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#996515] via-[#D4AF37] to-[#996515] text-white text-3xs font-cinzel font-black uppercase tracking-[0.25em] px-4 py-0.5 rounded-full shadow-xs">
                         OFFICIAL EQUITY SHARE
                       </div>
-                      <div className="text-4xl sm:text-6xl font-black text-[#CE2028] font-mono tracking-tight mt-1">
-                        {certDir.sharePercentage}%
+                      <div className="text-3xl sm:text-5xl font-black text-[#CE2028] font-mono tracking-tight mt-1">
+                        {(certDir.shareCount || certDir.sharePercentage || 0).toLocaleString('bn-BD')} টি
                       </div>
                       <div className="text-2xs font-bold text-[#8C6D23] uppercase tracking-widest mt-1.5 font-serif">
-                        বরাদ্দকৃত ইকুইটি শেয়ার অংশ
+                        বরাদ্দকৃত মোট সাধারণ শেয়ার
                       </div>
                       <div className="text-3xs text-slate-500 font-sans mt-0.5">
                         স্বত্বাধিকারী পরিচালক ও আজীবন অংশীদার
@@ -6723,11 +6936,6 @@ export default function ManagementDashboard({
       <TeamModal
         isOpen={isTeamModalOpen}
         editingTeamMember={editingTeamMember}
-        teamAddSource={teamAddSource}
-        setTeamAddSource={setTeamAddSource}
-        selectedDirectorForAccessId={selectedDirectorForAccessId}
-        setSelectedDirectorForAccessId={setSelectedDirectorForAccessId}
-        directors={directorsList}
         form={teamForm}
         setForm={setTeamForm}
         isSidebarCollapsed={isSidebarCollapsed}
