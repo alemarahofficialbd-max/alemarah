@@ -2035,8 +2035,8 @@ export default function ManagementDashboard({
       shortLabel: isDirector && !hasDirectorFullAccess ? 'আমার শেয়ার' : 'ডিরেক্টরস', 
       icon: Award 
     },
-    { id: 'jobs', label: '৭. চাকরির আবেদন ও সিভি', shortLabel: 'চাকরির আবেদন', icon: Briefcase },
-    { id: 'inquiries', label: '৮. ইনকোয়ারি ও লিড', shortLabel: 'ইনকোয়ারি/লিড', icon: Mail },
+    { id: 'inquiries', label: '৭. ইনকোয়ারি ও ওয়েবসাইট লিড', shortLabel: 'ইনকোয়ারি/লিড', icon: Mail },
+    { id: 'jobs', label: '৮. চাকরির আবেদন ও সিভি', shortLabel: 'চাকরির আবেদন', icon: Briefcase },
     { id: 'team', label: '৯. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
     { id: 'settings', label: '১০. সেটিংস, ভাষা ও সিকিউরিটি পিন', shortLabel: 'সেটিংস', icon: Settings }
   ];
@@ -2086,55 +2086,70 @@ export default function ManagementDashboard({
 
 // Helper: Render Inquiries / Leads from the public website
   const renderInquiriesSection = () => (
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs mt-6 overflow-visible">
-                <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center space-x-3 bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
-                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0">
-                    <Mail className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-base font-black text-slate-900 flex items-center space-x-2">
-                      <span>ইনকোয়ারি / লিড</span>
-                      <span className="px-2 py-0.5 rounded-full bg-amber-600 text-white text-3xs font-bold">
-                        {(data.inquiries || []).length} টি
-                      </span>
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      সাইট ভিজিট ও বিনিয়োগ ফর্ম থেকে আসা অনুরোধসমূহ
-                    </p>
-                  </div>
-                </div>
+    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-visible">
+      <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0">
+            <Mail className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="text-base font-black text-slate-900 flex items-center space-x-2">
+              <span>ইনকোয়ারি ও ওয়েবসাইট লিড</span>
+              <span className="px-2 py-0.5 rounded-full bg-amber-600 text-white text-3xs font-bold">
+                {(data.inquiries || []).length} টি
+              </span>
+            </h4>
+            <p className="text-xs text-slate-500 mt-0.5">
+              সাইট ভিজিট ও বিনিয়োগ ফর্ম থেকে সরাসরি আসা গ্রাহক অনুরোধসমূহ
+            </p>
+          </div>
+        </div>
+      </div>
 
-                {(!data.inquiries || data.inquiries.length === 0) ? (
-                  <div className="p-10 text-center text-slate-400 space-y-2">
-                    <Mail className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
-                    <p className="text-xs font-bold text-slate-600">এখনও কোনো ইনকোয়ারি জমা পড়েনি</p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-                    {data.inquiries.map((inq) => (
-                      <div key={inq.id} className="p-4 flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="font-bold text-sm text-slate-900">{inq.name}</div>
-                          <div className="text-xs text-slate-500 font-mono">{inq.phone}{inq.email ? ` • ${inq.email}` : ''}</div>
-                          {inq.message && <div className="text-xs text-slate-600 mt-1 truncate">{inq.message}</div>}
-                          {inq.investmentAmount && <div className="text-xs text-slate-600 mt-1">বিনিয়োগ: {inq.investmentAmount} • খাত: {inq.interestedSector || '—'}</div>}
-                        </div>
-                        <div className="text-right shrink-0">
-                          <span className={`px-2 py-0.5 rounded-full text-3xs font-bold ${inq.inquiryType === 'investment' ? 'bg-purple-50 text-purple-700' : 'bg-emerald-50 text-[#006231]'}`}>
-                            {inq.inquiryType === 'investment' ? 'বিনিয়োগ' : 'সাইট ভিজিট'}
-                          </span>
-                          <div className="text-3xs text-slate-400 mt-1">{inq.date}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+      {(!data.inquiries || data.inquiries.length === 0) ? (
+        <div className="p-12 text-center text-slate-400 space-y-2">
+          <Mail className="w-12 h-12 mx-auto text-slate-300 stroke-[1.5]" />
+          <p className="text-sm font-bold text-slate-700">এখনও কোনো ইনকোয়ারি জমা পড়েনি</p>
+          <p className="text-xs text-slate-400">ওয়েবসাইটের সাইট ভিজিট বা বিনিয়োগ ফর্ম থেকে কেউ সাবমিট করলে এখানে সরাসরি প্রদর্শিত হবে।</p>
+        </div>
+      ) : (
+        <div className="divide-y divide-slate-100">
+          {data.inquiries.map((inq) => (
+            <div key={inq.id} className="p-4 sm:p-5 hover:bg-slate-50/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="min-w-0 space-y-1">
+                <div className="flex items-center space-x-2">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900">{inq.name}</h4>
+                  <span className={`px-2 py-0.5 rounded-full text-3xs font-bold ${inq.inquiryType === 'investment' ? 'bg-purple-50 text-purple-700 border border-purple-100' : 'bg-emerald-50 text-[#006231] border border-emerald-100'}`}>
+                    {inq.inquiryType === 'investment' ? 'বিনিয়োগ অনুরোধ' : 'সাইট ভিজিট'}
+                  </span>
+                </div>
+                <div className="text-xs text-slate-600 flex flex-wrap items-center gap-2 font-mono">
+                  <span className="font-bold text-slate-800">{inq.phone}</span>
+                  {inq.email && <span>• {inq.email}</span>}
+                </div>
+                {inq.message && <div className="text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100 mt-1">{inq.message}</div>}
+                {inq.investmentAmount && <div className="text-xs text-slate-700 mt-1 font-medium">প্রত্যাশিত বিনিয়োগ: <span className="font-bold text-purple-700">{inq.investmentAmount}</span> • আগ্রহের খাত: <span className="font-bold">{inq.interestedSector || '—'}</span></div>}
               </div>
+              <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0">
+                <div className="text-3xs text-slate-400">{inq.date}</div>
+                <a
+                  href={`tel:${inq.phone}`}
+                  className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006231] border border-emerald-200 text-xs font-bold inline-flex items-center space-x-1 transition-colors cursor-pointer"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>সরাসরি কল</span>
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 
   // Helper: Render Job Applications & Candidate CVs Section
   const renderJobApplicationsSection = () => (
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs mt-6 overflow-visible">
+    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-visible">
                 <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-100 flex items-center justify-center shrink-0">
@@ -4109,30 +4124,25 @@ export default function ManagementDashboard({
               </div>
 
               
-              {/* Inquiries / Leads Section */}
-              {renderInquiriesSection()}
-
-              {/* Job Applications & Candidate CVs Section */}
-              {renderJobApplicationsSection()}
             </div>
           );
         })()}
 
         {/* ------------------------------------------------------- */}
-        {/* TAB 7: JOB APPLICATIONS & CANDIDATE CVS                 */}
-        {/* ------------------------------------------------------- */}
-        {managementNavItems.some(i => i.id === 'jobs') && activeTab === 'jobs' && (
-          <div className="space-y-6 animate-fadeIn">
-            {renderJobApplicationsSection()}
-          </div>
-        )}
-
-        {/* ------------------------------------------------------- */}
-        {/* TAB 8: INQUIRIES & WEBSITE LEADS                        */}
+        {/* TAB 7: INQUIRIES & WEBSITE LEADS                        */}
         {/* ------------------------------------------------------- */}
         {managementNavItems.some(i => i.id === 'inquiries') && activeTab === 'inquiries' && (
           <div className="space-y-6 animate-fadeIn">
             {renderInquiriesSection()}
+          </div>
+        )}
+
+        {/* ------------------------------------------------------- */}
+        {/* TAB 8: JOB APPLICATIONS & CANDIDATE CVS                 */}
+        {/* ------------------------------------------------------- */}
+        {managementNavItems.some(i => i.id === 'jobs') && activeTab === 'jobs' && (
+          <div className="space-y-6 animate-fadeIn">
+            {renderJobApplicationsSection()}
           </div>
         )}
 
