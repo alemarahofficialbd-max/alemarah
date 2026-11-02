@@ -114,6 +114,15 @@ export default function App() {
     }
   });
 
+  const [selectedEventId, setSelectedEventId] = useState(() => {
+    try {
+      const hash = window.location.hash || '';
+      const match = hash.match(/[?&]id=([^&]+)/i);
+      if (match && match[1]) return decodeURIComponent(match[1]);
+      if (hash.startsWith('#events/')) return hash.replace('#events/', '').split('?')[0];
+      return null;
+    } catch { return null; }
+  });
   const [selectedProject, setSelectedProject] = useState(() => {
     try {
       const rawHash = window.location.hash.replace('#', '');
@@ -260,7 +269,17 @@ export default function App() {
       const hash = currentRawHash.split('?')[0].split('&')[0];
       let targetPage = pageFromState;
       if (!targetPage) {
-        if (currentRawHash.startsWith('careers') || currentRawHash.startsWith('job-')) {
+        if (currentRawHash.startsWith('events')) {
+          targetPage = 'events';
+          const match = currentRawHash.match(/[?&]id=([^&]+)/i);
+          if (match && match[1]) {
+            setSelectedEventId(decodeURIComponent(match[1]));
+          } else if (currentRawHash.startsWith('events/')) {
+            setSelectedEventId(currentRawHash.replace('events/', '').split('?')[0]);
+          } else {
+            setSelectedEventId(null);
+          }
+        } else if (currentRawHash.startsWith('careers') || currentRawHash.startsWith('job-')) {
           targetPage = 'careers';
         } else if (currentRawHash.startsWith('project-details') || currentRawHash.startsWith('projects/') || currentRawHash.startsWith('project/')) {
           targetPage = 'project-details';
@@ -1030,7 +1049,15 @@ export default function App() {
             {/* Corporate Events & Media Section */}
             <EventsSection
               lang={lang}
-              onNavigateToEvents={() => navigateTo('events')}
+              onNavigateToEvents={(eventId) => {
+                setSelectedEventId(eventId || null);
+                if (eventId) {
+                  window.history.pushState(null, '', `#events?id=${eventId}`);
+                } else {
+                  window.history.pushState(null, '', '#events');
+                }
+                navigateTo('events');
+              }}
             />
 
             {/* Career & Hiring Spotlight Banner on Homepage */}
@@ -1235,7 +1262,11 @@ export default function App() {
         {currentPage === 'events' && (
           <EventsPage
             lang={lang}
-            onBack={() => navigateTo('home')}
+            initialEventId={selectedEventId}
+            onBack={() => {
+              setSelectedEventId(null);
+              navigateTo('home');
+            }}
             onOpenBookVisit={() => handleOpenBookVisit()}
           />
         )}

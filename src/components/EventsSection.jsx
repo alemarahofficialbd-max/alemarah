@@ -38,10 +38,10 @@ export default function EventsSection({ lang = 'bn', onNavigateToEvents = () => 
 
           <button
             type="button"
-            onClick={onNavigateToEvents}
+            onClick={() => onNavigateToEvents(null)}
             className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-[#006231] text-white text-xs sm:text-sm font-bold shadow-md transition-all shrink-0 cursor-pointer self-start md:self-end active:scale-95"
           >
-            <span>{isEn ? 'View All Events' : 'সকল ইভেন্ট ও প্রতিবেদন'}</span>
+            <span>{isEn ? 'View All Events' : 'সকল ইভেন্ট তালিকা'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -137,7 +137,7 @@ export default function EventsSection({ lang = 'bn', onNavigateToEvents = () => 
                 </div>
               </div>
 
-              {/* Bottom CTA to full page */}
+              {/* Bottom CTA to full details */}
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                 <div>
                   <div className="text-3xs text-slate-400 font-medium">আয়োজনে</div>
@@ -146,10 +146,10 @@ export default function EventsSection({ lang = 'bn', onNavigateToEvents = () => 
 
                 <button
                   type="button"
-                  onClick={onNavigateToEvents}
+                  onClick={() => onNavigateToEvents(event.id)}
                   className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#004724] hover:from-[#004724] hover:to-[#003318] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#006231]/25 flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-all"
                 >
-                  <span>{isEn ? 'Read Full Story' : 'সম্পূর্ণ বিবরণ পড়ুন'}</span>
+                  <span>{isEn ? 'Read Details' : 'সম্পূর্ণ বিবরণ পড়ুন'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
