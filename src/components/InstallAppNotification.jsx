@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, X, Share, SquarePlus, Menu, Smartphone, Sparkles } from 'lucide-react';
+import { Download, X, Share, SquarePlus, Menu, Sparkles } from 'lucide-react';
 
 const isIOSDevice = () => {
   if (typeof navigator === 'undefined') return false;
@@ -93,10 +93,10 @@ export default function InstallAppNotification({ lang = 'bn' }) {
         className="fixed bottom-20 sm:bottom-6 right-3 left-3 sm:left-auto sm:right-6 z-[95] max-w-sm sm:max-w-md bg-white/95 backdrop-blur-xl border border-emerald-100 rounded-2xl sm:rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.18)] p-3.5 sm:p-4 select-none animate-fadeIn"
       >
         <div className="flex items-start space-x-3">
-          {/* App Icon with pulse ring */}
+          {/* Official Al-Emarah Logo Mark with pulse ring */}
           <div className="relative shrink-0">
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-[#006231] to-[#004724] text-white flex items-center justify-center shadow-md shadow-[#006231]/30 border border-emerald-400/20">
-              <Smartphone className="w-6 h-6 text-white" />
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white flex items-center justify-center shadow-md shadow-emerald-950/10 border border-slate-200/80 p-1.5 overflow-hidden">
+              <img src="/alemarah_favicon.svg" alt="Al-Emarah Logo" className="w-full h-full object-contain" />
             </div>
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -163,11 +163,16 @@ export default function InstallAppNotification({ lang = 'bn' }) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-black text-slate-900 text-base">
-                {isIOS
-                  ? (isEn ? 'Install on iPhone / iPad' : 'আইফোন / আইপ্যাডে ইনস্টল করুন')
-                  : (isEn ? 'Install the App' : 'অ্যাপ ইনস্টল করুন')}
-              </h3>
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 p-1 flex items-center justify-center shadow-xs">
+                  <img src="/alemarah_favicon.svg" alt="Al-Emarah" className="w-full h-full object-contain" />
+                </div>
+                <h3 className="font-black text-slate-900 text-base">
+                  {isIOS
+                    ? (isEn ? 'Install on iPhone / iPad' : 'আইফোন / আইপ্যাডে ইনস্টল করুন')
+                    : (isEn ? 'Install the App' : 'অ্যাপ ইনস্টল করুন')}
+                </h3>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowGuide(false)}
