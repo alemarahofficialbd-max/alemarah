@@ -329,20 +329,20 @@ export const translations = {
           {
             id: "bod_6",
             serial: "06",
-            name: "Md. Hisbullah Howlader",
-            role: "Director",
-            organization: "Al-Emarah Properties",
-            education: "Entrepreneur & Director, Al-Emarah Properties",
-            image: "/images/hijbullah_nahian.jpg"
-          },
-          {
-            id: "bod_7",
-            serial: "07",
             name: "Abbas Uddin",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
             image: "/images/abbas_uddin.jpg"
+          },
+          {
+            id: "bod_7",
+            serial: "07",
+            name: "Md. Hisbullah Howlader",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/hijbullah_nahian.jpg"
           },
           {
             id: "bod_8",
@@ -1169,20 +1169,20 @@ export const translations = {
           {
             id: "bod_6",
             serial: "০৬",
-            name: "মোঃ হিজবুল্লাহ হাওলাদার",
-            role: "পরিচালক",
-            organization: "আল-ইমারাহ প্রোপার্টিজ",
-            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
-            image: "/images/hijbullah_nahian.jpg"
-          },
-          {
-            id: "bod_7",
-            serial: "০৭",
             name: "আব্বাস উদ্দিন",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
             image: "/images/abbas_uddin.jpg"
+          },
+          {
+            id: "bod_7",
+            serial: "০৭",
+            name: "মোঃ হিজবুল্লাহ হাওলাদার",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/hijbullah_nahian.jpg"
           },
           {
             id: "bod_8",
