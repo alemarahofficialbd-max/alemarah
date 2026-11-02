@@ -692,6 +692,7 @@ export default function ManagementDashboard({
     sharePercentage: '',
     phone: '',
     email: '',
+    accessKey: '',
     nomineeName: '',
     nomineeRelation: '',
     nomineePhone: ''
@@ -1729,7 +1730,7 @@ export default function ManagementDashboard({
     );
   };
 
-  const handleAddDirector = (e) => {
+  const handleAddDirector = async (e) => {
     e.preventDefault();
     const shareCountNum = parseInt(directorForm.shareCount || directorForm.sharePercentage, 10) || 0;
     if (!directorForm.name || !directorForm.investment || shareCountNum <= 0) {
@@ -1741,6 +1742,11 @@ export default function ManagementDashboard({
     const invAmt = Number(directorForm.investment) || 0;
 
     if (editingDirector) {
+      let updatedAccessKey = editingDirector.accessKey || (await hashPassword('admin123'));
+      if (directorForm.accessKey && directorForm.accessKey.trim()) {
+        updatedAccessKey = await hashPassword(directorForm.accessKey.trim());
+      }
+
       updateStore((prev) => ({
         ...prev,
         directors: (prev.directors || []).map(d => {
@@ -1755,6 +1761,7 @@ export default function ManagementDashboard({
               sharePercentage: shareCountNum,
               phone: directorForm.phone || d.phone,
               email: directorForm.email || d.email,
+              accessKey: updatedAccessKey,
               nomineeName: directorForm.nomineeName || d.nomineeName,
               nomineeRelation: directorForm.nomineeRelation || d.nomineeRelation,
               nomineePhone: directorForm.nomineePhone || d.nomineePhone
@@ -1775,6 +1782,7 @@ export default function ManagementDashboard({
           sharePercentage: shareCountNum,
           phone: directorForm.phone || prev.phone,
           email: directorForm.email || prev.email,
+          accessKey: updatedAccessKey,
           nomineeName: directorForm.nomineeName || prev.nomineeName,
           nomineeRelation: directorForm.nomineeRelation || prev.nomineeRelation,
           nomineePhone: directorForm.nomineePhone || prev.nomineePhone
@@ -1792,16 +1800,21 @@ export default function ManagementDashboard({
         sharePercentage: '',
         phone: '',
         email: '',
+        accessKey: '',
         nomineeName: '',
         nomineeRelation: '',
         nomineePhone: ''
       });
-      triggerAlert(`পরিচালক "${directorForm.name}"-এর তথ্য সফলভাবে আপডেট হয়েছে!`);
+      triggerAlert(`পরিচালক "${directorForm.name}"-এর তথ্য ও লগইন সফলভাবে আপডেট হয়েছে!`);
       return;
     }
 
     const nextIndex = currentDirectors.length + 1;
     const autoFolioNo = `DIR-${String(nextIndex).padStart(3, '0')}`;
+
+    const newDirectorAccessKey = directorForm.accessKey && directorForm.accessKey.trim() 
+      ? await hashPassword(directorForm.accessKey.trim()) 
+      : await hashPassword('admin123');
 
     const newDirector = {
       id: `DIR-${String(nextIndex).padStart(2, '0')}`,
@@ -1816,7 +1829,7 @@ export default function ManagementDashboard({
       dividendEarned: 0,
       phone: directorForm.phone || '01918-646575',
       email: directorForm.email || 'director@alemarahproperties.com',
-      accessKey: defaultAccessKeyHash,
+      accessKey: newDirectorAccessKey,
       joiningDate: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       status: 'সক্রিয় (Active)',
       nomineeName: directorForm.nomineeName || 'সংরক্ষিত',
@@ -1852,6 +1865,7 @@ export default function ManagementDashboard({
       sharePercentage: '',
       phone: '',
       email: '',
+      accessKey: '',
       nomineeName: '',
       nomineeRelation: '',
       nomineePhone: ''
@@ -4190,6 +4204,7 @@ export default function ManagementDashboard({
                           sharePercentage: '',
                           phone: '',
                           email: '',
+                          accessKey: '',
                           nomineeName: '',
                           nomineeRelation: '',
                           nomineePhone: ''
@@ -4801,6 +4816,7 @@ export default function ManagementDashboard({
                                           sharePercentage: String(dir.shareCount || dir.sharePercentage || ''),
                                           phone: dir.phone || '',
                                           email: dir.email || '',
+                                          accessKey: '',
                                           nomineeName: dir.nomineeName || '',
                                           nomineeRelation: dir.nomineeRelation || '',
                                           nomineePhone: dir.nomineePhone || ''
@@ -5369,20 +5385,21 @@ export default function ManagementDashboard({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
-                    পরিচালকের মোবাইল নম্বর
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    পরিচালকের মোবাইল নম্বর *
                   </label>
                   <input
                     type="tel"
+                    required
                     placeholder="01XXXXXXXXX"
                     value={directorForm.phone}
                     onChange={(e) => setDirectorForm({ ...directorForm, phone: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#006231]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-2xs font-semibold text-slate-600 mb-1">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     ইমেইল (ঐচ্ছিক)
                   </label>
                   <input
@@ -5390,8 +5407,64 @@ export default function ManagementDashboard({
                     placeholder="director@alemarahproperties.com"
                     value={directorForm.email}
                     onChange={(e) => setDirectorForm({ ...directorForm, email: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#006231]"
                   />
+                </div>
+              </div>
+
+              {/* Director Portal Login Access & Password Section */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50/80 via-white to-slate-50 border border-emerald-200/90 space-y-3 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#006231] to-[#0A4D27] text-white flex items-center justify-center shadow-xs">
+                      <KeyRound className="w-4 h-4 text-emerald-300" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center space-x-1.5">
+                        <span>পরিচালকের পোর্টাল লগইন ও নিরাপত্তা পাসওয়ার্ড</span>
+                      </h4>
+                      <p className="text-3xs text-slate-500">
+                        পরিচালক সিস্টেমে লগইন করে ব্যক্তিগত শেয়ার সার্টিফিকেট ও ডিভিডেন্ড লেজার দেখতে পাবেন
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-3xs font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100/80 text-[#006231] border border-emerald-200 shrink-0">
+                    লগইন এক্সেস
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {/* Username / Mobile Notice Card */}
+                  <div className="p-3 rounded-xl bg-white border border-slate-200/90 flex flex-col justify-center space-y-1">
+                    <span className="text-3xs font-bold text-slate-500 uppercase tracking-wider">
+                      লগইন আইডি / ব্যবহারকারী নাম:
+                    </span>
+                    <span className="font-mono text-xs sm:text-sm font-black text-[#006231] truncate">
+                      {directorForm.phone ? directorForm.phone : 'মোবাইল নম্বর লিখুন'}
+                    </span>
+                    <span className="text-[10px] text-slate-400 leading-tight">
+                      পরিচালক এই মোবাইল নম্বর ব্যবহার করে লগইন পেজ থেকে সাইন-ইন করবেন
+                    </span>
+                  </div>
+
+                  {/* Password Input */}
+                  <div>
+                    <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      {editingDirector ? 'নতুন পাসওয়ার্ড (ঐচ্ছিক)' : 'লগইন পাসওয়ার্ড সেট করুন *'}
+                    </label>
+                    <input
+                      type="text"
+                      value={directorForm.accessKey || ''}
+                      onChange={(e) => setDirectorForm({ ...directorForm, accessKey: e.target.value })}
+                      placeholder={editingDirector ? 'ফাঁকা রাখলে বর্তমান পাসওয়ার্ড বহাল থাকবে' : 'যেমন: admin123 (ডিফল্ট)'}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-mono font-semibold text-slate-800 outline-none focus:border-[#006231]"
+                    />
+                    <span className="text-[10px] text-slate-500 mt-1 block">
+                      {editingDirector 
+                        ? 'পাসওয়ার্ড পরিবর্তন করতে চাইলে এখানে নতুন পাসওয়ার্ড লিখুন' 
+                        : 'ফাঁকা রাখলে ডিফল্ট পাসওয়ার্ড admin123 নির্ধারিত হবে'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -5539,6 +5612,7 @@ export default function ManagementDashboard({
                       sharePercentage: String(d.shareCount || d.sharePercentage || ''),
                       phone: d.phone || '',
                       email: d.email || '',
+                      accessKey: '',
                       nomineeName: d.nomineeName || '',
                       nomineeRelation: d.nomineeRelation || '',
                       nomineePhone: d.nomineePhone || ''
