@@ -54,12 +54,16 @@ export default function Navbar({
     { id: 'investment', label: t.nav.investment || (lang === 'en' ? 'Investment' : 'বিনিয়োগ ও শেয়ার'), shortLabel: lang === 'en' ? 'Invest' : 'বিনিয়োগ', icon: Coins },
     { id: 'why-us', label: t.nav.whyUs, shortLabel: lang === 'en' ? 'Why Us' : 'কেন আল-ইমারাহ', icon: ShieldCheck },
     { id: 'about', label: t.nav.about, shortLabel: lang === 'en' ? 'About' : 'আমাদের সম্পর্কে', icon: Compass },
+    { id: 'events', label: lang === 'en' ? 'Events & Updates' : 'ইভেন্টস ও কার্যক্রম', shortLabel: lang === 'en' ? 'Events' : 'ইভেন্টস', icon: Calendar },
     { id: 'careers', label: t.nav.careers || (lang === 'en' ? 'Careers' : 'ক্যারিয়ার'), shortLabel: lang === 'en' ? 'Jobs' : 'ক্যারিয়ার', icon: Briefcase },
     { id: 'contact', label: t.nav.contact, shortLabel: t.nav.contact, icon: Phone }
   ];
 
+  // Desktop navigation: exclude 'events' as requested so top bar stays pristine
+  const desktopNavLinks = navLinks.filter(item => item.id !== 'events');
+
   // Mobile bottom dock bar strictly has 6 items to avoid wrapping onto a 2nd row
-  const bottomNavLinks = navLinks.filter(item => item.id !== 'careers');
+  const bottomNavLinks = navLinks.filter(item => item.id !== 'careers' && item.id !== 'events');
 
   const handleNavClick = (pageId) => {
     setMobileMenuOpen(false);
@@ -141,7 +145,7 @@ export default function Navbar({
 
             {/* Desktop Navigation Categories (6 exact items) */}
             <nav className="hidden xl:flex items-center space-x-1">
-              {navLinks.map((item) => {
+              {desktopNavLinks.map((item) => {
                 const IconComponent = item.icon;
                 const isActive = currentPage === item.id;
                 return (
@@ -163,7 +167,7 @@ export default function Navbar({
 
             {/* Medium screens navigation (lg to xl) */}
             <nav className="hidden lg:flex xl:hidden items-center space-x-0.5">
-              {navLinks.map((item) => {
+              {desktopNavLinks.map((item) => {
                 const isActive = currentPage === item.id;
                 return (
                   <button

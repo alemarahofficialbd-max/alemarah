@@ -15,6 +15,8 @@ import InvestmentPage from './components/InvestmentPage';
 import Footer from './components/Footer';
 import CareerPage from './components/CareerPage';
 import SplashScreen from './components/SplashScreen';
+import EventsSection from './components/EventsSection';
+import EventsPage from './components/EventsPage';
 import InstallAppNotification from './components/InstallAppNotification';
 import { translations } from './translations';
 import { projectsData } from './data/projectsData';
@@ -130,7 +132,7 @@ export default function App() {
 
   const [currentPage, setCurrentPage] = useState(() => {
     try {
-      const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details', 'careers'];
+      const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details', 'careers', 'events'];
       const rawHash = window.location.hash.replace('#', '');
       const hash = rawHash.split('?')[0].split('&')[0];
       const hasAdmin = Boolean(localStorage.getItem('alemarah_admin_session'));
@@ -203,7 +205,7 @@ export default function App() {
 
   // Synchronize browser history and hash navigation (back/forward button support & refresh retention)
   useEffect(() => {
-    const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details', 'careers'];
+    const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details', 'careers', 'events'];
     const rawHash = window.location.hash.replace('#', '');
     const initialHash = rawHash.split('?')[0].split('&')[0];
     
@@ -1025,6 +1027,12 @@ export default function App() {
               </div>
             </section>
 
+            {/* Corporate Events & Media Section */}
+            <EventsSection
+              lang={lang}
+              onNavigateToEvents={() => navigateTo('events')}
+            />
+
             {/* Career & Hiring Spotlight Banner on Homepage */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
               <div className="bg-gradient-to-r from-[#17261C] via-[#0A4D27] to-[#122217] text-white rounded-3xl p-6 sm:p-10 border border-emerald-500/25 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
@@ -1219,6 +1227,17 @@ export default function App() {
               onNavigate={navigateTo}
             />
           </div>
+        )}
+
+        {/* ==================================================== */}
+        {/* PAGE 5C: DEDICATED EVENTS & UPDATES PAGE           */}
+        {/* ==================================================== */}
+        {currentPage === 'events' && (
+          <EventsPage
+            lang={lang}
+            onBack={() => navigateTo('home')}
+            onOpenBookVisit={() => handleOpenBookVisit()}
+          />
         )}
 
         {/* ==================================================== */}
