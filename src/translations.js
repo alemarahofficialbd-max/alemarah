@@ -329,7 +329,7 @@ export const translations = {
           {
             id: "bod_6",
             serial: "06",
-            name: "Abbas Uddin",
+            name: "Md. Hisbullah Howlader",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
@@ -338,7 +338,7 @@ export const translations = {
           {
             id: "bod_7",
             serial: "07",
-            name: "Md. Hisbullah Howlader",
+            name: "Abbas Uddin",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
@@ -1169,7 +1169,7 @@ export const translations = {
           {
             id: "bod_6",
             serial: "০৬",
-            name: "আব্বাস উদ্দিন",
+            name: "মোঃ হিজবুল্লাহ হাওলাদার",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
@@ -1178,7 +1178,7 @@ export const translations = {
           {
             id: "bod_7",
             serial: "০৭",
-            name: "মোঃ হিজবুল্লাহ হাওলাদার",
+            name: "আব্বাস উদ্দিন",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
