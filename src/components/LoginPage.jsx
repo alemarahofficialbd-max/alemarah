@@ -17,7 +17,6 @@ import {
   Shield
 } from 'lucide-react';
 import { getManagementData, getCustomerUnits, findCustomerByIdentifier, verifyPassword, hashPassword, isHashedPassword, upgradeCredentialHash } from '../data/managementStore';
-import InstallAppButton from './InstallAppButton';
 
 // Verifies a typed password against a stored credential, and if the stored
 // value is still legacy plaintext, silently upgrades it to a hash once
@@ -277,14 +276,6 @@ export default function LoginPage({
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-
-          {/* Install App (Android/Chrome native prompt, manual steps for iPhone/other browsers) */}
-          <div className="absolute top-5 right-5">
-            <InstallAppButton
-              lang={lang}
-              className="inline-flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#006231]/10 hover:bg-[#006231]/15 text-[#006231] text-2xs sm:text-xs font-bold transition-colors cursor-pointer border border-[#006231]/20"
-            />
-          </div>
 
           {/* Official Brand Logo and Title */}
           <div className="text-center mb-6">

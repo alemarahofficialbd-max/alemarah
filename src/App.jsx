@@ -15,6 +15,7 @@ import InvestmentPage from './components/InvestmentPage';
 import Footer from './components/Footer';
 import CareerPage from './components/CareerPage';
 import SplashScreen from './components/SplashScreen';
+import InstallAppNotification from './components/InstallAppNotification';
 import { translations } from './translations';
 import { projectsData } from './data/projectsData';
 import { 
@@ -1289,6 +1290,9 @@ export default function App() {
       {showSplash && (
         <SplashScreen onFinish={() => setShowSplash(false)} minDuration={1600} />
       )}
+
+      {/* Modern PWA Install Notification / Popup Toast */}
+      <InstallAppNotification lang={lang} />
     </div>
   );
 }

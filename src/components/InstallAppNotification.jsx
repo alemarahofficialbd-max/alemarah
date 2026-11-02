@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Download, X, Share, SquarePlus, Menu } from 'lucide-react';
+import { Download, X, Share, SquarePlus, Menu, Smartphone, Sparkles } from 'lucide-react';
 
 const isIOSDevice = () => {
   if (typeof navigator === 'undefined') return false;
   const ua = navigator.userAgent || '';
   const iOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-  // iPadOS 13+ reports as "MacIntel" but has touch support, unlike a real Mac.
   const iPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
   return iOS || iPadOS;
 };
@@ -14,72 +13,153 @@ const isStandaloneDisplay = () =>
   (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
   window.navigator.standalone === true;
 
-// A persistent "Install App" button that works everywhere a browser-triggered
-// download/install can silently fail to appear:
-// - Android/Chrome/Edge: uses the captured beforeinstallprompt event.
-// - iPhone/iPad (Safari never fires beforeinstallprompt): shows manual
-//   "Share -> Add to Home Screen" steps instead.
-// - Any other browser/desktop where the native prompt hasn't fired yet:
-//   shows a generic manual fallback instead of doing nothing.
-export default function InstallAppButton({ lang = 'bn', className = '', compact = false }) {
+export default function InstallAppNotification({ lang = 'bn' }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showNotification, setShowNotification] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [installed, setInstalled] = useState(() => isStandaloneDisplay());
   const isEn = lang === 'en';
   const isIOS = isIOSDevice();
 
   useEffect(() => {
+    if (installed) return;
+
+    // Check if dismissed in this session
+    try {
+      if (sessionStorage.getItem('alemarah_install_dismissed') === 'true') {
+        return;
+      }
+    } catch (_) {}
+
     const handleBeforeInstall = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
+      setShowNotification(true);
     };
+
     const handleInstalled = () => {
       setInstalled(true);
+      setShowNotification(false);
       setDeferredPrompt(null);
     };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
     window.addEventListener('appinstalled', handleInstalled);
+
+    // Show popup notification smoothly after a short delay (2.5s)
+    const timer = setTimeout(() => {
+      setShowNotification(true);
+    }, 2500);
+
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
       window.removeEventListener('appinstalled', handleInstalled);
     };
-  }, []);
+  }, [installed]);
 
-  if (installed) return null;
+  if (installed || !showNotification) return null;
 
-  const handleClick = async () => {
+  const handleDismiss = () => {
+    setShowNotification(false);
+    try {
+      sessionStorage.setItem('alemarah_install_dismissed', 'true');
+    } catch (_) {}
+  };
+
+  const handleInstallClick = async () => {
     if (!isIOS && deferredPrompt) {
       try {
         deferredPrompt.prompt();
         const choice = await deferredPrompt.userChoice;
-        if (choice?.outcome === 'accepted') setInstalled(true);
+        if (choice?.outcome === 'accepted') {
+          setInstalled(true);
+          setShowNotification(false);
+        }
       } catch (_) {}
       setDeferredPrompt(null);
       return;
     }
-    // iOS, or a browser that hasn't (yet) fired beforeinstallprompt.
+    // iOS or browser without prompt: show step-by-step guide
     setShowGuide(true);
   };
 
   return (
     <>
-      <button
-        type="button"
-        onClick={handleClick}
-        className={className || 'inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-[#006231]/10 hover:bg-[#006231]/15 text-[#006231] text-xs font-bold transition-colors cursor-pointer border border-[#006231]/20'}
-        title={isEn ? 'Install App' : 'অ্যাপ ইনস্টল করুন'}
+      {/* Floating Notification / Popup Banner */}
+      <div 
+        role="alert"
+        aria-live="polite"
+        className="fixed bottom-20 sm:bottom-6 right-3 left-3 sm:left-auto sm:right-6 z-[95] max-w-sm sm:max-w-md bg-white/95 backdrop-blur-xl border border-emerald-100 rounded-2xl sm:rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.18)] p-3.5 sm:p-4 select-none animate-fadeIn"
       >
-        <Download className="w-3.5 h-3.5 shrink-0" />
-        {!compact && <span className="hidden sm:inline">{isEn ? 'Install App' : 'অ্যাপ ইনস্টল করুন'}</span>}
-      </button>
+        <div className="flex items-start space-x-3">
+          {/* App Icon with pulse ring */}
+          <div className="relative shrink-0">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-[#006231] to-[#004724] text-white flex items-center justify-center shadow-md shadow-[#006231]/30 border border-emerald-400/20">
+              <Smartphone className="w-6 h-6 text-white" />
+            </div>
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#006231]"></span>
+            </span>
+          </div>
 
+          {/* Details */}
+          <div className="min-w-0 flex-1 pr-6">
+            <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-black tracking-wide border border-emerald-200/60 mb-1">
+              <Sparkles className="w-2.5 h-2.5" />
+              <span>{isEn ? 'Official App' : 'অফিশিয়াল অ্যাপ'}</span>
+            </div>
+            <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug">
+              {isEn ? 'Install Al-Emarah App' : 'আল-ইমারাহ অ্যাপ ইনস্টল করুন'}
+            </h4>
+            <p className="text-3xs sm:text-2xs text-slate-500 mt-0.5 leading-relaxed">
+              {isEn
+                ? 'Fast browsing, instant updates, and offline access directly from your phone.'
+                : 'সহজ ব্রাউজিং ও হোম স্ক্রিন থেকে দ্রুত ব্যবহারের জন্য অ্যাপটি ইনস্টল করে নিন।'}
+            </p>
+
+            {/* Actions */}
+            <div className="mt-2.5 flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={handleInstallClick}
+                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#006231] to-[#004724] hover:from-[#004724] hover:to-[#003318] text-white font-bold text-xs shadow-md shadow-[#006231]/25 flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-all"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{isEn ? 'Install' : 'ইনস্টল করুন'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDismiss}
+                className="px-3 py-1.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 font-bold text-xs transition-colors cursor-pointer"
+              >
+                {isEn ? 'Later' : 'পরে'}
+              </button>
+            </div>
+          </div>
+
+          {/* Top-right close X */}
+          <button
+            type="button"
+            onClick={handleDismiss}
+            aria-label="Close"
+            className="absolute top-2.5 right-2.5 p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Guide Modal for iOS or manual install */}
       {showGuide && (
         <div
-          className="fixed inset-0 z-[300] bg-black/60 flex items-end sm:items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowGuide(false)}
         >
           <div
-            className="bg-white rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl"
+            className="bg-white rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
