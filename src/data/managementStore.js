@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabaseClient';
+﻿import { supabase } from '../lib/supabaseClient';
 
 const STORAGE_KEY = 'alemarah_management_store_v6';
 
@@ -518,24 +518,30 @@ export const syncToSupabase = async (data) => {
       const { error: clientErr } = await supabase.from('clients').upsert(clientRows, { onConflict: 'id' });
       if (clientErr) { console.error('Cloud sync failed: clients', clientErr); failedTables.push('clients'); }
 
-      // 4c. Sync Payments
-      const allPayments = [];
-      data.clients.forEach(c => {
-        if (c.paymentHistory && c.paymentHistory.length > 0) {
-          c.paymentHistory.forEach(pay => {
-            allPayments.push({
-              id: pay.id,
-              client_id: c.id,
-              date: pay.date || '',
-              amount: Number(pay.amount) || 0,
-              method: pay.method || ''
+      // 4c. Sync Payments — only for clients whose upsert succeeded
+      // (prevents FK violation 409 when a client was deleted in Supabase but remains locally)
+      if (!clientErr) {
+        const syncedClientIds = new Set(clientRows.map(r => r.id));
+        const allPayments = [];
+        data.clients.forEach(c => {
+          if (!syncedClientIds.has(c.id)) return;
+          if (c.paymentHistory && c.paymentHistory.length > 0) {
+            c.paymentHistory.forEach(pay => {
+              if (!pay.id || !pay.date) return;
+              allPayments.push({
+                id: pay.id,
+                client_id: c.id,
+                date: pay.date || '',
+                amount: Number(pay.amount) || 0,
+                method: pay.method || ''
+              });
             });
-          });
+          }
+        });
+        if (allPayments.length > 0) {
+          const { error: payErr } = await supabase.from('client_payments').upsert(allPayments, { onConflict: 'id' });
+          if (payErr) { console.error('Cloud sync failed: client_payments', payErr); failedTables.push('client_payments'); }
         }
-      });
-      if (allPayments.length > 0) {
-        const { error: payErr } = await supabase.from('client_payments').upsert(allPayments, { onConflict: 'id' });
-        if (payErr) { console.error('Cloud sync failed: client_payments', payErr); failedTables.push('client_payments'); }
       }
     }
 
