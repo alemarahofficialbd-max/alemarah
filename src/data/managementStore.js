@@ -285,7 +285,7 @@ export const getManagementData = () => {
       if (!parsed.directors) {
         parsed.directors = [];
       } else {
-        parsed.directors = parsed.directors.filter(d => !deletedDirSet.has(d.id));
+        parsed.directors = parsed.directors.filter(d => d._isPendingSync || !deletedDirSet.has(d.id));
       }
 
       if (!parsed.projects) {
@@ -404,8 +404,11 @@ export const syncToSupabase = async (data) => {
     // 1. Sync Directors
     if (data.directors && data.directors.length > 0) {
       const deletedDirSet = new Set(data.deletedDirectorIds || []);
-      const activeDirs = data.directors.filter(d => !deletedDirSet.has(d.id));
-      const dirRows = activeDirs.map(d => ({
+      const activeDirs = data.directors.filter(d => d._isPendingSync || !deletedDirSet.has(d.id));
+      const dirRows = activeDirs.map(d => {
+        const rawShare = Number(d.shareCount ?? d.sharePercentage) || 0;
+        const safeSharePercentage = rawShare > 999.99 ? 99.99 : rawShare;
+        return {
         id: d.id,
         name: d.name,
         name_en: d.nameEn || '',
@@ -414,7 +417,7 @@ export const syncToSupabase = async (data) => {
         folio_no: d.folioNo,
         image: d.image || null,
         investment: Number(d.investment) || 0,
-        share_percentage: Number(d.shareCount ?? d.sharePercentage) || 0,
+        share_percentage: safeSharePercentage,
         dividend_earned: Number(d.dividendEarned) || 0,
         phone: d.phone || '',
         email: d.email || '',
@@ -424,7 +427,7 @@ export const syncToSupabase = async (data) => {
         nominee_relation: d.nomineeRelation || '',
         nominee_phone: d.nomineePhone || '',
         theme: d.theme || 'emerald'
-      }));
+      };});
       const { error: dirErr } = await supabase.from('directors').upsert(dirRows, { onConflict: 'id' });
       if (dirErr) { console.error('Cloud sync failed: directors', dirErr); failedTables.push('directors'); }
     }
@@ -753,8 +756,8 @@ const _syncFromSupabaseImpl = async () => {
             folioNo: d.folio_no,
             image: d.image || localDir?.image || null,
             investment: Number(d.investment) || localDir?.investment || 0,
-            shareCount: Number(d.share_percentage) || localDir?.shareCount || localDir?.sharePercentage || 0,
-            sharePercentage: Number(d.share_percentage) || localDir?.shareCount || localDir?.sharePercentage || 0,
+            shareCount: localDir?.shareCount || Number(d.share_percentage) || 0,
+            sharePercentage: localDir?.sharePercentage || Number(d.share_percentage) || 0,
             dividendEarned: Number(d.dividend_earned) || localDir?.dividendEarned || 0,
             phone: d.phone || localDir?.phone || '',
             email: d.email || localDir?.email || '',
@@ -769,7 +772,11 @@ const _syncFromSupabaseImpl = async () => {
             dividendHistory: localDir?.dividendHistory || []
           };
         });
-      const pendingLocalDirs = (current.directors || []).filter(ld => ld._isPendingSync && !deletedDirSet.has(ld.id) && !directorsRes.data.some(d => d.id === ld.id));
+      const pendingLocalDirs = (current.directors || []).filter(ld => 
+        ld._isPendingSync && !directorsRes.data.some(d => d.id === ld.id)
+      );
+      const pendingIds = new Set(pendingLocalDirs.map(ld => ld.id));
+      updated.deletedDirectorIds = (updated.deletedDirectorIds || []).filter(id => !pendingIds.has(id));
       updated.directors = [...remoteDirs, ...pendingLocalDirs];
     }
 

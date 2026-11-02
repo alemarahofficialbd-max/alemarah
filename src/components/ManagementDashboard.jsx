@@ -1746,6 +1746,29 @@ export default function ManagementDashboard({
     );
   };
 
+  const getNextSafeDirectorFolio = () => {
+    const currentDirs = data.directors || [];
+    const allKnownIds = new Set([
+      ...currentDirs.map(d => d.id),
+      ...(data.deletedDirectorIds || [])
+    ]);
+    const allKnownFolios = new Set([
+      ...currentDirs.map(d => d.folioNo)
+    ]);
+    let safeIndex = currentDirs.length + 1;
+    while (
+      allKnownIds.has(`DIR-${String(safeIndex).padStart(2, '0')}`) ||
+      allKnownFolios.has(`DIR-${String(safeIndex).padStart(3, '0')}`)
+    ) {
+      safeIndex++;
+    }
+    return {
+      safeId: `DIR-${String(safeIndex).padStart(2, '0')}`,
+      safeFolio: `DIR-${String(safeIndex).padStart(3, '0')}`,
+      safeIndex
+    };
+  };
+
   const handleAddDirector = async (e) => {
     e.preventDefault();
     const shareCountNum = parseInt(directorForm.shareCount || directorForm.sharePercentage, 10) || 0;
@@ -1826,19 +1849,18 @@ export default function ManagementDashboard({
       return;
     }
 
-    const nextIndex = currentDirectors.length + 1;
-    const autoFolioNo = `DIR-${String(nextIndex).padStart(3, '0')}`;
+    const { safeId, safeFolio, safeIndex } = getNextSafeDirectorFolio();
 
     const newDirectorAccessKey = directorForm.accessKey && directorForm.accessKey.trim() 
       ? await hashPassword(directorForm.accessKey.trim()) 
       : await hashPassword('admin123');
 
     const newDirector = {
-      id: `DIR-${String(nextIndex).padStart(2, '0')}`,
+      id: safeId,
       _isPendingSync: true,
       name: directorForm.name,
       role: directorForm.role || 'পরিচালক',
-      folioNo: autoFolioNo,
+      folioNo: safeFolio,
       image: directorForm.image || null,
       investment: invAmt,
       shareCount: shareCountNum,
@@ -1855,11 +1877,11 @@ export default function ManagementDashboard({
       theme: 'emerald',
       installments: invAmt > 0 ? [
         {
-          id: `INS-${nextIndex}-01`,
+          id: `INS-${safeIndex}-01`,
           date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
           amount: invAmt,
           method: 'প্রাথমিক ইকুইটি জমা',
-          receiptNo: `RCPT-CAP-${String(nextIndex).padStart(3, '0')}-01`,
+          receiptNo: `RCPT-CAP-${String(safeIndex).padStart(3, '0')}-01`,
           note: 'প্রারম্ভিক শেয়ার মূলধন জমা'
         }
       ] : [],
@@ -1868,7 +1890,8 @@ export default function ManagementDashboard({
 
     updateStore((prev) => ({
       ...prev,
-      directors: [...(prev.directors || []), newDirector]
+      deletedDirectorIds: (prev.deletedDirectorIds || []).filter(id => id !== safeId),
+      directors: [...(prev.directors || []).filter(d => d.id !== safeId), newDirector]
     }));
 
     setIsDirectorModalOpen(false);
@@ -5392,7 +5415,7 @@ export default function ManagementDashboard({
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-center">
                   <span className="text-3xs font-bold text-slate-400 uppercase">শেয়ার সার্টিফিকেট / ফোলিও নং</span>
                   <span className="font-mono text-xs font-bold text-[#006231] mt-0.5">
-                    {editingDirector ? (editingDirector.folioNo || editingDirector.id) : `DIR-${String((data.directors || []).length + 1).padStart(3, '0')}`}
+                    {editingDirector ? (editingDirector.folioNo || editingDirector.id) : getNextSafeDirectorFolio().safeFolio}
                   </span>
                 </div>
               </div>
