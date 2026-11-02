@@ -1,11 +1,16 @@
 import React from 'react';
-import { ChevronLeft, X, Crown, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, X, Crown, ShieldCheck, CheckSquare, Square } from 'lucide-react';
 
-const PERMISSION_OPTIONS = [
-  { id: 'projects', label: 'প্রজেক্ট কন্ট্রোল' },
-  { id: 'expenses', label: 'খরচ ও ব্যয় এন্ট্রি' },
-  { id: 'clients', label: 'ক্লায়েন্ট তালিকা' },
-  { id: 'payments', label: 'কিস্তি ও জমা এন্ট্রি' }
+export const PERMISSION_OPTIONS = [
+  { id: 'clients', label: '১. ক্লায়েন্ট তালিকা ও নতুন এন্ট্রি', desc: 'গ্রাহকের প্রোফাইল, বুকিং ও ফ্ল্যাট বরাদ্দ' },
+  { id: 'payments', label: '২. পেমেন্ট ও জমা এন্ট্রি', desc: 'কিস্তি ও কালেকশন মানি রিসিট ভাউচার' },
+  { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল', desc: 'প্রকল্প তৈরি, এডিট, ফ্ল্যাট ইউনিট ও প্রাইসিং' },
+  { id: 'expenses', label: '৪. প্রজেক্ট বাজেট ও খরচ', desc: 'নির্মাণ খরচ, অফিস ব্যয় ও ক্যাশ বুক' },
+  { id: 'investments', label: '৫. ইনভেস্টমেন্ট ও শেয়ার প্যাকেজ', desc: 'বিনিয়োগ অফার, শেয়ারহোল্ডার ও পেআউট' },
+  { id: 'directors', label: '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', desc: 'পরিচালনা পর্ষদ, মূলধন জমা ও লভ্যাংশ' },
+  { id: 'jobs', label: '৭. চাকরির আবেদন ও সিভি', desc: 'আবেদনকারী সিভি, ইন্টারভিউ শিডিউলিং' },
+  { id: 'inquiries', label: '৮. ইনকোয়ারি ও ওয়েবসাইট লিড', desc: 'সাইট ভিজিট অনুরোধ ও কন্ট্যাক্ট ফর্ম লিড' },
+  { id: 'team', label: '৯. অ্যাডমিন ও টিম কন্ট্রোল', desc: 'অন্যান্য কর্মকর্তাদের ভূমিকা ও পারমিশন কন্ট্রোল' }
 ];
 
 // Full-screen "Add / Edit Team Member & Permissions" view - Staff Officers only
@@ -19,6 +24,16 @@ export default function TeamModal({
   onSubmit
 }) {
   if (!isOpen) return null;
+
+  const currentPermissions = Array.isArray(form.permissions) ? form.permissions : [];
+
+  const handleToggleAllPermissions = (selectAll) => {
+    if (selectAll) {
+      setForm({ ...form, permissions: PERMISSION_OPTIONS.map(p => p.id) });
+    } else {
+      setForm({ ...form, permissions: [] });
+    }
+  };
 
   return (
     <div className={`fixed inset-y-0 right-0 left-0 ${isSidebarCollapsed ? "md:left-20" : "md:left-64 lg:left-72"} z-[60] bg-[#F8FAFC] flex flex-col overflow-y-auto animate-fadeIn select-none`}>
@@ -120,6 +135,9 @@ export default function TeamModal({
                   <option value="প্রজেক্ট ডিরেক্টর / সাইট ইনচার্জ">প্রজেক্ট ডিরেক্টর / সাইট ইনচার্জ</option>
                   <option value="হেড অফ অ্যাকাউন্টস & ফাইন্যান্স">হেড অফ অ্যাকাউন্টস & ফাইন্যান্স</option>
                   <option value="সেলস অ্যান্ড মার্কেটিং ম্যানেজার">সেলস অ্যান্ড মার্কেটিং ম্যানেজার</option>
+                  <option value="এইচআর ও রিক্রুটমেন্ট অফিসার">এইচআর ও রিক্রুটমেন্ট অফিসার</option>
+                  <option value="ইনভেস্টর রিলেশন অফিসার">ইনভেস্টর রিলেশন অফিসার</option>
+                  <option value="কাস্টমার সাপোর্ট ও ফ্রন্ট ডেস্ক">কাস্টমার সাপোর্ট ও ফ্রন্ট ডেস্ক</option>
                   <option value="আইন ও কমপ্লায়েন্স অফিসার">আইন ও কমপ্লায়েন্স অফিসার</option>
                   <option value="অফিস স্টাফ">অফিস স্টাফ</option>
                 </select>
@@ -149,26 +167,58 @@ export default function TeamModal({
             </div>
 
             {!editingTeamMember?.isSuperAdmin && (
-              <div>
-                <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  অনুমোদিত দায়িত্ব ও পারমিশনসমূহ:
-                </label>
-                <div className="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-slate-50 border border-slate-200/80 text-2xs font-semibold text-slate-700">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-2xs font-bold text-slate-700 uppercase tracking-wider">
+                    অনুমোদিত দায়িত্ব ও পারমিশনসমূহ ({currentPermissions.length}/{PERMISSION_OPTIONS.length}):
+                  </label>
+                  <div className="flex items-center space-x-2 text-3xs font-bold">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAllPermissions(true)}
+                      className="px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-[#006231] border border-emerald-200 transition-colors cursor-pointer"
+                    >
+                      সব সিলেক্ট করুন
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAllPermissions(false)}
+                      className="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 transition-colors cursor-pointer"
+                    >
+                      সব আনচেক করুন
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
                   {PERMISSION_OPTIONS.map(p => {
-                    const isChecked = (form.permissions || []).includes(p.id);
+                    const isChecked = currentPermissions.includes(p.id);
                     return (
-                      <label key={p.id} className="flex items-center space-x-2 cursor-pointer">
+                      <label 
+                        key={p.id} 
+                        className={`flex items-start space-x-2.5 p-2 rounded-xl border transition-all cursor-pointer ${
+                          isChecked 
+                            ? 'bg-emerald-50/70 border-emerald-200/90 text-slate-900 shadow-2xs' 
+                            : 'bg-white border-slate-200/70 text-slate-600 hover:border-slate-300'
+                        }`}
+                      >
                         <input
                           type="checkbox"
                           checked={isChecked}
                           onChange={(e) => {
-                            const curr = form.permissions || [];
-                            const next = e.target.checked ? [...curr, p.id] : curr.filter(x => x !== p.id);
+                            const next = e.target.checked ? [...currentPermissions, p.id] : currentPermissions.filter(x => x !== p.id);
                             setForm({ ...form, permissions: next });
                           }}
-                          className="w-3.5 h-3.5 text-[#006231] rounded"
+                          className="w-4 h-4 mt-0.5 text-[#006231] rounded accent-[#006231] cursor-pointer"
                         />
-                        <span>{p.label}</span>
+                        <div className="min-w-0 flex-1">
+                          <span className={`block text-xs font-bold leading-tight ${isChecked ? 'text-[#006231]' : 'text-slate-800'}`}>
+                            {p.label}
+                          </span>
+                          <span className="block text-3xs text-slate-500 leading-snug mt-0.5">
+                            {p.desc}
+                          </span>
+                        </div>
                       </label>
                     );
                   })}

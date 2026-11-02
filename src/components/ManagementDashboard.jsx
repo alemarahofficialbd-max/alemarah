@@ -170,10 +170,10 @@ export default function ManagementDashboard({
       }
       if (isStaffOfficer) {
         const perms = admin?.permissions || [];
-        if (saved && perms.includes(saved) && saved !== 'team' && saved !== 'settings' && saved !== 'directors') {
+        if (saved && perms.includes(saved) && saved !== 'settings') {
           return saved;
         }
-        return perms[0] || '';
+        return perms[0] || 'clients';
       }
       return saved || 'clients';
     } catch {
@@ -2009,6 +2009,19 @@ export default function ManagementDashboard({
   // Director full management access check: Super Admin or explicitly permitted in permissions
   const hasDirectorFullAccess = isSuperAdmin || (admin?.permissions || []).includes('directors');
 
+  // Permission label mapping dictionary for staff officers
+  const PERMISSION_LABEL_MAP = {
+    clients: 'ক্লায়েন্ট তালিকা ও বুকিং',
+    payments: 'কিস্তি ও জমা এন্ট্রি',
+    projects: 'প্রজেক্ট কন্ট্রোল',
+    expenses: 'প্রজেক্ট বাজেট ও খরচ',
+    investments: 'ইনভেস্টমেন্ট ও শেয়ার প্যাকেজ',
+    directors: 'বোর্ড অব ডিরেক্টরস ও শেয়ার',
+    jobs: 'চাকরির আবেদন ও সিভি',
+    inquiries: 'ইনকোয়ারি ও ওয়েবসাইট লিড',
+    team: 'অ্যাডমিন ও টিম কন্ট্রোল'
+  };
+
   // Management Footer Navbar items with Role-Based Permission Control
   const allNavItems = [
     { id: 'clients', label: '১. ক্লায়েন্ট তালিকা ও নতুন এন্ট্রি', shortLabel: 'ক্লায়েন্ট', icon: Users },
@@ -2016,24 +2029,26 @@ export default function ManagementDashboard({
     { id: 'projects', label: '৩. প্রজেক্ট কন্ট্রোল', shortLabel: 'প্রজেক্ট', icon: Building2 },
     { id: 'expenses', label: '৪. প্রজেক্ট বাজেট ও খরচ', shortLabel: 'বাজেট ও খরচ', icon: Wallet },
     { id: 'investments', label: '৫. ইনভেস্টমেন্ট', shortLabel: 'ইনভেস্টমেন্ট', icon: TrendingUp },
-    { id: 'team', label: '৬. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
     { 
       id: 'directors', 
       label: isDirector && !hasDirectorFullAccess ? 'ব্যক্তিগত পোর্টফোলিও ও শেয়ার' : '৬. বোর্ড অব ডিরেক্টরস ও শেয়ার', 
       shortLabel: isDirector && !hasDirectorFullAccess ? 'আমার শেয়ার' : 'ডিরেক্টরস', 
       icon: Award 
     },
-    { id: 'settings', label: '৭. সেটিংস, ভাষা ও সিকিউরিটি পিন', shortLabel: 'সেটিংস', icon: Settings }
+    { id: 'jobs', label: '৭. চাকরির আবেদন ও সিভি', shortLabel: 'চাকরির আবেদন', icon: Briefcase },
+    { id: 'inquiries', label: '৮. ইনকোয়ারি ও লিড', shortLabel: 'ইনকোয়ারি/লিড', icon: Mail },
+    { id: 'team', label: '৯. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
+    { id: 'settings', label: '১০. সেটিংস, ভাষা ও সিকিউরিটি পিন', shortLabel: 'সেটিংস', icon: Settings }
   ];
 
   const managementNavItems = allNavItems.filter(item => {
     // 1. Super Admin has unrestricted 100% master access to all tabs
     if (isSuperAdmin) return true;
 
-    // 2. Tab 5 (team) and Tab 7 (settings) are strictly reserved for Super Admin
-    if (item.id === 'team' || item.id === 'settings') return false;
+    // 2. Settings is strictly reserved for Super Admin
+    if (item.id === 'settings') return false;
 
-    // 3. Board Director access: By default, ONLY personal portfolio under 'directors'
+    // 3. Board Director access: By default, ONLY personal portfolio under 'directors' + any permitted modules
     if (isDirector) {
       if (item.id === 'directors') return true;
       const perms = admin?.permissions || [];
@@ -2041,7 +2056,6 @@ export default function ManagementDashboard({
     }
 
     // 4. Staff / Officer: strictly permitted modules only
-    if (item.id === 'directors') return false;
     const perms = admin?.permissions || [];
     return perms.includes(item.id);
   });
@@ -2069,6 +2083,332 @@ export default function ManagementDashboard({
     setEditingTeamMember(null);
     setActiveTab(tabId);
   };
+
+// Helper: Render Inquiries / Leads from the public website
+  const renderInquiriesSection = () => (
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs mt-6 overflow-visible">
+                <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center space-x-3 bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-black text-slate-900 flex items-center space-x-2">
+                      <span>ইনকোয়ারি / লিড</span>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-600 text-white text-3xs font-bold">
+                        {(data.inquiries || []).length} টি
+                      </span>
+                    </h4>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      সাইট ভিজিট ও বিনিয়োগ ফর্ম থেকে আসা অনুরোধসমূহ
+                    </p>
+                  </div>
+                </div>
+
+                {(!data.inquiries || data.inquiries.length === 0) ? (
+                  <div className="p-10 text-center text-slate-400 space-y-2">
+                    <Mail className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
+                    <p className="text-xs font-bold text-slate-600">এখনও কোনো ইনকোয়ারি জমা পড়েনি</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-slate-100 max-h-96 overflow-y-auto">
+                    {data.inquiries.map((inq) => (
+                      <div key={inq.id} className="p-4 flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="font-bold text-sm text-slate-900">{inq.name}</div>
+                          <div className="text-xs text-slate-500 font-mono">{inq.phone}{inq.email ? ` • ${inq.email}` : ''}</div>
+                          {inq.message && <div className="text-xs text-slate-600 mt-1 truncate">{inq.message}</div>}
+                          {inq.investmentAmount && <div className="text-xs text-slate-600 mt-1">বিনিয়োগ: {inq.investmentAmount} • খাত: {inq.interestedSector || '—'}</div>}
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className={`px-2 py-0.5 rounded-full text-3xs font-bold ${inq.inquiryType === 'investment' ? 'bg-purple-50 text-purple-700' : 'bg-emerald-50 text-[#006231]'}`}>
+                            {inq.inquiryType === 'investment' ? 'বিনিয়োগ' : 'সাইট ভিজিট'}
+                          </span>
+                          <div className="text-3xs text-slate-400 mt-1">{inq.date}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+  );
+
+  // Helper: Render Job Applications & Candidate CVs Section
+  const renderJobApplicationsSection = () => (
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs mt-6 overflow-visible">
+                <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-100 flex items-center justify-center shrink-0">
+                      <Briefcase className="w-5 h-5 text-[#006231]" />
+                    </div>
+                    <div>
+                      <h4 className="text-base font-black text-slate-900 flex items-center space-x-2">
+                        <span>চাকরির আবেদন ও সিভি</span>
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-3xs font-bold">
+                          {(data.jobApplications || []).length} জন
+                        </span>
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        অনলাইন চাকরির আবেদন ও প্রার্থীদের সিভি তালিকা
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Cloud Sync Refresh Button */}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setIsSyncingJobs(true);
+                      try {
+                        const cloudApps = await fetchJobApplicationsFromSupabase();
+                        const current = getManagementData();
+                        const updated = {
+                          ...current,
+                          jobApplications: cloudApps
+                        };
+                        try {
+                          localStorage.setItem('alemarah_management_data_v1', JSON.stringify(updated));
+                        } catch (_) {}
+                        setData(updated);
+                        triggerAlert('ক্লাউড থেকে চাকরির আবেদন সফলভাবে আপডেট করা হয়েছে।');
+                      } catch (err) {
+                        console.error('Sync error:', err);
+                        await syncFromSupabase();
+                        setData(getManagementData());
+                      } finally {
+                        setIsSyncingJobs(false);
+                      }
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006231] border border-emerald-200 text-xs font-bold flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs transition-all active:scale-95 shrink-0"
+                    title="ক্লাউড থেকে নতুন আবেদন সিঙ্ক করুন"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isSyncingJobs ? 'animate-spin text-emerald-700' : 'text-[#006231]'}`} />
+                    <span>{isSyncingJobs ? 'সিঙ্ক হচ্ছে...' : 'রিফ্রেশ করুন'}</span>
+                  </button>
+                </div>
+
+                {(!data.jobApplications || data.jobApplications.length === 0) ? (
+                  <div className="p-10 text-center text-slate-400 space-y-2">
+                    <FileText className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
+                    <p className="text-xs font-bold text-slate-600">এখনও কোনো চাকরির আবেদন জমা পড়েনি</p>
+                    <p className="text-3xs text-slate-400">ওয়েবসাইটের কেরিয়ার পেজ থেকে কেউ আবেদন করলে এখানে স্বয়ংক্রিয়ভাবে তালিকাভুক্ত হবে।</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-slate-100">
+                    {data.jobApplications.map((app, appIdx) => {
+                      const statusBadge = getStatusBadge(app.status);
+                      return (
+                      <div 
+                        key={app.id} 
+                        className={`p-3 sm:p-4 hover:bg-slate-50/80 transition-colors flex items-center justify-between gap-3 relative ${openActionMenuId === app.id ? 'z-30' : 'z-10'}`}
+                      >
+                        {/* Mobile View: Exactly 2 clean lines (Line 1: Name, Line 2: Applied Pod & Status) */}
+                        <div 
+                          className="sm:hidden space-y-0.5 cursor-pointer min-w-0 flex-1" 
+                          onClick={() => setSelectedAppForDetails(app)}
+                        >
+                          {/* Line 1: Candidate Name */}
+                          <div className="flex items-center gap-1.5 leading-tight">
+                            <span className="text-xs font-black text-slate-900 truncate">
+                              {app.applicantName || app.name}
+                            </span>
+                          </div>
+
+                          {/* Line 2: Pod (Smaller, Subtle Subtitle) + Status Dot */}
+                          <div className="flex items-center gap-1.5 leading-tight text-3xs text-slate-500 font-medium">
+                            <span className="truncate max-w-[125px]">
+                              {formatCleanJobTitle(app.jobTitle || app.submittedPosition)}
+                            </span>
+                            <span className="text-slate-300">•</span>
+                            <span className={`inline-flex items-center gap-1 font-bold shrink-0 ${statusBadge.textColor}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${statusBadge.dot}`}></span>
+                              <span>{statusBadge.label}</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Desktop View: Full details with clear name, role, ID, phone, date */}
+                        <div 
+                          className="hidden sm:block space-y-1 cursor-pointer min-w-0 flex-1" 
+                          onClick={() => setSelectedAppForDetails(app)}
+                        >
+                          {/* Line 1: Name + Role */}
+                          <div className="flex items-center gap-2 leading-tight">
+                            <span className="text-sm font-black text-slate-900 hover:text-[#006231] transition-colors truncate">
+                              {app.applicantName}
+                            </span>
+                            <span className="text-slate-300">•</span>
+                            <span className="text-xs font-bold text-[#006231] truncate">
+                              {formatCleanJobTitle(app.jobTitle || app.submittedPosition)}
+                            </span>
+                          </div>
+
+                          {/* Line 2: ID + Phone + Date */}
+                          <div className="flex items-center gap-2 text-xs text-slate-500 font-medium leading-tight truncate">
+                            <span className="font-mono text-slate-700 font-bold shrink-0">
+                              {app.id}
+                            </span>
+                            <span>•</span>
+                            <span className="shrink-0 flex items-center gap-1 text-slate-600">
+                              <Phone className="w-3 h-3 text-[#006231] shrink-0" />
+                              <span>{app.phone}</span>
+                            </span>
+                            <span>•</span>
+                            <span className="text-slate-400 shrink-0">
+                              {app.appliedDateBn || app.date}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Desktop Status Pill (Prominent outside badge so status is visible immediately from outside) */}
+                        <div className="hidden sm:flex items-center shrink-0">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 shadow-2xs ${statusBadge.bg}`}>
+                            <span className={`w-2 h-2 rounded-full ${statusBadge.dot}`}></span>
+                            <span>{statusBadge.label}</span>
+                          </span>
+                        </div>
+
+                        {/* Right: Compact "বিস্তারিত" button + 3-Dot Dropdown Menu in same line */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedAppForDetails(app)}
+                            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-3xs sm:text-xs font-bold flex items-center gap-1 transition-all cursor-pointer active:scale-95 border border-blue-200/80 shadow-2xs"
+                          >
+                            <Eye className="w-3.5 h-3.5 shrink-0" />
+                            <span>বিস্তারিত</span>
+                          </button>
+
+                          {/* 3-Dot Options Button */}
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenActionMenuId(openActionMenuId === app.id ? null : app.id);
+                              }}
+                              className="p-1.5 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-slate-200"
+                              title="আরও অপশন"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            {openActionMenuId === app.id && (
+                              <>
+                                <div 
+                                  className="fixed inset-0 z-20" 
+                                  onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
+                                />
+                                <div 
+                                  onClick={(e) => e.stopPropagation()} 
+                                  className={`absolute right-0 w-52 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 animate-fadeIn text-xs ${
+                                    appIdx >= data.jobApplications.length - 2 && data.jobApplications.length > 1
+                                      ? 'bottom-full mb-1.5'
+                                      : 'top-full mt-1.5'
+                                  }`}
+                                >
+                                  {/* 1. Interview & Status */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setOpenActionMenuId(null);
+                                      setSelectedAppForInterview(app);
+                                      setInterviewForm({
+                                        status: formatCleanStatus(app.status),
+                                        interviewDate: app.interviewDate || '২০২৬-১১-০৫',
+                                        interviewTime: app.interviewTime || 'সকাল ১১:০০ টা',
+                                        interviewLocation: app.interviewLocation || 'আল-ইমারাহ প্রোপার্টিজ লিমিটেড, হেড অফিস, পুরানা পল্টন, ঢাকা',
+                                        requiredDocuments: app.requiredDocuments || 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
+                                        adminNotes: app.adminNotes || 'নির্ধারিত সময়ের ১৫ মিনিট পূর্বে উপস্থিত থাকার অনুরোধ করা হচ্ছে।'
+                                      });
+                                    }}
+                                    className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
+                                  >
+                                    <Calendar className="w-3.5 h-3.5 text-purple-600" />
+                                    <span>ইন্টারভিউ ও স্ট্যাটাস</span>
+                                  </button>
+
+                                  {/* 2. View CV */}
+                                  {app.cvFile && (app.cvFile.url || app.cvFile.dataUrl) ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setOpenActionMenuId(null);
+                                        handleViewCv(app.cvFile);
+                                      }}
+                                      className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
+                                    >
+                                      <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                                      <span>সিভি দেখুন / ডাউনলোড</span>
+                                    </button>
+                                  ) : app.cvLink ? (
+                                    <a
+                                      href={app.cvLink}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      onClick={() => setOpenActionMenuId(null)}
+                                      className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
+                                    >
+                                      <ExternalLink className="w-3.5 h-3.5 text-blue-600" />
+                                      <span>ড্রাইভ সিভি খুলুন</span>
+                                    </a>
+                                  ) : null}
+
+                                  {/* 3. WhatsApp */}
+                                  <a
+                                    href={`https://wa.me/88${(app.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                                      app.interviewDate
+                                        ? `আসসালামু আলাইকুম ${app.applicantName},\n\nআল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${formatCleanJobTitle(app.jobTitle || app.submittedPosition)}" পদের জন্য আপনার চাকরির আবেদনটি শর্টলিস্টেড হয়েছে।\n\n📅 সাক্ষাৎকারের তারিখ: ${app.interviewDate}\n⏰ সময়: ${app.interviewTime || 'সকাল ১১:০০ টা'}\n📍 স্থান: ${app.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}\n📄 সঙ্গে আনতে হবে: ${app.requiredDocuments || 'মূল সনদপত্র, ২ কপি ছবি ও সিভি'}${app.adminNotes ? `\n\nবিশেষ নির্দেশনা: ${app.adminNotes}` : ''}\n\nট্র্যাকিং নম্বর: ${app.id}\nওয়েবসাইটে স্ট্যাটাস দেখুন: https://www.alemarahproperties.com/#careers\n\nধন্যবাদ,\nরিক্রুটমেন্ট প্যানেল\nআল-ইমারাহ প্রোপার্টিজ লিমিটেড`
+                                        : `আসসালামু আলাইকুম ${app.applicantName}, আল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${formatCleanJobTitle(app.jobTitle || app.submittedPosition)}" পদে আপনার আবেদন (আইডি: ${app.id}) আমাদের রিক্রুটমেন্ট প্যানেলে পর্যালোচনাধীন রয়েছে।`
+                                    )}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={() => setOpenActionMenuId(null)}
+                                    className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
+                                  >
+                                    <Send className="w-3.5 h-3.5 text-[#25D366]" />
+                                    <span>WhatsApp বার্তা</span>
+                                  </a>
+
+                                  {/* 4. Phone Call */}
+                                  <a
+                                    href={`tel:${app.phone}`}
+                                    onClick={() => setOpenActionMenuId(null)}
+                                    className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
+                                  >
+                                    <Phone className="w-3.5 h-3.5 text-[#006231]" />
+                                    <span>সরাসরি কল</span>
+                                  </a>
+
+                                  {/* 5. Delete (Super Admin only) */}
+                                  {isSuperAdmin && (
+                                    <>
+                                      <div className="h-px bg-slate-100 my-1"></div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setOpenActionMenuId(null);
+                                          handleDeleteJobApplication(app);
+                                        }}
+                                        className="w-full px-3.5 py-2 text-left hover:bg-red-50 flex items-center space-x-2 text-red-600 font-bold transition-colors cursor-pointer"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                        <span>আবেদন মুছে ফেলুন</span>
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                    })}
+                  </div>
+                )}
+              </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row font-bengali tracking-normal antialiased animate-fadeIn">
@@ -3532,7 +3872,7 @@ export default function ManagementDashboard({
         )}
 
         {/* ------------------------------------------------------- */}
-        {/* TAB 5: SUPER ADMIN & TEAM ROLE MANAGEMENT               */}
+          {/* TAB 5: SUPER ADMIN & TEAM ROLE MANAGEMENT               */}
         {/* ------------------------------------------------------- */}
         {managementNavItems.some(i => i.id === 'team') && activeTab === 'team' && (() => {
           const superAdminMember = data.managementTeam?.find(m => m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com') || data.superAdmin || {
@@ -3702,7 +4042,7 @@ export default function ManagementDashboard({
                                   <div className="flex flex-wrap gap-1 pt-0.5">
                                     {(mem.permissions && mem.permissions.length > 0) ? mem.permissions.map((perm, idx) => (
                                       <span key={idx} className="px-2 py-0.5 rounded-md bg-emerald-50 text-[#006231] border border-emerald-100 text-3xs font-bold">
-                                        {perm === 'projects' ? 'প্রজেক্ট' : perm === 'expenses' ? 'ব্যয়' : perm === 'clients' ? 'ক্লায়েন্ট' : perm === 'payments' ? 'কিস্তি' : perm === 'directors' ? 'পরিচালক' : perm}
+                                        {PERMISSION_LABEL_MAP[perm] || perm}
                                       </span>
                                     )) : <span className="text-3xs text-slate-400 font-semibold italic">কোনো অতিরিক্ত পারমিশন নেই (সংরক্ষিত)</span>}
                                   </div>
@@ -3768,330 +4108,33 @@ export default function ManagementDashboard({
                 )}
               </div>
 
-              {/* Inquiries / Leads from the public website (contact + investment forms) */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs mt-6 overflow-visible">
-                <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center space-x-3 bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
-                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0">
-                    <Mail className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-base font-black text-slate-900 flex items-center space-x-2">
-                      <span>ইনকোয়ারি / লিড</span>
-                      <span className="px-2 py-0.5 rounded-full bg-amber-600 text-white text-3xs font-bold">
-                        {(data.inquiries || []).length} টি
-                      </span>
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      সাইট ভিজিট ও বিনিয়োগ ফর্ম থেকে আসা অনুরোধসমূহ
-                    </p>
-                  </div>
-                </div>
+              
+              {/* Inquiries / Leads Section */}
+              {renderInquiriesSection()}
 
-                {(!data.inquiries || data.inquiries.length === 0) ? (
-                  <div className="p-10 text-center text-slate-400 space-y-2">
-                    <Mail className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
-                    <p className="text-xs font-bold text-slate-600">এখনও কোনো ইনকোয়ারি জমা পড়েনি</p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-                    {data.inquiries.map((inq) => (
-                      <div key={inq.id} className="p-4 flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="font-bold text-sm text-slate-900">{inq.name}</div>
-                          <div className="text-xs text-slate-500 font-mono">{inq.phone}{inq.email ? ` • ${inq.email}` : ''}</div>
-                          {inq.message && <div className="text-xs text-slate-600 mt-1 truncate">{inq.message}</div>}
-                          {inq.investmentAmount && <div className="text-xs text-slate-600 mt-1">বিনিয়োগ: {inq.investmentAmount} • খাত: {inq.interestedSector || '—'}</div>}
-                        </div>
-                        <div className="text-right shrink-0">
-                          <span className={`px-2 py-0.5 rounded-full text-3xs font-bold ${inq.inquiryType === 'investment' ? 'bg-purple-50 text-purple-700' : 'bg-emerald-50 text-[#006231]'}`}>
-                            {inq.inquiryType === 'investment' ? 'বিনিয়োগ' : 'সাইট ভিজিট'}
-                          </span>
-                          <div className="text-3xs text-slate-400 mt-1">{inq.date}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* 3. Job Applications & Candidate CVs Section */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs mt-6 overflow-visible">
-                <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#006231] border border-emerald-100 flex items-center justify-center shrink-0">
-                      <Briefcase className="w-5 h-5 text-[#006231]" />
-                    </div>
-                    <div>
-                      <h4 className="text-base font-black text-slate-900 flex items-center space-x-2">
-                        <span>চাকরির আবেদন ও সিভি</span>
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-3xs font-bold">
-                          {(data.jobApplications || []).length} জন
-                        </span>
-                      </h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        অনলাইন চাকরির আবেদন ও প্রার্থীদের সিভি তালিকা
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Cloud Sync Refresh Button */}
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setIsSyncingJobs(true);
-                      try {
-                        const cloudApps = await fetchJobApplicationsFromSupabase();
-                        const current = getManagementData();
-                        const updated = {
-                          ...current,
-                          jobApplications: cloudApps
-                        };
-                        try {
-                          localStorage.setItem('alemarah_management_data_v1', JSON.stringify(updated));
-                        } catch (_) {}
-                        setData(updated);
-                        triggerAlert('ক্লাউড থেকে চাকরির আবেদন সফলভাবে আপডেট করা হয়েছে।');
-                      } catch (err) {
-                        console.error('Sync error:', err);
-                        await syncFromSupabase();
-                        setData(getManagementData());
-                      } finally {
-                        setIsSyncingJobs(false);
-                      }
-                    }}
-                    className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006231] border border-emerald-200 text-xs font-bold flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs transition-all active:scale-95 shrink-0"
-                    title="ক্লাউড থেকে নতুন আবেদন সিঙ্ক করুন"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isSyncingJobs ? 'animate-spin text-emerald-700' : 'text-[#006231]'}`} />
-                    <span>{isSyncingJobs ? 'সিঙ্ক হচ্ছে...' : 'রিফ্রেশ করুন'}</span>
-                  </button>
-                </div>
-
-                {(!data.jobApplications || data.jobApplications.length === 0) ? (
-                  <div className="p-10 text-center text-slate-400 space-y-2">
-                    <FileText className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
-                    <p className="text-xs font-bold text-slate-600">এখনও কোনো চাকরির আবেদন জমা পড়েনি</p>
-                    <p className="text-3xs text-slate-400">ওয়েবসাইটের কেরিয়ার পেজ থেকে কেউ আবেদন করলে এখানে স্বয়ংক্রিয়ভাবে তালিকাভুক্ত হবে।</p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-slate-100">
-                    {data.jobApplications.map((app, appIdx) => {
-                      const statusBadge = getStatusBadge(app.status);
-                      return (
-                      <div 
-                        key={app.id} 
-                        className={`p-3 sm:p-4 hover:bg-slate-50/80 transition-colors flex items-center justify-between gap-3 relative ${openActionMenuId === app.id ? 'z-30' : 'z-10'}`}
-                      >
-                        {/* Mobile View: Exactly 2 clean lines (Line 1: Name, Line 2: Applied Pod & Status) */}
-                        <div 
-                          className="sm:hidden space-y-0.5 cursor-pointer min-w-0 flex-1" 
-                          onClick={() => setSelectedAppForDetails(app)}
-                        >
-                          {/* Line 1: Candidate Name */}
-                          <div className="flex items-center gap-1.5 leading-tight">
-                            <span className="text-xs font-black text-slate-900 truncate">
-                              {app.applicantName || app.name}
-                            </span>
-                          </div>
-
-                          {/* Line 2: Pod (Smaller, Subtle Subtitle) + Status Dot */}
-                          <div className="flex items-center gap-1.5 leading-tight text-3xs text-slate-500 font-medium">
-                            <span className="truncate max-w-[125px]">
-                              {formatCleanJobTitle(app.jobTitle || app.submittedPosition)}
-                            </span>
-                            <span className="text-slate-300">•</span>
-                            <span className={`inline-flex items-center gap-1 font-bold shrink-0 ${statusBadge.textColor}`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${statusBadge.dot}`}></span>
-                              <span>{statusBadge.label}</span>
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Desktop View: Full details with clear name, role, ID, phone, date */}
-                        <div 
-                          className="hidden sm:block space-y-1 cursor-pointer min-w-0 flex-1" 
-                          onClick={() => setSelectedAppForDetails(app)}
-                        >
-                          {/* Line 1: Name + Role */}
-                          <div className="flex items-center gap-2 leading-tight">
-                            <span className="text-sm font-black text-slate-900 hover:text-[#006231] transition-colors truncate">
-                              {app.applicantName}
-                            </span>
-                            <span className="text-slate-300">•</span>
-                            <span className="text-xs font-bold text-[#006231] truncate">
-                              {formatCleanJobTitle(app.jobTitle || app.submittedPosition)}
-                            </span>
-                          </div>
-
-                          {/* Line 2: ID + Phone + Date */}
-                          <div className="flex items-center gap-2 text-xs text-slate-500 font-medium leading-tight truncate">
-                            <span className="font-mono text-slate-700 font-bold shrink-0">
-                              {app.id}
-                            </span>
-                            <span>•</span>
-                            <span className="shrink-0 flex items-center gap-1 text-slate-600">
-                              <Phone className="w-3 h-3 text-[#006231] shrink-0" />
-                              <span>{app.phone}</span>
-                            </span>
-                            <span>•</span>
-                            <span className="text-slate-400 shrink-0">
-                              {app.appliedDateBn || app.date}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Desktop Status Pill (Prominent outside badge so status is visible immediately from outside) */}
-                        <div className="hidden sm:flex items-center shrink-0">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 shadow-2xs ${statusBadge.bg}`}>
-                            <span className={`w-2 h-2 rounded-full ${statusBadge.dot}`}></span>
-                            <span>{statusBadge.label}</span>
-                          </span>
-                        </div>
-
-                        {/* Right: Compact "বিস্তারিত" button + 3-Dot Dropdown Menu in same line */}
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedAppForDetails(app)}
-                            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-3xs sm:text-xs font-bold flex items-center gap-1 transition-all cursor-pointer active:scale-95 border border-blue-200/80 shadow-2xs"
-                          >
-                            <Eye className="w-3.5 h-3.5 shrink-0" />
-                            <span>বিস্তারিত</span>
-                          </button>
-
-                          {/* 3-Dot Options Button */}
-                          <div className="relative">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setOpenActionMenuId(openActionMenuId === app.id ? null : app.id);
-                              }}
-                              className="p-1.5 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-slate-200"
-                              title="আরও অপশন"
-                            >
-                              <MoreVertical className="w-4 h-4" />
-                            </button>
-
-                            {/* Dropdown Menu */}
-                            {openActionMenuId === app.id && (
-                              <>
-                                <div 
-                                  className="fixed inset-0 z-20" 
-                                  onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
-                                />
-                                <div 
-                                  onClick={(e) => e.stopPropagation()} 
-                                  className={`absolute right-0 w-52 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 animate-fadeIn text-xs ${
-                                    appIdx >= data.jobApplications.length - 2 && data.jobApplications.length > 1
-                                      ? 'bottom-full mb-1.5'
-                                      : 'top-full mt-1.5'
-                                  }`}
-                                >
-                                  {/* 1. Interview & Status */}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setOpenActionMenuId(null);
-                                      setSelectedAppForInterview(app);
-                                      setInterviewForm({
-                                        status: formatCleanStatus(app.status),
-                                        interviewDate: app.interviewDate || '২০২৬-১১-০৫',
-                                        interviewTime: app.interviewTime || 'সকাল ১১:০০ টা',
-                                        interviewLocation: app.interviewLocation || 'আল-ইমারাহ প্রোপার্টিজ লিমিটেড, হেড অফিস, পুরানা পল্টন, ঢাকা',
-                                        requiredDocuments: app.requiredDocuments || 'মূল শিক্ষাগত সনদপত্র, ২ কপি ছবি ও এনআইডি কপি, হালনাগাদ জীবনবৃত্তান্ত (CV)',
-                                        adminNotes: app.adminNotes || 'নির্ধারিত সময়ের ১৫ মিনিট পূর্বে উপস্থিত থাকার অনুরোধ করা হচ্ছে।'
-                                      });
-                                    }}
-                                    className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
-                                  >
-                                    <Calendar className="w-3.5 h-3.5 text-purple-600" />
-                                    <span>ইন্টারভিউ ও স্ট্যাটাস</span>
-                                  </button>
-
-                                  {/* 2. View CV */}
-                                  {app.cvFile && (app.cvFile.url || app.cvFile.dataUrl) ? (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setOpenActionMenuId(null);
-                                        handleViewCv(app.cvFile);
-                                      }}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
-                                    >
-                                      <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                                      <span>সিভি দেখুন / ডাউনলোড</span>
-                                    </button>
-                                  ) : app.cvLink ? (
-                                    <a
-                                      href={app.cvLink}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      onClick={() => setOpenActionMenuId(null)}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
-                                    >
-                                      <ExternalLink className="w-3.5 h-3.5 text-blue-600" />
-                                      <span>ড্রাইভ সিভি খুলুন</span>
-                                    </a>
-                                  ) : null}
-
-                                  {/* 3. WhatsApp */}
-                                  <a
-                                    href={`https://wa.me/88${(app.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                                      app.interviewDate
-                                        ? `আসসালামু আলাইকুম ${app.applicantName},\n\nআল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${formatCleanJobTitle(app.jobTitle || app.submittedPosition)}" পদের জন্য আপনার চাকরির আবেদনটি শর্টলিস্টেড হয়েছে।\n\n📅 সাক্ষাৎকারের তারিখ: ${app.interviewDate}\n⏰ সময়: ${app.interviewTime || 'সকাল ১১:০০ টা'}\n📍 স্থান: ${app.interviewLocation || 'আল-ইমারাহ হেড অফিস, পুরানা পল্টন, ঢাকা'}\n📄 সঙ্গে আনতে হবে: ${app.requiredDocuments || 'মূল সনদপত্র, ২ কপি ছবি ও সিভি'}${app.adminNotes ? `\n\nবিশেষ নির্দেশনা: ${app.adminNotes}` : ''}\n\nট্র্যাকিং নম্বর: ${app.id}\nওয়েবসাইটে স্ট্যাটাস দেখুন: https://www.alemarahproperties.com/#careers\n\nধন্যবাদ,\nরিক্রুটমেন্ট প্যানেল\nআল-ইমারাহ প্রোপার্টিজ লিমিটেড`
-                                        : `আসসালামু আলাইকুম ${app.applicantName}, আল-ইমারাহ প্রোপার্টিজ লিমিটেডে "${formatCleanJobTitle(app.jobTitle || app.submittedPosition)}" পদে আপনার আবেদন (আইডি: ${app.id}) আমাদের রিক্রুটমেন্ট প্যানেলে পর্যালোচনাধীন রয়েছে।`
-                                    )}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    onClick={() => setOpenActionMenuId(null)}
-                                    className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
-                                  >
-                                    <Send className="w-3.5 h-3.5 text-[#25D366]" />
-                                    <span>WhatsApp বার্তা</span>
-                                  </a>
-
-                                  {/* 4. Phone Call */}
-                                  <a
-                                    href={`tel:${app.phone}`}
-                                    onClick={() => setOpenActionMenuId(null)}
-                                    className="w-full px-3.5 py-2 text-left hover:bg-slate-50 flex items-center space-x-2 text-slate-700 font-bold transition-colors cursor-pointer"
-                                  >
-                                    <Phone className="w-3.5 h-3.5 text-[#006231]" />
-                                    <span>সরাসরি কল</span>
-                                  </a>
-
-                                  {/* 5. Delete (Super Admin only) */}
-                                  {isSuperAdmin && (
-                                    <>
-                                      <div className="h-px bg-slate-100 my-1"></div>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setOpenActionMenuId(null);
-                                          handleDeleteJobApplication(app);
-                                        }}
-                                        className="w-full px-3.5 py-2 text-left hover:bg-red-50 flex items-center space-x-2 text-red-600 font-bold transition-colors cursor-pointer"
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                        <span>আবেদন মুছে ফেলুন</span>
-                                      </button>
-                                    </>
-                                  )}
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                    })}
-                  </div>
-                )}
-              </div>
+              {/* Job Applications & Candidate CVs Section */}
+              {renderJobApplicationsSection()}
             </div>
           );
         })()}
+
+        {/* ------------------------------------------------------- */}
+        {/* TAB 7: JOB APPLICATIONS & CANDIDATE CVS                 */}
+        {/* ------------------------------------------------------- */}
+        {managementNavItems.some(i => i.id === 'jobs') && activeTab === 'jobs' && (
+          <div className="space-y-6 animate-fadeIn">
+            {renderJobApplicationsSection()}
+          </div>
+        )}
+
+        {/* ------------------------------------------------------- */}
+        {/* TAB 8: INQUIRIES & WEBSITE LEADS                        */}
+        {/* ------------------------------------------------------- */}
+        {managementNavItems.some(i => i.id === 'inquiries') && activeTab === 'inquiries' && (
+          <div className="space-y-6 animate-fadeIn">
+            {renderInquiriesSection()}
+          </div>
+        )}
 
         {/* ------------------------------------------------------- */}
         {/* TAB 6: BOARD OF DIRECTORS & SHAREHOLDERS                 */}
@@ -5021,7 +5064,7 @@ export default function ManagementDashboard({
       {/* 4. BOTTOM FOOTER NAVBAR (PHONE ONLY - EDGE TO EDGE & ATTACHED TO BOTTOM) */}
       {/* ========================================================= */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-2xl border-t border-slate-200 shadow-lg">
-        <div className="flex items-center justify-around py-2 px-3 max-w-lg mx-auto">
+        <div className="flex items-center justify-around overflow-x-auto no-scrollbar py-2 px-2 max-w-lg mx-auto">
           {managementNavItems.filter(item => item.id !== 'settings').map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -5031,7 +5074,7 @@ export default function ManagementDashboard({
                 onClick={() => navigateToTab(item.id)}
                 aria-label={item.shortLabel || item.label}
                 title={item.label}
-                className={`p-2 rounded-xl transition-all cursor-pointer relative ${
+                className={`shrink-0 p-2 rounded-xl transition-all cursor-pointer relative ${
                   isActive 
                     ? 'bg-red-50 text-[#CE2028] scale-105 shadow-2xs font-bold' 
                     : 'text-slate-400 hover:text-slate-600'
@@ -7780,10 +7823,7 @@ export default function ManagementDashboard({
                   <div className="flex flex-wrap gap-1.5">
                     {(admin?.permissions || []).map((permKey) => (
                       <span key={permKey} className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[#006231] text-3xs font-bold">
-                        {permKey === 'clients' ? 'গ্রাহক ও বুকিং' :
-                         permKey === 'payments' ? 'পেমেন্ট ও কালেকশন' :
-                         permKey === 'projects' ? 'প্রজেক্ট কন্ট্রোল' :
-                         permKey === 'expenses' ? 'খরচ ও ক্যাশ' : permKey}
+                        {PERMISSION_LABEL_MAP[permKey] || permKey}
                       </span>
                     ))}
                   </div>
