@@ -102,7 +102,7 @@ import ReceiptPrintModal from './management/ReceiptPrintModal';
 import ClientModal from './management/ClientModal';
 import AddUnitModal from './management/AddUnitModal';
 import BulkUnitModal from './management/BulkUnitModal';
-import TeamModal from './management/TeamModal';
+import TeamModal, { PERMISSION_OPTIONS } from './management/TeamModal';
 import AddProjectModal from './management/AddProjectModal';
 import AddInvestmentOfferModal from './management/AddInvestmentOfferModal';
 import InvestorModal from './management/InvestorModal';
@@ -664,7 +664,8 @@ export default function ManagementDashboard({
   const [selectedDirectorForAccess, setSelectedDirectorForAccess] = useState(null);
   const [directorAccessForm, setDirectorAccessForm] = useState({
     password: '',
-    status: 'সক্রিয় (Active)'
+    status: 'সক্রিয় (Active)',
+    permissions: []
   });
   const [expandedDirectors, setExpandedDirectors] = useState({});
   const [selectedDirectorForProfile, setSelectedDirectorForProfile] = useState(null);
@@ -1543,8 +1544,12 @@ export default function ManagementDashboard({
 
   const handleOpenDirectorAccess = (dir) => {
     setSelectedDirectorForAccess(dir);
+    const linkedTeamMember = (data.managementTeam || []).find(m => m.directorId === dir.id || m.id === dir.id);
     setDirectorAccessForm({
       password: '',
+      permissions: Array.isArray(linkedTeamMember?.permissions)
+        ? linkedTeamMember.permissions
+        : PERMISSION_OPTIONS.map(p => p.id),
       status: dir.status || 'সক্রিয় (Active)'
     });
     setIsDirectorAccessModalOpen(true);
@@ -1559,25 +1564,57 @@ export default function ManagementDashboard({
       updatedAccessKey = await hashPassword(directorAccessForm.password.trim());
     }
 
-    updateStore((prev) => ({
-      ...prev,
-      managementTeam: (prev.managementTeam || []).map(m => {
-        if (m.directorId === selectedDirectorForAccess.id || m.id === selectedDirectorForAccess.id) {
-          return { ...m, accessKey: updatedAccessKey, status: directorAccessForm.status };
-        }
-        return m;
-      }),
-      directors: (prev.directors || []).map(d => {
-        if (d.id === selectedDirectorForAccess.id) {
-          return {
-            ...d,
-            accessKey: updatedAccessKey,
-            status: directorAccessForm.status
-          };
-        }
-        return d;
-      })
-    }));
+    const formPermissions = Array.isArray(directorAccessForm.permissions) ? directorAccessForm.permissions : [];
+
+    updateStore((prev) => {
+      const existingIdx = (prev.managementTeam || []).findIndex(m =>
+        m.directorId === selectedDirectorForAccess.id || m.id === selectedDirectorForAccess.id
+      );
+      let nextTeam = [...(prev.managementTeam || [])];
+      if (existingIdx !== -1) {
+        nextTeam[existingIdx] = {
+          ...nextTeam[existingIdx],
+          accessKey: updatedAccessKey,
+          status: directorAccessForm.status,
+          permissions: formPermissions
+        };
+      } else {
+        // No team entry linked to this director yet -- create one so the
+        // permissions chosen here actually take effect (without this,
+        // effectivePermissions has nothing to read and the director sees
+        // no sections at all after logging in).
+        nextTeam.push({
+          id: `MGT-DIR-${selectedDirectorForAccess.id.replace('DIR-', '')}`,
+          _isPendingSync: true,
+          name: selectedDirectorForAccess.name,
+          phone: selectedDirectorForAccess.phone,
+          email: selectedDirectorForAccess.email || '',
+          role: selectedDirectorForAccess.role,
+          accessKey: updatedAccessKey,
+          isSuperAdmin: false,
+          isDirector: true,
+          directorId: selectedDirectorForAccess.id,
+          permissions: formPermissions,
+          status: directorAccessForm.status
+        });
+      }
+      const activeTargetId = `MGT-DIR-${selectedDirectorForAccess.id.replace('DIR-', '')}`;
+      return {
+        ...prev,
+        deletedAdminIds: (prev.deletedAdminIds || []).filter(delId => delId !== activeTargetId),
+        managementTeam: nextTeam,
+        directors: (prev.directors || []).map(d => {
+          if (d.id === selectedDirectorForAccess.id) {
+            return {
+              ...d,
+              accessKey: updatedAccessKey,
+              status: directorAccessForm.status
+            };
+          }
+          return d;
+        })
+      };
+    });
 
     if (selectedDirectorForProfile?.id === selectedDirectorForAccess.id) {
       setSelectedDirectorForProfile(prev => ({
@@ -6178,6 +6215,38 @@ export default function ManagementDashboard({
                     <XCircle className="w-3.5 h-3.5" />
                     <span>নিষ্ক্রিয় (Inactive)</span>
                   </button>
+                </div>
+              </div>
+
+              {/* Module / Section Access Permissions */}
+              <div className="space-y-1.5">
+                <label className="block text-2xs font-bold text-slate-600 uppercase">
+                  {'অনুমোদিত মডিউল / সেকশন এক্সেস'} ({(directorAccessForm.permissions || []).length}/{PERMISSION_OPTIONS.length})
+                </label>
+                <div className="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto pr-1">
+                  {PERMISSION_OPTIONS.map(p => {
+                    const checked = (directorAccessForm.permissions || []).includes(p.id);
+                    return (
+                      <label
+                        key={p.id}
+                        className={`flex items-start space-x-2 p-2 rounded-lg border cursor-pointer transition-colors ${
+                          checked ? 'bg-emerald-50 border-emerald-300' : 'bg-slate-50 border-slate-200'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => {
+                            const current = directorAccessForm.permissions || [];
+                            const next = checked ? current.filter(id => id !== p.id) : [...current, p.id];
+                            setDirectorAccessForm(prev => ({ ...prev, permissions: next }));
+                          }}
+                          className="mt-0.5 w-3.5 h-3.5 accent-emerald-600 cursor-pointer"
+                        />
+                        <span className="text-2xs font-semibold text-slate-700 leading-tight">{p.label}</span>
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
 
