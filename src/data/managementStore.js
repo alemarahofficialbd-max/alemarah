@@ -975,6 +975,7 @@ export const saveInquiry = (inquiry) => {
     const current = getManagementData();
     const newInquiry = {
       id: `INQ-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`,
+      _isPendingSync: true,
       date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       timestamp: new Date().toISOString(),
       status: 'নতুন (New)',
