@@ -1,9 +1,9 @@
 import React from 'react';
-import { X, FileSpreadsheet, CheckCircle2, Copy, Printer } from 'lucide-react';
+import { X, FileSpreadsheet, CheckCircle2, Copy, Printer, Trash2 } from 'lucide-react';
 import { formatBDT } from '../../data/managementStore';
 
 // Popup: payment transaction detail (phone & desktop), extracted from ManagementDashboard.
-export default function TransactionDetailModal({ trxModal, onClose, onPrint, onCopy }) {
+export default function TransactionDetailModal({ trxModal, onClose, onPrint, onCopy, onDelete }) {
   if (!trxModal) return null;
 
   return (
@@ -118,6 +118,17 @@ export default function TransactionDetailModal({ trxModal, onClose, onPrint, onC
             <Printer className="w-3.5 h-3.5" />
             <span>রসিদ প্রিন্ট করুন</span>
           </button>
+          {onDelete && (
+            <button
+              type="button"
+              onClick={() => onDelete(trxModal.trx, trxModal.client)}
+              className="py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs border border-red-200 cursor-pointer transition-colors inline-flex items-center space-x-1"
+              title="এই পেমেন্ট রেকর্ডটি মুছে ফেলুন"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>মুছুন</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={onClose}

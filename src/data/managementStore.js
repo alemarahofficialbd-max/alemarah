@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabaseClient';
 
-const STORAGE_KEY = 'alemarah_management_store_v5';
+const STORAGE_KEY = 'alemarah_management_store_v6';
 
 // -------------------------------------------------------------
 // Password hashing (Web Crypto PBKDF2-SHA256) — runs entirely in the
@@ -51,29 +51,7 @@ export const verifyPassword = async (plainText, stored) => {
 };
 
 export const initialManagementData = {
-  projects: [
-    {
-      id: "al-quds-tower",
-      name: "আল কুদস টাওয়ার",
-      nameEn: "Al Quds Tower",
-      location: "পশ্চিম সানারপাড়, মদিনাবাগ, ৬৬ নং ওয়ার্ড, ডেমরা, ঢাকা",
-      progress: 15,
-      currentStage: "পাইলিং ও ফাউন্ডেশন প্রস্তুতি",
-      budget: 350000000,
-      pricePerSqft: 2800,
-      pricingMode: "both",
-      type: "residential",
-      totalFloors: 14,
-      unitsPerFloor: 6,
-      units: [
-        "২য় তলা, ফ্ল্যাট ২-এ",
-        "২য় তলা, ফ্ল্যাট ২-বি",
-        "৩য় তলা, ফ্ল্যাট ৩-এ",
-        "৩য় তলা, ফ্ল্যাট ৩-বি",
-        "৭ম তলা, ফ্ল্যাট ৭-বি (১২৬৫ বর্গফুট)"
-      ]
-    }
-  ],
+  projects: [],
   clients: [],
   superAdmin: {
     id: 'SUPER-ADMIN-01',
@@ -283,52 +261,52 @@ export const getManagementData = () => {
     if (data) {
       const parsed = JSON.parse(data);
       const canonicalDirs = initialManagementData.directors || [];
+      const deletedDirSet = new Set(parsed.deletedDirectorIds || []);
+      const deletedProjSet = new Set(parsed.deletedProjectIds || []);
+      const deletedClientSet = new Set(parsed.deletedClientIds || []);
+      const deletedCustSet = new Set(parsed.deletedCustomerIds || []);
+      const deletedPaymentSet = new Set(parsed.deletedPaymentIds || []);
+      const deletedOfferSet = new Set(parsed.deletedOfferIds || []);
+      const deletedInvestorSet = new Set(parsed.deletedInvestorIds || []);
+
       if (!parsed.directors) {
         parsed.directors = [];
       } else {
-        // Ensure canonical directors preserve existing edits and serial order
-        parsed.directors = canonicalDirs.map(defaultDir => {
-          const existing = parsed.directors.find(x => x.id === defaultDir.id);
-          if (!existing) return defaultDir;
-          const cleanedFolioNo = existing.folioNo ? existing.folioNo.replace(/^AEP-/, '') : defaultDir.folioNo;
-          return {
-            ...defaultDir,
-            ...existing,
-            name: existing.name || defaultDir.name,
-            nameEn: existing.nameEn || defaultDir.nameEn,
-            role: existing.role || defaultDir.role,
-            roleEn: existing.roleEn || defaultDir.roleEn,
-            image: existing.image || defaultDir.image,
-            folioNo: cleanedFolioNo,
-            accessKey: existing.accessKey || defaultDir.accessKey || 'admin123',
-            installments: existing.installments && existing.installments.length > 0 
-              ? existing.installments 
-              : defaultDir.installments,
-            dividendHistory: existing.dividendHistory && existing.dividendHistory.length > 0
-              ? existing.dividendHistory
-              : defaultDir.dividendHistory
-          };
-        }).concat(
-          parsed.directors.filter(d => !canonicalDirs.some(c => c.id === d.id))
-        );
+        parsed.directors = parsed.directors.filter(d => !deletedDirSet.has(d.id));
       }
+
       if (!parsed.projects) {
-        parsed.projects = initialManagementData.projects;
+        parsed.projects = [];
       } else {
-        const deletedIds = new Set(parsed.deletedProjectIds || []);
         parsed.projects = parsed.projects
-          .filter(p => !deletedIds.has(p.id))
-          .map(p => {
-            const initP = initialManagementData.projects.find(x => x.id === p.id);
-            return {
-              ...p,
-              type: p.type || initP?.type || 'residential',
-              totalFloors: p.totalFloors || initP?.totalFloors || 10,
-              unitsPerFloor: p.unitsPerFloor || initP?.unitsPerFloor || 2,
-              units: (p.units && p.units.length > 0) ? p.units : (initP?.units || [])
-            };
-          });
+          .filter(p => !deletedProjSet.has(p.id))
+          .map(p => ({
+            ...p,
+            type: p.type || 'residential',
+            totalFloors: p.totalFloors || 10,
+            unitsPerFloor: p.unitsPerFloor || 2,
+            units: p.units || [],
+            expenses: (p.expenses || []).filter(e => !new Set(parsed.deletedExpenseIds || []).has(e.id))
+          }));
       }
+
+      if (!parsed.clients) {
+        parsed.clients = [];
+      } else {
+        parsed.clients = parsed.clients
+          .filter(c => !deletedClientSet.has(c.id))
+          .map(c => ({
+            ...c,
+            paymentHistory: (c.paymentHistory || []).filter(pay => !deletedPaymentSet.has(pay.id))
+          }));
+      }
+
+      if (!parsed.customers) {
+        parsed.customers = [];
+      } else {
+        parsed.customers = parsed.customers.filter(c => !deletedCustSet.has(c.id));
+      }
+
       if (!parsed.superAdmin) {
         parsed.superAdmin = initialManagementData.superAdmin;
       }
@@ -340,24 +318,18 @@ export const getManagementData = () => {
       if (!parsed.inquiries) {
         parsed.inquiries = [];
       }
-      if (!parsed.customers) {
-        parsed.customers = [];
-      }
-      if (!parsed.jobApplications || parsed.jobApplications.length === 0) {
+      if (!parsed.jobApplications) {
         parsed.jobApplications = initialManagementData.jobApplications;
-      } else {
-        // Ensure default restored applications are present
-        initialManagementData.jobApplications.forEach(initApp => {
-          if (!parsed.jobApplications.some(a => a.id === initApp.id)) {
-            parsed.jobApplications.push(initApp);
-          }
-        });
       }
       if (!parsed.investmentOffers) {
         parsed.investmentOffers = [];
+      } else {
+        parsed.investmentOffers = parsed.investmentOffers.filter(o => !deletedOfferSet.has(o.id));
       }
       if (!parsed.investors) {
         parsed.investors = [];
+      } else {
+        parsed.investors = parsed.investors.filter(i => !deletedInvestorSet.has(i.id));
       }
       return migrateClientsToCustomers(parsed);
     }
@@ -720,39 +692,36 @@ const _syncFromSupabaseImpl = async () => {
 
       // Cloud Sync: Retrieve authoritative system tombstones (deleted IDs across all devices)
       const tombstoneRow = adminsRes.data.find(a => a.id === 'SYSTEM-DELETED-IDS');
-      const cloudDeletedProjectIds = Array.isArray(tombstoneRow?.permissions?.deletedProjectIds)
-        ? tombstoneRow.permissions.deletedProjectIds
-        : [];
-      const cloudDeletedOfferIds = Array.isArray(tombstoneRow?.permissions?.deletedOfferIds)
-        ? tombstoneRow.permissions.deletedOfferIds
-        : [];
-      const cloudDeletedDirectorIds = Array.isArray(tombstoneRow?.permissions?.deletedDirectorIds)
-        ? tombstoneRow.permissions.deletedDirectorIds
-        : [];
+      const p = tombstoneRow?.permissions || {};
+      const cloudDeletedProjectIds = Array.isArray(p.deletedProjectIds) ? p.deletedProjectIds : [];
+      const cloudDeletedOfferIds = Array.isArray(p.deletedOfferIds) ? p.deletedOfferIds : [];
+      const cloudDeletedDirectorIds = Array.isArray(p.deletedDirectorIds) ? p.deletedDirectorIds : [];
+      const cloudDeletedClientIds = Array.isArray(p.deletedClientIds) ? p.deletedClientIds : [];
+      const cloudDeletedCustomerIds = Array.isArray(p.deletedCustomerIds) ? p.deletedCustomerIds : [];
+      const cloudDeletedPaymentIds = Array.isArray(p.deletedPaymentIds) ? p.deletedPaymentIds : [];
+      const cloudDeletedExpenseIds = Array.isArray(p.deletedExpenseIds) ? p.deletedExpenseIds : [];
+      const cloudDeletedInvestorIds = Array.isArray(p.deletedInvestorIds) ? p.deletedInvestorIds : [];
 
-      const mergedDeletedProjectIds = Array.from(new Set([
-        ...(current.deletedProjectIds || []),
-        ...cloudDeletedProjectIds
-      ]));
-      updated.deletedProjectIds = mergedDeletedProjectIds;
-
-      const mergedDeletedOfferIds = Array.from(new Set([
-        ...(current.deletedOfferIds || []),
-        ...cloudDeletedOfferIds
-      ]));
-      updated.deletedOfferIds = mergedDeletedOfferIds;
-
-      const mergedDeletedDirectorIds = Array.from(new Set([
-        ...(current.deletedDirectorIds || []),
-        ...cloudDeletedDirectorIds
-      ]));
-      updated.deletedDirectorIds = mergedDeletedDirectorIds;
+      updated.deletedProjectIds = Array.from(new Set([...(current.deletedProjectIds || []), ...cloudDeletedProjectIds]));
+      updated.deletedOfferIds = Array.from(new Set([...(current.deletedOfferIds || []), ...cloudDeletedOfferIds]));
+      updated.deletedDirectorIds = Array.from(new Set([...(current.deletedDirectorIds || []), ...cloudDeletedDirectorIds]));
+      updated.deletedClientIds = Array.from(new Set([...(current.deletedClientIds || []), ...cloudDeletedClientIds]));
+      updated.deletedCustomerIds = Array.from(new Set([...(current.deletedCustomerIds || []), ...cloudDeletedCustomerIds]));
+      updated.deletedPaymentIds = Array.from(new Set([...(current.deletedPaymentIds || []), ...cloudDeletedPaymentIds]));
+      updated.deletedExpenseIds = Array.from(new Set([...(current.deletedExpenseIds || []), ...cloudDeletedExpenseIds]));
+      updated.deletedInvestorIds = Array.from(new Set([...(current.deletedInvestorIds || []), ...cloudDeletedInvestorIds]));
     }
 
     const deletedProjSet = new Set(updated.deletedProjectIds || []);
     const deletedDirSet = new Set(updated.deletedDirectorIds || []);
+    const deletedClientSet = new Set(updated.deletedClientIds || []);
+    const deletedCustSet = new Set(updated.deletedCustomerIds || []);
+    const deletedPaymentSet = new Set(updated.deletedPaymentIds || []);
+    const deletedExpenseSet = new Set(updated.deletedExpenseIds || []);
+    const deletedOfferSet = new Set(updated.deletedOfferIds || []);
+    const deletedInvestorSet = new Set(updated.deletedInvestorIds || []);
 
-    if (directorsRes.data && directorsRes.data.length > 0) {
+    if (directorsRes.data) {
       const remoteDirs = directorsRes.data
         .filter(d => !deletedDirSet.has(d.id))
         .map(d => {
@@ -782,22 +751,23 @@ const _syncFromSupabaseImpl = async () => {
             dividendHistory: localDir?.dividendHistory || []
           };
         });
-      // Retain only locally added directors marked as pending sync, never resurrect deleted ones
-      const extraLocalDirs = (current.directors || []).filter(ld => ld._isPendingSync && !deletedDirSet.has(ld.id) && !directorsRes.data.some(d => d.id === ld.id));
-      updated.directors = [...remoteDirs, ...extraLocalDirs];
+      const pendingLocalDirs = (current.directors || []).filter(ld => ld._isPendingSync && !deletedDirSet.has(ld.id) && !directorsRes.data.some(d => d.id === ld.id));
+      updated.directors = [...remoteDirs, ...pendingLocalDirs];
     }
 
     if (projectsRes.data) {
-      updated.projects = projectsRes.data
+      const remoteProjects = projectsRes.data
         .filter(p => !deletedProjSet.has(p.id))
         .map(p => {
           const localProj = (current.projects || []).find(x => x.id === p.id);
-          const expensesFromRemote = (p.expenses || []).map(e => ({
-            id: e.id,
-            title: e.title,
-            amount: Number(e.amount) || 0,
-            date: e.date
-          }));
+          const expensesFromRemote = (p.expenses || [])
+            .filter(e => !deletedExpenseSet.has(e.id))
+            .map(e => ({
+              id: e.id,
+              title: e.title,
+              amount: Number(e.amount) || 0,
+              date: e.date
+            }));
           return {
             id: p.id,
             name: p.name,
@@ -817,123 +787,133 @@ const _syncFromSupabaseImpl = async () => {
             landPrice: localProj?.landPrice || 0,
             constructionPrice: localProj?.constructionPrice || 0,
             units: (p.units && p.units.length > 0) ? p.units : (localProj?.units || []),
-            expenses: expensesFromRemote.length > 0 ? expensesFromRemote : (localProj?.expenses || [])
+            expenses: expensesFromRemote
           };
         });
-
-      // ONLY retain locally added projects that are explicitly marked as pending sync
-      // and NOT in tombstones. Stale projects from localStorage are NEVER resurrected!
       const pendingLocalProjects = (current.projects || [])
         .filter(lp => lp._isPendingSync && !deletedProjSet.has(lp.id) && !projectsRes.data.some(p => p.id === lp.id));
-      updated.projects = [...updated.projects, ...pendingLocalProjects];
+      updated.projects = [...remoteProjects, ...pendingLocalProjects];
     }
 
-    if (clientsRes.data && clientsRes.data.length > 0) {
-      const remoteClients = clientsRes.data.map(c => {
-        const localClient = (current.clients || []).find(x => x.id === c.id);
-        const paymentsFromRemote = (c.paymentHistory || []).map(pay => ({
-          id: pay.id,
-          date: pay.date,
-          amount: Number(pay.amount) || 0,
-          method: pay.method
+    if (clientsRes.data) {
+      const remoteClients = clientsRes.data
+        .filter(c => !deletedClientSet.has(c.id))
+        .map(c => {
+          const localClient = (current.clients || []).find(x => x.id === c.id);
+          const paymentsFromRemote = (c.paymentHistory || [])
+            .filter(pay => !deletedPaymentSet.has(pay.id))
+            .map(pay => ({
+              id: pay.id,
+              date: pay.date,
+              amount: Number(pay.amount) || 0,
+              method: pay.method
+            }));
+          return {
+            id: c.id,
+            customerId: c.customer_id || localClient?.customerId,
+            name: c.name,
+            phone: c.phone,
+            password: c.password || localClient?.password || 'password123',
+            projectId: c.project_id || localClient?.projectId,
+            projectName: c.project_name || localClient?.projectName,
+            flatNo: c.flat_no || localClient?.flatNo,
+            totalPrice: Number(c.total_price) || 0,
+            totalPaid: Number(c.total_paid) || 0,
+            nextDueDate: c.next_due_date || localClient?.nextDueDate,
+            nextDueAmount: Number(c.next_due_amount) || 0,
+            pricingMode: c.pricing_mode || localClient?.pricingMode || 'package',
+            landPrice: Number(c.land_price) || localClient?.landPrice || 0,
+            constructionPrice: Number(c.construction_price) || localClient?.constructionPrice || 0,
+            sizeSqft: Number(c.size_sqft) || localClient?.sizeSqft || 0,
+            paymentHistory: paymentsFromRemote
+          };
+        });
+      const pendingLocalClients = (current.clients || [])
+        .filter(lc => lc._isPendingSync && !deletedClientSet.has(lc.id) && !clientsRes.data.some(c => c.id === lc.id));
+      updated.clients = [...remoteClients, ...pendingLocalClients];
+    }
+
+    if (customersRes?.data) {
+      const remoteCustomers = customersRes.data
+        .filter(cust => !deletedCustSet.has(cust.id))
+        .map(cust => {
+          const localCust = (current.customers || []).find(x => x.id === cust.id);
+          return {
+            id: cust.id,
+            name: cust.name || localCust?.name || '',
+            phone: cust.phone || localCust?.phone || '',
+            password: cust.password || localCust?.password || 'password123',
+            status: cust.status || localCust?.status || 'সক্রিয় (Active)',
+            createdAt: cust.created_at || localCust?.createdAt || new Date().toISOString()
+          };
+        });
+      const pendingLocalCustomers = (current.customers || [])
+        .filter(lc => lc._isPendingSync && !deletedCustSet.has(lc.id) && !customersRes.data.some(c => c.id === lc.id));
+      updated.customers = [...remoteCustomers, ...pendingLocalCustomers];
+    }
+
+    if (offersRes?.data) {
+      const remoteOffers = offersRes.data
+        .filter(o => !deletedOfferSet.has(o.id))
+        .map(o => ({
+          id: o.id,
+          name: o.name,
+          location: o.location || '',
+          description: o.description || '',
+          minInvestment: Number(o.min_investment) || 0,
+          maxInvestment: Number(o.max_investment) || 0,
+          tenureYears: Number(o.tenure_years) || 0,
+          netProfitPercent: Number(o.net_profit_percent) || 0,
+          directorTierMinInvestment: Number(o.director_tier_min_investment) || 0,
+          directorTierRecurring: Boolean(o.director_tier_recurring)
         }));
-        return {
-          id: c.id,
-          customerId: c.customer_id || localClient?.customerId,
-          name: c.name,
-          phone: c.phone,
-          password: c.password || localClient?.password || 'password123',
-          projectId: c.project_id || localClient?.projectId,
-          projectName: c.project_name || localClient?.projectName,
-          flatNo: c.flat_no || localClient?.flatNo,
-          totalPrice: Number(c.total_price) || 0,
-          totalPaid: Number(c.total_paid) || 0,
-          nextDueDate: c.next_due_date || localClient?.nextDueDate,
-          nextDueAmount: Number(c.next_due_amount) || 0,
-          pricingMode: c.pricing_mode || localClient?.pricingMode || 'package',
-          landPrice: Number(c.land_price) || localClient?.landPrice || 0,
-          constructionPrice: Number(c.construction_price) || localClient?.constructionPrice || 0,
-          sizeSqft: Number(c.size_sqft) || localClient?.sizeSqft || 0,
-          paymentHistory: paymentsFromRemote.length > 0 ? paymentsFromRemote : (localClient?.paymentHistory || [])
-        };
-      });
-      // Retain any locally added clients that aren't yet in Supabase
-      const extraLocalClients = (current.clients || []).filter(lc => !clientsRes.data.some(c => c.id === lc.id));
-      updated.clients = [...remoteClients, ...extraLocalClients];
+      const pendingLocalOffers = (current.investmentOffers || [])
+        .filter(lo => lo._isPendingSync && !deletedOfferSet.has(lo.id) && !offersRes.data.some(o => o.id === lo.id));
+      updated.investmentOffers = [...remoteOffers, ...pendingLocalOffers];
     }
 
-    if (customersRes?.data && customersRes.data.length > 0) {
-      const remoteCustomers = customersRes.data.map(cust => {
-        const localCust = (current.customers || []).find(x => x.id === cust.id);
-        return {
-          id: cust.id,
-          name: cust.name || localCust?.name || '',
-          phone: cust.phone || localCust?.phone || '',
-          password: cust.password || localCust?.password || 'password123',
-          status: cust.status || localCust?.status || 'সক্রিয় (Active)',
-          createdAt: localCust?.createdAt || new Date().toISOString()
-        };
-      });
-      const extraLocalCustomers = (current.customers || []).filter(lc => !customersRes.data.some(c => c.id === lc.id));
-      updated.customers = [...remoteCustomers, ...extraLocalCustomers];
+    if (investorsRes?.data) {
+      const remoteInvestors = investorsRes.data
+        .filter(inv => !deletedInvestorSet.has(inv.id))
+        .map(inv => ({
+          id: inv.id,
+          name: inv.name,
+          phone: inv.phone || '',
+          offerId: inv.offer_id,
+          tier: inv.tier || 'general',
+          investedAmount: Number(inv.invested_amount) || 0,
+          investmentDate: inv.investment_date || '',
+          cycleEndDate: inv.cycle_end_date || '',
+          status: inv.status || 'সক্রিয় (Active)',
+          totalPaid: Number(inv.total_paid) || 0,
+          payoutHistory: inv.payout_history || [],
+          address: inv.address || '',
+          nomineeName: inv.nominee_name || '',
+          nomineeRelation: inv.nominee_relation || '',
+          nomineePhone: inv.nominee_phone || ''
+        }));
+      const pendingLocalInvestors = (current.investors || [])
+        .filter(li => li._isPendingSync && !deletedInvestorSet.has(li.id) && !investorsRes.data.some(inv => inv.id === li.id));
+      updated.investors = [...remoteInvestors, ...pendingLocalInvestors];
     }
 
-    if (inquiriesRes?.data && inquiriesRes.data.length > 0) {
-      updated.inquiries = inquiriesRes.data.map(inq => ({
+    if (inquiriesRes?.data) {
+      const remoteInquiries = inquiriesRes.data.map(inq => ({
         id: inq.id,
-        name: inq.name,
-        phone: inq.phone,
-        email: inq.email,
-        projectId: inq.project_id,
-        inquiryType: inq.inquiry_type,
-        investmentAmount: inq.investment_amount,
-        interestedSector: inq.interested_sector,
-        message: inq.message,
-        status: inq.status,
-        date: inq.created_at ? new Date(inq.created_at).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
-        timestamp: inq.created_at
+        name: inq.name || '',
+        phone: inq.phone || '',
+        email: inq.email || '',
+        projectId: inq.project_id || null,
+        type: inq.inquiry_type || 'site_visit',
+        investmentAmount: inq.investment_amount || '',
+        interestedSector: inq.interested_sector || '',
+        message: inq.message || '',
+        status: inq.status || 'নতুন (New)',
+        timestamp: inq.created_at || new Date().toISOString()
       }));
-      const extraLocalInquiries = (current.inquiries || []).filter(li => !inquiriesRes.data.some(inq => inq.id === li.id));
-      updated.inquiries = [...updated.inquiries, ...extraLocalInquiries];
-    }
-
-    if (offersRes?.data && offersRes.data.length > 0) {
-      updated.investmentOffers = offersRes.data.map(o => ({
-        id: o.id,
-        name: o.name,
-        location: o.location || '',
-        description: o.description || '',
-        minInvestment: Number(o.min_investment) || 0,
-        maxInvestment: Number(o.max_investment) || 0,
-        tenureYears: Number(o.tenure_years) || 0,
-        netProfitPercent: Number(o.net_profit_percent) || 0,
-        directorTierMinInvestment: Number(o.director_tier_min_investment) || 0,
-        directorTierRecurring: Boolean(o.director_tier_recurring)
-      }));
-      const extraLocalOffers = (current.investmentOffers || []).filter(lo => !offersRes.data.some(o => o.id === lo.id));
-      updated.investmentOffers = [...updated.investmentOffers, ...extraLocalOffers];
-    }
-
-    if (investorsRes?.data && investorsRes.data.length > 0) {
-      updated.investors = investorsRes.data.map(inv => ({
-        id: inv.id,
-        name: inv.name,
-        phone: inv.phone || '',
-        offerId: inv.offer_id,
-        tier: inv.tier || 'general',
-        investedAmount: Number(inv.invested_amount) || 0,
-        investmentDate: inv.investment_date || '',
-        cycleEndDate: inv.cycle_end_date || '',
-        status: inv.status || 'সক্রিয় (Active)',
-        totalPaid: Number(inv.total_paid) || 0,
-        payoutHistory: Array.isArray(inv.payout_history) ? inv.payout_history : [],
-        address: inv.address || '',
-        nomineeName: inv.nominee_name || '',
-        nomineeRelation: inv.nominee_relation || '',
-        nomineePhone: inv.nominee_phone || ''
-      }));
-      const extraLocalInvestors = (current.investors || []).filter(li => !investorsRes.data.some(inv => inv.id === li.id));
-      updated.investors = [...updated.investors, ...extraLocalInvestors];
+      const pendingLocalInquiries = (current.inquiries || [])
+        .filter(li => li._isPendingSync && !inquiriesRes.data.some(inq => inq.id === li.id));
+      updated.inquiries = [...remoteInquiries, ...pendingLocalInquiries];
     }
 
     const migrated = migrateClientsToCustomers(updated);
@@ -1319,6 +1299,42 @@ export const formatBDT = (num) => {
   return '৳ ' + val.toLocaleString('bn-BD');
 };
 
+// Record tombstone in Supabase Cloud SYSTEM-DELETED-IDS
+export const recordTombstoneInSupabase = async (field, id) => {
+  try {
+    if (!id) return;
+    const { data: tombstoneRow } = await supabase
+      .from('admins')
+      .select('permissions')
+      .eq('id', 'SYSTEM-DELETED-IDS')
+      .maybeSingle();
+
+    const currentList = Array.isArray(tombstoneRow?.permissions?.[field])
+      ? tombstoneRow.permissions[field]
+      : [];
+    const updatedList = Array.from(new Set([...currentList, id]));
+
+    await supabase.from('admins').upsert({
+      id: 'SYSTEM-DELETED-IDS',
+      name: 'System Deleted Records Tombstones',
+      name_en: 'System Tombstones',
+      email: 'tombstones@alemarahproperties.com',
+      phone: '01816233013',
+      role: 'system_tombstones',
+      role_type: 'system_tombstones',
+      access_key: 'system_tombstones',
+      is_super_admin: false,
+      permissions: {
+        ...(tombstoneRow?.permissions || {}),
+        [field]: updatedList
+      },
+      status: 'সক্রিয়'
+    }, { onConflict: 'id' });
+  } catch (err) {
+    console.error(`Error recording tombstone for ${field}:`, err);
+  }
+};
+
 // Delete a project and its expenses from Supabase Cloud and record tombstone
 export const deleteProjectFromSupabase = async (projId) => {
   try {
@@ -1326,101 +1342,98 @@ export const deleteProjectFromSupabase = async (projId) => {
     await supabase.from('clients').update({ project_id: null }).eq('project_id', projId);
     await supabase.from('project_expenses').delete().eq('project_id', projId);
     await supabase.from('projects').delete().eq('id', projId);
-
-    // Record tombstone in central database so all other devices purge this project immediately
-    const { data: tombstoneRow } = await supabase.from('admins').select('permissions').eq('id', 'SYSTEM-DELETED-IDS').maybeSingle();
-    const currentDeleted = Array.isArray(tombstoneRow?.permissions?.deletedProjectIds) ? tombstoneRow.permissions.deletedProjectIds : [];
-    const updatedDeleted = Array.from(new Set([...currentDeleted, projId]));
-    
-    await supabase.from('admins').upsert({
-      id: 'SYSTEM-DELETED-IDS',
-      name: 'System Deleted Records Tombstones',
-      name_en: 'System Tombstones',
-      email: 'tombstones@alemarahproperties.com',
-      phone: '01816233013',
-      role: 'system_tombstones',
-      role_type: 'system_tombstones',
-      access_key: 'system_tombstones',
-      is_super_admin: false,
-      permissions: {
-        ...(tombstoneRow?.permissions || {}),
-        deletedProjectIds: updatedDeleted
-      },
-      status: 'সক্রিয়'
-    }, { onConflict: 'id' });
+    await recordTombstoneInSupabase('deletedProjectIds', projId);
   } catch (err) {
     console.error('Error deleting project from Supabase:', err);
   }
 };
 
-// A locally-deleted expense that was never removed from Supabase comes
-// back the next time this device (or any other) pulls remote data, since
-// the remote row still exists. Delete it there too, not just locally.
+// Delete an expense from Supabase Cloud and record tombstone
 export const deleteExpenseFromSupabase = async (expId) => {
   try {
     if (!expId) return;
     await supabase.from('project_expenses').delete().eq('id', expId);
+    await recordTombstoneInSupabase('deletedExpenseIds', expId);
   } catch (err) {
     console.error('Error deleting expense from Supabase:', err);
   }
 };
 
+// Delete a client, associated payments, and orphaned customer from Supabase Cloud
+export const deleteClientFromSupabase = async (clientId, clientData) => {
+  try {
+    if (!clientId) return;
+    // 1. Delete all payments associated with this client
+    await supabase.from('client_payments').delete().eq('client_id', clientId);
+    // 2. Delete the client row
+    await supabase.from('clients').delete().eq('id', clientId);
+    // 3. Record tombstone
+    await recordTombstoneInSupabase('deletedClientIds', clientId);
+
+    // 4. Check if customer identity should also be purged
+    const customerId = clientData?.customerId;
+    if (customerId) {
+      const { data: remainingClients } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('customer_id', customerId);
+      if (!remainingClients || remainingClients.length === 0) {
+        await supabase.from('customers').delete().eq('id', customerId);
+        await recordTombstoneInSupabase('deletedCustomerIds', customerId);
+      }
+    }
+  } catch (err) {
+    console.error('Error deleting client from Supabase:', err);
+  }
+};
+
+// Delete a payment / money receipt voucher from Supabase Cloud
+export const deletePaymentFromSupabase = async (paymentId, clientId, amount) => {
+  try {
+    if (!paymentId) return;
+    await supabase.from('client_payments').delete().eq('id', paymentId);
+    if (clientId && amount) {
+      const { data: clData } = await supabase.from('clients').select('total_paid').eq('id', clientId).maybeSingle();
+      if (clData) {
+        const newTotal = Math.max(0, (Number(clData.total_paid) || 0) - Number(amount));
+        await supabase.from('clients').update({ total_paid: newTotal }).eq('id', clientId);
+      }
+    }
+    await recordTombstoneInSupabase('deletedPaymentIds', paymentId);
+  } catch (err) {
+    console.error('Error deleting payment from Supabase:', err);
+  }
+};
+
+// Delete an investment offer from Supabase Cloud
 export const deleteInvestmentOfferFromSupabase = async (offerId) => {
   try {
     if (!offerId) return;
     await supabase.from('investors').delete().eq('offer_id', offerId);
     await supabase.from('investment_offers').delete().eq('id', offerId);
-
-    const { data: tombstoneRow } = await supabase.from('admins').select('permissions').eq('id', 'SYSTEM-DELETED-IDS').maybeSingle();
-    const currentDeleted = Array.isArray(tombstoneRow?.permissions?.deletedOfferIds) ? tombstoneRow.permissions.deletedOfferIds : [];
-    const updatedDeleted = Array.from(new Set([...currentDeleted, offerId]));
-
-    await supabase.from('admins').upsert({
-      id: 'SYSTEM-DELETED-IDS',
-      name: 'System Deleted Records Tombstones',
-      name_en: 'System Tombstones',
-      email: 'tombstones@alemarahproperties.com',
-      phone: '01816233013',
-      role: 'system_tombstones',
-      role_type: 'system_tombstones',
-      access_key: 'system_tombstones',
-      is_super_admin: false,
-      permissions: {
-        ...(tombstoneRow?.permissions || {}),
-        deletedOfferIds: updatedDeleted
-      },
-      status: 'সক্রিয়'
-    }, { onConflict: 'id' });
+    await recordTombstoneInSupabase('deletedOfferIds', offerId);
   } catch (err) {
     console.error('Error deleting investment offer from Supabase:', err);
   }
 };
 
+// Delete an individual investor from Supabase Cloud
+export const deleteInvestorFromSupabase = async (invId) => {
+  try {
+    if (!invId) return;
+    await supabase.from('investors').delete().eq('id', invId);
+    await recordTombstoneInSupabase('deletedInvestorIds', invId);
+  } catch (err) {
+    console.error('Error deleting investor from Supabase:', err);
+  }
+};
+
+// Delete a director from Supabase Cloud
 export const deleteDirectorFromSupabase = async (dirId) => {
   try {
     if (!dirId) return;
     await supabase.from('directors').delete().eq('id', dirId);
-
-    const { data: tombstoneRow } = await supabase.from('admins').select('permissions').eq('id', 'SYSTEM-DELETED-IDS').maybeSingle();
-    const currentDeleted = Array.isArray(tombstoneRow?.permissions?.deletedDirectorIds) ? tombstoneRow.permissions.deletedDirectorIds : [];
-    const updatedDeleted = Array.from(new Set([...currentDeleted, dirId]));
-
-    await supabase.from('admins').upsert({
-      id: 'SYSTEM-DELETED-IDS',
-      name: 'System Deleted Records Tombstones',
-      name_en: 'System Tombstones',
-      email: 'tombstones@alemarahproperties.com',
-      phone: '01816233013',
-      role: 'system_tombstones',
-      role_type: 'system_tombstones',
-      access_key: 'system_tombstones',
-      is_super_admin: false,
-      permissions: {
-        ...(tombstoneRow?.permissions || {}),
-        deletedDirectorIds: updatedDeleted
-      },
-      status: 'সক্রিয়'
-    }, { onConflict: 'id' });
+    await recordTombstoneInSupabase('deletedDirectorIds', dirId);
   } catch (err) {
     console.error('Error deleting director from Supabase:', err);
   }

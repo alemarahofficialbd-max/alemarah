@@ -88,7 +88,10 @@ import {
   deleteProjectFromSupabase,
   deleteExpenseFromSupabase,
   deleteInvestmentOfferFromSupabase,
-  deleteDirectorFromSupabase
+  deleteDirectorFromSupabase,
+  deleteClientFromSupabase,
+  deletePaymentFromSupabase,
+  deleteInvestorFromSupabase
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -785,30 +788,94 @@ export default function ManagementDashboard({
     );
   };
 
-  const handleDeleteClient = async (clientId) => {
+  const handleDeleteClient = (clientId) => {
     const clientToDelete = data.clients.find(c => c.id === clientId);
     if (!clientToDelete) return;
-    const confirmed = window.confirm(`আপনি কি নিশ্চিতভাবে "${clientToDelete.name}"-এর কাস্টমার ও বুকিং রেকর্ডটি মুছে ফেলতে চান?\n\nএটি ক্লাউড ডাটাবেজ থেকেও স্থায়ীভাবে মুছে যাবে।`);
-    if (!confirmed) return;
+    requestProtectedDelete(
+      `কাস্টমার "${clientToDelete.name}" মুছে ফেলা`,
+      `আপনি কি নিশ্চিতভাবে "${clientToDelete.name}"-এর কাস্টমার ও বুকিং রেকর্ডটি মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন। এটি ক্লাউড ডাটাবেজ থেকেও স্থায়ীভাবে মুছে যাবে।`,
+      async () => {
+        const customerId = clientToDelete.customerId;
+        const otherUnits = (data.clients || []).filter(c => c.id !== clientId && c.customerId === customerId);
 
-    // Delete locally
-    updateStore(prev => ({
-      ...prev,
-      clients: prev.clients.filter(c => c.id !== clientId)
-    }));
+        updateStore(prev => ({
+          ...prev,
+          clients: (prev.clients || []).filter(c => c.id !== clientId),
+          customers: otherUnits.length > 0 
+            ? (prev.customers || []) 
+            : (prev.customers || []).filter(cu => cu.id !== customerId && cu.phone !== clientToDelete.phone),
+          deletedClientIds: [...new Set([...(prev.deletedClientIds || []), clientId])],
+          deletedCustomerIds: (otherUnits.length === 0 && customerId)
+            ? [...new Set([...(prev.deletedCustomerIds || []), customerId])] 
+            : (prev.deletedCustomerIds || [])
+        }));
 
-    // Delete from Supabase
-    try {
-      await supabase.from('client_payments').delete().eq('client_id', clientId);
-      await supabase.from('clients').delete().eq('id', clientId);
-    } catch (err) {
-      console.error('Error deleting client from Supabase:', err);
-    }
+        await deleteClientFromSupabase(clientId, clientToDelete);
 
-    if (selectedClientForProfile?.id === clientId) {
-      setSelectedClientForProfile(null);
-    }
-    triggerAlert(`"${clientToDelete.name}" সফলভাবে মুছে ফেলা হয়েছে!`);
+        if (selectedClientForProfile?.id === clientId) {
+          setSelectedClientForProfile(null);
+        }
+        triggerAlert(`"${clientToDelete.name}" সফলভাবে মুছে ফেলা হয়েছে!`);
+      }
+    );
+  };
+
+  const handleDeletePayment = (trx, client) => {
+    if (!isSuperAdmin) return;
+    const cl = client || data.clients.find(c => (c.paymentHistory || []).some(p => p.id === trx.id));
+    if (!cl) return;
+
+    requestProtectedDelete(
+      `পেমেন্ট / রসিদ "${trx.id}" মুছে ফেলা`,
+      `আপনি কি নিশ্চিতভাবে ${cl.name}-এর ${formatBDT(trx.amount)} টাকার জমার রেকর্ডটি (${trx.id}) মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
+      async () => {
+        const payAmount = Number(trx.amount) || 0;
+        updateStore((prev) => ({
+          ...prev,
+          clients: (prev.clients || []).map(c => {
+            if (c.id === cl.id) {
+              return {
+                ...c,
+                totalPaid: Math.max(0, (Number(c.totalPaid) || 0) - payAmount),
+                paymentHistory: (c.paymentHistory || []).filter(p => p.id !== trx.id)
+              };
+            }
+            return c;
+          }),
+          deletedPaymentIds: [...new Set([...(prev.deletedPaymentIds || []), trx.id])]
+        }));
+
+        await deletePaymentFromSupabase(trx.id, cl.id, payAmount);
+
+        if (selectedHistoryTrxForModal?.trx?.id === trx.id) {
+          setSelectedHistoryTrxForModal(null);
+        }
+        if (selectedReceiptForPrint?.trx?.id === trx.id) {
+          setSelectedReceiptForPrint(null);
+        }
+        triggerAlert(`পেমেন্ট রেকর্ড "${trx.id}" সফলভাবে মুছে ফেলা হয়েছে!`);
+      }
+    );
+  };
+
+  const handleDeleteInvestor = (invId, invName) => {
+    if (!isSuperAdmin) return;
+    requestProtectedDelete(
+      `ইনভেস্টর "${invName}" মুছে ফেলা`,
+      `আপনি কি নিশ্চিতভাবে "${invName}"-এর বিনিয়োগ রেকর্ডটি মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
+      async () => {
+        updateStore((prev) => ({
+          ...prev,
+          investors: (prev.investors || []).filter(inv => inv.id !== invId),
+          deletedInvestorIds: [...new Set([...(prev.deletedInvestorIds || []), invId])]
+        }));
+        await deleteInvestorFromSupabase(invId);
+        if (selectedInvestorProfile?.id === invId) {
+          setSelectedInvestorProfile(null);
+        }
+        triggerAlert(`ইনভেস্টর "${invName}" সফলভাবে মুছে ফেলা হয়েছে!`);
+      }
+    );
   };
 
   const handleUpdateClientPassword = async (clientId, newPassword) => {
@@ -2770,6 +2837,19 @@ export default function ManagementDashboard({
                             >
                               <Printer className="w-4 h-4 text-[#006231]" />
                             </button>
+                            {isSuperAdmin && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const cl = data.clients.find(c => c.id === trx.clientId);
+                                  handleDeletePayment(trx, cl);
+                                }}
+                                title="এই পেমেন্ট ভাউচারটি মুছে ফেলুন"
+                                className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -3392,6 +3472,16 @@ export default function ManagementDashboard({
                                   <Plus className="w-3 h-3" />
                                   <span>পরিশোধ করুন</span>
                                 </button>
+                                {isSuperAdmin && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteInvestor(inv.id, inv.name)}
+                                    className="ml-1.5 p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 cursor-pointer inline-flex items-center"
+                                    title="ইনভেস্টর মুছে ফেলুন"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                )}
                               </td>
                             </tr>
                           );
@@ -6159,6 +6249,8 @@ export default function ManagementDashboard({
           setInvestorPayoutForm(emptyInvestorPayoutForm());
           setIsInvestorPayoutModalOpen(true);
         }}
+        onDeleteInvestor={handleDeleteInvestor}
+        onDeleteInvestor={handleDeleteInvestor}
         onAddAnotherInvestment={() => {
           const targetOffer = (data.investmentOffers || []).find(o => o.id === selectedInvestorProfile?.offerId) || selectedOfferForDetails;
           setSelectedInvestorProfile(null);
@@ -7412,6 +7504,17 @@ export default function ManagementDashboard({
                                   <Printer className="w-3 h-3" />
                                   <span>রসিদ প্রিন্ট</span>
                                 </button>
+                                {isSuperAdmin && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeletePayment(trx, cl)}
+                                    className="ml-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 font-bold text-3xs border border-slate-200 transition-all cursor-pointer inline-flex items-center space-x-1"
+                                    title="এই জমার রেকর্ড মুছুন"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <span>মুছুন</span>
+                                  </button>
+                                )}
                               </td>
                             </tr>
                           ))}
@@ -7444,6 +7547,7 @@ export default function ManagementDashboard({
           setSelectedReceiptForPrint(printData);
         }}
         onCopy={triggerAlert}
+        onDelete={handleDeletePayment}
       />
 
       {/* FULL SCREEN VIEW: OFFICIAL MONEY RECEIPT PREVIEW & PRINT  */}

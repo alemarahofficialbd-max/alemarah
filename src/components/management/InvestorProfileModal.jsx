@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, X, UserCircle2, Phone, MapPin, Plus, Wallet } from 'lucide-react';
+import { ChevronLeft, X, UserCircle2, Phone, MapPin, Plus, Wallet, Trash2 } from 'lucide-react';
 
 const fmt = (n) => `৳${(Number(n) || 0).toLocaleString('bn-BD')}`;
 
@@ -15,7 +15,8 @@ export default function InvestorProfileModal({
   isSidebarCollapsed,
   onClose,
   onAddPayout,
-  onAddAnotherInvestment
+  onAddAnotherInvestment,
+  onDeleteInvestor
 }) {
   if (!isOpen || !investor) return null;
 
@@ -140,6 +141,16 @@ export default function InvestorProfileModal({
                         >
                           <Wallet className="w-3 h-3" />
                           <span>পরিশোধ</span>
+                        </button>
+                      )}
+                      {onDeleteInvestor && (
+                        <button
+                          type="button"
+                          onClick={() => onDeleteInvestor(inv.id, investor.name)}
+                          className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 cursor-pointer inline-flex items-center"
+                          title="এই বিনিয়োগ রেকর্ড মুছে ফেলুন"
+                        >
+                          <Trash2 className="w-3 h-3" />
                         </button>
                       )}
                     </div>
