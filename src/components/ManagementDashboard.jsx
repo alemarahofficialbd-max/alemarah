@@ -816,6 +816,7 @@ export default function ManagementDashboard({
   };
 
   const handleDeleteClient = (clientId) => {
+    if (!isSuperAdmin) return;
     const clientToDelete = data.clients.find(c => c.id === clientId);
     if (!clientToDelete) return;
     requestProtectedDelete(
@@ -2998,17 +2999,19 @@ export default function ManagementDashboard({
                                 + জমা
                               </button>
 
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteClient(cl.id);
-                                }}
-                                className="p-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 transition-all cursor-pointer active:scale-95"
-                                title="কাস্টমার মুছে ফেলুন"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                              {isSuperAdmin && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteClient(cl.id);
+                                  }}
+                                  className="p-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 transition-all cursor-pointer active:scale-95"
+                                  title="কাস্টমার মুছে ফেলুন"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -7667,15 +7670,17 @@ export default function ManagementDashboard({
                             </button>
 
                             {/* Delete Customer Button */}
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteClient(cl.id)}
-                              className="py-2 px-3.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs active:scale-95"
-                              title="এই কাস্টমার ও বুকিং রেকর্ড মুছে ফেলুন"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                              <span>কাস্টমার মুছুন</span>
-                            </button>
+                            {isSuperAdmin && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteClient(cl.id)}
+                                className="py-2 px-3.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs active:scale-95"
+                                title="এই কাস্টমার ও বুকিং রেকর্ড মুছে ফেলুন"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 text-red-600" />
+                                <span>কাস্টমার মুছুন</span>
+                              </button>
+                            )}
                           </div>
 
                           {/* Confirmed / Approved Status Badge (CLI-MV... machine ID removed completely) */}
