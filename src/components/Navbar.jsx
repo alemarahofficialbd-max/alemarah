@@ -59,8 +59,8 @@ export default function Navbar({
     { id: 'contact', label: t.nav.contact, shortLabel: t.nav.contact, icon: Phone }
   ];
 
-  // Desktop navigation: exclude 'events' as requested so top bar stays pristine
-  const desktopNavLinks = navLinks.filter(item => item.id !== 'events');
+  // Desktop navigation includes all links
+  const desktopNavLinks = navLinks;
 
   // Mobile bottom dock bar strictly has 6 items to avoid wrapping onto a 2nd row
   const bottomNavLinks = navLinks.filter(item => item.id !== 'careers' && item.id !== 'events');
@@ -144,7 +144,7 @@ export default function Navbar({
             </button>
 
             {/* Desktop Navigation Categories (6 exact items) */}
-            <nav className="hidden xl:flex items-center space-x-1">
+            <nav className="hidden xl:flex items-center space-x-0.5 2xl:space-x-1">
               {desktopNavLinks.map((item) => {
                 const IconComponent = item.icon;
                 const isActive = currentPage === item.id;
@@ -152,7 +152,7 @@ export default function Navbar({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
-                    className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                    className={`flex items-center space-x-1 2xl:space-x-1.5 px-2.5 2xl:px-3 py-2 rounded-xl text-xs 2xl:text-sm font-semibold transition-all cursor-pointer ${
                       isActive 
                         ? 'text-[#CE2028] bg-red-50/80 font-bold shadow-2xs' 
                         : 'text-gray-700 hover:text-[#CE2028] hover:bg-gray-50'
@@ -173,13 +173,13 @@ export default function Navbar({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    className={`px-2 py-1.5 rounded-lg text-2xs font-semibold transition-all cursor-pointer ${
                       isActive 
                         ? 'text-[#CE2028] bg-red-50/80 font-bold' 
                         : 'text-gray-700 hover:text-[#CE2028] hover:bg-gray-50'
                     }`}
                   >
-                    <span>{item.label}</span>
+                    <span>{item.shortLabel || item.label}</span>
                   </button>
                 );
               })}
