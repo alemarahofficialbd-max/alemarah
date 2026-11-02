@@ -248,7 +248,7 @@ export default function LoginPage({
       setIsSuccess(true);
       setStatusMessage(isEn ? 'Super Admin credentials filled. Click "Access Portal".' : 'সুপার অ্যাডমিন ইমেইল ও পাসওয়ার্ড বসানো হয়েছে।');
     } else if (type === 'director') {
-      const director = store.directors?.[0] || { name: 'শেখ ফজলুল করীম মারুফ', phone: '01816233013', accessKey: 'admin123' };
+      const director = store.directors?.[0] || { name: 'শেখ ফজলুল করিম মারুফ', phone: '01816233013', accessKey: 'admin123' };
       setIdentifierInput(director?.phone || '01816233013');
       setPasswordInput(demoPassword(director?.accessKey, 'admin123'));
       setIsSuccess(true);

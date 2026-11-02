@@ -4712,10 +4712,50 @@ export default function ManagementDashboard({
                               <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); handleOpenDirectorAccess(dir); }}
-                                className="col-span-2 py-2 px-2.5 rounded-xl bg-[#006231] hover:bg-[#004d26] text-white text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
+                                className="py-2 px-2.5 rounded-xl bg-[#006231] hover:bg-[#004d26] text-white text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
                               >
                                 <KeyRound className="w-3.5 h-3.5" />
-                                <span>লগইন পাসওয়ার্ড ও এক্সেস</span>
+                                <span>এক্সেস</span>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingDirector(dir);
+                                setIsCustomDirectorRole(!['চেয়ারম্যান', 'ব্যবস্থাপনা পরিচালক', 'পরিচালক', 'ডিরেক্টর'].includes(dir.role));
+                                setDirectorForm({
+                                  name: dir.name || '',
+                                  image: dir.image || null,
+                                  role: dir.role || 'পরিচালক',
+                                  investment: String(dir.investment || ''),
+                                  shareCount: String(dir.shareCount || dir.sharePercentage || ''),
+                                  sharePercentage: String(dir.shareCount || dir.sharePercentage || ''),
+                                  phone: dir.phone || '',
+                                  email: dir.email || '',
+                                  accessKey: '',
+                                  nomineeName: dir.nomineeName || '',
+                                  nomineeRelation: dir.nomineeRelation || '',
+                                  nomineePhone: dir.nomineePhone || ''
+                                });
+                                setIsDirectorModalOpen(true);
+                              }}
+                              className="py-2 px-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>তথ্য এডিট</span>
+                            </button>
+                            {isSuperAdmin && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteDirector(dir.id, dir.name);
+                                }}
+                                className="col-span-2 py-2 px-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>পরিচালক ডিলিট করুন</span>
                               </button>
                             )}
                           </div>

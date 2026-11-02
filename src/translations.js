@@ -221,14 +221,14 @@ export const translations = {
       // Chairman's Message
       chairmanTitle: "Message from the Honorable Chairman",
       chairmanQuote: "The core philosophy of Al-Emarah Properties is planned development, responsible management, and sustainable wealth creation. We believe real estate is not merely land and brick structures; it is deeply intertwined with human lives, urbanization, and shaping the future. In every venture, we uphold transparency, accountability, professionalism, and ethical governance to build a dependable, multi-faceted institution for generations.",
-      chairmanName: "Sheikh Fazlul Karim Maroof",
+      chairmanName: "Sheikh Fazlul Karim Maruf",
       chairmanDesignation: "Chairman",
       chairmanEducation: "Graduate, Public Administration, University of Dhaka",
       
       // Managing Director's Message
       mdTitle: "Message from the Managing Director",
       mdQuote: "As the Managing Director, my primary duty is advancing our organization into a powerful, multifaceted, and publicly trusted enterprise through sound planning, skilled management, and pragmatic execution. Alongside residential and commercial towers like Al Quds Tower and Barakah Tower 01, our Emarah Agro initiative is opening new frontiers in sustainable agriculture and participatory returns. Because behind a person's savings lie their hard work, their family's future, and their aspiration to build something lasting. From that accountability, our journey continues from planning to execution, from a single initiative toward multi-asset development.",
-      mdName: "Talukdar Tariq Masud",
+      mdName: "Talukder Tarik Mashud",
       mdDesignation: "Managing Director",
       mdEducation: "BSS Political Science, Govt Titumir College",
 
@@ -241,7 +241,7 @@ export const translations = {
         members: [
           {
             id: "chairman",
-            name: "Sheikh Fazlul Karim Maroof",
+            name: "Sheikh Fazlul Karim Maruf",
             role: "Chairman",
             organization: "Al-Emarah Properties",
             education: "Graduate, Public Administration, University of Dhaka",
@@ -249,7 +249,7 @@ export const translations = {
           },
           {
             id: "md",
-            name: "Talukdar Tariq Masud",
+            name: "Talukder Tarik Mashud",
             role: "Managing Director",
             organization: "Al-Emarah Properties",
             education: "BSS Political Science, Govt. Titumir College",
@@ -257,7 +257,7 @@ export const translations = {
           },
           {
             id: "dir_nur_hossain",
-            name: "Alhaj Mawlana Nur Hossain",
+            name: "Alhaz Mawlana Nur Hossen",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Prominent Islamic Scholar & Entrepreneur",
@@ -284,7 +284,7 @@ export const translations = {
           {
             id: "bod_1",
             serial: "01",
-            name: "Sheikh Fazlul Karim Maroof",
+            name: "Sheikh Fazlul Karim Maruf",
             role: "Chairman",
             organization: "Al-Emarah Properties",
             education: "Graduate, Public Administration, University of Dhaka",
@@ -293,7 +293,7 @@ export const translations = {
           {
             id: "bod_2",
             serial: "02",
-            name: "Talukdar Tariq Masud",
+            name: "Talukder Tarik Mashud",
             role: "Managing Director",
             organization: "Al-Emarah Properties",
             education: "BSS Political Science, Govt. Titumir College",
@@ -302,7 +302,7 @@ export const translations = {
           {
             id: "bod_3",
             serial: "03",
-            name: "Alhaj Mawlana Nur Hossain",
+            name: "Alhaz Mawlana Nur Hossen",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Prominent Islamic Scholar & Entrepreneur",
@@ -320,7 +320,7 @@ export const translations = {
           {
             id: "bod_5",
             serial: "05",
-            name: "Al Amin Hawlader",
+            name: "Al Amin Hawolader",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
@@ -329,25 +329,25 @@ export const translations = {
           {
             id: "bod_6",
             serial: "06",
-            name: "Hijbullah Nahian",
-            role: "Director",
-            organization: "Al-Emarah Properties",
-            education: "Entrepreneur & Director, Al-Emarah Properties",
-            image: "/images/hijbullah_nahian.jpg"
-          },
-          {
-            id: "bod_7",
-            serial: "07",
-            name: "M M Abbas Uddin",
+            name: "Abbas Uddin",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
             image: "/images/abbas_uddin.jpg"
           },
           {
+            id: "bod_7",
+            serial: "07",
+            name: "Md. Hisbullah Howlader",
+            role: "Director",
+            organization: "Al-Emarah Properties",
+            education: "Entrepreneur & Director, Al-Emarah Properties",
+            image: "/images/hijbullah_nahian.jpg"
+          },
+          {
             id: "bod_8",
             serial: "08",
-            name: "Abu Zar Gifari",
+            name: "Abuzar Gifari",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
@@ -356,7 +356,7 @@ export const translations = {
           {
             id: "bod_9",
             serial: "09",
-            name: "Md Zunayd Bin Hamid",
+            name: "Md. Zunaid Bin Hamid",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
@@ -374,7 +374,7 @@ export const translations = {
           {
             id: "bod_11",
             serial: "11",
-            name: "MD Nizamul Islam",
+            name: "Md Masum",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
@@ -383,7 +383,7 @@ export const translations = {
           {
             id: "bod_12",
             serial: "12",
-            name: "MD Masum",
+            name: "Md Nizamul Islam",
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
@@ -716,7 +716,7 @@ export const translations = {
       intro: "Al-Emarah Properties maintains a structured, balanced corporate hierarchy comprising the Board of Directors, Executive Committee, Chairman, and Managing Director with well-demarcated roles and responsibilities.",
       chairmanRole: {
         title: "Strategic Vision & Board Leadership",
-        desc: "Led by Honorable Chairman Sheikh Fazlul Karim Maroof (Public Administration, University of Dhaka). His extensive organizational expertise, institutional wisdom, and wide civic engagement provide unshakeable ethical and strategic guidance."
+        desc: "Led by Honorable Chairman Sheikh Fazlul Karim Maruf (Public Administration, University of Dhaka). His extensive organizational expertise, institutional wisdom, and wide civic engagement provide unshakeable ethical and strategic guidance."
       },
       execRole: {
         title: "Executive Committee & Operations",
@@ -1081,7 +1081,7 @@ export const translations = {
         members: [
           {
             id: "chairman",
-            name: "শেখ ফজলুল করীম মারুফ",
+            name: "শেখ ফজলুল করিম মারুফ",
             role: "চেয়ারম্যান",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "স্নাতক, লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়",
@@ -1105,7 +1105,7 @@ export const translations = {
           },
           {
             id: "dir_taneem",
-            name: "তানিম মাহফুজ",
+            name: "তানীম মাহফুজ",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
@@ -1124,7 +1124,7 @@ export const translations = {
           {
             id: "bod_1",
             serial: "০১",
-            name: "শেখ ফজলুল করীম মারুফ",
+            name: "শেখ ফজলুল করিম মারুফ",
             role: "চেয়ারম্যান",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "স্নাতক, লোক প্রশাসন, ঢাকা বিশ্ববিদ্যালয়",
@@ -1151,7 +1151,7 @@ export const translations = {
           {
             id: "bod_4",
             serial: "০৪",
-            name: "তানিম মাহফুজ",
+            name: "তানীম মাহফুজ",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
@@ -1160,7 +1160,7 @@ export const translations = {
           {
             id: "bod_5",
             serial: "০৫",
-            name: "আল আমিন হাওলাদার",
+            name: "আল আমীন হাওলাদার",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
@@ -1169,25 +1169,25 @@ export const translations = {
           {
             id: "bod_6",
             serial: "০৬",
-            name: "হিজবুল্লাহ নাহিয়ান",
-            role: "পরিচালক",
-            organization: "আল-ইমারাহ প্রোপার্টিজ",
-            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
-            image: "/images/hijbullah_nahian.jpg"
-          },
-          {
-            id: "bod_7",
-            serial: "০৭",
-            name: "এম এম আব্বাস উদ্দিন",
+            name: "আব্বাস উদ্দিন",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
             image: "/images/abbas_uddin.jpg"
           },
           {
+            id: "bod_7",
+            serial: "০৭",
+            name: "মোঃ হিজবুল্লাহ হাওলাদার",
+            role: "পরিচালক",
+            organization: "আল-ইমারাহ প্রোপার্টিজ",
+            education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
+            image: "/images/hijbullah_nahian.jpg"
+          },
+          {
             id: "bod_8",
             serial: "০৮",
-            name: "আবু জর গিফারী",
+            name: "আবুযর গিফারী",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
@@ -1196,7 +1196,7 @@ export const translations = {
           {
             id: "bod_9",
             serial: "০৯",
-            name: "মোঃ জুনায়েদ বিন হামিদ",
+            name: "মোঃ জুনাইদ বিন হামিদ",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
@@ -1205,7 +1205,7 @@ export const translations = {
           {
             id: "bod_10",
             serial: "১০",
-            name: "মোহাম্মদ শাহ আলম",
+            name: "মোহাম্মদ শাহ্ আলম",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
@@ -1214,7 +1214,7 @@ export const translations = {
           {
             id: "bod_11",
             serial: "১১",
-            name: "মোঃ নিজামুল ইসলাম",
+            name: "মোঃ মাসুম",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
@@ -1223,7 +1223,7 @@ export const translations = {
           {
             id: "bod_12",
             serial: "১২",
-            name: "মোঃ মাসুম",
+            name: "মোঃ নিজামুল ইসলাম",
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
