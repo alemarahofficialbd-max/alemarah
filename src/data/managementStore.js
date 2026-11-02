@@ -813,6 +813,11 @@ const _syncFromSupabaseImpl = async () => {
               amount: Number(e.amount) || 0,
               date: e.date
             }));
+          // Keep a locally-added expense that hasn't landed in Supabase yet
+          // instead of letting a racing pull drop it before its push completes.
+          const pendingLocalExpenses = (localProj?.expenses || []).filter(le =>
+            le._isPendingSync && !deletedExpenseSet.has(le.id) && !expensesFromRemote.some(e => e.id === le.id)
+          );
           return {
             id: p.id,
             name: p.name,
@@ -832,7 +837,7 @@ const _syncFromSupabaseImpl = async () => {
             landPrice: localProj?.landPrice || 0,
             constructionPrice: localProj?.constructionPrice || 0,
             units: (p.units && p.units.length > 0) ? p.units : (localProj?.units || []),
-            expenses: expensesFromRemote
+            expenses: [...expensesFromRemote, ...pendingLocalExpenses]
           };
         });
       const pendingLocalProjects = (current.projects || [])
@@ -853,6 +858,11 @@ const _syncFromSupabaseImpl = async () => {
               amount: Number(pay.amount) || 0,
               method: pay.method
             }));
+          // Keep a locally-recorded payment that hasn't landed in Supabase
+          // yet instead of letting a racing pull drop it before its push completes.
+          const pendingLocalPayments = (localClient?.paymentHistory || []).filter(lp =>
+            lp._isPendingSync && !deletedPaymentSet.has(lp.id) && !paymentsFromRemote.some(p => p.id === lp.id)
+          );
           return {
             id: c.id,
             customerId: c.customer_id || localClient?.customerId,
@@ -870,7 +880,7 @@ const _syncFromSupabaseImpl = async () => {
             landPrice: Number(c.land_price) || localClient?.landPrice || 0,
             constructionPrice: Number(c.construction_price) || localClient?.constructionPrice || 0,
             sizeSqft: Number(c.size_sqft) || localClient?.sizeSqft || 0,
-            paymentHistory: paymentsFromRemote
+            paymentHistory: [...paymentsFromRemote, ...pendingLocalPayments]
           };
         });
       const pendingLocalClients = (current.clients || [])

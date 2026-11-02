@@ -960,6 +960,7 @@ export default function ManagementDashboard({
 
     const newTrx = {
       id: `TRX-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      _isPendingSync: true,
       date: paymentForm.date ? new Date(paymentForm.date).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       amount: payAmount,
       method: paymentForm.method || 'ব্যাংক ডিপোজিট'
@@ -1472,6 +1473,7 @@ export default function ManagementDashboard({
 
     const newExp = {
       id: `EXP-${Date.now().toString().slice(-4)}`,
+      _isPendingSync: true,
       title: expenseForm.title,
       amount: expAmount,
       date: expenseForm.date
