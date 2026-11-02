@@ -116,6 +116,11 @@ export default function App() {
 
   const [selectedEventId, setSelectedEventId] = useState(() => {
     try {
+      const pathname = typeof window !== 'undefined' ? window.location.pathname || '' : '';
+      if (pathname.startsWith('/events/')) {
+        const seg = pathname.replace('/events/', '').split('/')[0].split('?')[0];
+        if (seg) return decodeURIComponent(seg);
+      }
       const hash = window.location.hash || '';
       const match = hash.match(/[?&]id=([^&]+)/i);
       if (match && match[1]) return decodeURIComponent(match[1]);
@@ -141,6 +146,11 @@ export default function App() {
 
   const [currentPage, setCurrentPage] = useState(() => {
     try {
+      const pathname = typeof window !== 'undefined' ? window.location.pathname || '' : '';
+      if (pathname === '/events' || pathname.startsWith('/events/')) {
+        return 'events';
+      }
+
       const validPages = ['home', 'projects', 'investment', 'why-us', 'about', 'contact', 'login', 'dashboard', 'management', 'project-details', 'careers', 'events'];
       const rawHash = window.location.hash.replace('#', '');
       const hash = rawHash.split('?')[0].split('&')[0];
@@ -269,7 +279,15 @@ export default function App() {
       const hash = currentRawHash.split('?')[0].split('&')[0];
       let targetPage = pageFromState;
       if (!targetPage) {
-        if (currentRawHash.startsWith('events')) {
+        const pathname = window.location.pathname || '';
+        if (pathname.startsWith('/events/')) {
+          targetPage = 'events';
+          const seg = pathname.replace('/events/', '').split('/')[0].split('?')[0];
+          setSelectedEventId(seg ? decodeURIComponent(seg) : null);
+        } else if (pathname === '/events') {
+          targetPage = 'events';
+          setSelectedEventId(null);
+        } else if (currentRawHash.startsWith('events')) {
           targetPage = 'events';
           const match = currentRawHash.match(/[?&]id=([^&]+)/i);
           if (match && match[1]) {

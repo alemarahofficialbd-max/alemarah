@@ -37,32 +37,44 @@ export default function EventsPage({
   const [activePhotoModal, setActivePhotoModal] = useState(null);
   const [copied, setCopied] = useState(false);
 
-  // Sync hash when selectedEventId changes
+  // Sync URL when selectedEventId changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (selectedEventId) {
-        window.history.replaceState(null, '', `#events?id=${selectedEventId}`);
+        window.history.replaceState(null, '', `/events/${selectedEventId}`);
       } else {
-        window.history.replaceState(null, '', '#events');
+        window.history.replaceState(null, '', '/#events');
       }
     }
   }, [selectedEventId]);
 
   // Listen to popstate or hashchange
   useEffect(() => {
-    const handleHash = () => {
+    const handleUrlChange = () => {
+      const pathname = window.location.pathname || '';
+      if (pathname.startsWith('/events/')) {
+        const seg = pathname.replace('/events/', '').split('/')[0].split('?')[0];
+        if (seg) {
+          setSelectedEventId(decodeURIComponent(seg));
+          return;
+        }
+      }
       const hash = window.location.hash || '';
       const match = hash.match(/[?&]id=([^&]+)/i);
       if (match && match[1]) {
         setSelectedEventId(decodeURIComponent(match[1]));
       } else if (hash.startsWith('#events/')) {
         setSelectedEventId(hash.replace('#events/', '').split('?')[0]);
-      } else if (hash === '#events') {
+      } else if (hash === '#events' || pathname === '/events') {
         setSelectedEventId(null);
       }
     };
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
+    window.addEventListener('hashchange', handleUrlChange);
+    window.addEventListener('popstate', handleUrlChange);
+    return () => {
+      window.removeEventListener('hashchange', handleUrlChange);
+      window.removeEventListener('popstate', handleUrlChange);
+    };
   }, []);
 
   const currentEvent = eventsData.find(e => e.id === selectedEventId);
@@ -75,8 +87,8 @@ export default function EventsPage({
     if (currentEvent) {
       const titleText = `${currentEvent.title[lang]} | Al-Emarah Properties`;
       const descText = currentEvent.tagline[lang] || currentEvent.paragraphs[lang][0];
-      const imageUrl = `${origin}${currentEvent.featuredImage || currentEvent.images[0]?.src || '/images/events/al_quds_connect_1.jpg'}`;
-      const shareUrl = `${origin}/#events?id=${currentEvent.id}`;
+      const imageUrl = `${origin}/images/events/al_quds_connect_1_og.jpg`;
+      const shareUrl = `${origin}/events/${currentEvent.id}`;
 
       document.title = titleText;
 
@@ -95,6 +107,8 @@ export default function EventsPage({
       setMeta('property', 'og:image', imageUrl);
       setMeta('property', 'og:image:secure_url', imageUrl);
       setMeta('property', 'og:image:type', 'image/jpeg');
+      setMeta('property', 'og:image:width', '1200');
+      setMeta('property', 'og:image:height', '630');
       setMeta('property', 'og:url', shareUrl);
       setMeta('name', 'twitter:title', titleText);
       setMeta('name', 'twitter:description', descText);
@@ -107,7 +121,7 @@ export default function EventsPage({
   const handleShare = async () => {
     if (!currentEvent) return;
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.alemarahproperties.com';
-    const shareUrl = `${origin}/#events?id=${currentEvent.id}`;
+    const shareUrl = `${origin}/events/${currentEvent.id}`;
     const shareTitle = currentEvent.title[lang];
     const shareText = currentEvent.tagline[lang];
 
@@ -131,7 +145,7 @@ export default function EventsPage({
   const handleCopyLink = async () => {
     if (!currentEvent) return;
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.alemarahproperties.com';
-    const shareUrl = `${origin}/#events?id=${currentEvent.id}`;
+    const shareUrl = `${origin}/events/${currentEvent.id}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
@@ -144,7 +158,7 @@ export default function EventsPage({
   // --------------------------------------------------------------------------
   if (currentEvent) {
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.alemarahproperties.com';
-    const shareUrl = `${origin}/#events?id=${currentEvent.id}`;
+    const shareUrl = `${origin}/events/${currentEvent.id}`;
 
     return (
       <div className="min-h-screen bg-[#FBFBFB] py-6 sm:py-12 animate-fadeIn select-none">
