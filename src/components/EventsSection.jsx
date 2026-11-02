@@ -104,15 +104,15 @@ export default function EventsSection({ lang = 'bn', onNavigateToEvents = () => 
                 {/* Meta info tags */}
                 <div className="flex items-center flex-wrap gap-2 text-2xs text-slate-500">
                   <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-[#006231] font-bold border border-emerald-100">
-                    <Users className="w-3 h-3" />
+                    <Users className="w-3.5 h-3.5" />
                     <span>{event.category[lang]}</span>
                   </span>
                   <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold">
-                    <Calendar className="w-3 h-3 text-slate-500" />
+                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
                     <span>{event.date[lang]}</span>
                   </span>
                   <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold">
-                    <MapPin className="w-3 h-3 text-slate-500" />
+                    <MapPin className="w-3.5 h-3.5 text-slate-500" />
                     <span>{event.location[lang]}</span>
                   </span>
                 </div>
@@ -137,11 +137,15 @@ export default function EventsSection({ lang = 'bn', onNavigateToEvents = () => 
                 </div>
               </div>
 
-              {/* Bottom CTA to full details */}
+              {/* Bottom CTA to full details with Logo */}
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <div>
-                  <div className="text-3xs text-slate-400 font-medium">আয়োজনে</div>
-                  <div className="text-xs font-bold text-slate-900">Al-Emarah Properties Limited</div>
+                <div className="space-y-1">
+                  <div className="text-3xs text-slate-400 font-semibold">{isEn ? 'Organized by' : 'আয়োজনে :'}</div>
+                  <img 
+                    src="/alemarah_logo_header.svg" 
+                    alt="Al-Emarah Properties Limited" 
+                    className="h-7 sm:h-8 w-auto object-contain"
+                  />
                 </div>
 
                 <button

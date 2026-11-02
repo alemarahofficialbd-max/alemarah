@@ -11,9 +11,7 @@ import {
   CheckCircle2, 
   Sparkles,
   Building2,
-  Phone,
   ArrowRight,
-  Filter,
   MessageCircle
 } from 'lucide-react';
 import { eventsData } from '../data/eventsData';
@@ -36,7 +34,6 @@ export default function EventsPage({
     return initialEventId;
   });
 
-  const [activeCategory, setActiveCategory] = useState('all');
   const [activePhotoModal, setActivePhotoModal] = useState(null);
   const [copied, setCopied] = useState(false);
 
@@ -141,10 +138,6 @@ export default function EventsPage({
       setTimeout(() => setCopied(false), 2500);
     } catch (_) {}
   };
-
-  const filteredEvents = activeCategory === 'all' 
-    ? eventsData 
-    : eventsData.filter(e => e.categorySlug === activeCategory);
 
   // --------------------------------------------------------------------------
   // VIEW 1: DEDICATED EVENT DETAILS VIEW (When an event is selected)
@@ -328,12 +321,16 @@ export default function EventsPage({
                 </div>
               </div>
 
-              {/* Formal Closing */}
-              <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="text-xs text-slate-400 font-medium">{currentEvent.closing.signOff[lang]}</div>
-                  <div className="text-base font-black text-slate-900">{currentEvent.closing.organization}</div>
-                  <div className="text-xs font-semibold text-[#006231] tracking-wide">{currentEvent.closing.motto}</div>
+              {/* Formal Closing with Official Brand Logo */}
+              <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div className="space-y-2">
+                  <div className="text-xs text-slate-400 font-semibold">{currentEvent.closing.signOff[lang]}</div>
+                  <img 
+                    src="/alemarah_logo_header.svg" 
+                    alt="Al-Emarah Properties Limited" 
+                    className="h-9 sm:h-11 w-auto object-contain"
+                  />
+                  <div className="text-xs font-bold text-[#006231] tracking-wide pt-0.5">{currentEvent.closing.motto}</div>
                 </div>
 
                 <div className="flex items-center space-x-3">
@@ -426,48 +423,9 @@ export default function EventsPage({
           </button>
         </div>
 
-        {/* Filter Category Tabs */}
-        <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none">
-          <button
-            type="button"
-            onClick={() => setActiveCategory('all')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
-              activeCategory === 'all'
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
-            }`}
-          >
-            {isEn ? 'All Events' : 'সকল আয়োজন'} ({eventsData.length})
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveCategory('meetup')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
-              activeCategory === 'meetup'
-                ? 'bg-[#006231] text-white shadow-md'
-                : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
-            }`}
-          >
-            {isEn ? 'Investor Meetups' : 'গ্রাহক ও বিনিয়োগকারী সম্মেলন'}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveCategory('project')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
-              activeCategory === 'project'
-                ? 'bg-[#006231] text-white shadow-md'
-                : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
-            }`}
-          >
-            {isEn ? 'Project Seminars' : 'প্রকল্প সম্মেলন ও অগ্রগতি'}
-          </button>
-        </div>
-
         {/* Events Grid Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
-          {filteredEvents.map((evt) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8 max-w-5xl">
+          {eventsData.map((evt) => (
             <div
               key={evt.id}
               onClick={() => setSelectedEventId(evt.id)}
@@ -526,11 +484,13 @@ export default function EventsPage({
                 </div>
               </div>
 
-              {/* Card Footer Button */}
+              {/* Card Footer with Official Logo & Button */}
               <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-3xs text-slate-400 font-bold uppercase tracking-wider">
-                  Al-Emarah Properties
-                </span>
+                <img 
+                  src="/alemarah_logo_header.svg" 
+                  alt="Al-Emarah Properties Limited" 
+                  className="h-6 sm:h-7 w-auto object-contain"
+                />
 
                 <button
                   type="button"
