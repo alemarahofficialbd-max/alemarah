@@ -5333,13 +5333,34 @@ export default function ManagementDashboard({
                     onChange={(e) => setDirectorForm({ ...directorForm, role: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#CE2028]"
                   >
-                    <option value="পরিচালক">পরিচালক</option>
+                    <option value="চেয়ারম্যান">চেয়ারম্যান (Chairman)</option>
+                    <option value="ভাইস চেয়ারম্যান">ভাইস চেয়ারম্যান (Vice Chairman)</option>
+                    <option value="ব্যবস্থাপনা পরিচালক">ব্যবস্থাপনা পরিচালক (Managing Director)</option>
+                    <option value="উপ-ব্যবস্থাপনা পরিচালক">উপ-ব্যবস্থাপনা পরিচালক (Deputy MD)</option>
+                    <option value="পরিচালক">পরিচালক (Director)</option>
                     <option value="পরিচালক (প্রকৌশল ও কারিগরি)">পরিচালক (প্রকৌশল ও কারিগরি)</option>
                     <option value="পরিচালক (অর্থ ও নিরীক্ষা)">পরিচালক (অর্থ ও নিরীক্ষা)</option>
-                    <option value="পরিচালক (আইন ও কমপ্লায়েন্স)">পরিচালক (আইন ও কমপ্লায়েন্স)</option>
                     <option value="পরিচালক (পরিকল্পনা ও উন্নয়ন)">পরিচালক (পরিকল্পনা ও উন্নয়ন)</option>
-                    <option value="উপ-ব্যবস্থাপনা পরিচালক">উপ-ব্যবস্থাপনা পরিচালক</option>
-                    <option value="স্বতন্ত্র পরিচালক">স্বতন্ত্র পরিচালক</option>
+                    <option value="পরিচালক (আইন ও কমপ্লায়েন্স)">পরিচালক (আইন ও কমপ্লায়েন্স)</option>
+                    <option value="পরিচালক (প্রশাসন ও মানবসম্পদ)">পরিচালক (প্রশাসন ও মানবসম্পদ)</option>
+                    <option value="পরিচালক (মার্কেটিং ও সেলস)">পরিচালক (মার্কেটিং ও সেলস)</option>
+                    <option value="স্বতন্ত্র পরিচালক">স্বতন্ত্র পরিচালক (Independent Director)</option>
+                    {directorForm.role && ![
+                      'চেয়ারম্যান',
+                      'ভাইস চেয়ারম্যান',
+                      'ব্যবস্থাপনা পরিচালক',
+                      'উপ-ব্যবস্থাপনা পরিচালক',
+                      'পরিচালক',
+                      'পরিচালক (প্রকৌশল ও কারিগরি)',
+                      'পরিচালক (অর্থ ও নিরীক্ষা)',
+                      'পরিচালক (পরিকল্পনা ও উন্নয়ন)',
+                      'পরিচালক (আইন ও কমপ্লায়েন্স)',
+                      'পরিচালক (প্রশাসন ও মানবসম্পদ)',
+                      'পরিচালক (মার্কেটিং ও সেলস)',
+                      'স্বতন্ত্র পরিচালক'
+                    ].includes(directorForm.role) && (
+                      <option value={directorForm.role}>{directorForm.role}</option>
+                    )}
                   </select>
                 </div>
 
