@@ -158,19 +158,31 @@ export default function ManagementDashboard({
     ? (data.directors || []).find(d => d.id === admin?.id || d.phone === admin?.phone || d.email === admin?.email) || admin
     : null;
 
+  // Real-time resolution of live officer permissions from central store
+  const cleanPhoneStr = (p) => (p || '').replace(/[^0-9]/g, '');
+  const liveOfficer = !isSuperAdmin ? (data.managementTeam || []).find(m => 
+    (m.id && admin?.id && m.id === admin?.id) || 
+    (cleanPhoneStr(m.phone) && cleanPhoneStr(admin?.phone) && cleanPhoneStr(m.phone) === cleanPhoneStr(admin?.phone)) ||
+    (m.email && admin?.email && m.email.toLowerCase() === admin?.email.toLowerCase())
+  ) : null;
+
+  const effectivePermissions = isSuperAdmin 
+    ? ['all'] 
+    : (liveOfficer && Array.isArray(liveOfficer.permissions) ? liveOfficer.permissions : (Array.isArray(admin?.permissions) ? admin.permissions : []));
+
   const [activeTab, setActiveTabState] = useState(() => {
     try {
       const saved = localStorage.getItem('alemarah_management_tab');
       if (isDirector) {
         const allowed = ['directors', ...(admin?.permissions || [])];
-        if (saved && allowed.includes(saved)) {
+        if (saved && (allowed.includes('all') || allowed.includes(saved))) {
           return saved;
         }
         return 'directors';
       }
       if (isStaffOfficer) {
-        const perms = admin?.permissions || [];
-        if (saved && perms.includes(saved) && saved !== 'settings') {
+        const perms = Array.isArray(admin?.permissions) ? admin.permissions : [];
+        if (saved && (perms.includes('all') || perms.includes(saved)) && saved !== 'settings') {
           return saved;
         }
         return perms[0] || 'clients';
@@ -1310,7 +1322,7 @@ export default function ManagementDashboard({
 
   const handleAddInvestorPayout = (e) => {
     e.preventDefault();
-    if (!isSuperAdmin && !(admin?.permissions || []).includes('investments')) {
+    if (!isSuperAdmin && !effectivePermissions.includes('all') && !effectivePermissions.includes('investments')) {
       alert('এই কাজের অনুমতি নেই।');
       return;
     }
@@ -1424,7 +1436,7 @@ export default function ManagementDashboard({
 
   const handleAddExpense = (e) => {
     e.preventDefault();
-    if (!isSuperAdmin && !(admin?.permissions || []).includes('expenses')) {
+    if (!isSuperAdmin && !effectivePermissions.includes('all') && !effectivePermissions.includes('expenses')) {
       alert('এই কাজের অনুমতি নেই।');
       return;
     }
@@ -2007,7 +2019,7 @@ export default function ManagementDashboard({
   const totalDirectorDividends = directorsList.reduce((acc, d) => acc + (d.dividendEarned || 0), 0);
 
   // Director full management access check: Super Admin or explicitly permitted in permissions
-  const hasDirectorFullAccess = isSuperAdmin || (admin?.permissions || []).includes('directors');
+  const hasDirectorFullAccess = isSuperAdmin || effectivePermissions.includes('all') || effectivePermissions.includes('directors');
 
   // Permission label mapping dictionary for staff officers
   const PERMISSION_LABEL_MAP = {
@@ -2051,13 +2063,11 @@ export default function ManagementDashboard({
     // 3. Board Director access: By default, ONLY personal portfolio under 'directors' + any permitted modules
     if (isDirector) {
       if (item.id === 'directors') return true;
-      const perms = admin?.permissions || [];
-      return perms.includes(item.id);
+      return effectivePermissions.includes('all') || effectivePermissions.includes(item.id);
     }
 
     // 4. Staff / Officer: strictly permitted modules only
-    const perms = admin?.permissions || [];
-    return perms.includes(item.id);
+    return effectivePermissions.includes('all') || effectivePermissions.includes(item.id);
   });
 
   // Automatically enforce tab permissions so unauthorized tabs cannot be accessed
@@ -7831,7 +7841,7 @@ export default function ManagementDashboard({
                 <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/70 space-y-2">
                   <div className="text-3xs font-black uppercase text-slate-400">অনুমোদিত অ্যাক্সেস মডিউল:</div>
                   <div className="flex flex-wrap gap-1.5">
-                    {(admin?.permissions || []).map((permKey) => (
+                    {effectivePermissions.map((permKey) => (
                       <span key={permKey} className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[#006231] text-3xs font-bold">
                         {PERMISSION_LABEL_MAP[permKey] || permKey}
                       </span>

@@ -79,6 +79,19 @@ export const initialManagementData = {
       isSuperAdmin: true,
       permissions: ['all'],
       status: 'সক্রিয় (Active)'
+    },
+    {
+      id: 'MGT-01',
+      name: 'প্রকৌশলী তানভীর আহমেদ',
+      nameEn: 'Engr. Tanvir Ahmed',
+      email: 'officer@alemarah.com',
+      phone: '01743926926',
+      role: 'সেলস অ্যান্ড মার্কেটিং ম্যানেজার',
+      roleType: 'officer',
+      accessKey: 'admin123',
+      isSuperAdmin: false,
+      permissions: ['clients', 'inquiries'],
+      status: 'সক্রিয় (Active)'
     }
   ],
   directors: [],
@@ -312,8 +325,13 @@ export const getManagementData = () => {
       }
       if (!parsed.managementTeam || parsed.managementTeam.length === 0) {
         parsed.managementTeam = initialManagementData.managementTeam;
-      } else if (!parsed.managementTeam.some(m => m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com')) {
-        parsed.managementTeam = [initialManagementData.superAdmin, ...parsed.managementTeam];
+      } else {
+        if (!parsed.managementTeam.some(m => m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com')) {
+          parsed.managementTeam = [initialManagementData.superAdmin, ...parsed.managementTeam];
+        }
+        if (!parsed.managementTeam.some(m => m.id === 'MGT-01' || (m.phone && m.phone.replace(/[^0-9]/g, '') === '01743926926'))) {
+          parsed.managementTeam = [...parsed.managementTeam, initialManagementData.managementTeam[1]];
+        }
       }
       if (!parsed.inquiries) {
         parsed.inquiries = [];
