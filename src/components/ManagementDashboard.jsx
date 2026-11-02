@@ -265,16 +265,6 @@ export default function ManagementDashboard({
     return () => unsubscribe();
   }, []);
 
-  // Ensure managementTeam contains strictly staff members (isolate directors completely)
-  useEffect(() => {
-    const hasDirectorInTeam = (data.managementTeam || []).some(m => m.isDirector || m.directorId);
-    if (hasDirectorInTeam) {
-      updateStore(prev => ({
-        ...prev,
-        managementTeam: (prev.managementTeam || []).filter(m => !m.isDirector && !m.directorId)
-      }));
-    }
-  }, [data.managementTeam]);
 
   // Warn when a background cloud save silently fails (data stays local-only)
   useEffect(() => {
@@ -670,6 +660,9 @@ export default function ManagementDashboard({
   const [expandedDirectors, setExpandedDirectors] = useState({});
   const [selectedDirectorForProfile, setSelectedDirectorForProfile] = useState(null);
   const [selectedDirectorForCertificate, setSelectedDirectorForCertificate] = useState(null);
+  // When logged in as a director, this toggles the Board of Directors
+  // section between their own profile and the full shared director list.
+  const [directorSectionTab, setDirectorSectionTab] = useState('profile');
   
   // Capital Installment Deposit modal state
   const [isCapitalDepositModalOpen, setIsCapitalDepositModalOpen] = useState(false);
@@ -4292,6 +4285,34 @@ export default function ManagementDashboard({
         {/* ------------------------------------------------------- */}
         {managementNavItems.some(i => i.id === 'directors') && activeTab === 'directors' && (
           <div className="space-y-6 animate-fadeIn">
+            {/* Director-only sub-tabs: own profile vs. full shared list (only when they actually have access to the shared list) */}
+            {isDirector && loggedInDirector && hasDirectorFullAccess && (
+              <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200/80 shadow-xs w-fit">
+                <button
+                  type="button"
+                  onClick={() => setDirectorSectionTab('profile')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    directorSectionTab === 'profile'
+                      ? 'bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white shadow-sm'
+                      : 'text-slate-500 hover:bg-slate-50'
+                  }`}
+                >
+                  {'আমার প্রোফাইল'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDirectorSectionTab('list')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    directorSectionTab === 'list'
+                      ? 'bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white shadow-sm'
+                      : 'text-slate-500 hover:bg-slate-50'
+                  }`}
+                >
+                  {'সকল ডিরেক্টর তালিকা'}
+                </button>
+              </div>
+            )}
+
             {/* Header Action Bar (SuperAdmin only) */}
             {!isDirector && (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs">
@@ -4340,7 +4361,7 @@ export default function ManagementDashboard({
             )}
 
             {/* VIP Director Personal Shareholder Profile Card */}
-            {isDirector && loggedInDirector && (
+            {isDirector && loggedInDirector && directorSectionTab === 'profile' && (
               <div className="bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-xs space-y-6">
                 <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-5 pb-5 border-b border-slate-100">
                   <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-3 sm:space-y-0 sm:space-x-4 text-center sm:text-left">
@@ -4420,7 +4441,7 @@ export default function ManagementDashboard({
               </div>
             )}
 
-{hasDirectorFullAccess && (
+{hasDirectorFullAccess && (!isDirector || directorSectionTab === 'list') && (
               <>
             {/* Top KPI Metrics for Directors (Clean without cluttered badges) */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
