@@ -1691,8 +1691,10 @@ export default function ManagementDashboard({
           ? (prev.directors || []).map(d => d.id === teamForm.directorId ? { ...d, accessKey: newAccessKeyHash || d.accessKey || defaultAccessKeyHash, phone: teamForm.phone || d.phone, email: teamForm.email || d.email } : d)
           : prev.directors;
 
+        const activeTargetId = teamForm.directorId ? `MGT-DIR-${teamForm.directorId.replace('DIR-', '')}` : null;
         return {
           ...prev,
+          deletedAdminIds: (prev.deletedAdminIds || []).filter(delId => delId !== activeTargetId),
           managementTeam: nextTeam,
           directors: updatedDirectors
         };
@@ -1713,8 +1715,11 @@ export default function ManagementDashboard({
       `আপনি কি নিশ্চিতভাবে "${name}"-কে অপসারণ করতে চান? অনুমতি দিতে মাস্টার পিন লিখুন।`,
       async () => {
         await deleteTeamMember(id);
-        const updated = getManagementData();
-        setData(updated);
+        setData((prev) => ({
+          ...prev,
+          deletedAdminIds: [...new Set([...(prev.deletedAdminIds || []), id])],
+          managementTeam: (prev.managementTeam || []).filter(m => m.id !== id)
+        }));
         triggerAlert(`${name}-কে সফলভাবে অপসারণ করা হয়েছে।`);
       }
     );

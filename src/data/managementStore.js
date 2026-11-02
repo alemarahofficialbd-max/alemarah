@@ -320,18 +320,19 @@ export const getManagementData = () => {
         parsed.customers = parsed.customers.filter(c => !deletedCustSet.has(c.id));
       }
 
+      const deletedAdminSet = new Set(parsed.deletedAdminIds || []);
+
+      if (!parsed.managementTeam) {
+        parsed.managementTeam = [];
+      } else {
+        parsed.managementTeam = parsed.managementTeam.filter(m => m.isSuperAdmin || m._isPendingSync || !deletedAdminSet.has(m.id));
+      }
+
       if (!parsed.superAdmin) {
         parsed.superAdmin = initialManagementData.superAdmin;
       }
-      if (!parsed.managementTeam || parsed.managementTeam.length === 0) {
-        parsed.managementTeam = initialManagementData.managementTeam;
-      } else {
-        if (!parsed.managementTeam.some(m => m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com')) {
-          parsed.managementTeam = [initialManagementData.superAdmin, ...parsed.managementTeam];
-        }
-        if (!parsed.managementTeam.some(m => m.id === 'MGT-01' || (m.phone && m.phone.replace(/[^0-9]/g, '') === '01743926926'))) {
-          parsed.managementTeam = [...parsed.managementTeam, initialManagementData.managementTeam[1]];
-        }
+      if (!parsed.managementTeam.some(m => m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com')) {
+        parsed.managementTeam = [parsed.superAdmin || initialManagementData.superAdmin, ...parsed.managementTeam];
       }
       if (!parsed.inquiries) {
         parsed.inquiries = [];
@@ -434,7 +435,9 @@ export const syncToSupabase = async (data) => {
 
     // 2. Sync Admins & Team
     if (data.managementTeam && data.managementTeam.length > 0) {
-      const adminRows = data.managementTeam.map(a => ({
+      const deletedAdminSet = new Set(data.deletedAdminIds || []);
+      const activeAdmins = data.managementTeam.filter(a => a.isSuperAdmin || a._isPendingSync || !deletedAdminSet.has(a.id));
+      const adminRows = activeAdmins.map(a => ({
         id: a.id,
         name: a.name,
         name_en: a.nameEn || '',
@@ -684,9 +687,11 @@ const _syncFromSupabaseImpl = async () => {
           status: superAdminRow.status
         };
       }
-      // Filter out system storage from management team display
+      const deletedAdminSet = new Set(updated.deletedAdminIds || []);
+
+      // Filter out system storage and deleted admins from management team display
       updated.managementTeam = adminsRes.data
-        .filter(a => a.id !== 'JOB-APPLICATIONS-STORE' && a.id !== 'SYSTEM-DELETED-IDS')
+        .filter(a => a.id !== 'JOB-APPLICATIONS-STORE' && a.id !== 'SYSTEM-DELETED-IDS' && (a.is_super_admin || !deletedAdminSet.has(a.id)))
         .map(a => ({
           id: a.id,
           name: a.name,
@@ -717,6 +722,7 @@ const _syncFromSupabaseImpl = async () => {
       const cloudDeletedProjectIds = Array.isArray(p.deletedProjectIds) ? p.deletedProjectIds : [];
       const cloudDeletedOfferIds = Array.isArray(p.deletedOfferIds) ? p.deletedOfferIds : [];
       const cloudDeletedDirectorIds = Array.isArray(p.deletedDirectorIds) ? p.deletedDirectorIds : [];
+      const cloudDeletedAdminIds = Array.isArray(p.deletedAdminIds) ? p.deletedAdminIds : [];
       const cloudDeletedClientIds = Array.isArray(p.deletedClientIds) ? p.deletedClientIds : [];
       const cloudDeletedCustomerIds = Array.isArray(p.deletedCustomerIds) ? p.deletedCustomerIds : [];
       const cloudDeletedPaymentIds = Array.isArray(p.deletedPaymentIds) ? p.deletedPaymentIds : [];
@@ -726,6 +732,7 @@ const _syncFromSupabaseImpl = async () => {
       updated.deletedProjectIds = Array.from(new Set([...(current.deletedProjectIds || []), ...cloudDeletedProjectIds]));
       updated.deletedOfferIds = Array.from(new Set([...(current.deletedOfferIds || []), ...cloudDeletedOfferIds]));
       updated.deletedDirectorIds = Array.from(new Set([...(current.deletedDirectorIds || []), ...cloudDeletedDirectorIds]));
+      updated.deletedAdminIds = Array.from(new Set([...(current.deletedAdminIds || []), ...cloudDeletedAdminIds]));
       updated.deletedClientIds = Array.from(new Set([...(current.deletedClientIds || []), ...cloudDeletedClientIds]));
       updated.deletedCustomerIds = Array.from(new Set([...(current.deletedCustomerIds || []), ...cloudDeletedCustomerIds]));
       updated.deletedPaymentIds = Array.from(new Set([...(current.deletedPaymentIds || []), ...cloudDeletedPaymentIds]));
@@ -1049,12 +1056,15 @@ export const deleteTeamMember = async (id) => {
   try {
     const current = getManagementData();
     const updatedTeam = (current.managementTeam || []).filter(m => m.id !== id);
+    const updatedDeleted = Array.from(new Set([...(current.deletedAdminIds || []), id]));
     const updated = {
       ...current,
-      managementTeam: updatedTeam
+      managementTeam: updatedTeam,
+      deletedAdminIds: updatedDeleted
     };
     saveManagementData(updated);
     await supabase.from('admins').delete().eq('id', id);
+    await recordTombstoneInSupabase('deletedAdminIds', id);
     return true;
   } catch (err) {
     console.error('Error deleting admin from Supabase:', err);
