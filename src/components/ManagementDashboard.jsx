@@ -282,8 +282,6 @@ export default function ManagementDashboard({
   // Job Application Interview Scheduling & Status State
   const [selectedAppForInterview, setSelectedAppForInterview] = useState(null);
   const [selectedAppForDetails, setSelectedAppForDetails] = useState(null);
-  const [appToDelete, setAppToDelete] = useState(null);
-  const [isDeletingApp, setIsDeletingApp] = useState(false);
   const [interviewSuccessModal, setInterviewSuccessModal] = useState(null);
   const [isSyncingJobs, setIsSyncingJobs] = useState(false);
 
@@ -1039,30 +1037,34 @@ export default function ManagementDashboard({
     const isBooked = projClients.some(c => c.flatNo === uData.name || (uData.unitNo && c.flatNo?.includes(uData.unitNo)));
 
     if (isBooked) {
-      alert('সতর্কবার্তা: এই ইউনিটটি ইতিমধ্যে একজন ক্রেতাকে বরাদ্দ দেওয়া হয়েছে! ক্রেতার বরাদ্দ বাতিল বা পরিবর্তন না করে এই ইউনিট ডিলিট করা যাবে না।');
+      triggerAlert('সতর্কবার্তা: এই ইউনিটটি ইতিমধ্যে একজন ক্রেতাকে বরাদ্দ দেওয়া হয়েছে! ক্রেতার বরাদ্দ বাতিল বা পরিবর্তন না করে এই ইউনিট ডিলিট করা যাবে না।');
       return;
     }
 
-    if (window.confirm(`আপনি কি নিশ্চিতভাবে "${uData.name}" ইউনিটটি ডিলিট করতে চান?`)) {
-      updateStore((prev) => ({
-        ...prev,
-        projects: prev.projects.map(p => {
-          if (p.id === projId) {
-            return {
-              ...p,
-              units: (p.units || []).filter(u => {
-                if (typeof u === 'object') {
-                  return u.id !== uData.id && u.name !== uData.name;
-                }
-                return u !== uData.name;
-              })
-            };
-          }
-          return p;
-        })
-      }));
-      triggerAlert(`ইউনিট "${uData.name}" ডিলিট করা হয়েছে!`);
-    }
+    requestProtectedDelete(
+      `ইউনিট "${uData.name}" মুছে ফেলা`,
+      `আপনি কি নিশ্চিতভাবে "${uData.name}" ইউনিটটি প্রজেক্ট থেকে মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
+      () => {
+        updateStore((prev) => ({
+          ...prev,
+          projects: prev.projects.map(p => {
+            if (p.id === projId) {
+              return {
+                ...p,
+                units: (p.units || []).filter(u => {
+                  if (typeof u === 'object') {
+                    return u.id !== uData.id && u.name !== uData.name;
+                  }
+                  return u !== uData.name;
+                })
+              };
+            }
+            return p;
+          })
+        }));
+        triggerAlert(`ইউনিট "${uData.name}" সফলভাবে ডিলিট করা হয়েছে!`);
+      }
+    );
   };
 
   const handleBulkGenerateFlats = (projId, config) => {
@@ -1685,6 +1687,32 @@ export default function ManagementDashboard({
         const updated = getManagementData();
         setData(updated);
         triggerAlert(`${name}-কে সফলভাবে অপসারণ করা হয়েছে।`);
+      }
+    );
+  };
+
+  const handleDeleteJobApplication = (app) => {
+    if (!isSuperAdmin) return;
+    const applicantName = app.applicantName || app.name || 'প্রার্থী';
+    requestProtectedDelete(
+      `চাকরির আবেদন মুছে ফেলা`,
+      `আপনি কি নিশ্চিতভাবে "${applicantName}" (${app.id})-এর চাকরির আবেদন ও সিভি স্থায়ীভাবে মুছে ফেলতে চান? অনুমতি দিতে মাস্টার পিন লিখুন।`,
+      async () => {
+        try {
+          const updated = await deleteJobApplication(app.id);
+          if (updated) {
+            setData(updated);
+          } else {
+            setData(getManagementData());
+          }
+          if (selectedAppForDetails?.id === app.id) {
+            setSelectedAppForDetails(null);
+          }
+          triggerAlert(`"${applicantName}"-এর চাকরির আবেদন সফলভাবে মুছে ফেলা হয়েছে।`);
+        } catch (err) {
+          console.error('Delete job application error:', err);
+          triggerAlert('আবেদন মুছে ফেলতে সমস্যা হয়েছে।');
+        }
       }
     );
   };
@@ -4041,7 +4069,7 @@ export default function ManagementDashboard({
                                         type="button"
                                         onClick={() => {
                                           setOpenActionMenuId(null);
-                                          setAppToDelete(app);
+                                          handleDeleteJobApplication(app);
                                         }}
                                         className="w-full px-3.5 py-2 text-left hover:bg-red-50 flex items-center space-x-2 text-red-600 font-bold transition-colors cursor-pointer"
                                       >
@@ -8419,8 +8447,7 @@ export default function ManagementDashboard({
                     type="button"
                     onClick={() => {
                       const app = selectedAppForDetails;
-                      setSelectedAppForDetails(null);
-                      setAppToDelete(app);
+                      handleDeleteJobApplication(app);
                     }}
                     className="px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 border border-red-200 font-bold text-xs flex items-center space-x-1 cursor-pointer transition-colors"
                   >
@@ -8458,107 +8485,7 @@ export default function ManagementDashboard({
       )}
 
 
-      {/* ========================================================= */}
-      {/* CUSTOM JOB APPLICATION DELETE CONFIRMATION MODAL          */}
-      {/* ========================================================= */}
-      {appToDelete && (
-        <div
-          className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn select-none"
-          onClick={() => !isDeletingApp && setAppToDelete(null)}
-        >
-          <div
-            className="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl border border-red-100 animate-scaleUp"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Red Danger Icon */}
-            <div className="w-16 h-16 rounded-2xl bg-red-50 text-red-600 mx-auto flex items-center justify-center border border-red-100 shadow-inner">
-              <Trash2 className="w-8 h-8 text-red-600" />
-            </div>
-
-            {/* Title & Target Info */}
-            <div className="space-y-2">
-              <div className="inline-block px-2.5 py-0.5 rounded-full bg-red-50 text-red-600 text-3xs font-black uppercase tracking-wider border border-red-200">
-                স্থায়ীভাবে মুছে ফেলা
-              </div>
-              <h3 className="text-lg font-black text-slate-900">
-                আবেদন মুছে ফেলতে চান?
-              </h3>
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1.5">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-500 font-medium">প্রার্থীর নাম:</span>
-                  <span className="font-bold text-slate-900">{appToDelete.applicantName}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-500 font-medium">ট্র্যাকিং আইডি:</span>
-                  <span className="font-mono font-bold text-slate-700">{appToDelete.id}</span>
-                </div>
-                {(appToDelete.jobTitle || appToDelete.submittedPosition) && (
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500 font-medium">আবেদনের পদ:</span>
-                    <span className="font-semibold text-emerald-800">
-                      {formatCleanJobTitle(appToDelete.jobTitle || appToDelete.submittedPosition)}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <p className="text-3xs text-slate-500 leading-relaxed px-1">
-                সতর্কতা: নিশ্চিত করলে এই প্রার্থীর সম্পূর্ণ আবেদন ও জীবনবৃত্তান্ত (CV) ডাটাবেজ থেকে স্থায়ীভাবে মুছে ফেলা হবে।
-              </p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2.5 pt-1">
-              <button
-                type="button"
-                disabled={isDeletingApp}
-                onClick={() => setAppToDelete(null)}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all cursor-pointer disabled:opacity-50"
-              >
-                বাতিল করুন
-              </button>
-              <button
-                type="button"
-                disabled={isDeletingApp}
-                onClick={async () => {
-                  try {
-                    setIsDeletingApp(true);
-                    const appId = appToDelete.id;
-                    const applicantName = appToDelete.applicantName;
-                    const updated = await deleteJobApplication(appId);
-                    if (updated) {
-                      setData(updated);
-                    } else {
-                      const latest = getManagementData();
-                      setData(latest);
-                    }
-                    setAppToDelete(null);
-                    triggerAlert(`"${applicantName}"-এর আবেদনটি ডাটাবেজ থেকে স্থায়ীভাবে মুছে ফেলা হয়েছে।`);
-                  } catch (err) {
-                    console.error('Delete error:', err);
-                    triggerAlert('আবেদন মুছে ফেলতে সমস্যা হয়েছে।');
-                  } finally {
-                    setIsDeletingApp(false);
-                  }
-                }}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold text-xs transition-all shadow-md shadow-red-600/25 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-              >
-                {isDeletingApp ? (
-                  <>
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>মুছে ফেলা হচ্ছে...</span>
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>হ্যাঁ, মুছে ফেলুন</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      
     </div>
   );
 }
