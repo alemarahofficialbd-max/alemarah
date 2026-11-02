@@ -25,8 +25,9 @@ import {
   HardHat, 
   Search, 
   Plus, 
-  CheckCircle2, 
-  Clock, 
+  CheckCircle2,
+  XCircle,
+  Clock,
   Calendar, 
   ArrowUpRight, 
   Filter, 
@@ -6162,7 +6163,7 @@ export default function ManagementDashboard({
                         : 'bg-slate-100 text-slate-500 border border-slate-200'
                     }`}
                   >
-                    <CheckCircle className="w-3.5 h-3.5" />
+                    <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>সক্রিয় (Active)</span>
                   </button>
                   <button
