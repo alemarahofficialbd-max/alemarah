@@ -696,7 +696,7 @@ const _syncFromSupabaseImpl = async () => {
       const deletedAdminSet = new Set(updated.deletedAdminIds || []);
 
       // Filter out system storage and deleted admins from management team display
-      updated.managementTeam = adminsRes.data
+      const remoteTeam = adminsRes.data
         .filter(a => a.id !== 'JOB-APPLICATIONS-STORE' && a.id !== 'SYSTEM-DELETED-IDS' && (a.is_super_admin || !deletedAdminSet.has(a.id)))
         .map(a => ({
           id: a.id,
@@ -711,6 +711,13 @@ const _syncFromSupabaseImpl = async () => {
           permissions: a.permissions || ['projects', 'expenses'],
           status: a.status
         }));
+      // Keep a locally-added/edited member that hasn't landed in Supabase
+      // yet instead of letting a racing pull wipe it out before its own
+      // background push completes.
+      const pendingLocalTeam = (current.managementTeam || []).filter(lm =>
+        lm._isPendingSync && !deletedAdminSet.has(lm.id) && !remoteTeam.some(a => a.id === lm.id)
+      );
+      updated.managementTeam = [...remoteTeam, ...pendingLocalTeam];
 
       // Cloud Sync: Retrieve authoritative job applications from Supabase Cloud
       const jobStoreRow = adminsRes.data.find(a => a.id === 'JOB-APPLICATIONS-STORE');

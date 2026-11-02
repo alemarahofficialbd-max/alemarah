@@ -741,6 +741,7 @@ export default function ManagementDashboard({
 
     const targetCustomer = existingCustomer || phoneMatch || {
       id: customerIdFromPhone(clientForm.phone),
+      _isPendingSync: true,
       name: clientForm.name,
       phone: clientForm.phone,
       password: clientForm.password || 'password123',
@@ -762,6 +763,7 @@ export default function ManagementDashboard({
       const finalPricingMode = allowedModes.includes(unit.pricingMode) ? unit.pricingMode : allowedModes[0];
       return {
       id: `CLI-${Date.now().toString(36).toUpperCase()}-${idx}-${Math.floor(1000 + Math.random() * 9000)}`,
+      _isPendingSync: true,
       customerId: targetCustomer.id,
       name: targetCustomer.name,
       image: clientForm.image || '',
@@ -793,12 +795,20 @@ export default function ManagementDashboard({
     };
     });
 
+    const newUnitIds = new Set(newUnits.map(u => u.id));
     updateStore((prev) => ({
       ...prev,
       clients: [...newUnits, ...prev.clients],
       customers: isNewCustomerRecord
         ? [targetCustomer, ...(prev.customers || [])]
-        : (prev.customers || [])
+        : (prev.customers || []),
+      // A customer/client id can be deterministic (phone-based) or reused
+      // after an earlier delete -- drop any matching tombstone so the
+      // freshly (re-)added record isn't filtered out as "deleted" again.
+      deletedClientIds: (prev.deletedClientIds || []).filter(id => !newUnitIds.has(id)),
+      deletedCustomerIds: isNewCustomerRecord
+        ? (prev.deletedCustomerIds || []).filter(id => id !== targetCustomer.id)
+        : (prev.deletedCustomerIds || [])
     }));
 
     setIsClientModalOpen(false);
@@ -1265,6 +1275,7 @@ export default function ManagementDashboard({
     }
     const newOffer = {
       id: `offer-${Date.now().toString().slice(-6)}`,
+      _isPendingSync: true,
       name: investmentOfferForm.name,
       location: investmentOfferForm.location || '',
       description: investmentOfferForm.description || '',
@@ -1308,6 +1319,7 @@ export default function ManagementDashboard({
 
     const newInvestor = {
       id: `INV-${Date.now().toString(36).toUpperCase()}`,
+      _isPendingSync: true,
       name: investorForm.name,
       phone: investorForm.phone,
       offerId: offer.id,
@@ -1670,8 +1682,27 @@ export default function ManagementDashboard({
             status: lang === 'bn' ? 'সক্রিয়' : 'Active'
           };
         } else {
+          let newId;
+          if (teamForm.directorId) {
+            newId = `MGT-DIR-${teamForm.directorId.replace('DIR-', '')}`;
+          } else {
+            // Generate an id that doesn't collide with an existing OR a
+            // previously-deleted member — a length-based id (MGT-0N) can
+            // otherwise reuse a tombstoned id and get silently hidden by
+            // the deletedAdminIds filter on the very next load/sync.
+            const allKnownIds = new Set([
+              ...prev.managementTeam.map(m => m.id),
+              ...(prev.deletedAdminIds || [])
+            ]);
+            let safeIndex = prev.managementTeam.length + 1;
+            while (allKnownIds.has(`MGT-0${safeIndex}`)) {
+              safeIndex++;
+            }
+            newId = `MGT-0${safeIndex}`;
+          }
           const newMember = {
-            id: teamForm.directorId ? `MGT-DIR-${teamForm.directorId.replace('DIR-', '')}` : `MGT-0${prev.managementTeam.length + 1}`,
+            id: newId,
+            _isPendingSync: true,
             name: teamForm.name,
             phone: teamForm.phone,
             email: teamForm.email || '',
@@ -1694,7 +1725,7 @@ export default function ManagementDashboard({
         const activeTargetId = teamForm.directorId ? `MGT-DIR-${teamForm.directorId.replace('DIR-', '')}` : null;
         return {
           ...prev,
-          deletedAdminIds: (prev.deletedAdminIds || []).filter(delId => delId !== activeTargetId),
+          deletedAdminIds: (prev.deletedAdminIds || []).filter(delId => delId !== activeTargetId && !nextTeam.some(m => m.id === delId)),
           managementTeam: nextTeam,
           directors: updatedDirectors
         };
