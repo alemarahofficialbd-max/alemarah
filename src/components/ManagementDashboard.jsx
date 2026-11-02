@@ -6223,7 +6223,7 @@ export default function ManagementDashboard({
                 <label className="block text-2xs font-bold text-slate-600 uppercase">
                   {'অনুমোদিত মডিউল / সেকশন এক্সেস'} ({(directorAccessForm.permissions || []).length}/{PERMISSION_OPTIONS.length})
                 </label>
-                <div className="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:max-h-none max-h-48 overflow-y-auto pr-1">
                   {PERMISSION_OPTIONS.map(p => {
                     const checked = (directorAccessForm.permissions || []).includes(p.id);
                     return (
