@@ -6285,11 +6285,30 @@ export default function ManagementDashboard({
                 <div className="absolute inset-3 sm:inset-5 border-2 border-dashed border-[#B8860B]/60 rounded-3xl pointer-events-none"></div>
                 <div className="absolute inset-5 sm:inset-7 border border-[#B8860B]/30 rounded-2xl pointer-events-none"></div>
 
-                {/* Corner Guilloche Embellishments */}
-                <div className="absolute top-5 left-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">•</div>
-                <div className="absolute top-5 right-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">•</div>
-                <div className="absolute bottom-5 left-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">•</div>
-                <div className="absolute bottom-5 right-6 text-[#996515] text-2xl font-serif select-none pointer-events-none">•</div>
+                {/* Ornamental Corner Brackets (replaces plain dots with a proper engraved-corner look) */}
+                {[
+                  'top-5 left-5 border-t-2 border-l-2 rounded-tl-2xl',
+                  'top-5 right-5 border-t-2 border-r-2 rounded-tr-2xl',
+                  'bottom-5 left-5 border-b-2 border-l-2 rounded-bl-2xl',
+                  'bottom-5 right-5 border-b-2 border-r-2 rounded-br-2xl'
+                ].map((pos) => (
+                  <div key={pos} className={`absolute ${pos} w-8 h-8 sm:w-12 sm:h-12 border-[#B8860B]/70 pointer-events-none`}></div>
+                ))}
+                <div className="absolute top-7 left-7 w-1.5 h-1.5 rounded-full bg-[#B8860B]/70 pointer-events-none"></div>
+                <div className="absolute top-7 right-7 w-1.5 h-1.5 rounded-full bg-[#B8860B]/70 pointer-events-none"></div>
+                <div className="absolute bottom-7 left-7 w-1.5 h-1.5 rounded-full bg-[#B8860B]/70 pointer-events-none"></div>
+                <div className="absolute bottom-7 right-7 w-1.5 h-1.5 rounded-full bg-[#B8860B]/70 pointer-events-none"></div>
+
+                {/* Guilloche-style Fine Line Background (bank-note engraving texture) */}
+                <svg className="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none select-none" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <pattern id="certGuilloche" width="42" height="42" patternUnits="userSpaceOnUse" patternTransform="rotate(18)">
+                      <circle cx="21" cy="21" r="18" fill="none" stroke="#8C6D23" strokeWidth="0.6" />
+                      <circle cx="21" cy="21" r="10" fill="none" stroke="#8C6D23" strokeWidth="0.4" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#certGuilloche)" />
+                </svg>
 
                 {/* Background Watermark Crest */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-[0.035] pointer-events-none select-none">
@@ -6361,6 +6380,12 @@ export default function ManagementDashboard({
 
                   {/* Grand Gold Rosette Share Badge */}
                   <div className="relative inline-block my-2">
+                    {/* Scalloped sunburst rosette ring behind the card for an authentic medallion look */}
+                    <div
+                      className="absolute -inset-2.5 sm:-inset-3.5 rounded-[2rem] opacity-80 pointer-events-none"
+                      style={{ background: 'repeating-conic-gradient(from 0deg, #D4AF37 0deg 9deg, #FCF2D4 9deg 18deg)' }}
+                    ></div>
+                    <div className="absolute -inset-1 rounded-[1.75rem] bg-[#FFFDF8] pointer-events-none"></div>
                     <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-white via-[#FFFDF8] to-[#FCF6E8] border-2 border-[#D4AF37] shadow-xl relative min-w-[240px] sm:min-w-[280px]">
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#996515] via-[#D4AF37] to-[#996515] text-white text-3xs font-cinzel font-black uppercase tracking-[0.25em] px-4 py-0.5 rounded-full shadow-xs">
                         OFFICIAL EQUITY SHARE
@@ -6387,7 +6412,7 @@ export default function ManagementDashboard({
                   {/* MD Signature */}
                   <div className="text-center">
                     <div className="w-28 sm:w-44 h-12 border-b-2 border-slate-700 mx-auto flex items-end justify-center pb-1">
-                      <span className="font-serif italic text-3xs sm:text-xs text-slate-400">ব্যস্থাপনা পরিচালক</span>
+                      <span className="font-cinzel italic text-sm sm:text-lg text-slate-400/80 tracking-wide">AEP</span>
                     </div>
                     <div className="text-xs sm:text-sm font-bold text-slate-900 mt-2 font-serif">ব্যবস্থাপনা পরিচালক</div>
                     <div className="text-3xs text-slate-500">আল-ইমারাহ প্রপার্টিজ লিঃ</div>
@@ -6395,19 +6420,26 @@ export default function ManagementDashboard({
 
                   {/* Golden Corporate Rosette Seal in Center */}
                   <div className="flex flex-col items-center justify-center">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-[#996515] via-[#E6C66E] to-[#8C6D23] p-1 shadow-lg ring-4 ring-[#D4AF37]/30 flex items-center justify-center text-white">
-                      <div className="w-full h-full rounded-full border-2 border-dashed border-white/80 flex flex-col items-center justify-center text-center p-1 bg-gradient-to-b from-[#8C6D23] to-[#664614]">
-                        <span className="text-3xs font-serif font-black tracking-widest uppercase">AEP LTD</span>
-                        <span className="text-[8px] text-amber-200">SEAL</span>
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
+                      {/* Serrated outer ring for an embossed/foil-stamped look */}
+                      <div
+                        className="absolute inset-0 rounded-full opacity-90"
+                        style={{ background: 'repeating-conic-gradient(from 0deg, #8C6D23 0deg 7.5deg, #E6C66E 7.5deg 15deg)' }}
+                      ></div>
+                      <div className="absolute inset-[5px] rounded-full bg-gradient-to-tr from-[#996515] via-[#E6C66E] to-[#8C6D23] shadow-lg"></div>
+                      <div className="absolute inset-[9px] rounded-full border-2 border-dashed border-white/80 flex flex-col items-center justify-center text-center bg-gradient-to-b from-[#8C6D23] to-[#664614] text-white">
+                        <Award className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200 mb-0.5" />
+                        <span className="text-[7px] sm:text-3xs font-serif font-black tracking-widest uppercase">AEP LTD</span>
+                        <span className="text-[6px] sm:text-[8px] text-amber-200">SEAL</span>
                       </div>
                     </div>
-                    <span className="text-[9px] font-bold text-[#8C6D23] mt-1 tracking-wider uppercase font-cinzel">OFFICIAL SEAL</span>
+                    <span className="text-[9px] font-bold text-[#8C6D23] mt-1.5 tracking-wider uppercase font-cinzel">OFFICIAL SEAL</span>
                   </div>
 
                   {/* Chairman Signature */}
                   <div className="text-center">
                     <div className="w-28 sm:w-44 h-12 border-b-2 border-slate-700 mx-auto flex items-end justify-center pb-1">
-                      <span className="font-serif italic text-3xs sm:text-xs text-slate-400">বোর্ড চেয়ারম্যান</span>
+                      <span className="font-cinzel italic text-sm sm:text-lg text-slate-400/80 tracking-wide">AEP</span>
                     </div>
                     <div className="text-xs sm:text-sm font-bold text-slate-900 mt-2 font-serif">বোর্ড চেয়ারম্যান</div>
                     <div className="text-3xs text-slate-500">আল-ইমারাহ প্রপার্টিজ লিঃ</div>
