@@ -378,7 +378,7 @@ export const translations = {
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
-            image: null
+            image: "/images/md_masum.jpg"
           },
           {
             id: "bod_12",
@@ -387,7 +387,7 @@ export const translations = {
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
-            image: null
+            image: "/images/md_nizamul_islam.jpg"
           }
         ]
       },
@@ -1218,7 +1218,7 @@ export const translations = {
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
-            image: null
+            image: "/images/md_masum.jpg"
           },
           {
             id: "bod_12",
@@ -1227,7 +1227,7 @@ export const translations = {
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
-            image: null
+            image: "/images/md_nizamul_islam.jpg"
           }
         ]
       },
