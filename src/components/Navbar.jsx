@@ -15,6 +15,7 @@ import {
   Coins,
   Briefcase
 } from 'lucide-react';
+import InstallAppButton from './InstallAppButton';
 
 export default function Navbar({ 
   currentPage = 'home', 
@@ -182,7 +183,11 @@ export default function Navbar({
             </nav>
 
             {/* Right Corner Button: সাইট ভিজিট বুক করুন */}
-            <div className="hidden lg:flex items-center shrink-0">
+            <div className="hidden lg:flex items-center space-x-2 shrink-0">
+              <InstallAppButton
+                lang={lang}
+                className="flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl border border-[#006231]/25 bg-[#006231]/5 hover:bg-[#006231]/10 text-[#006231] text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap"
+              />
               <button
                 onClick={onOpenBookVisit}
                 className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#CE2028]/25 transition-all active:scale-95 cursor-pointer whitespace-nowrap"
@@ -194,6 +199,12 @@ export default function Navbar({
 
             {/* Mobile Header Controls */}
             <div className="flex items-center space-x-2 lg:hidden">
+              <InstallAppButton
+                lang={lang}
+                compact
+                className="flex items-center p-2 rounded-lg border border-[#006231]/25 bg-[#006231]/5 text-[#006231] cursor-pointer"
+              />
+
               <button
                 onClick={toggleLanguage}
                 className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-xs font-semibold cursor-pointer"
