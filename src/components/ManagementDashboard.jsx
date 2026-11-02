@@ -6473,18 +6473,18 @@ export default function ManagementDashboard({
                   </p>
 
                   {/* Grand Gold Rosette Share Badge */}
-                  <div className="relative inline-block my-2">
+                  <div className="relative inline-block my-5 sm:my-4 max-w-full">
                     {/* Scalloped sunburst rosette ring behind the card for an authentic medallion look */}
                     <div
-                      className="absolute -inset-2.5 sm:-inset-3.5 rounded-[2rem] opacity-80 pointer-events-none"
+                      className="absolute -inset-2 sm:-inset-3.5 rounded-[2rem] opacity-80 pointer-events-none"
                       style={{ background: 'repeating-conic-gradient(from 0deg, #D4AF37 0deg 9deg, #FCF2D4 9deg 18deg)' }}
                     ></div>
-                    <div className="absolute -inset-1 rounded-[1.75rem] bg-[#FFFDF8] pointer-events-none"></div>
-                    <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-white via-[#FFFDF8] to-[#FCF6E8] border-2 border-[#D4AF37] shadow-xl relative min-w-[240px] sm:min-w-[280px]">
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#996515] via-[#D4AF37] to-[#996515] text-white text-3xs font-cinzel font-black uppercase tracking-[0.25em] px-4 py-0.5 rounded-full shadow-xs">
-                        OFFICIAL EQUITY SHARE
+                    <div className="absolute -inset-0.5 sm:-inset-1 rounded-[1.75rem] bg-[#FFFDF8] pointer-events-none"></div>
+                    <div className="p-5 sm:p-8 rounded-3xl bg-gradient-to-b from-white via-[#FFFDF8] to-[#FCF6E8] border-2 border-[#D4AF37] shadow-xl relative min-w-[200px] sm:min-w-[280px] max-w-[88vw] sm:max-w-none mx-auto">
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-[#996515] via-[#D4AF37] to-[#996515] flex items-center justify-center mx-auto shadow-xs mb-1.5">
+                        <Award className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white" />
                       </div>
-                      <div className="text-3xl sm:text-5xl font-black text-[#CE2028] font-mono tracking-tight mt-1">
+                      <div className="text-3xl sm:text-5xl font-black text-[#CE2028] font-mono tracking-tight">
                         {(certDir.shareCount || certDir.sharePercentage || 0).toLocaleString('bn-BD')} টি
                       </div>
                       <div className="text-2xs font-bold text-[#8C6D23] uppercase tracking-widest mt-1.5 font-serif">
@@ -6506,7 +6506,7 @@ export default function ManagementDashboard({
                   {/* MD Signature */}
                   <div className="text-center">
                     <div className="w-28 sm:w-44 h-12 border-b-2 border-slate-700 mx-auto flex items-end justify-center pb-1">
-                      <span className="font-cinzel italic text-sm sm:text-lg text-slate-400/80 tracking-wide">AEP</span>
+                      
                     </div>
                     <div className="text-xs sm:text-sm font-bold text-slate-900 mt-2 font-serif">ব্যবস্থাপনা পরিচালক</div>
                     <div className="text-3xs text-slate-500">আল-ইমারাহ প্রপার্টিজ লিঃ</div>
@@ -6533,7 +6533,7 @@ export default function ManagementDashboard({
                   {/* Chairman Signature */}
                   <div className="text-center">
                     <div className="w-28 sm:w-44 h-12 border-b-2 border-slate-700 mx-auto flex items-end justify-center pb-1">
-                      <span className="font-cinzel italic text-sm sm:text-lg text-slate-400/80 tracking-wide">AEP</span>
+                      
                     </div>
                     <div className="text-xs sm:text-sm font-bold text-slate-900 mt-2 font-serif">বোর্ড চেয়ারম্যান</div>
                     <div className="text-3xs text-slate-500">আল-ইমারাহ প্রপার্টিজ লিঃ</div>
