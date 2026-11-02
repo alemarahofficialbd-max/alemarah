@@ -158,7 +158,7 @@ export default function ManagementDashboard({
     ? (data.directors || []).find(d => d.id === admin?.id || d.phone === admin?.phone || d.email === admin?.email) || admin
     : null;
 
-  // Real-time resolution of live officer permissions from central store
+  // Real-time resolution of live officer and director permissions from central store
   const cleanPhoneStr = (p) => (p || '').replace(/[^0-9]/g, '');
   const liveOfficer = !isSuperAdmin ? (data.managementTeam || []).find(m => 
     (m.id && admin?.id && m.id === admin?.id) || 
@@ -166,9 +166,19 @@ export default function ManagementDashboard({
     (m.email && admin?.email && m.email.toLowerCase() === admin?.email.toLowerCase())
   ) : null;
 
+  const liveDirector = isDirector ? (data.directors || []).find(d => 
+    (d.id && admin?.id && d.id === admin?.id) || 
+    (cleanPhoneStr(d.phone) && cleanPhoneStr(admin?.phone) && cleanPhoneStr(d.phone) === cleanPhoneStr(admin?.phone)) ||
+    (d.email && admin?.email && d.email.toLowerCase() === admin?.email.toLowerCase())
+  ) : null;
+
   const effectivePermissions = isSuperAdmin 
     ? ['all'] 
-    : (liveOfficer && Array.isArray(liveOfficer.permissions) ? liveOfficer.permissions : (Array.isArray(admin?.permissions) ? admin.permissions : []));
+    : (liveOfficer && Array.isArray(liveOfficer.permissions) 
+        ? liveOfficer.permissions 
+        : (liveDirector && Array.isArray(liveDirector.permissions) 
+            ? liveDirector.permissions 
+            : (Array.isArray(admin?.permissions) ? admin.permissions : [])));
 
   const [activeTab, setActiveTabState] = useState(() => {
     try {
@@ -1536,7 +1546,12 @@ export default function ManagementDashboard({
 
     updateStore((prev) => ({
       ...prev,
-      managementTeam: (prev.managementTeam || []).filter(m => m.directorId !== selectedDirectorForAccess.id && m.id !== selectedDirectorForAccess.id),
+      managementTeam: (prev.managementTeam || []).map(m => {
+        if (m.directorId === selectedDirectorForAccess.id || m.id === selectedDirectorForAccess.id) {
+          return { ...m, accessKey: updatedAccessKey, status: directorAccessForm.status };
+        }
+        return m;
+      }),
       directors: (prev.directors || []).map(d => {
         if (d.id === selectedDirectorForAccess.id) {
           return {
