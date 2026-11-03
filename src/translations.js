@@ -333,7 +333,7 @@ export const translations = {
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
-            image: "/images/abbas_uddin.jpg"
+            image: "/images/hijbullah_nahian.jpg"
           },
           {
             id: "bod_7",
@@ -342,7 +342,7 @@ export const translations = {
             role: "Director",
             organization: "Al-Emarah Properties",
             education: "Entrepreneur & Director, Al-Emarah Properties",
-            image: "/images/hijbullah_nahian.jpg"
+            image: "/images/abbas_uddin.jpg"
           },
           {
             id: "bod_8",
@@ -1173,7 +1173,7 @@ export const translations = {
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
-            image: "/images/abbas_uddin.jpg"
+            image: "/images/hijbullah_nahian.jpg"
           },
           {
             id: "bod_7",
@@ -1182,7 +1182,7 @@ export const translations = {
             role: "পরিচালক",
             organization: "আল-ইমারাহ প্রোপার্টিজ",
             education: "উদ্যোক্তা ও পরিচালক, আল-ইমারাহ প্রোপার্টিজ",
-            image: "/images/hijbullah_nahian.jpg"
+            image: "/images/abbas_uddin.jpg"
           },
           {
             id: "bod_8",
