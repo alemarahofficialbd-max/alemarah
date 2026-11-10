@@ -70,7 +70,8 @@ import {
   RefreshCw,
   FileCheck,
   Send,
-  MoreVertical
+  MoreVertical,
+  Megaphone
 } from 'lucide-react';
 import {
   formatBDT,
@@ -92,7 +93,9 @@ import {
   deleteDirectorFromSupabase,
   deleteClientFromSupabase,
   deletePaymentFromSupabase,
-  deleteInvestorFromSupabase
+  deleteInvestorFromSupabase,
+  saveAnnouncement,
+  deleteAnnouncementFromStore
 } from '../data/managementStore';
 import { getUnitData } from './management/helpers';
 import CapitalDepositModal from './management/CapitalDepositModal';
@@ -297,6 +300,16 @@ export default function ManagementDashboard({
   const [selectedAppForDetails, setSelectedAppForDetails] = useState(null);
   const [interviewSuccessModal, setInterviewSuccessModal] = useState(null);
   const [isSyncingJobs, setIsSyncingJobs] = useState(false);
+
+  // Announcement composer state (Super Admin broadcast tool)
+  const [announcementForm, setAnnouncementForm] = useState({
+    title: '',
+    message: '',
+    date: '',
+    time: '',
+    targets: []
+  });
+  const [isSendingAnnouncement, setIsSendingAnnouncement] = useState(false);
 
   // Clean Job Title and Status Formatters (Pure Bengali, No Clutter/English brackets)
   const formatCleanJobTitle = (title) => {
@@ -2174,11 +2187,16 @@ export default function ManagementDashboard({
     },
     { id: 'inquiries', label: '৭. ইনকোয়ারি ও ওয়েবসাইট লিড', shortLabel: 'ইনকোয়ারি/লিড', icon: Mail },
     { id: 'jobs', label: '৮. চাকরির আবেদন ও সিভি', shortLabel: 'চাকরির আবেদন', icon: Briefcase },
-    { id: 'team', label: '৯. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
-    { id: 'settings', label: '১০. সেটিংস, ভাষা ও সিকিউরিটি পিন', shortLabel: 'সেটিংস', icon: Settings }
+    { id: 'announcements', shortLabel: 'ঘোষণা', icon: Megaphone, label: '৯. ঘোষণা (সবার জন্য)' },
+    { id: 'team', label: '১০. অ্যাডমিন ও টিম রোল কন্ট্রোল', shortLabel: 'অ্যাডমিন/টিম', icon: ShieldCheck },
+    { id: 'settings', label: '১১. সেটিংস, ভাষা ও সিকিউরিটি পিন', shortLabel: 'সেটিংস', icon: Settings }
   ];
 
   const managementNavItems = allNavItems.filter(item => {
+    // 0. Announcements notice board is visible to every logged-in role;
+    // only Super Admin gets the compose/send controls inside it.
+    if (item.id === 'announcements') return true;
+
     // 1. Super Admin has unrestricted 100% master access to all tabs
     if (isSuperAdmin) return true;
 
@@ -2558,6 +2576,246 @@ export default function ManagementDashboard({
                   </div>
                 )}
               </div>
+  );
+
+  // Helper: Render Announcements (broadcast notices to Customer / Director /
+  // Management / Shareholder, individually or all together — with a fixed
+  // date & time for each notice).
+  const ANNOUNCEMENT_AUDIENCES = [
+    { key: 'customer', label: 'গ্রাহক (Customer)' },
+    { key: 'director', label: 'পরিচালক (Director)' },
+    { key: 'management', label: 'ব্যবস্থাপনা (Management)' },
+    { key: 'investor', label: 'শেয়ারহোল্ডার (Shareholder)' }
+  ];
+
+  const myAnnouncementAudience = isSuperAdmin ? null : (isDirector ? 'director' : 'management');
+
+  const visibleAnnouncements = (data.announcements || [])
+    .filter(a => isSuperAdmin || (Array.isArray(a.targets) && a.targets.includes(myAnnouncementAudience)))
+    .slice()
+    .sort((a, b) => new Date(`${b.date || '1970-01-01'}T${b.time || '00:00'}`) - new Date(`${a.date || '1970-01-01'}T${a.time || '00:00'}`));
+
+  const toggleAnnouncementTarget = (key) => {
+    setAnnouncementForm(prev => ({
+      ...prev,
+      targets: prev.targets.includes(key) ? prev.targets.filter(k => k !== key) : [...prev.targets, key]
+    }));
+  };
+
+  const isAllTargetsSelected = ANNOUNCEMENT_AUDIENCES.every(aud => announcementForm.targets.includes(aud.key));
+
+  const toggleAllAnnouncementTargets = () => {
+    setAnnouncementForm(prev => ({
+      ...prev,
+      targets: isAllTargetsSelected ? [] : ANNOUNCEMENT_AUDIENCES.map(a => a.key)
+    }));
+  };
+
+  const handleSendAnnouncement = async () => {
+    if (!announcementForm.title.trim() || !announcementForm.message.trim()) {
+      triggerAlert('শিরোনাম ও বার্তা অবশ্যই লিখতে হবে।');
+      return;
+    }
+    if (!announcementForm.date || !announcementForm.time) {
+      triggerAlert('ঘোষণার তারিখ ও সময় উভয়ই নির্বাচন করুন।');
+      return;
+    }
+    if (announcementForm.targets.length === 0) {
+      triggerAlert('অন্তত একটি গ্রুপ (গ্রাহক/পরিচালক/ব্যবস্থাপনা/শেয়ারহোল্ডার) নির্বাচন করুন।');
+      return;
+    }
+    setIsSendingAnnouncement(true);
+    try {
+      await saveAnnouncement({
+        title: announcementForm.title.trim(),
+        message: announcementForm.message.trim(),
+        date: announcementForm.date,
+        time: announcementForm.time,
+        targets: announcementForm.targets,
+        createdBy: admin?.name || 'Super Admin'
+      });
+      setData(getManagementData());
+      setAnnouncementForm({ title: '', message: '', date: '', time: '', targets: [] });
+      triggerAlert('ঘোষণা সফলভাবে পাঠানো হয়েছে।');
+    } catch (e) {
+      triggerAlert('ঘোষণা পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।');
+    } finally {
+      setIsSendingAnnouncement(false);
+    }
+  };
+
+  const handleDeleteAnnouncement = (ann) => {
+    requestProtectedDelete(
+      'ঘোষণা মুছে ফেলুন?',
+      `"${ann.title}" ঘোষণাটি স্থায়ীভাবে মুছে ফেলা হবে এবং এটি আর কারো কাছে দেখা যাবে না।`,
+      async () => {
+        await deleteAnnouncementFromStore(ann.id);
+        setData(getManagementData());
+        triggerAlert('ঘোষণা মুছে ফেলা হয়েছে।');
+      }
+    );
+  };
+
+  const renderAnnouncementsSection = () => (
+    <div className="space-y-6">
+      {isSuperAdmin && (
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-visible">
+          <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center space-x-3 bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center shrink-0">
+              <Megaphone className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-base font-black text-slate-900">নতুন ঘোষণা পাঠান</h4>
+              <p className="text-xs text-slate-500 mt-0.5">গ্রাহক, পরিচালক, ব্যবস্থাপনা ও শেয়ারহোল্ডারদের আলাদা আলাদাভাবে অথবা সবাইকে একসাথে ঘোষণা পাঠান</p>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-6 space-y-4">
+            <div>
+              <label className="text-xs font-bold text-slate-600 mb-1.5 block">শিরোনাম</label>
+              <input
+                type="text"
+                value={announcementForm.title}
+                onChange={(e) => setAnnouncementForm(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="যেমনঃ ঈদ উপলক্ষে অফিস বন্ধের নোটিস"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#006231]/30 focus:border-[#006231]"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-600 mb-1.5 block">বার্তা</label>
+              <textarea
+                value={announcementForm.message}
+                onChange={(e) => setAnnouncementForm(prev => ({ ...prev, message: e.target.value }))}
+                placeholder="ঘোষণার বিস্তারিত বার্তা লিখুন..."
+                rows={4}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#006231]/30 focus:border-[#006231] resize-none"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-slate-600 mb-1.5 block flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5" /> তারিখ
+                </label>
+                <input
+                  type="date"
+                  value={announcementForm.date}
+                  onChange={(e) => setAnnouncementForm(prev => ({ ...prev, date: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#006231]/30 focus:border-[#006231]"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600 mb-1.5 block flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" /> সময়
+                </label>
+                <input
+                  type="time"
+                  value={announcementForm.time}
+                  onChange={(e) => setAnnouncementForm(prev => ({ ...prev, time: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#006231]/30 focus:border-[#006231]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-600 mb-2 block">কাদের কাছে পাঠানো হবে?</label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={toggleAllAnnouncementTargets}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                    isAllTargetsSelected
+                      ? 'bg-[#006231] text-white border-[#006231] shadow-sm'
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  সবাইকে একসাথে (All)
+                </button>
+                {ANNOUNCEMENT_AUDIENCES.map(aud => (
+                  <button
+                    key={aud.key}
+                    type="button"
+                    onClick={() => toggleAnnouncementTarget(aud.key)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      announcementForm.targets.includes(aud.key)
+                        ? 'bg-emerald-50 text-[#006231] border-[#006231]'
+                        : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    {aud.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSendAnnouncement}
+              disabled={isSendingAnnouncement}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-sm flex items-center justify-center space-x-2 shadow-md shadow-[#006231]/20 cursor-pointer disabled:opacity-60"
+            >
+              <Send className="w-4 h-4" />
+              <span>{isSendingAnnouncement ? 'পাঠানো হচ্ছে...' : 'ঘোষণা পাঠান'}</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-visible">
+        <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center shrink-0">
+              <Megaphone className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-base font-black text-slate-900">
+                {isSuperAdmin ? 'পাঠানো সব ঘোষণা' : 'আপনার জন্য ঘোষণা'}
+              </h4>
+              <p className="text-xs text-slate-500 mt-0.5">{visibleAnnouncements.length} টি ঘোষণা</p>
+            </div>
+          </div>
+        </div>
+
+        {visibleAnnouncements.length === 0 ? (
+          <div className="p-10 text-center text-slate-400 space-y-2">
+            <Megaphone className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
+            <p className="text-xs font-bold text-slate-600">এখনও কোনো ঘোষণা দেওয়া হয়নি</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {visibleAnnouncements.map(ann => (
+              <div key={ann.id} className="p-4 sm:p-5 flex items-start justify-between gap-3">
+                <div className="min-w-0 space-y-1.5">
+                  <h5 className="font-bold text-sm text-slate-900">{ann.title}</h5>
+                  <p className="text-xs text-slate-600 whitespace-pre-wrap">{ann.message}</p>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-3xs font-bold text-slate-500 flex items-center gap-1">
+                      <Calendar className="w-3 h-3" /> {ann.date} <Clock className="w-3 h-3 ml-1" /> {ann.time}
+                    </span>
+                    {(ann.targets || []).map(key => (
+                      <span key={key} className="px-2 py-0.5 rounded-full bg-emerald-50 text-[#006231] border border-emerald-100 text-3xs font-bold">
+                        {ANNOUNCEMENT_AUDIENCES.find(a => a.key === key)?.label || key}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                {isSuperAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteAnnouncement(ann)}
+                    className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+                    title="মুছে ফেলুন"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 
   return (
@@ -4280,6 +4538,15 @@ export default function ManagementDashboard({
         {managementNavItems.some(i => i.id === 'jobs') && activeTab === 'jobs' && (
           <div className="space-y-6 animate-fadeIn">
             {renderJobApplicationsSection()}
+          </div>
+        )}
+
+        {/* ------------------------------------------------------- */}
+        {/* TAB: ANNOUNCEMENTS (Customer / Director / Management / Shareholder) */}
+        {/* ------------------------------------------------------- */}
+        {activeTab === 'announcements' && (
+          <div className="animate-fadeIn">
+            {renderAnnouncementsSection()}
           </div>
         )}
 

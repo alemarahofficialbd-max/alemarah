@@ -24,7 +24,8 @@ import {
   Calendar,
   X,
   Settings,
-  HelpCircle
+  HelpCircle,
+  Megaphone
 } from 'lucide-react';
 import { formatBDT, getManagementData, updateStore } from '../data/managementStore';
 
@@ -67,6 +68,12 @@ export default function ClientDashboard({
       ? (mgtData.clients.find(c => c.id === propClient.id || (c.phone && propClient.phone && c.phone.replace(/[^0-9]/g, '') === propClient.phone.replace(/[^0-9]/g, ''))) || propClient)
       : null);
   const project = client ? (mgtData.projects.find(p => p.id === client.projectId) || null) : null;
+
+  // Announcements sent by management to customers
+  const customerAnnouncements = (mgtData.announcements || [])
+    .filter(a => Array.isArray(a.targets) && a.targets.includes('customer'))
+    .slice()
+    .sort((a, b) => new Date(`${b.date || '1970-01-01'}T${b.time || '00:00'}`) - new Date(`${a.date || '1970-01-01'}T${a.time || '00:00'}`));
 
   // Selected receipt modal
   const [selectedReceipt, setSelectedReceipt] = useState(null);
@@ -379,6 +386,31 @@ export default function ClientDashboard({
 
         {/* Dynamic Tab Workspace */}
         <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 pt-5 space-y-6 flex-1">
+
+          {/* ------------------------------------------------------- */}
+          {/* ম্যানেজমেন্ট থেকে পাঠানো ঘোষণা / নোটিস বোর্ড              */}
+          {/* ------------------------------------------------------- */}
+          {customerAnnouncements.length > 0 && (
+            <div className="bg-white rounded-2xl border border-amber-200/80 shadow-xs overflow-hidden animate-fadeIn">
+              <div className="p-3.5 sm:p-4 border-b border-amber-100 flex items-center space-x-2.5 bg-amber-50">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                  <Megaphone className="w-4 h-4" />
+                </div>
+                <h4 className="text-sm font-black text-slate-900">ঘোষণা / নোটিস</h4>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {customerAnnouncements.map(ann => (
+                  <div key={ann.id} className="p-3.5 sm:p-4 space-y-1">
+                    <h5 className="font-bold text-sm text-slate-900">{ann.title}</h5>
+                    <p className="text-xs text-slate-600 whitespace-pre-wrap">{ann.message}</p>
+                    <div className="flex items-center gap-1.5 text-3xs font-bold text-slate-400 pt-0.5">
+                      <Calendar className="w-3 h-3" /> {ann.date} <Clock className="w-3 h-3 ml-1" /> {ann.time}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* ------------------------------------------------------- */}
           {/* TAB 1: কাস্টমার ও ফ্ল্যাট তথ্য (DETAILS)                  */}

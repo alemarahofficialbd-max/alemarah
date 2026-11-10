@@ -99,6 +99,7 @@ export const initialManagementData = {
   customers: [],
   investmentOffers: [],
   investors: [],
+  announcements: [],
   jobApplications: [
     {
       id: 'AL-JOB-2026-10003',
@@ -350,6 +351,9 @@ export const getManagementData = () => {
       } else {
         parsed.investors = parsed.investors.filter(i => !deletedInvestorSet.has(i.id));
       }
+      if (!parsed.announcements) {
+        parsed.announcements = [];
+      }
       return migrateClientsToCustomers(parsed);
     }
   } catch (e) {
@@ -394,6 +398,106 @@ export const fetchJobApplicationsFromSupabase = async () => {
     console.log('Notice fetching job applications:', err);
   }
   return [];
+};
+
+// Sync announcements to Supabase Cloud Central Storage (same blob-row
+// pattern as job applications, since there's no dedicated table for this).
+export const syncAnnouncementsToSupabase = async (announcements) => {
+  try {
+    if (!Array.isArray(announcements)) return;
+    await supabase.from('admins').upsert({
+      id: 'ANNOUNCEMENTS-STORE',
+      name: 'Announcements Central Store',
+      email: 'announcements-store@alemarahproperties.com',
+      phone: '01816233013',
+      role: 'system_storage',
+      role_type: 'system_storage',
+      access_key: 'system_storage',
+      is_super_admin: false,
+      permissions: announcements,
+      status: 'সক্রিয়'
+    }, { onConflict: 'id' });
+  } catch (err) {
+    console.error('Error syncing announcements to Supabase cloud:', err);
+  }
+};
+
+// Fetch announcements directly from Supabase Cloud
+export const fetchAnnouncementsFromSupabase = async () => {
+  try {
+    const { data, error } = await supabase.from('admins').select('permissions').eq('id', 'ANNOUNCEMENTS-STORE').single();
+    if (data && Array.isArray(data.permissions)) {
+      return data.permissions;
+    }
+  } catch (err) {
+    console.log('Notice fetching announcements:', err);
+  }
+  return [];
+};
+
+// Create and broadcast a new announcement to the chosen audience(s)
+// (customer / director / management / investor), merging with whatever
+// is already on the cloud so concurrent admins don't clobber each other.
+export const saveAnnouncement = async (announcement) => {
+  try {
+    const current = getManagementData();
+
+    let remoteList = [];
+    try {
+      const { data } = await supabase.from('admins').select('permissions').eq('id', 'ANNOUNCEMENTS-STORE').single();
+      if (data && Array.isArray(data.permissions)) {
+        remoteList = data.permissions;
+      }
+    } catch (_) {}
+
+    const baseList = remoteList.length > 0 ? remoteList : (current.announcements || []);
+
+    const newAnnouncement = {
+      id: `ANN-${Date.now()}`,
+      title: '',
+      message: '',
+      targets: [],
+      date: '',
+      time: '',
+      createdAt: new Date().toISOString(),
+      createdBy: '',
+      ...announcement
+    };
+
+    const mergedList = [newAnnouncement, ...baseList.filter(a => a && a.id !== newAnnouncement.id)];
+    const updated = { ...current, announcements: mergedList };
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: updated }));
+    } catch (_) {}
+
+    await syncAnnouncementsToSupabase(mergedList);
+
+    return newAnnouncement;
+  } catch (e) {
+    console.error('Error saving announcement:', e);
+  }
+};
+
+// Delete an announcement locally and push the remaining list to Supabase
+export const deleteAnnouncementFromStore = async (id) => {
+  try {
+    const current = getManagementData();
+    const remainingList = (current.announcements || []).filter(a => a.id !== id);
+    const updated = { ...current, announcements: remainingList };
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('alemarah_store_updated', { detail: updated }));
+    } catch (_) {}
+
+    await syncAnnouncementsToSupabase(remainingList);
+    return true;
+  } catch (e) {
+    console.error('Error deleting announcement:', e);
+    return false;
+  }
 };
 
 // Background async sync to Supabase
@@ -697,7 +801,7 @@ const _syncFromSupabaseImpl = async () => {
 
       // Filter out system storage and deleted admins from management team display
       const remoteTeam = adminsRes.data
-        .filter(a => a.id !== 'JOB-APPLICATIONS-STORE' && a.id !== 'SYSTEM-DELETED-IDS' && (a.is_super_admin || !deletedAdminSet.has(a.id)))
+        .filter(a => a.id !== 'JOB-APPLICATIONS-STORE' && a.id !== 'ANNOUNCEMENTS-STORE' && a.id !== 'SYSTEM-DELETED-IDS' && (a.is_super_admin || !deletedAdminSet.has(a.id)))
         .map(a => ({
           id: a.id,
           name: a.name,
@@ -727,6 +831,12 @@ const _syncFromSupabaseImpl = async () => {
         } else if ((current.jobApplications || []).length > 0) {
           syncJobApplicationsToSupabase(current.jobApplications);
         }
+      }
+
+      // Cloud Sync: Retrieve authoritative announcements from Supabase Cloud
+      const announcementsStoreRow = adminsRes.data.find(a => a.id === 'ANNOUNCEMENTS-STORE');
+      if (announcementsStoreRow && Array.isArray(announcementsStoreRow.permissions)) {
+        updated.announcements = announcementsStoreRow.permissions;
       }
 
       // Cloud Sync: Retrieve authoritative system tombstones (deleted IDs across all devices)
