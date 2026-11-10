@@ -69,9 +69,14 @@ export default function ClientDashboard({
       : null);
   const project = client ? (mgtData.projects.find(p => p.id === client.projectId) || null) : null;
 
-  // Announcements sent by management to customers
+  // Announcements sent by management to customers -- a notice can be
+  // aimed at every project's customers, or narrowed to specific
+  // project(s); show it if any of this customer's owned units belongs
+  // to a targeted project (or scoping is unset/legacy, which means all).
+  const ownedProjectIds = ownedUnits.map(u => u.projectId).filter(Boolean);
   const customerAnnouncements = (mgtData.announcements || [])
     .filter(a => Array.isArray(a.targets) && a.targets.includes('customer'))
+    .filter(a => a.customerAllProjects !== false || (a.customerProjectIds || []).some(id => ownedProjectIds.includes(id)))
     .slice()
     .sort((a, b) => new Date(`${b.date || '1970-01-01'}T${b.time || '00:00'}`) - new Date(`${a.date || '1970-01-01'}T${a.time || '00:00'}`));
 

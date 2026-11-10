@@ -318,13 +318,21 @@ export default function ManagementDashboard({
   const [interviewSuccessModal, setInterviewSuccessModal] = useState(null);
   const [isSyncingJobs, setIsSyncingJobs] = useState(false);
 
-  // Announcement composer state (Super Admin broadcast tool)
+  // Announcement composer state (Super Admin broadcast tool). A project
+  // can have many flats/customers and there can be many investment
+  // offers, so "customer" / "shareholder" targeting needs to optionally
+  // narrow to specific projects / offers instead of always broadcasting
+  // to every project or every offer's investors.
   const [announcementForm, setAnnouncementForm] = useState({
     title: '',
     message: '',
     date: '',
     time: '',
-    targets: []
+    targets: [],
+    customerAllProjects: true,
+    customerProjectIds: [],
+    shareholderAllOffers: true,
+    shareholderOfferIds: []
   });
   const [isSendingAnnouncement, setIsSendingAnnouncement] = useState(false);
   const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
@@ -2643,6 +2651,24 @@ export default function ManagementDashboard({
     }));
   };
 
+  const toggleAnnouncementProjectId = (projectId) => {
+    setAnnouncementForm(prev => ({
+      ...prev,
+      customerProjectIds: prev.customerProjectIds.includes(projectId)
+        ? prev.customerProjectIds.filter(id => id !== projectId)
+        : [...prev.customerProjectIds, projectId]
+    }));
+  };
+
+  const toggleAnnouncementOfferId = (offerId) => {
+    setAnnouncementForm(prev => ({
+      ...prev,
+      shareholderOfferIds: prev.shareholderOfferIds.includes(offerId)
+        ? prev.shareholderOfferIds.filter(id => id !== offerId)
+        : [...prev.shareholderOfferIds, offerId]
+    }));
+  };
+
   const handleSendAnnouncement = async () => {
     if (!announcementForm.title.trim() || !announcementForm.message.trim()) {
       triggerAlert('শিরোনাম ও বার্তা অবশ্যই লিখতে হবে।');
@@ -2656,6 +2682,14 @@ export default function ManagementDashboard({
       triggerAlert('অন্তত একটি গ্রুপ (গ্রাহক/পরিচালক/ব্যবস্থাপনা/শেয়ারহোল্ডার) নির্বাচন করুন।');
       return;
     }
+    if (announcementForm.targets.includes('customer') && !announcementForm.customerAllProjects && announcementForm.customerProjectIds.length === 0) {
+      triggerAlert('গ্রাহকদের জন্য অন্তত একটি প্রজেক্ট নির্বাচন করুন, অথবা "সব প্রজেক্ট" বেছে নিন।');
+      return;
+    }
+    if (announcementForm.targets.includes('investor') && !announcementForm.shareholderAllOffers && announcementForm.shareholderOfferIds.length === 0) {
+      triggerAlert('শেয়ারহোল্ডারদের জন্য অন্তত একটি ইনভেস্টমেন্ট অফার নির্বাচন করুন, অথবা "সব অফার" বেছে নিন।');
+      return;
+    }
     setIsSendingAnnouncement(true);
     try {
       await saveAnnouncement({
@@ -2664,10 +2698,14 @@ export default function ManagementDashboard({
         date: announcementForm.date,
         time: announcementForm.time,
         targets: announcementForm.targets,
+        customerAllProjects: announcementForm.targets.includes('customer') ? announcementForm.customerAllProjects : null,
+        customerProjectIds: announcementForm.targets.includes('customer') && !announcementForm.customerAllProjects ? announcementForm.customerProjectIds : [],
+        shareholderAllOffers: announcementForm.targets.includes('investor') ? announcementForm.shareholderAllOffers : null,
+        shareholderOfferIds: announcementForm.targets.includes('investor') && !announcementForm.shareholderAllOffers ? announcementForm.shareholderOfferIds : [],
         createdBy: admin?.name || 'Super Admin'
       });
       setData(getManagementData());
-      setAnnouncementForm({ title: '', message: '', date: '', time: '', targets: [] });
+      setAnnouncementForm({ title: '', message: '', date: '', time: '', targets: [], customerAllProjects: true, customerProjectIds: [], shareholderAllOffers: true, shareholderOfferIds: [] });
       triggerAlert('ঘোষণা সফলভাবে পাঠানো হয়েছে।');
     } catch (e) {
       triggerAlert('ঘোষণা পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।');
@@ -2750,7 +2788,8 @@ export default function ManagementDashboard({
               </div>
             </div>
 
-            <div className="relative" ref={audienceDropdownRef}>
+            <div className="sm:flex sm:items-end sm:gap-3">
+            <div className="relative flex-1" ref={audienceDropdownRef}>
               <label className="text-xs font-bold text-slate-600 mb-2 block">কাদের কাছে পাঠানো হবে?</label>
               <button
                 type="button"
@@ -2768,7 +2807,7 @@ export default function ManagementDashboard({
               </button>
 
               {isAudienceDropdownOpen && (
-                <div className="absolute z-20 mt-1.5 w-full bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                <div className="absolute z-20 mt-1.5 w-full bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5 max-h-96 overflow-y-auto">
                   <label className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-slate-50 cursor-pointer border-b border-slate-100 mb-1">
                     <input
                       type="checkbox"
@@ -2779,15 +2818,78 @@ export default function ManagementDashboard({
                     <span className="text-xs font-bold text-slate-800">সবাইকে একসাথে (All)</span>
                   </label>
                   {ANNOUNCEMENT_AUDIENCES.map(aud => (
-                    <label key={aud.key} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-slate-50 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={announcementForm.targets.includes(aud.key)}
-                        onChange={() => toggleAnnouncementTarget(aud.key)}
-                        className="w-4 h-4 rounded accent-[#006231] cursor-pointer"
-                      />
-                      <span className="text-xs font-semibold text-slate-700">{aud.label}</span>
-                    </label>
+                    <div key={aud.key}>
+                      <label className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-slate-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={announcementForm.targets.includes(aud.key)}
+                          onChange={() => toggleAnnouncementTarget(aud.key)}
+                          className="w-4 h-4 rounded accent-[#006231] cursor-pointer"
+                        />
+                        <span className="text-xs font-semibold text-slate-700">{aud.label}</span>
+                      </label>
+
+                      {/* Customer target: optionally narrow to specific project(s), since one
+                          project can have many flats/customers and there can be many projects. */}
+                      {aud.key === 'customer' && announcementForm.targets.includes('customer') && (
+                        <div className="ml-6 mb-1.5 pl-2.5 border-l-2 border-emerald-100 space-y-0.5">
+                          <label className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={announcementForm.customerAllProjects}
+                              onChange={() => setAnnouncementForm(prev => ({ ...prev, customerAllProjects: !prev.customerAllProjects }))}
+                              className="w-3.5 h-3.5 rounded accent-[#006231] cursor-pointer"
+                            />
+                            <span className="text-3xs font-bold text-slate-600">সব প্রজেক্ট (All Projects)</span>
+                          </label>
+                          {!announcementForm.customerAllProjects && (
+                            (data.projects || []).length === 0 ? (
+                              <p className="text-3xs text-slate-400 px-2 py-1">কোনো প্রজেক্ট নেই</p>
+                            ) : (data.projects || []).map(proj => (
+                              <label key={proj.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={announcementForm.customerProjectIds.includes(proj.id)}
+                                  onChange={() => toggleAnnouncementProjectId(proj.id)}
+                                  className="w-3.5 h-3.5 rounded accent-[#006231] cursor-pointer"
+                                />
+                                <span className="text-3xs font-semibold text-slate-600">{proj.name}</span>
+                              </label>
+                            ))
+                          )}
+                        </div>
+                      )}
+
+                      {/* Shareholder target: optionally narrow to specific investment offer(s). */}
+                      {aud.key === 'investor' && announcementForm.targets.includes('investor') && (
+                        <div className="ml-6 mb-1.5 pl-2.5 border-l-2 border-emerald-100 space-y-0.5">
+                          <label className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={announcementForm.shareholderAllOffers}
+                              onChange={() => setAnnouncementForm(prev => ({ ...prev, shareholderAllOffers: !prev.shareholderAllOffers }))}
+                              className="w-3.5 h-3.5 rounded accent-[#006231] cursor-pointer"
+                            />
+                            <span className="text-3xs font-bold text-slate-600">সব অফার (All Offers)</span>
+                          </label>
+                          {!announcementForm.shareholderAllOffers && (
+                            (data.investmentOffers || []).length === 0 ? (
+                              <p className="text-3xs text-slate-400 px-2 py-1">কোনো ইনভেস্টমেন্ট অফার নেই</p>
+                            ) : (data.investmentOffers || []).map(offer => (
+                              <label key={offer.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={announcementForm.shareholderOfferIds.includes(offer.id)}
+                                  onChange={() => toggleAnnouncementOfferId(offer.id)}
+                                  className="w-3.5 h-3.5 rounded accent-[#006231] cursor-pointer"
+                                />
+                                <span className="text-3xs font-semibold text-slate-600">{offer.name}</span>
+                              </label>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
@@ -2797,11 +2899,12 @@ export default function ManagementDashboard({
               type="button"
               onClick={handleSendAnnouncement}
               disabled={isSendingAnnouncement}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-sm flex items-center justify-center space-x-2 shadow-md shadow-[#006231]/20 cursor-pointer disabled:opacity-60"
+              className="w-full sm:w-auto mt-3 sm:mt-0 px-6 py-3 rounded-xl bg-gradient-to-r from-[#006231] to-[#0A4D27] text-white font-bold text-sm flex items-center justify-center space-x-2 shadow-md shadow-[#006231]/20 cursor-pointer disabled:opacity-60 shrink-0"
             >
               <Send className="w-4 h-4" />
               <span>{isSendingAnnouncement ? 'পাঠানো হচ্ছে...' : 'ঘোষণা পাঠান'}</span>
             </button>
+            </div>
           </div>
         </div>
       )}
@@ -2843,6 +2946,16 @@ export default function ManagementDashboard({
                       </span>
                     ))}
                   </div>
+                  {ann.targets?.includes('customer') && ann.customerAllProjects === false && (
+                    <p className="text-3xs text-slate-500">
+                      প্রজেক্ট: {(ann.customerProjectIds || []).map(id => (data.projects || []).find(p => p.id === id)?.name || id).join(', ') || '—'}
+                    </p>
+                  )}
+                  {ann.targets?.includes('investor') && ann.shareholderAllOffers === false && (
+                    <p className="text-3xs text-slate-500">
+                      অফার: {(ann.shareholderOfferIds || []).map(id => (data.investmentOffers || []).find(o => o.id === id)?.name || id).join(', ') || '—'}
+                    </p>
+                  )}
                 </div>
                 {isSuperAdmin && (
                   <button
