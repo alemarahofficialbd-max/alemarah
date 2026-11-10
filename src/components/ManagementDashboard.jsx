@@ -351,6 +351,17 @@ export default function ManagementDashboard({
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, [isAudienceDropdownOpen]);
 
+  // There is no real push/SMS/email notification system in this app --
+  // an announcement only becomes visible when the viewer opens the
+  // dashboard. This "unread" badge on the ঘোষণা nav tab is the one thing
+  // that can make a new announcement noticeable without that click,
+  // tracked per-admin in localStorage (each admin/director has their
+  // own "last seen" timestamp).
+  const announcementSeenKey = `alemarah_announcements_seen_${admin?.id || 'guest'}`;
+  const [announcementsLastSeenAt, setAnnouncementsLastSeenAt] = useState(() => {
+    try { return localStorage.getItem(announcementSeenKey) || ''; } catch { return ''; }
+  });
+
   // Clean Job Title and Status Formatters (Pure Bengali, No Clutter/English brackets)
   const formatCleanJobTitle = (title) => {
     if (!title) return 'হিসাব ও প্রশাসন কর্মকর্তা';
@@ -2654,6 +2665,23 @@ export default function ManagementDashboard({
     .slice()
     .sort((a, b) => new Date(`${b.date || '1970-01-01'}T${b.time || '00:00'}`) - new Date(`${a.date || '1970-01-01'}T${a.time || '00:00'}`));
 
+  const unreadAnnouncementCount = visibleAnnouncements.filter(a =>
+    a.createdAt && (!announcementsLastSeenAt || a.createdAt > announcementsLastSeenAt)
+  ).length;
+
+  // Mark every currently-visible announcement as seen once the admin
+  // actually opens the tab (not just on mount, so the badge is accurate
+  // even if a new announcement arrives while they're on another tab).
+  useEffect(() => {
+    if (activeTab !== 'announcements' || visibleAnnouncements.length === 0) return;
+    const newest = visibleAnnouncements.reduce((max, a) => (a.createdAt && a.createdAt > max ? a.createdAt : max), '');
+    if (newest && newest !== announcementsLastSeenAt) {
+      setAnnouncementsLastSeenAt(newest);
+      try { localStorage.setItem(announcementSeenKey, newest); } catch (_) {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, data.announcements]);
+
   const toggleAnnouncementTarget = (key) => {
     setAnnouncementForm(prev => ({
       ...prev,
@@ -3065,8 +3093,16 @@ export default function ManagementDashboard({
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
                   }`}
                 >
-                  <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'space-x-3'}`}>
-                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-700'}`} />
+                  <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'space-x-3'} relative`}>
+                    <span className="relative">
+                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-700'}`} />
+                      {item.id === 'announcements' && unreadAnnouncementCount > 0 && (
+                        <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#CE2028] opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#CE2028] border border-white"></span>
+                        </span>
+                      )}
+                    </span>
                     {!isSidebarCollapsed && (
                       <span className="truncate">{item.label}</span>
                     )}
@@ -5744,6 +5780,12 @@ export default function ManagementDashboard({
               >
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#CE2028] absolute top-1 right-1.5 animate-pulse"></span>
+                )}
+                {item.id === 'announcements' && unreadAnnouncementCount > 0 && (
+                  <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#CE2028] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#CE2028] border border-white"></span>
+                  </span>
                 )}
                 <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>

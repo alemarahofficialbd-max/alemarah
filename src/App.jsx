@@ -83,7 +83,20 @@ const resolveProjectFromHash = (rawHash, projects) => {
 };
 
 export default function App() {
-  const [lang, setLang] = useState('bn'); // 'bn' (Bangla) or 'en' (English)
+  // Persist the chosen language so switching to English actually sticks
+  // across a reload/new tab instead of silently reverting to Bangla.
+  const [lang, setLangState] = useState(() => {
+    try {
+      const stored = localStorage.getItem('alemarah_lang');
+      return stored === 'en' || stored === 'bn' ? stored : 'bn';
+    } catch {
+      return 'bn';
+    }
+  });
+  const setLang = (next) => {
+    setLangState(next);
+    try { localStorage.setItem('alemarah_lang', next); } catch (_) {}
+  };
 
   // Retrieve persisted login sessions
   const [currentAdmin, setCurrentAdmin] = useState(() => {
