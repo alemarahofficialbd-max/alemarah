@@ -178,6 +178,20 @@ export default function ManagementDashboard({
   // director, showing a stranger's shareholder profile.
   const loggedInDirector = isDirector ? (liveDirector || admin) : null;
 
+  // Whether a managementTeam entry is a director's portal-access record
+  // rather than a plain staff officer. The Supabase "admins" table has no
+  // is_director/director_id columns, so those flags never survive a
+  // cloud round-trip (push doesn't send them, pull doesn't read them) --
+  // after any sync, a director's access entry loses them and falls back
+  // into the regular staff list. The "MGT-DIR-" id prefix is the one
+  // thing every such entry reliably keeps, so it's the primary check.
+  const isDirectorTeamEntry = (m) => Boolean(m?.isDirector || m?.directorId || (m?.id && m.id.startsWith('MGT-DIR-')));
+  // Finds the managementTeam entry linked to a given director record,
+  // matching on the same resilient criteria.
+  const findLinkedTeamEntry = (directorRecordId) => (data.managementTeam || []).find(m =>
+    m.directorId === directorRecordId || m.id === directorRecordId || m.id === `MGT-DIR-${String(directorRecordId).replace('DIR-', '')}`
+  );
+
   const effectivePermissions = isSuperAdmin 
     ? ['all'] 
     : (liveOfficer && Array.isArray(liveOfficer.permissions) 
@@ -271,6 +285,7 @@ export default function ManagementDashboard({
   }, []);
 
 
+
   // Warn when a background cloud save silently fails (data stays local-only)
   useEffect(() => {
     const onSyncFailed = (e) => {
@@ -312,6 +327,20 @@ export default function ManagementDashboard({
     targets: []
   });
   const [isSendingAnnouncement, setIsSendingAnnouncement] = useState(false);
+  const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
+  const audienceDropdownRef = useRef(null);
+
+  // Close the announcement audience dropdown on an outside click
+  useEffect(() => {
+    if (!isAudienceDropdownOpen) return;
+    const onClickOutside = (e) => {
+      if (audienceDropdownRef.current && !audienceDropdownRef.current.contains(e.target)) {
+        setIsAudienceDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, [isAudienceDropdownOpen]);
 
   // Clean Job Title and Status Formatters (Pure Bengali, No Clutter/English brackets)
   const formatCleanJobTitle = (title) => {
@@ -1443,7 +1472,7 @@ export default function ManagementDashboard({
           ...prev,
           directors: (prev.directors || []).filter(d => d.id !== dirId),
           deletedDirectorIds: [...new Set([...(prev.deletedDirectorIds || []), dirId])],
-          managementTeam: (prev.managementTeam || []).filter(m => m.directorId !== dirId && m.id !== dirId)
+          managementTeam: (prev.managementTeam || []).filter(m => m.directorId !== dirId && m.id !== dirId && m.id !== `MGT-DIR-${dirId.replace('DIR-', '')}`)
         }));
         await deleteDirectorFromSupabase(dirId);
         if (selectedDirectorForProfile?.id === dirId) {
@@ -1553,7 +1582,7 @@ export default function ManagementDashboard({
 
   const handleOpenDirectorAccess = (dir) => {
     setSelectedDirectorForAccess(dir);
-    const linkedTeamMember = (data.managementTeam || []).find(m => m.directorId === dir.id || m.id === dir.id);
+    const linkedTeamMember = findLinkedTeamEntry(dir.id);
     setDirectorAccessForm({
       password: '',
       permissions: Array.isArray(linkedTeamMember?.permissions)
@@ -1576,8 +1605,9 @@ export default function ManagementDashboard({
     const formPermissions = Array.isArray(directorAccessForm.permissions) ? directorAccessForm.permissions : [];
 
     updateStore((prev) => {
+      const expectedDirId = `MGT-DIR-${selectedDirectorForAccess.id.replace('DIR-', '')}`;
       const existingIdx = (prev.managementTeam || []).findIndex(m =>
-        m.directorId === selectedDirectorForAccess.id || m.id === selectedDirectorForAccess.id
+        m.directorId === selectedDirectorForAccess.id || m.id === selectedDirectorForAccess.id || m.id === expectedDirId
       );
       let nextTeam = [...(prev.managementTeam || [])];
       if (existingIdx !== -1) {
@@ -2720,35 +2750,47 @@ export default function ManagementDashboard({
               </div>
             </div>
 
-            <div>
+            <div className="relative" ref={audienceDropdownRef}>
               <label className="text-xs font-bold text-slate-600 mb-2 block">কাদের কাছে পাঠানো হবে?</label>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={toggleAllAnnouncementTargets}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                    isAllTargetsSelected
-                      ? 'bg-[#006231] text-white border-[#006231] shadow-sm'
-                      : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  সবাইকে একসাথে (All)
-                </button>
-                {ANNOUNCEMENT_AUDIENCES.map(aud => (
-                  <button
-                    key={aud.key}
-                    type="button"
-                    onClick={() => toggleAnnouncementTarget(aud.key)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                      announcementForm.targets.includes(aud.key)
-                        ? 'bg-emerald-50 text-[#006231] border-[#006231]'
-                        : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    {aud.label}
-                  </button>
-                ))}
-              </div>
+              <button
+                type="button"
+                onClick={() => setIsAudienceDropdownOpen(v => !v)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-left flex items-center justify-between gap-2 bg-white hover:border-slate-300 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#006231]/30 focus:border-[#006231]"
+              >
+                <span className={announcementForm.targets.length === 0 ? 'text-slate-400' : 'text-slate-800 font-semibold'}>
+                  {announcementForm.targets.length === 0
+                    ? 'গ্রুপ নির্বাচন করুন...'
+                    : isAllTargetsSelected
+                      ? 'সবাইকে একসাথে (All)'
+                      : ANNOUNCEMENT_AUDIENCES.filter(a => announcementForm.targets.includes(a.key)).map(a => a.label).join(', ')}
+                </span>
+                <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${isAudienceDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isAudienceDropdownOpen && (
+                <div className="absolute z-20 mt-1.5 w-full bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                  <label className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-slate-50 cursor-pointer border-b border-slate-100 mb-1">
+                    <input
+                      type="checkbox"
+                      checked={isAllTargetsSelected}
+                      onChange={toggleAllAnnouncementTargets}
+                      className="w-4 h-4 rounded accent-[#006231] cursor-pointer"
+                    />
+                    <span className="text-xs font-bold text-slate-800">সবাইকে একসাথে (All)</span>
+                  </label>
+                  {ANNOUNCEMENT_AUDIENCES.map(aud => (
+                    <label key={aud.key} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-slate-50 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={announcementForm.targets.includes(aud.key)}
+                        onChange={() => toggleAnnouncementTarget(aud.key)}
+                        className="w-4 h-4 rounded accent-[#006231] cursor-pointer"
+                      />
+                      <span className="text-xs font-semibold text-slate-700">{aud.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
 
             <button
@@ -4296,7 +4338,7 @@ export default function ManagementDashboard({
             isSuperAdmin: true
           };
 
-          const officerTeam = (data.managementTeam || []).filter(m => !(m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com' || m.isDirector || m.directorId));
+          const officerTeam = (data.managementTeam || []).filter(m => !(m.isSuperAdmin || m.email === 'alemarah.officialbd@gmail.com' || isDirectorTeamEntry(m)));
 
           return (
             <div className="space-y-6 animate-fadeIn">
