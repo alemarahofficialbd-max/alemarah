@@ -157,24 +157,26 @@ export default function ManagementDashboard({
 
   const isStaffOfficer = !isSuperAdmin && !isDirector;
 
-  // 2. Identify director profile if logged in as director
-  const loggedInDirector = isDirector 
-    ? (data.directors || []).find(d => d.id === admin?.id || d.phone === admin?.phone || d.email === admin?.email) || admin
-    : null;
-
   // Real-time resolution of live officer and director permissions from central store
   const cleanPhoneStr = (p) => (p || '').replace(/[^0-9]/g, '');
-  const liveOfficer = !isSuperAdmin ? (data.managementTeam || []).find(m => 
-    (m.id && admin?.id && m.id === admin?.id) || 
+  const liveOfficer = !isSuperAdmin ? (data.managementTeam || []).find(m =>
+    (m.id && admin?.id && m.id === admin?.id) ||
     (cleanPhoneStr(m.phone) && cleanPhoneStr(admin?.phone) && cleanPhoneStr(m.phone) === cleanPhoneStr(admin?.phone)) ||
     (m.email && admin?.email && m.email.toLowerCase() === admin?.email.toLowerCase())
   ) : null;
 
-  const liveDirector = isDirector ? (data.directors || []).find(d => 
-    (d.id && admin?.id && d.id === admin?.id) || 
+  const liveDirector = isDirector ? (data.directors || []).find(d =>
+    (d.id && admin?.id && d.id === admin?.id) ||
     (cleanPhoneStr(d.phone) && cleanPhoneStr(admin?.phone) && cleanPhoneStr(d.phone) === cleanPhoneStr(admin?.phone)) ||
     (d.email && admin?.email && d.email.toLowerCase() === admin?.email.toLowerCase())
   ) : null;
+
+  // 2. Identify director profile if logged in as director. Reuses the
+  // guarded matching above instead of its own id/phone/email === check --
+  // an unguarded "" === "" on an optional email field used to match the
+  // first director with no email on file instead of the actual logged-in
+  // director, showing a stranger's shareholder profile.
+  const loggedInDirector = isDirector ? (liveDirector || admin) : null;
 
   const effectivePermissions = isSuperAdmin 
     ? ['all'] 
@@ -1395,7 +1397,7 @@ export default function ManagementDashboard({
   const handleDeleteInvestmentOffer = (offerId, offerName) => {
     if (!isSuperAdmin) return;
     requestProtectedDelete(
-      `ইনভেস্টমেন্ট প্রজেক্ট "${offerName}" মুছে ফেলা`,
+      `ইনভেস্টমেন্ট অফার "${offerName}" মুছে ফেলা`,
       `আপনি কি নিশ্চিতভাবে "${offerName}" এবং এর সকল ইনভেস্টর তথ্য মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
       () => {
         updateStore((prev) => ({
@@ -1405,7 +1407,7 @@ export default function ManagementDashboard({
         }));
         deleteInvestmentOfferFromSupabase(offerId);
         if (selectedOfferForDetails?.id === offerId) setSelectedOfferForDetails(null);
-        triggerAlert(`ইনভেস্টমেন্ট প্রজেক্ট "${offerName}" সফলভাবে মুছে ফেলা হয়েছে!`);
+        triggerAlert(`ইনভেস্টমেন্ট অফার "${offerName}" সফলভাবে মুছে ফেলা হয়েছে!`);
       }
     );
   };
@@ -1949,8 +1951,8 @@ export default function ManagementDashboard({
       shareCount: shareCountNum,
       sharePercentage: shareCountNum,
       dividendEarned: 0,
-      phone: directorForm.phone || '01918-646575',
-      email: directorForm.email || 'director@alemarahproperties.com',
+      phone: directorForm.phone || '',
+      email: directorForm.email || '',
       accessKey: newDirectorAccessKey,
       joiningDate: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       status: 'সক্রিয় (Active)',
@@ -3972,8 +3974,8 @@ export default function ManagementDashboard({
               <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-bold text-sm sm:text-base text-slate-900">ইনভেস্টমেন্ট প্রজেক্টসমূহ</h3>
-                    <p className="text-3xs text-slate-500">এগ্রো/লাইভস্টক জাতীয় প্রজেক্ট — ফ্ল্যাট/sqft নেই, শুধু বিনিয়োগ স্ল্যাব</p>
+                    <h3 className="font-bold text-sm sm:text-base text-slate-900">ইনভেস্টমেন্ট অফারসমূহ</h3>
+                    <p className="text-3xs text-slate-500">এগ্রো/লাইভস্টক জাতীয় অফার — ফ্ল্যাট/sqft নেই, শুধু বিনিয়োগ স্ল্যাব (এটি রিয়েল এস্টেট প্রজেক্ট নয়, "প্রজেক্ট কন্ট্রোল" ট্যাব থেকে আলাদা)</p>
                   </div>
                   <button
                     type="button"
@@ -3981,15 +3983,15 @@ export default function ManagementDashboard({
                     className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#006231] to-[#004d26] text-white font-bold text-xs shadow-md hover:opacity-95 transition-all cursor-pointer inline-flex items-center space-x-1.5"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>নতুন ইনভেস্টমেন্ট প্রজেক্ট যোগ করুন</span>
+                    <span>নতুন ইনভেস্টমেন্ট অফার যোগ করুন</span>
                   </button>
                 </div>
 
                 {(data.investmentOffers || []).length === 0 ? (
                   <div className="py-14 text-center space-y-2">
                     <TrendingUp className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
-                    <p className="text-xs font-bold text-slate-600">এখনো কোনো ইনভেস্টমেন্ট প্রজেক্ট তৈরি করা হয়নি</p>
-                    <p className="text-3xs text-slate-400">উপরে বাটনে ক্লিক করে এগ্রো/লাইভস্টক জাতীয় প্রথম প্রজেক্ট যোগ করুন</p>
+                    <p className="text-xs font-bold text-slate-600">এখনো কোনো ইনভেস্টমেন্ট অফার তৈরি করা হয়নি</p>
+                    <p className="text-3xs text-slate-400">উপরে বাটনে ক্লিক করে এগ্রো/লাইভস্টক জাতীয় প্রথম অফার যোগ করুন</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -4005,7 +4007,7 @@ export default function ManagementDashboard({
                             <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-3">
                               <div className="space-y-1 min-w-0">
                                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#006231] text-3xs font-black border border-emerald-200/60 inline-block">
-                                  ইনভেস্টমেন্ট প্রজেক্ট
+                                  ইনভেস্টমেন্ট অফার
                                 </span>
                                 <h4 className="text-base font-bold text-slate-900 truncate">{offer.name}</h4>
                                 {offer.location && (
