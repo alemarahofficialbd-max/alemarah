@@ -21,7 +21,7 @@ export default function InvestorProfileModal({
   if (!isOpen || !investor) return null;
 
   const phone = investor.phone;
-  const slabs = (allInvestors || []).filter(inv => inv.phone === phone);
+  const slabs = (allInvestors || []).filter(inv => phone && inv.phone === phone);
   const totalInvested = slabs.reduce((acc, inv) => acc + (Number(inv.investedAmount) || 0), 0);
   const totalPaid = slabs.reduce((acc, inv) => acc + (Number(inv.totalPaid) || 0), 0);
   const allPayouts = slabs

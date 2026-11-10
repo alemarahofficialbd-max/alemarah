@@ -87,7 +87,7 @@ export default function EventsPage({
     if (currentEvent) {
       const titleText = `${currentEvent.title[lang]} | Al-Emarah Properties`;
       const descText = currentEvent.tagline[lang] || currentEvent.paragraphs[lang][0];
-      const imageUrl = `${origin}/images/events/al_quds_connect_1_og.jpg`;
+      const imageUrl = `${origin}/images/events/${currentEvent.ogImage || 'al_quds_connect_1_og.jpg'}`;
       const shareUrl = `${origin}/events/${currentEvent.id}`;
 
       document.title = titleText;

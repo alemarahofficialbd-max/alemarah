@@ -598,7 +598,7 @@ export default function ProjectDetailsPage({
 
               {/* Specific breakdown grid with distinct premium vector icons */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
-                {(isEn ? project.featuresEn : project.featuresBn).map((feature, idx) => {
+                {((isEn ? project.featuresEn : project.featuresBn) || []).map((feature, idx) => {
                   const { Icon: FeatureIcon, color, bg } = getFeatureIconConfig(feature, idx);
                   return (
                     <div 

@@ -891,7 +891,14 @@ const _syncFromSupabaseImpl = async () => {
             dividendEarned: Number(d.dividend_earned) || localDir?.dividendEarned || 0,
             phone: d.phone || localDir?.phone || '',
             email: d.email || localDir?.email || '',
-            accessKey: localDir?.accessKey || 'admin123',
+            // The directors table has no access_key column, so a custom
+            // password set for a director never reaches the cloud and is
+            // lost on any other device/browser. The linked team-login
+            // entry (managementTeam, id "MGT-DIR-<n>") DOES sync its own
+            // access_key, so fall back to that before the shared default.
+            accessKey: localDir?.accessKey
+              || (current.managementTeam || []).find(m => m.directorId === d.id || m.id === `MGT-DIR-${d.id.replace('DIR-', '')}`)?.accessKey
+              || 'admin123',
             joiningDate: d.joining_date || localDir?.joiningDate || '',
             status: d.status || localDir?.status || 'সক্রিয় (Active)',
             nomineeName: d.nominee_name || localDir?.nomineeName || '',

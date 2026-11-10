@@ -967,7 +967,10 @@ export default function ManagementDashboard({
       clients: prev.clients.map(c => c.id === clientId ? { ...c, password: cleanPass } : c),
       customers: (prev.customers || []).map(cus => {
         const clRow = prev.clients.find(c => c.id === clientId);
-        return (cus.id === clRow?.customerId || cus.phone === clRow?.phone) ? { ...cus, password: cleanPass } : cus;
+        return (
+          (clRow?.customerId && cus.id === clRow.customerId) ||
+          (clRow?.phone && cus.phone && cus.phone === clRow.phone)
+        ) ? { ...cus, password: cleanPass } : cus;
       })
     }));
 
@@ -1750,9 +1753,9 @@ export default function ManagementDashboard({
     } else {
       updateStore((prev) => {
         // If this director was already in team, update them; otherwise create new member
-        const existingIdx = prev.managementTeam.findIndex(m => 
-          (teamForm.directorId && m.directorId === teamForm.directorId) || 
-          m.phone === teamForm.phone
+        const existingIdx = prev.managementTeam.findIndex(m =>
+          (teamForm.directorId && m.directorId === teamForm.directorId) ||
+          (teamForm.phone && m.phone && m.phone === teamForm.phone)
         );
 
         let nextTeam = [...prev.managementTeam];

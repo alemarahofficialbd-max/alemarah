@@ -183,7 +183,7 @@ export default function ClientDashboard({
             onClick={onLogout}
             className="w-full py-3 rounded-xl bg-[#006231] text-white font-bold text-sm hover:opacity-95 transition-all cursor-pointer shadow-md shadow-[#006231]/20"
           >
-            লগইন পেজে যান
+            হোমপেজে ফিরে লগইন করুন
           </button>
         </div>
       </div>
