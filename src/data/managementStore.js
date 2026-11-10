@@ -214,10 +214,22 @@ export const initialManagementData = {
   ]
 };
 
+// Normalize a BD mobile number to its local 11-digit "01XXXXXXXXX" form
+// so "01711223344", "+8801711223344" and "8801711223344" are recognized
+// as the same number instead of becoming three different customer
+// identities. Numbers that don't match a recognizable BD mobile shape
+// are returned as-is (digits only), unchanged.
+export const normalizePhoneDigits = (phone) => {
+  const digits = (phone || '').replace(/[^0-9]/g, '');
+  if (digits.length === 13 && digits.startsWith('880')) return '0' + digits.slice(3);
+  if (digits.length === 10 && digits.startsWith('1')) return '0' + digits;
+  return digits;
+};
+
 // Build a stable customer id from a phone number so repeated migrations
 // of the same phone always resolve to the same customer record.
 export const customerIdFromPhone = (phone) => {
-  const digits = (phone || '').replace(/[^0-9]/g, '');
+  const digits = normalizePhoneDigits(phone);
   return digits ? `CUS-${digits}` : `CUS-${Date.now().toString(36).toUpperCase()}`;
 };
 
@@ -228,8 +240,8 @@ const migrateClientsToCustomers = (data) => {
   const clients = data.clients || [];
   const customers = data.customers ? [...data.customers] : [];
   const findCustomerByPhone = (phone) => {
-    const digits = (phone || '').replace(/[^0-9]/g, '');
-    return digits ? customers.find(c => (c.phone || '').replace(/[^0-9]/g, '') === digits) : null;
+    const digits = normalizePhoneDigits(phone);
+    return digits ? customers.find(c => normalizePhoneDigits(c.phone) === digits) : null;
   };
 
   const migratedClients = clients.map(client => {
@@ -260,10 +272,10 @@ export const getCustomerUnits = (data, customerId) =>
 
 // Find a customer identity by phone or by any of their unit record ids.
 export const findCustomerByIdentifier = (data, identifier) => {
-  const cleanPhone = (identifier || '').replace(/[^0-9]/g, '');
+  const cleanPhone = normalizePhoneDigits(identifier);
   const trimmed = (identifier || '').trim().toLowerCase();
   return (data.customers || []).find(cust =>
-    (cleanPhone && cust.phone && cust.phone.replace(/[^0-9]/g, '') === cleanPhone) ||
+    (cleanPhone && cust.phone && normalizePhoneDigits(cust.phone) === cleanPhone) ||
     (cust.id && cust.id.toLowerCase() === trimmed)
   ) || null;
 };
@@ -1610,6 +1622,12 @@ export const deleteDirectorFromSupabase = async (dirId) => {
     if (!dirId) return;
     await supabase.from('directors').delete().eq('id', dirId);
     await recordTombstoneInSupabase('deletedDirectorIds', dirId);
+    // Also remove the director's own portal-login row from admins, and
+    // tombstone it -- otherwise it stays in the cloud and a later sync
+    // on any device brings the deleted director's login back.
+    const linkedTeamId = `MGT-DIR-${dirId.replace('DIR-', '')}`;
+    await supabase.from('admins').delete().eq('id', linkedTeamId);
+    await recordTombstoneInSupabase('deletedAdminIds', linkedTeamId);
   } catch (err) {
     console.error('Error deleting director from Supabase:', err);
   }

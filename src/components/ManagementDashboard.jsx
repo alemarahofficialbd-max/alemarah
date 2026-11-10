@@ -79,6 +79,7 @@ import {
   saveManagementData,
   subscribeToManagementData,
   customerIdFromPhone,
+  normalizePhoneDigits,
   hashPassword,
   isHashedPassword,
   deleteJobApplication,
@@ -723,7 +724,7 @@ export default function ManagementDashboard({
     amount: '',
     date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
     method: 'ব্যাংক চেক',
-    receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
+    receiptNo: `RCPT-CAP-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
     note: 'মূলধনের কিস্তি জমা'
   });
 
@@ -734,7 +735,7 @@ export default function ManagementDashboard({
     amount: '',
     date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
     method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
-    voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
+    voucherNo: `VCH-DIV-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
     note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
   });
 
@@ -780,10 +781,19 @@ export default function ManagementDashboard({
       alert('প্রথমে একটি প্রজেক্ট তৈরি করুন');
       return;
     }
+    // A unit whose selected projectId no longer matches any real project
+    // (e.g. that project got deleted while this form was open) must not
+    // silently fall back to whichever project happens to be first in the
+    // list -- that would book the flat under the wrong project.
+    const hasInvalidProject = clientForm.units.some(u => !data.projects.some(p => p.id === u.projectId));
+    if (hasInvalidProject) {
+      alert('একটি বা একাধিক ইউনিটের প্রজেক্ট নির্বাচন সঠিক নয় (হয়তো প্রজেক্টটি মুছে ফেলা হয়েছে) -- প্রতিটি ইউনিটের জন্য সঠিক প্রজেক্ট আবার নির্বাচন করুন।');
+      return;
+    }
 
     const phoneMatch = !isExistingCustomer
       ? (data.customers || []).find(c => c.phone && clientForm.phone &&
-          c.phone.replace(/[^0-9]/g, '') === clientForm.phone.replace(/[^0-9]/g, ''))
+          normalizePhoneDigits(c.phone) === normalizePhoneDigits(clientForm.phone))
       : null;
 
     const targetCustomer = existingCustomer || phoneMatch || {
@@ -798,7 +808,7 @@ export default function ManagementDashboard({
 
     const generatedEmail = clientForm.emailPrefix
       ? `${clientForm.emailPrefix.trim()}@alemarah.com`
-      : `${(targetCustomer.name || 'client').toLowerCase().replace(/[^a-z0-9]/g, '') || 'client'}${Math.floor(100 + Math.random() * 900)}@alemarah.com`;
+      : `${(targetCustomer.name || 'client').toLowerCase().replace(/[^a-z0-9]/g, '') || 'client'}${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}@alemarah.com`;
 
     const newUnits = clientForm.units.map((unit, idx) => {
       const selectedProj = data.projects.find(p => p.id === unit.projectId) || data.projects[0];
@@ -883,7 +893,7 @@ export default function ManagementDashboard({
           clients: (prev.clients || []).filter(c => c.id !== clientId),
           customers: otherUnits.length > 0 
             ? (prev.customers || []) 
-            : (prev.customers || []).filter(cu => cu.id !== customerId && cu.phone !== clientToDelete.phone),
+            : (prev.customers || []).filter(cu => cu.id !== customerId && normalizePhoneDigits(cu.phone) !== normalizePhoneDigits(clientToDelete.phone)),
           deletedClientIds: [...new Set([...(prev.deletedClientIds || []), clientId])],
           deletedCustomerIds: (otherUnits.length === 0 && customerId)
             ? [...new Set([...(prev.deletedCustomerIds || []), customerId])] 
@@ -969,7 +979,7 @@ export default function ManagementDashboard({
         const clRow = prev.clients.find(c => c.id === clientId);
         return (
           (clRow?.customerId && cus.id === clRow.customerId) ||
-          (clRow?.phone && cus.phone && cus.phone === clRow.phone)
+          (clRow?.phone && cus.phone && normalizePhoneDigits(cus.phone) === normalizePhoneDigits(clRow.phone))
         ) ? { ...cus, password: cleanPass } : cus;
       })
     }));
@@ -1069,7 +1079,7 @@ export default function ManagementDashboard({
     const calcPrice = (landNum + constrNum > 0) ? (landNum + constrNum) : (Number(form.price) || 0);
 
     const newUnitObj = {
-      id: `unit-${Date.now().toString(36)}-${Math.floor(100 + Math.random() * 900)}`,
+      id: `unit-${Date.now().toString(36)}-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
       name: formattedName,
       unitNo: form.unitNo.trim(),
       type: unitType,
@@ -1440,10 +1450,13 @@ export default function ManagementDashboard({
       `ইনভেস্টমেন্ট অফার "${offerName}" মুছে ফেলা`,
       `আপনি কি নিশ্চিতভাবে "${offerName}" এবং এর সকল ইনভেস্টর তথ্য মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
       () => {
+        const orphanedInvestorIds = (data.investors || []).filter(inv => inv.offerId === offerId).map(inv => inv.id);
         updateStore((prev) => ({
           ...prev,
           investmentOffers: (prev.investmentOffers || []).filter(o => o.id !== offerId),
-          investors: (prev.investors || []).filter(inv => inv.offerId !== offerId)
+          investors: (prev.investors || []).filter(inv => inv.offerId !== offerId),
+          deletedOfferIds: [...new Set([...(prev.deletedOfferIds || []), offerId])],
+          deletedInvestorIds: [...new Set([...(prev.deletedInvestorIds || []), ...orphanedInvestorIds])]
         }));
         deleteInvestmentOfferFromSupabase(offerId);
         if (selectedOfferForDetails?.id === offerId) setSelectedOfferForDetails(null);
@@ -1479,11 +1492,13 @@ export default function ManagementDashboard({
       `পরিচালক "${dirName}" মুছে ফেলা`,
       `আপনি কি নিশ্চিতভাবে সম্মানিত পরিচালক "${dirName}"-কে এবং তার সংশ্লিষ্ট সকল রেকর্ড তালিকা থেকে মুছে ফেলতে চান? এটি নিশ্চিত করতে মাস্টার পিন দিন।`,
       async () => {
+        const linkedTeamId = `MGT-DIR-${dirId.replace('DIR-', '')}`;
         updateStore((prev) => ({
           ...prev,
           directors: (prev.directors || []).filter(d => d.id !== dirId),
           deletedDirectorIds: [...new Set([...(prev.deletedDirectorIds || []), dirId])],
-          managementTeam: (prev.managementTeam || []).filter(m => m.directorId !== dirId && m.id !== dirId && m.id !== `MGT-DIR-${dirId.replace('DIR-', '')}`)
+          deletedAdminIds: [...new Set([...(prev.deletedAdminIds || []), linkedTeamId])],
+          managementTeam: (prev.managementTeam || []).filter(m => m.directorId !== dirId && m.id !== dirId && m.id !== linkedTeamId)
         }));
         await deleteDirectorFromSupabase(dirId);
         if (selectedDirectorForProfile?.id === dirId) {
@@ -1567,7 +1582,8 @@ export default function ManagementDashboard({
               };
             }
             return p;
-          })
+          }),
+          deletedExpenseIds: [...new Set([...(prev.deletedExpenseIds || []), expId])]
         }));
         deleteExpenseFromSupabase(expId);
         triggerAlert(`খরচের এন্ট্রি সফলভাবে মুছে ফেলা হয়েছে!`);
@@ -2059,7 +2075,7 @@ export default function ManagementDashboard({
       date: capitalDepositForm.date || new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       amount: amountNum,
       method: capitalDepositForm.method,
-      receiptNo: capitalDepositForm.receiptNo || `RCPT-${Math.floor(100 + Math.random() * 900)}`,
+      receiptNo: capitalDepositForm.receiptNo || `RCPT-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
       note: capitalDepositForm.note || 'মূলধনের কিস্তি জমা'
     };
 
@@ -2095,7 +2111,7 @@ export default function ManagementDashboard({
       amount: '',
       date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       method: 'ব্যাংক চেক',
-      receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
+      receiptNo: `RCPT-CAP-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
       note: 'মূলধনের কিস্তি জমা'
     });
     triggerAlert(`পরিচালক ${capitalDepositTargetDirector.name}-এর ${formatBDT(amountNum)} মূলধন কিস্তি সফলভাবে জমা হয়েছে!`);
@@ -2120,7 +2136,7 @@ export default function ManagementDashboard({
       date: dividendForm.date ? new Date(dividendForm.date).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       amount: amountNum,
       method: dividendForm.method,
-      voucherNo: dividendForm.voucherNo || `VCH-${Math.floor(100 + Math.random() * 900)}`,
+      voucherNo: dividendForm.voucherNo || `VCH-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
       note: dividendForm.note || 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
     };
 
@@ -2156,7 +2172,7 @@ export default function ManagementDashboard({
       amount: '',
       date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
-      voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
+      voucherNo: `VCH-DIV-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
       note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
     });
     triggerAlert(`পরিচালক ${dividendTargetDirector.name}-কে ${formatBDT(amountNum)} ডিভিডেন্ড সফলভাবে প্রদান করা হয়েছে!`);
@@ -5084,7 +5100,7 @@ export default function ManagementDashboard({
                                   amount: '',
                                   date: new Date().toISOString().split('T')[0],
                                   method: 'ব্যাংক চেক',
-                                  receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
+                                  receiptNo: `RCPT-CAP-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
                                   note: 'মূলধনের কিস্তি জমা'
                                 });
                                 setIsCapitalDepositModalOpen(true);
@@ -5103,7 +5119,7 @@ export default function ManagementDashboard({
                                   amount: '',
                                   date: new Date().toISOString().split('T')[0],
                                   method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
-                                  voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
+                                  voucherNo: `VCH-DIV-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
                                   note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
                                 });
                                 setIsDividendModalOpen(true);
@@ -5339,7 +5355,7 @@ export default function ManagementDashboard({
                                           amount: '',
                                           date: new Date().toISOString().split('T')[0],
                                           method: 'ব্যাংক চেক',
-                                          receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
+                                          receiptNo: `RCPT-CAP-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
                                           note: 'মূলধনের কিস্তি জমা'
                                         });
                                         setIsCapitalDepositModalOpen(true);
@@ -5362,7 +5378,7 @@ export default function ManagementDashboard({
                                           amount: '',
                                           date: new Date().toISOString().split('T')[0],
                                           method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
-                                          voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
+                                          voucherNo: `VCH-DIV-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
                                           note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
                                         });
                                         setIsDividendModalOpen(true);
@@ -6395,7 +6411,7 @@ export default function ManagementDashboard({
                             amount: '',
                             date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
                             method: 'ব্যাংক চেক',
-                            receiptNo: `RCPT-CAP-${Math.floor(100 + Math.random() * 900)}`,
+                            receiptNo: `RCPT-CAP-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
                             note: 'মূলধনের কিস্তি জমা'
                           });
                           setIsCapitalDepositModalOpen(true);
@@ -6478,7 +6494,7 @@ export default function ManagementDashboard({
                             amount: '',
                             date: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
                             method: 'ব্যাংক অ্যাকাউন্ট ট্রান্সফার',
-                            voucherNo: `VCH-DIV-${Math.floor(100 + Math.random() * 900)}`,
+                            voucherNo: `VCH-DIV-${`${Date.now().toString().slice(-7)}${Math.floor(10 + Math.random() * 90)}`}`,
                             note: 'নিয়মিত শেয়ার লভ্যাংশ বণ্টন'
                           });
                           setIsDividendModalOpen(true);
