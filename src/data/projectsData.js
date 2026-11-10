@@ -8,6 +8,7 @@ export const projectsData = [
     status: "ongoing", // ongoing, upcoming, ready
     locationEn: "West Sanarpar, Madinabaag, Ward-66, Demra, Dhaka",
     locationBn: "পশ্চিম সানারপাড়, মদিনাবাগ, ৬৬ নং ওয়ার্ড, ডেমরা, ঢাকা",
+    mapUrl: "https://maps.app.goo.gl/4YmYYp469TZVYk2v5",
     areaEn: "Sanarpar, Demra",
     areaBn: "সানারপাড়, ডেমরা",
     typeEn: "Residential & Commercial Mixed-Use (Land Share Based)",

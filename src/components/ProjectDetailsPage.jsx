@@ -314,7 +314,7 @@ export default function ProjectDetailsPage({
 
           <div className="flex flex-wrap items-center gap-4 pt-2 text-xs sm:text-sm text-gray-600 border-t border-gray-100">
             <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.locationEn)}`}
+              href={project.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.locationEn)}`}
               target="_blank"
               rel="noreferrer"
               className="flex items-center space-x-1.5 font-bold text-gray-800 hover:text-[#CE2028] transition-colors"
