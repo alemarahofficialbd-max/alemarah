@@ -25,6 +25,10 @@ export default function InvestmentPage({
   onNavigateToProjects,
   onOpenBookVisit 
 }) {
+  const scrollToInquiryForm = () => {
+    document.getElementById('inquiry-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -165,12 +169,13 @@ export default function InvestmentPage({
             </p>
 
             <div className="pt-2 flex flex-wrap gap-4">
-              <a
-                href="#inquiry-form"
-                className="px-6 py-3.5 rounded-xl bg-[#8EBF40] hover:bg-[#7ca935] text-gray-950 font-bold text-xs sm:text-sm transition-all shadow-lg active:scale-95"
+              <button
+                type="button"
+                onClick={scrollToInquiryForm}
+                className="px-6 py-3.5 rounded-xl bg-[#8EBF40] hover:bg-[#7ca935] text-gray-950 font-bold text-xs sm:text-sm transition-all shadow-lg active:scale-95 cursor-pointer"
               >
                 {isEn ? 'Apply for Investment Consultation' : 'বিনিয়োগ পরামর্শের জন্য আবেদন করুন'}
-              </a>
+              </button>
               <a
                 href="tel:+8801816233013"
                 className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs sm:text-sm border border-white/20 transition-all flex items-center space-x-2"
@@ -313,12 +318,13 @@ export default function InvestmentPage({
                   <span className="text-[11px] text-gray-500 block">{isEn ? 'Starting from' : 'শুরু মাত্র'}</span>
                   <span className="text-lg font-black text-[#006231]">{isEn ? 'BDT 2,00,000' : '৳ ২,০০,০০০'}</span>
                 </div>
-                <a
-                  href="#inquiry-form"
-                  className="px-5 py-2.5 rounded-xl bg-[#006231] hover:bg-[#004724] text-white text-xs font-bold transition-all"
+                <button
+                  type="button"
+                  onClick={scrollToInquiryForm}
+                  className="px-5 py-2.5 rounded-xl bg-[#006231] hover:bg-[#004724] text-white text-xs font-bold transition-all cursor-pointer"
                 >
                   {isEn ? 'Inquire Agro Share' : 'এগ্রো শেয়ারে যুক্ত হোন'}
-                </a>
+                </button>
               </div>
             </div>
           </div>
