@@ -158,7 +158,7 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">
               {lang === 'en' ? 'Quick Navigation' : 'ক্যাটাগরি / মেনু'}
             </h4>
-            <div className="space-y-1">
+            <div className="space-y-0">
               {footerNavLinks.map((item) => {
                 const IconComponent = item.icon;
                 return (
@@ -168,7 +168,7 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
                       onNavigate(item.id);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="flex items-center space-x-3 w-full px-2.5 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all text-xs sm:text-sm font-semibold cursor-pointer text-left group"
+                    className="flex items-center space-x-3 w-full px-2.5 py-1 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all text-xs sm:text-sm font-semibold cursor-pointer text-left group"
                   >
                     <IconComponent className="w-4 h-4 text-gray-400 group-hover:text-[#CE2028] transition-colors shrink-0" />
                     <span className="transition-colors">{item.label}</span>
@@ -224,19 +224,10 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
-            {/* United Emarah Limited (Parent) */}
-            <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-              <span className="text-xs font-black tracking-wide text-white">UNITED EMARAH LIMITED</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-medium">
-                {lang === 'en' ? 'Parent Company' : 'মাদার কোম্পানি'}
-              </span>
-            </div>
-
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
             {/* Al-Emarah Properties (Sister Concern) */}
-            <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-              <span className="w-2 h-2 rounded-full bg-[#CE2028]"></span>
+            <div className="flex items-center space-x-2 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <img src="/alemarah_logo_footer.svg" alt="Al-Emarah Properties" className="w-5 h-5 object-contain" />
               <span className="text-xs font-bold text-gray-200">Al-Emarah Properties</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-300 font-medium">
                 {lang === 'en' ? 'Real Estate' : 'আবাসন'}
@@ -244,8 +235,8 @@ export default function Footer({ lang, setLang, t, onNavigate = () => {}, onOpen
             </div>
 
             {/* Emarah Agro (Sister Concern) */}
-            <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-              <span className="w-2 h-2 rounded-full bg-[#8EBF40]"></span>
+            <div className="flex items-center space-x-2 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <img src="/images/emarah_agro.svg" alt="Emarah Agro" className="w-5 h-5 object-contain bg-white rounded-sm p-0.5" />
               <span className="text-xs font-bold text-gray-200">Emarah Agro</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-300 font-medium">
                 {lang === 'en' ? 'Agro & Farming' : 'কৃষি ও খামার'}

@@ -87,6 +87,7 @@
         statusOngoing: "Under Construction",
         statusUpcoming: "Launching Soon",
         statusReady: "Ready for Living",
+        statusActive: "Active & Running",
         viewDetails: "View Details",
         bookVisit: "Schedule Visit",
         inquire: "Inquire Price"
@@ -405,7 +406,7 @@
             name: "Al-Emarah Properties Limited",
             badge: "Real Estate & Infrastructure",
             desc: "Pioneering premium residential condominiums, smart commercial landmarks, and shared investment partnerships in Dhaka.",
-            logo: "/alemarah_logo.svg",
+            logo: "/alemarah_logo_footer.svg",
             status: "Flagship Venture",
             highlight: "Residential & Commercial Developments"
           },
@@ -927,6 +928,7 @@
         statusOngoing: "নির্মাণাধীন",
         statusUpcoming: "শীঘ্রই শুরু হচ্ছে",
         statusReady: "বসবাসের জন্য প্রস্তুত",
+        statusActive: "চলমান ও সক্রিয়",
         viewDetails: "বিস্তারিত দেখুন",
         bookVisit: "সাইট ভিজিট বুক করুন",
         inquire: "মূল্য জানুন"
@@ -1245,7 +1247,7 @@
             name: "আল-ইমারাহ প্রোপার্টিজ লিমিটেড",
             badge: "রিয়েল এস্টেট ও অবকাঠামো উন্নয়ন",
             desc: "ঢাকাসহ দেশের সম্ভাবনাময় লোকেশনে পরিকল্পিত আধুনিক অ্যাপার্টমেন্ট, বাণিজ্যিক ভবন, হালাল আবাসন ও লাভজনক শেয়ার পার্টনারশিপ প্রকল্প।",
-            logo: "/alemarah_logo.svg",
+            logo: "/alemarah_logo_footer.svg",
             status: "ফ্ল্যাগশিপ প্রতিষ্ঠান",
             highlight: "পরিকল্পিত ও বিশ্বস্ত আবাসন প্রকল্প"
           },

@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { 
-  Building2, 
-  MapPin, 
-  Bed, 
-  Bath, 
-  Maximize2, 
-  Calendar, 
-  ArrowRight, 
+import {
+  Building2,
+  MapPin,
+  Bed,
+  Bath,
+  Maximize2,
+  Calendar,
+  ArrowRight,
   CheckCircle,
   Eye,
   SlidersHorizontal,
-  Search
+  Search,
+  Coins,
+  TrendingUp
 } from 'lucide-react';
 import { projectsData } from '../data/projectsData';
 
@@ -81,6 +83,11 @@ export default function Projects({
         return {
           label: t.projects.card.statusReady,
           className: 'bg-[#006231] text-white shadow-xs'
+        };
+      case 'active':
+        return {
+          label: t.projects.card.statusActive || (lang === 'en' ? 'Active & Running' : 'চলমান ও সক্রিয়'),
+          className: 'bg-[#8EBF40] text-white shadow-xs'
         };
       default:
         return { label: '', className: '' };
@@ -176,6 +183,7 @@ export default function Projects({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProjects.map((project) => {
             const badge = getStatusBadge(project.status);
+            const isAgro = project.category === 'agro';
             return (
               <div
                 key={project.id}
@@ -221,37 +229,57 @@ export default function Projects({
                   </div>
 
                   {/* Key Specifications Grid */}
-                  <div className="grid grid-cols-3 gap-2 py-3 border-y border-gray-100 text-center">
-                    <div>
-                      <div className="text-xs text-gray-400 font-medium">{t.projects.card.beds}</div>
-                      <div className="text-sm font-bold text-gray-800 flex items-center justify-center space-x-1 mt-0.5">
-                        <Bed className="w-3.5 h-3.5 text-[#CE2028]" />
-                        <span>{project.beds > 0 ? project.beds : 'N/A'}</span>
+                  {isAgro ? (
+                    <div className="grid grid-cols-2 gap-2 py-3 border-y border-gray-100 text-center">
+                      <div>
+                        <div className="text-xs text-gray-400 font-medium">{lang === 'en' ? 'Min. Investment' : 'ন্যূনতম বিনিয়োগ'}</div>
+                        <div className="text-sm font-bold text-gray-800 flex items-center justify-center space-x-1 mt-0.5">
+                          <Coins className="w-3.5 h-3.5 text-[#CE2028]" />
+                          <span>{lang === 'en' ? project.minInvestmentEn : project.minInvestmentBn}</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-xs text-gray-400 font-medium">{lang === 'en' ? 'Profit Share' : 'মুনাফার অংশ'}</div>
+                        <div className="text-sm font-bold text-gray-800 flex items-center justify-center space-x-1 mt-0.5">
+                          <TrendingUp className="w-3.5 h-3.5 text-[#006231]" />
+                          <span>56%</span>
+                        </div>
                       </div>
                     </div>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-2 py-3 border-y border-gray-100 text-center">
+                      <div>
+                        <div className="text-xs text-gray-400 font-medium">{t.projects.card.beds}</div>
+                        <div className="text-sm font-bold text-gray-800 flex items-center justify-center space-x-1 mt-0.5">
+                          <Bed className="w-3.5 h-3.5 text-[#CE2028]" />
+                          <span>{project.beds > 0 ? project.beds : 'N/A'}</span>
+                        </div>
+                      </div>
 
-                    <div>
-                      <div className="text-xs text-gray-400 font-medium">{t.projects.card.baths}</div>
-                      <div className="text-sm font-bold text-gray-800 flex items-center justify-center space-x-1 mt-0.5">
-                        <Bath className="w-3.5 h-3.5 text-[#006231]" />
-                        <span>{project.baths}</span>
+                      <div>
+                        <div className="text-xs text-gray-400 font-medium">{t.projects.card.baths}</div>
+                        <div className="text-sm font-bold text-gray-800 flex items-center justify-center space-x-1 mt-0.5">
+                          <Bath className="w-3.5 h-3.5 text-[#006231]" />
+                          <span>{project.baths}</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-xs text-gray-400 font-medium">{t.projects.card.size}</div>
+                        <div className="text-sm font-bold text-gray-800 flex items-center justify-center space-x-1 mt-0.5">
+                          <Maximize2 className="w-3.5 h-3.5 text-[#8EBF40]" />
+                          <span>{project.sizeSqft}</span>
+                        </div>
                       </div>
                     </div>
+                  )}
 
-                    <div>
-                      <div className="text-xs text-gray-400 font-medium">{t.projects.card.size}</div>
-                      <div className="text-sm font-bold text-gray-800 flex items-center justify-center space-x-1 mt-0.5">
-                        <Maximize2 className="w-3.5 h-3.5 text-[#8EBF40]" />
-                        <span>{project.sizeSqft}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Handover Timeline */}
+                  {/* Handover / Status Timeline */}
                   <div className="flex items-center justify-between text-xs text-gray-600 font-medium">
                     <span className="flex items-center space-x-1">
                       <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                      <span>{t.projects.card.handover}:</span>
+                      <span>{isAgro ? (lang === 'en' ? 'Status' : 'বর্তমান অবস্থা') : t.projects.card.handover}:</span>
                     </span>
                     <span className="font-bold text-gray-900">
                       {lang === 'en' ? project.handoverEn : project.handoverBn}
@@ -278,8 +306,17 @@ export default function Projects({
                       }}
                       className="flex-1 flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs font-bold shadow-md shadow-[#CE2028]/20 transition-all cursor-pointer"
                     >
-                      <Calendar className="w-4 h-4 text-white" />
-                      <span>{t.projects.card.bookVisit}</span>
+                      {isAgro ? (
+                        <>
+                          <Coins className="w-4 h-4 text-white" />
+                          <span>{lang === 'en' ? 'Invest Now' : 'বিনিয়োগ করুন'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Calendar className="w-4 h-4 text-white" />
+                          <span>{t.projects.card.bookVisit}</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

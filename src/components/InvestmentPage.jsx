@@ -267,7 +267,7 @@ export default function InvestmentPage({
           <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
             <div className="relative aspect-16/9 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&w=1200&q=80"
+                src="/images/agro_6.webp"
                 alt="Al-Emarah Agro"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -299,7 +299,7 @@ export default function InvestmentPage({
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
-                    <span>{isEn ? 'Regular physical farm visits' : 'সরাসরি খামার পরিদর্শনের সুযোগ'}</span>
+                    <span>{isEn ? '56% of net profit shared with investors' : 'নিট মুনাফার ৫৬% বিনিয়োগকারীদের মাঝে বন্টন'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
@@ -311,7 +311,7 @@ export default function InvestmentPage({
               <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
                 <div>
                   <span className="text-[11px] text-gray-500 block">{isEn ? 'Starting from' : 'শুরু মাত্র'}</span>
-                  <span className="text-lg font-black text-[#006231]">{isEn ? 'BDT 1,00,000' : '৳ ১,০০,০০০'}</span>
+                  <span className="text-lg font-black text-[#006231]">{isEn ? 'BDT 2,00,000' : '৳ ২,০০,০০০'}</span>
                 </div>
                 <a
                   href="#inquiry-form"

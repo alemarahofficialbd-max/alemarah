@@ -45,6 +45,10 @@ import {
   Sprout,
   Fish,
   Wheat,
+  Egg,
+  Beef,
+  TrendingUp,
+  Wallet,
   Briefcase,
   GraduationCap,
   School,
@@ -222,17 +226,20 @@ export default function ProjectDetailsPage({
   if (!project) return null;
 
   const isEn = lang === 'en';
+  const isAgro = project.category === 'agro';
 
   const statusColors = {
     ongoing: 'bg-amber-500 text-white',
     upcoming: 'bg-blue-600 text-white',
-    ready: 'bg-[#006231] text-white'
+    ready: 'bg-[#006231] text-white',
+    active: 'bg-[#8EBF40] text-white'
   };
 
   const statusLabels = {
     ongoing: t.projects.card.statusOngoing,
     upcoming: t.projects.card.statusUpcoming,
-    ready: t.projects.card.statusReady
+    ready: t.projects.card.statusReady,
+    active: t.projects.card.statusActive || (isEn ? 'Active & Running' : 'চলমান ও সক্রিয়')
   };
 
   const currentItem = selectedImageItem || galleryItems[0] || { url: project.image, titleBn: project.nameBn, titleEn: project.nameEn, category: 'exterior' };
@@ -351,7 +358,7 @@ export default function ProjectDetailsPage({
             <span className="text-gray-300">|</span>
             <div className="flex items-center space-x-1.5 font-medium">
               <Calendar className="w-4 h-4 text-[#006231]" />
-              <span>{t.projects.card.handover}: <strong>{isEn ? project.handoverEn : project.handoverBn}</strong></span>
+              <span>{isAgro ? (isEn ? 'Status' : 'বর্তমান অবস্থা') : t.projects.card.handover}: <strong>{isEn ? project.handoverEn : project.handoverBn}</strong></span>
             </div>
           </div>
         </div>
@@ -540,6 +547,49 @@ export default function ProjectDetailsPage({
             </div>
 
             {/* Quick Metrics Bar with Matching Icons */}
+            {isAgro ? (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <Wallet className="w-4 h-4 text-[#CE2028]" />
+                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Min. Investment' : 'ন্যূনতম বিনিয়োগ'}</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-gray-900">
+                    {isEn ? project.minInvestmentEn : project.minInvestmentBn}
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <TrendingUp className="w-4 h-4 text-[#006231]" />
+                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Profit Share' : 'মুনাফার অংশ'}</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-gray-900">
+                    {isEn ? project.profitShareEn : project.profitShareBn}
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <Calendar className="w-4 h-4 text-[#8EBF40]" />
+                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Payout Schedule' : 'লভ্যাংশ প্রদান'}</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-gray-900">
+                    {isEn ? project.payoutEn : project.payoutBn}
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <Layers className="w-4 h-4 text-purple-600" />
+                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Contract Term' : 'চুক্তির মেয়াদ'}</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-gray-900">
+                    {isEn ? project.durationEn : project.durationBn}
+                  </div>
+                </div>
+              </div>
+            ) : (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
               {/* Size */}
               <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
@@ -637,6 +687,7 @@ export default function ProjectDetailsPage({
                 </div>
               </div>
             </div>
+            )}
 
             {/* Comprehensive Features & Specifications with Dedicated Icons */}
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6">
@@ -672,14 +723,15 @@ export default function ProjectDetailsPage({
                 })}
               </div>
 
-              {/* Structural Safety & Engineering Assurance */}
+              {/* Structural Safety & Engineering Assurance (real-estate only) */}
+              {!isAgro && (
               <div className="mt-6 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-gray-900 via-[#1C1819] to-gray-900 text-white space-y-4 shadow-lg">
                 <div className="flex items-center space-x-2 text-[#8EBF40] text-xs font-bold uppercase tracking-wider">
                   <ShieldCheck className="w-4 h-4" />
                   <span>{isEn ? 'BUET Tested Structural Engineering Safety' : 'বুয়েট পরীক্ষিত কাঠামোগত নিরাপত্তা'}</span>
                 </div>
                 <h4 className="text-lg sm:text-xl font-black text-white">
-                  {isEn ? 'Engineered for Earthquake & Structural Durability' : 'ভূমিকম্প সহনশীল ও দীর্ঘমেয়াদি শতভাগ নিরাপদ নির্মাণ'}
+                  {isEn ? 'Engineered for Earthquake & Structural Durability' : 'ভূমিকম্প সহনশীল ও দীর্ঘমেয়াদি শতভাগ নিরাপদ নির্মাণ'}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-gray-300 pt-2">
                   <div className="flex items-center space-x-2 p-2.5 rounded-xl bg-white/5 border border-white/10">
@@ -696,7 +748,43 @@ export default function ProjectDetailsPage({
                   </div>
                 </div>
               </div>
+              )}
             </div>
+
+            {/* Business Sectors (Agro projects only) */}
+            {isAgro && (project.businessSectorsEn || project.businessSectorsBn) && (
+              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6">
+                <div className="space-y-1">
+                  <div className="text-xs font-bold text-[#CE2028] uppercase tracking-wider flex items-center space-x-1.5">
+                    <Sprout className="w-3.5 h-3.5" />
+                    <span>{isEn ? 'Core Business Sectors' : 'আমাদের ব্যবসার প্রধান ক্ষেত্র'}</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-gray-900">
+                    {isEn ? 'What We Farm & Produce' : 'যেসব কার্যক্রম নিয়ে আমরা কাজ করি'}
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                  {(isEn ? project.businessSectorsEn : project.businessSectorsBn).map((sector, idx) => {
+                    const sectorIcons = [Egg, Fish, Beef, Wheat];
+                    const SectorIcon = sectorIcons[idx % sectorIcons.length];
+                    return (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-2xl bg-white border border-gray-100 shadow-2xs hover:shadow-md hover:border-gray-200 transition-all flex items-start space-x-3.5"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 shadow-2xs">
+                          <SectorIcon className="w-5 h-5 text-[#006231]" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-gray-900">{sector.title}</div>
+                          <div className="text-xs sm:text-sm text-gray-600 leading-relaxed mt-0.5">{sector.desc}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Project Detailed Description / Overview (if available) */}
             {(project.descriptionBn || project.descriptionEn) && (
@@ -878,14 +966,16 @@ export default function ProjectDetailsPage({
             <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg space-y-5">
               <div className="space-y-1">
                 <span className="text-2xs font-bold text-[#CE2028] uppercase tracking-wider flex items-center space-x-1">
-                  <Calendar className="w-3 h-3" />
-                  <span>{isEn ? 'Free Site Consultation' : 'ফ্রি সাইট ভিজিট'}</span>
+                  {isAgro ? <Coins className="w-3 h-3" /> : <Calendar className="w-3 h-3" />}
+                  <span>{isAgro ? (isEn ? 'Start Your Investment' : 'বিনিয়োগ শুরু করুন') : (isEn ? 'Free Site Consultation' : 'ফ্রি সাইট ভিজিট')}</span>
                 </span>
                 <h3 className="text-xl font-black text-gray-900">
-                  {isEn ? 'Schedule a Site Visit' : 'সরাসরি সাইট পরিদর্শন করুন'}
+                  {isAgro ? (isEn ? 'Become an Investment Partner' : 'বিনিয়োগ অংশীদার হোন') : (isEn ? 'Schedule a Site Visit' : 'সরাসরি সাইট পরিদর্শন করুন')}
                 </h3>
                 <p className="text-xs text-gray-500">
-                  {isEn ? 'Experience the location and project progress in person with our senior engineers.' : 'আমাদের সিনিয়র ইঞ্জিনিয়ারের তত্ত্বাবধানে প্রকল্প এলাকা ও নির্মাণ অগ্রগতি সরাসরি ঘুরে দেখুন।'}
+                  {isAgro
+                    ? (isEn ? 'Share your details and our team will contact you with the formal investment agreement.' : 'আপনার তথ্য দিন, আমাদের প্রতিনিধি লিখিত বিনিয়োগ চুক্তি নিয়ে যোগাযোগ করবেন।')
+                    : (isEn ? 'Experience the location and project progress in person with our senior engineers.' : 'আমাদের সিনিয়র ইঞ্জিনিয়ারের তত্ত্বাবধানে প্রকল্প এলাকা ও নির্মাণ অগ্রগতি সরাসরি ঘুরে দেখুন।')}
                 </p>
               </div>
 
@@ -894,8 +984,8 @@ export default function ProjectDetailsPage({
                 onClick={() => onBookVisit(project)}
                 className="w-full flex items-center justify-center space-x-2 py-3.5 px-4 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-sm font-bold shadow-lg shadow-[#CE2028]/25 transition-all cursor-pointer active:scale-95"
               >
-                <Calendar className="w-4 h-4 text-white" />
-                <span>{isEn ? 'Book Free Site Visit' : 'সাইট ভিজিট বুক করুন'}</span>
+                {isAgro ? <Coins className="w-4 h-4 text-white" /> : <Calendar className="w-4 h-4 text-white" />}
+                <span>{isAgro ? (isEn ? 'Invest Now' : 'বিনিয়োগ করুন') : (isEn ? 'Book Free Site Visit' : 'সাইট ভিজিট বুক করুন')}</span>
               </button>
 
               {/* WhatsApp Direct Chat */}
