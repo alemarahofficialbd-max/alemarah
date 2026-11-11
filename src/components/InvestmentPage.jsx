@@ -15,7 +15,11 @@ import {
   Calendar,
   Sparkles,
   HelpCircle,
-  FileText
+  FileText,
+  Egg,
+  Fish,
+  Beef,
+  Wheat
 } from 'lucide-react';
 import { saveInquiry } from '../data/managementStore';
 
@@ -288,23 +292,42 @@ export default function InvestmentPage({
                   {isEn ? 'Al-Emarah Agro & Livestock Project' : 'আল-ইমারাহ এগ্রো ও লাইভস্টক প্রকল্প'}
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                  {isEn 
-                    ? 'State-of-the-art cattle breeding, dairy supply, and sacrificial livestock farm registered under the Department of Livestock Services.'
-                    : 'সরকারি প্রাণিসম্পদ অধিদপ্তর নিবন্ধিত আধুনিক ডেইরি ক্যাটল ও খামার। নিয়মিত দুধ উৎপাদন ও কোরবানির পশু সরবরাহকারী একটি চলমান উৎপাদনমুখী যৌথ প্রকল্প।'}
+                  {isEn
+                    ? 'An agro enterprise built on egg-laying poultry, fish farming, livestock rearing, and seasonal agricultural produce — turning farming into an organized, income-generating economic asset.'
+                    : 'ডিম উৎপাদনকারী মুরগি পালন, মৎস্য চাষ, গবাদিপশু পালন এবং মৌসুমি কৃষিপণ্য উৎপাদনকে কেন্দ্র করে পরিচালিত একটি কৃষিভিত্তিক প্রতিষ্ঠান — যা কৃষিকে একটি পরিকল্পিত ও আয়-উৎপাদনশীল অর্থনৈতিক সম্পদে রূপান্তর করে।'}
                 </p>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+                  <div className="flex flex-col items-center text-center space-y-1 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                    <Egg className="w-4 h-4 text-[#006231]" />
+                    <span className="text-[10px] sm:text-xs font-semibold text-gray-700 leading-tight">{isEn ? 'Layer Poultry' : 'লেয়ার পোল্ট্রি'}</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center space-y-1 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                    <Fish className="w-4 h-4 text-[#006231]" />
+                    <span className="text-[10px] sm:text-xs font-semibold text-gray-700 leading-tight">{isEn ? 'Fish Farming' : 'মৎস্য চাষ'}</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center space-y-1 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                    <Beef className="w-4 h-4 text-[#006231]" />
+                    <span className="text-[10px] sm:text-xs font-semibold text-gray-700 leading-tight">{isEn ? 'Dairy Farm' : 'গবাদিপশু পালন'}</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center space-y-1 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                    <Wheat className="w-4 h-4 text-[#006231]" />
+                    <span className="text-[10px] sm:text-xs font-semibold text-gray-700 leading-tight">{isEn ? 'Agro Produce' : 'মৌসুমি কৃষিপণ্য'}</span>
+                  </div>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 text-xs text-gray-700">
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
-                    <span>{isEn ? 'Direct physical cattle assets' : 'জীবন্ত ও দৃশ্যমান গবাদিপশু সম্পদ'}</span>
+                    <span>{isEn ? 'Direct physical farm assets' : 'জীবন্ত ও দৃশ্যমান কৃষি সম্পদ'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
-                    <span>{isEn ? 'Periodic dairy sale distribution' : 'নিয়মিত দুধ ও পশু বিক্রির মুনাফা'}</span>
+                    <span>{isEn ? 'Payout every 3 months after month 6' : 'প্রথম ৬ মাস পর প্রতি ৩ মাস অন্তর মুনাফা প্রদান'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
-                    <span>{isEn ? '65% of net profit shared with investors' : 'নিট মুনাফার ৬৫% বিনিয়োগকারীদের মাঝে বন্টন'}</span>
+                    <span>{isEn ? '65% of net profit shared with investors' : 'নিট মুনাফার ৬৫% বিনিয়োগকারীদের মাঝে বন্টন'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
