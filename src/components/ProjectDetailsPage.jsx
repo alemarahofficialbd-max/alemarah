@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowLeft, 
   MapPin, 
@@ -22,7 +22,8 @@ import {
   Coins, 
   Check, 
   Share2, 
-  ChevronRight, 
+  ChevronRight,
+  ChevronLeft,
   MessageSquare, 
   ExternalLink,
   Utensils,
@@ -236,6 +237,29 @@ export default function ProjectDetailsPage({
 
   const currentItem = selectedImageItem || galleryItems[0] || { url: project.image, titleBn: project.nameBn, titleEn: project.nameEn, category: 'exterior' };
   const activeDisplayImage = activeMediaTab === 'floorplan' && project.floorPlan ? project.floorPlan : currentItem.url;
+
+  // Swipe/arrow navigation through the currently filtered gallery, wrapping
+  // around at both ends so the main photo can be changed without scrolling
+  // down to a big thumbnail grid.
+  const goToGalleryOffset = (offset) => {
+    if (!filteredGallery.length) return;
+    const currentIdx = filteredGallery.findIndex(item => item.url === currentItem.url);
+    const baseIdx = currentIdx === -1 ? 0 : currentIdx;
+    const nextIdx = (baseIdx + offset + filteredGallery.length) % filteredGallery.length;
+    setSelectedImageItem(filteredGallery[nextIdx]);
+  };
+
+  const touchStartXRef = useRef(null);
+  const handleGalleryTouchStart = (e) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+  const handleGalleryTouchEnd = (e) => {
+    if (touchStartXRef.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+    touchStartXRef.current = null;
+    if (Math.abs(deltaX) < 40) return;
+    goToGalleryOffset(deltaX < 0 ? 1 : -1);
+  };
   const activeDisplayTitle = activeMediaTab === 'floorplan' 
     ? (isEn ? 'Approved Architectural Floor Plan' : 'অনুমোদিত আর্কিটেকচারাল ফ্লোর প্ল্যান নকশা')
     : (isEn ? (currentItem.titleEn || currentItem.titleBn) : (currentItem.titleBn || currentItem.titleEn));
@@ -366,18 +390,51 @@ export default function ProjectDetailsPage({
                 </div>
               )}
 
-              {/* Main Image View */}
-              <div className="relative h-72 sm:h-96 md:h-[480px] rounded-2xl overflow-hidden shadow-inner bg-gray-900 group">
+              {/* Main Image View -- swipe left/right (touch) or use the arrow
+                  buttons to move through the gallery without scrolling down
+                  to a big thumbnail grid. */}
+              <div
+                className="relative h-72 sm:h-96 md:h-[480px] rounded-2xl overflow-hidden shadow-inner bg-gray-900 group select-none"
+                onTouchStart={activeMediaTab === 'photos' ? handleGalleryTouchStart : undefined}
+                onTouchEnd={activeMediaTab === 'photos' ? handleGalleryTouchEnd : undefined}
+              >
                 <img
                   src={activeDisplayImage}
                   alt={activeDisplayTitle || (isEn ? project.nameEn : project.nameBn)}
                   className="w-full h-full object-cover transition-all duration-500 group-hover:scale-[1.02]"
+                  draggable={false}
                 />
-                
+
+                {activeMediaTab === 'photos' && filteredGallery.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => goToGalleryOffset(-1)}
+                      aria-label={isEn ? 'Previous photo' : 'আগের ছবি'}
+                      className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md text-white flex items-center justify-center cursor-pointer transition-all active:scale-90"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => goToGalleryOffset(1)}
+                      aria-label={isEn ? 'Next photo' : 'পরের ছবি'}
+                      className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md text-white flex items-center justify-center cursor-pointer transition-all active:scale-90"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+
                 {/* Top Badge: View type indicator */}
                 <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold text-white shadow-md flex items-center space-x-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                   <span>{activeMediaTab === 'floorplan' ? (isEn ? 'Floor Plan' : 'ফ্লোর প্ল্যান') : (isEn ? 'Photo Showcase' : 'প্রকল্পের বাস্তব দৃশ্য')}</span>
+                  {activeMediaTab === 'photos' && filteredGallery.length > 1 && (
+                    <span className="text-emerald-300">
+                      {filteredGallery.findIndex(item => item.url === currentItem.url) + 1}/{filteredGallery.length}
+                    </span>
+                  )}
                 </div>
 
                 {/* Bottom Overlay: Room / View Caption & Label */}
@@ -444,8 +501,8 @@ export default function ProjectDetailsPage({
                     )}
                   </div>
 
-                  {/* Thumbnail Cards Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-[380px] overflow-y-auto pr-1">
+                  {/* Thumbnail Strip: one compact scrollable row instead of a tall grid */}
+                  <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory">
                     {filteredGallery.map((item, idx) => {
                       const isSelected = activeDisplayImage === item.url;
                       const itemTitle = isEn ? (item.titleEn || item.titleBn) : (item.titleBn || item.titleEn);
@@ -454,26 +511,24 @@ export default function ProjectDetailsPage({
                           key={idx}
                           type="button"
                           onClick={() => setSelectedImageItem(item)}
-                          className={`group relative rounded-xl overflow-hidden border-2 transition-all cursor-pointer text-left flex flex-col ${
+                          title={itemTitle}
+                          className={`group relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all cursor-pointer snap-start ${
                             isSelected
-                              ? 'border-[#CE2028] ring-2 ring-[#CE2028]/30 scale-[1.02] shadow-sm'
-                              : 'border-gray-200 opacity-80 hover:opacity-100 hover:border-gray-400'
+                              ? 'border-[#CE2028] ring-2 ring-[#CE2028]/30 shadow-sm'
+                              : 'border-gray-200 opacity-70 hover:opacity-100 hover:border-gray-400'
                           }`}
                         >
-                          <div className="aspect-4/3 w-full overflow-hidden bg-gray-100 relative">
+                          <div className="w-full h-full overflow-hidden bg-gray-100 relative">
                             <img
                               src={item.url}
                               alt={itemTitle}
                               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                             />
-                            {item.category === 'interior' && (
+                            {false && (
                               <span className="absolute top-1 left-1 bg-red-600/90 text-white text-[9px] font-bold px-1.5 py-0.2 rounded shadow-xs">
                                 ইন্টেরিয়র
                               </span>
                             )}
-                          </div>
-                          <div className="p-1.5 bg-white text-[10px] font-semibold text-gray-800 truncate border-t border-gray-100 w-full" title={itemTitle}>
-                            {itemTitle}
                           </div>
                         </button>
                       );
@@ -886,7 +941,7 @@ export default function ProjectDetailsPage({
 
               {/* Brochure Download Action */}
               <button
-                onClick={() => alert(isEn ? `Brochure for ${project.nameEn} will be sent to your WhatsApp/Email.` : `${project.nameBn}-এর বিস্তারিত ব্রোশিউর ও বুকলেট প্রস্তুত রয়েছে। আমাদের প্রতিনিধি আপনাকে পাঠিয়ে দেবেন।`)}
+                onClick={() => project.brochureUrl ? window.open(project.brochureUrl, '_blank', 'noreferrer') : alert(isEn ? `Brochure for ${project.nameEn} will be sent to your WhatsApp/Email.` : `${project.nameBn}-এর বিস্তারিত ব্রোশিউর ও বুকলেট প্রস্তুত রয়েছে। আমাদের প্রতিনিধি আপনাকে পাঠিয়ে দেবেন।`)}
                 className="w-full flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-colors cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5 text-gray-600" />

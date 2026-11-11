@@ -9,6 +9,7 @@ export const projectsData = [
     locationEn: "West Sanarpar, Madinabaag, Ward-66, Demra, Dhaka",
     locationBn: "পশ্চিম সানারপাড়, মদিনাবাগ, ৬৬ নং ওয়ার্ড, ডেমরা, ঢাকা",
     mapUrl: "https://maps.app.goo.gl/4YmYYp469TZVYk2v5",
+    brochureUrl: "/documents/Al-Quds-Tower-Brochure.pdf",
     areaEn: "Sanarpar, Demra",
     areaBn: "সানারপাড়, ডেমরা",
     typeEn: "Residential & Commercial Mixed-Use (Land Share Based)",
