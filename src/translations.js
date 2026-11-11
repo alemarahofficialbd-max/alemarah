@@ -414,7 +414,7 @@
             name: "Emarah Agro",
             badge: "Agriculture & Agro Ventures",
             desc: "Modernizing sustainable agriculture, dairy farming, organic food supply chains, and green agribusiness with integrity and advanced agro-technology.",
-            logo: "/images/emarah_agro.jpg",
+            logo: "/images/emarah_agro.svg",
             status: "Agro Initiative",
             highlight: "Organic Food & Modern Farming"
           }
@@ -1254,7 +1254,7 @@
             name: "ইমারাহ এগ্রো",
             badge: "আধুনিক কৃষি ও ডেইরি উদ্যোগ",
             desc: "নিরাপদ খাদ্য উৎপাদন, আধুনিক কৃষি প্রযুক্তি, টেকসই পশুপালন ও পরিবেশবান্ধব খামার ব্যবস্থাপনার মাধ্যমে কৃষিখাতে নির্ভরযোগ্য উদ্যোগ।",
-            logo: "/images/emarah_agro.jpg",
+            logo: "/images/emarah_agro.svg",
             status: "এগ্রো ও ফার্মিং উদ্যোগ",
             highlight: "নিরাপদ খাদ্য ও টেকসই খামার"
           }

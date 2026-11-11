@@ -335,9 +335,10 @@ export const projectsData = [
     buildingTypeEn: "Modern Livestock & Eco-Farming Complex",
     buildingTypeBn: "আধুনিক ডেইরি ক্যাটল ও এগ্রো কমপ্লেক্স",
     totalFloors: 1,
-    image: "/images/emarah_agro.jpg",
+    brochureUrl: "/documents/Emarah-Agro-Brochure.pdf",
+    image: "/images/emarah_agro.svg",
     gallery: [
-      "/images/emarah_agro.jpg",
+      "/images/emarah_agro.svg",
       "/images/agro_1.webp",
       "/images/agro_2.webp",
       "/images/agro_3.webp",
@@ -346,7 +347,14 @@ export const projectsData = [
       "/images/agro_6.webp",
       "/images/agro_7.webp",
       "/images/agro_8.webp",
-      "/images/agro_9.webp"
+      "/images/agro_9.webp",
+      "/images/agro_10.webp",
+      "/images/agro_11.webp",
+      "/images/agro_12.webp",
+      "/images/agro_13.webp",
+      "/images/agro_14.webp",
+      "/images/agro_15.webp",
+      "/images/agro_16.webp"
     ],
     featuresEn: [
       "Modern planned dairy cattle, meat cattle fattening, and poultry farming",

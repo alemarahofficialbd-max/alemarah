@@ -237,6 +237,7 @@ export default function ProjectDetailsPage({
 
   const currentItem = selectedImageItem || galleryItems[0] || { url: project.image, titleBn: project.nameBn, titleEn: project.nameEn, category: 'exterior' };
   const activeDisplayImage = activeMediaTab === 'floorplan' && project.floorPlan ? project.floorPlan : currentItem.url;
+  const isLogoDisplayImage = typeof activeDisplayImage === 'string' && activeDisplayImage.endsWith('emarah_agro.svg');
 
   // Swipe/arrow navigation through the currently filtered gallery, wrapping
   // around at both ends so the main photo can be changed without scrolling
@@ -394,14 +395,14 @@ export default function ProjectDetailsPage({
                   buttons to move through the gallery without scrolling down
                   to a big thumbnail grid. */}
               <div
-                className="relative h-72 sm:h-96 md:h-[480px] rounded-2xl overflow-hidden shadow-inner bg-gray-900 group select-none"
+                className={`relative h-72 sm:h-96 md:h-[480px] rounded-2xl overflow-hidden shadow-inner group select-none ${isLogoDisplayImage ? 'bg-white' : 'bg-gray-900'}`}
                 onTouchStart={activeMediaTab === 'photos' ? handleGalleryTouchStart : undefined}
                 onTouchEnd={activeMediaTab === 'photos' ? handleGalleryTouchEnd : undefined}
               >
                 <img
                   src={activeDisplayImage}
                   alt={activeDisplayTitle || (isEn ? project.nameEn : project.nameBn)}
-                  className="w-full h-full object-cover transition-all duration-500 group-hover:scale-[1.02]"
+                  className={`transition-all duration-500 group-hover:scale-[1.02] ${isLogoDisplayImage ? 'w-full h-full object-contain p-10 sm:p-16' : 'w-full h-full object-cover'}`}
                   draggable={false}
                 />
 
@@ -518,11 +519,11 @@ export default function ProjectDetailsPage({
                               : 'border-gray-200 opacity-70 hover:opacity-100 hover:border-gray-400'
                           }`}
                         >
-                          <div className="w-full h-full overflow-hidden bg-gray-100 relative">
+                          <div className={`w-full h-full overflow-hidden relative ${item.url.endsWith('emarah_agro.svg') ? 'bg-white' : 'bg-gray-100'}`}>
                             <img
                               src={item.url}
                               alt={itemTitle}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${item.url.endsWith('emarah_agro.svg') ? 'object-contain p-1.5' : 'object-cover'}`}
                             />
                             {false && (
                               <span className="absolute top-1 left-1 bg-red-600/90 text-white text-[9px] font-bold px-1.5 py-0.2 rounded shadow-xs">
