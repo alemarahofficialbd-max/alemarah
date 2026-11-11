@@ -304,7 +304,7 @@ export default function InvestmentPage({
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />
-                    <span>{isEn ? '56% of net profit shared with investors' : 'নিট মুনাফার ৫৬% বিনিয়োগকারীদের মাঝে বন্টন'}</span>
+                    <span>{isEn ? '65% of net profit shared with investors' : 'নিট মুনাফার ৬৫% বিনিয়োগকারীদের মাঝে বন্টন'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-[#8EBF40] shrink-0" />

@@ -243,7 +243,7 @@ export default function Projects({
                         <div className="text-xs text-gray-400 font-medium">{lang === 'en' ? 'Profit Share' : 'মুনাফার অংশ'}</div>
                         <div className="text-sm font-bold text-gray-800 flex items-center justify-center space-x-1 mt-0.5">
                           <TrendingUp className="w-3.5 h-3.5 text-[#006231]" />
-                          <span>56%</span>
+                          <span>65%</span>
                         </div>
                       </div>
                     </div>

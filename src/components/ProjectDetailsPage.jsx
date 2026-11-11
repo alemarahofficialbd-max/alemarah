@@ -794,7 +794,9 @@ export default function ProjectDetailsPage({
                   <span>{isEn ? 'Project Concept & Overview' : 'প্রকল্পের ধারণা ও সার্বিক পরিচিতি'}</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-gray-900">
-                  {isEn ? 'Strategic Land Ownership & Living' : 'জমির স্বতন্ত্র মালিকানা ও পরিকল্পিত আবাসন'}
+                  {isAgro
+                    ? (isEn ? 'Growing With Trust' : 'বিশ্বাসের সঙ্গে এগিয়ে চলা')
+                    : (isEn ? 'Strategic Land Ownership & Living' : 'জমির স্বতন্ত্র মালিকানা ও পরিকল্পিত আবাসন')}
                 </h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-normal">
                   {isEn ? project.descriptionEn : project.descriptionBn}
@@ -828,6 +830,48 @@ export default function ProjectDetailsPage({
                     )}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Why Choose Us (Agro projects only) */}
+            {isAgro && (project.whyChooseUsEn || project.whyChooseUsBn) && (
+              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6">
+                <div className="space-y-1">
+                  <div className="text-xs font-bold text-[#CE2028] uppercase tracking-wider flex items-center space-x-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>{isEn ? 'Our Strength' : 'আমাদের শক্তি'}</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-gray-900">
+                    {isEn ? 'Why Emarah Agro?' : 'কেন ইমারাহ এগ্রো?'}
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {(isEn ? project.whyChooseUsEn : project.whyChooseUsBn).map((item, idx) => (
+                    <div key={idx} className="flex items-start space-x-2.5 p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+                      <Check className="w-4 h-4 text-[#006231] shrink-0 mt-0.5" />
+                      <div>
+                        <div className="text-sm font-bold text-gray-900">{item.title}</div>
+                        <div className="text-xs sm:text-sm text-gray-600 leading-relaxed mt-0.5">{item.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Future Plan (Agro projects only) */}
+            {isAgro && (project.futurePlanEn || project.futurePlanBn) && (
+              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-3">
+                <div className="flex items-center space-x-2 text-[#006231] text-xs font-bold uppercase tracking-wider">
+                  <TrendingUp className="w-4 h-4 text-[#8EBF40]" />
+                  <span>{isEn ? 'Our Future Plan' : 'আমাদের ভবিষ্যৎ পরিকল্পনা'}</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-gray-900">
+                  {isEn ? "Today's Foundation, Tomorrow's Potential" : 'আজকের ভিত্তি, আগামী দিনের সম্ভাবনা'}
+                </h3>
+                <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-normal">
+                  {isEn ? project.futurePlanEn : project.futurePlanBn}
+                </p>
               </div>
             )}
 

@@ -326,6 +326,26 @@ export const projectsData = [
     areaBn: "এগ্রো প্রজেক্ট",
     typeEn: "Agro-Based Asset & Production Initiative",
     typeBn: "কৃষিভিত্তিক উৎপাদন ও সম্পদ উন্নয়ন",
+    descriptionEn: "Emarah Agro is an agro-based enterprise centered on egg-laying poultry, fish farming, livestock rearing, and seasonal agricultural produce. Built on modern management, quality commitment, and sustainable practices, it turns farming into an organized, productive economic asset.",
+    descriptionBn: "ইমারাহ এগ্রো একটি কৃষিভিত্তিক প্রতিষ্ঠান, যার মূল কার্যক্রম ডিম উৎপাদনকারী মুরগি পালন, মৎস্য চাষ, গবাদিপশু পালন এবং বিভিন্ন মৌসুমি কৃষিপণ্য উৎপাদনকে কেন্দ্র করে পরিচালিত। আধুনিক ব্যবস্থাপনা, মানের প্রতি অঙ্গীকার ও টেকসই কৃষি চিন্তাভাবনার মাধ্যমে কৃষিকে একটি পরিকল্পিত ও উৎপাদনশীল অর্থনৈতিক সম্পদে রূপান্তর করা হয়েছে।",
+    whyChooseUsEn: [
+      { title: "Integrated Farm Operations", desc: "Layer poultry, fish, livestock and seasonal produce — one combined agro enterprise." },
+      { title: "Commitment to Quality", desc: "Standards maintained at every stage of production." },
+      { title: "Regular Care & Management", desc: "Proper care and management for poultry, fish and livestock." },
+      { title: "Sustainable Thinking", desc: "Moving toward a long-term, environmentally sound farming system." },
+      { title: "Use of Local Resources", desc: "Emphasis on the best use of local environment and agricultural resources." },
+      { title: "Long-Term Planning", desc: "A phased plan to expand production capacity and business scope." }
+    ],
+    whyChooseUsBn: [
+      { title: "সমন্বিত ফার্ম কার্যক্রম", desc: "লেয়ার পোল্ট্রি, মৎস্য, গবাদিপশু ও মৌসুমি কৃষিপণ্য — বিভিন্ন খাতের সমন্বিত উদ্যোগ।" },
+      { title: "মানের প্রতি অঙ্গীকার", desc: "উৎপাদনের প্রতিটি পর্যায়ে মান বজায় রাখার চেষ্টা।" },
+      { title: "নিয়মিত পরিচর্যা", desc: "পোল্ট্রি, মাছ ও গবাদিপশুর জন্য যথাযথ পরিচর্যা ও ব্যবস্থাপনা।" },
+      { title: "টেকসই চিন্তাভাবনা", desc: "দীর্ঘমেয়াদি ও পরিবেশসম্মত কৃষি ব্যবস্থার দিকে অগ্রসর হওয়া।" },
+      { title: "স্থানীয় সম্পদের ব্যবহার", desc: "স্থানীয় পরিবেশ ও কৃষি সম্পদের সর্বোত্তম ব্যবহারের ওপর গুরুত্ব।" },
+      { title: "দীর্ঘমেয়াদি পরিকল্পনা", desc: "ধাপে ধাপে উৎপাদন সক্ষমতা ও ব্যবসার পরিধি সম্প্রসারণের পরিকল্পনা।" }
+    ],
+    futurePlanEn: "Emarah Agro aims to expand its farm operations further to become a full-fledged, modern agro-based enterprise: scaling up layer poultry and egg output, expanding fish farming and the livestock farm, increasing seasonal produce, adopting modern agro-technology, and improving storage and supply systems.",
+    futurePlanBn: "ইমারাহ এগ্রো ভবিষ্যতে তার ফার্ম কার্যক্রম আরও সম্প্রসারণের মাধ্যমে একটি পূর্ণাঙ্গ ও আধুনিক এগ্রোভিত্তিক প্রতিষ্ঠানে পরিণত হতে চায় — লেয়ার পোল্ট্রি কার্যক্রম ও ডিম উৎপাদন সক্ষমতা বৃদ্ধি, মৎস্য চাষ ও গবাদিপশু খামারের পরিধি সম্প্রসারণ, মৌসুমি কৃষিপণ্যের উৎপাদন বৃদ্ধি, আধুনিক কৃষি প্রযুক্তির ব্যবহার এবং কৃষিজ পণ্য সংরক্ষণ ও সরবরাহ ব্যবস্থার উন্নয়ন।",
     landAreaEn: "Extensive Green Agro Farm",
     landAreaBn: "সুবিশাল সবুজ এগ্রো খামার",
     beds: 0,
@@ -340,8 +360,8 @@ export const projectsData = [
     image: "/images/agro_6.webp",
     minInvestmentEn: "BDT 2,00,000",
     minInvestmentBn: "৳ ২,০০,০০০ (দুই লক্ষ টাকা)",
-    profitShareEn: "56% of Net Profit to Investors",
-    profitShareBn: "নিট মুনাফার ৫৬% বিনিয়োগকারীদের মাঝে বন্টন",
+    profitShareEn: "65% of Net Profit to Investors",
+    profitShareBn: "নিট মুনাফার ৬৫% বিনিয়োগকারীদের মাঝে বন্টন",
     payoutEn: "Every 3 months, after the first 6 months",
     payoutBn: "বিনিয়োগের প্রথম ৬ মাস পর প্রতি ৩ মাস অন্তর",
     durationEn: "3 Years (renewable by mutual agreement)",
@@ -382,14 +402,14 @@ export const projectsData = [
       "Eco-friendly fish cultivation, egg production, and duck breeding",
       "Converting agriculture into an organized, profitable, and productive economic asset",
       "Employment creation and potential income generation through participatory ownership",
-      "Minimum investment BDT 2,00,000 under a formal written agreement, with 56% of net profit shared among investors"
+      "Minimum investment BDT 2,00,000 under a formal written agreement, with 65% of net profit shared among investors"
     ],
     featuresBn: [
       "আধুনিক ও পরিকল্পিত কৃষি ব্যবস্থাপনায় দুগ্ধ ও মাংসজাত গরু এবং ডেইরি ক্যাটল",
       "ডিমের মুরগি, হাঁস পালন এবং পরিবেশবান্ধব আধুনিক পদ্ধতিতে মাছ চাষ",
       "কৃষিকে একটি পরিকল্পিত সম্পদ ও উৎপাদনশীল অর্থনৈতিক কার্যক্রমে রূপান্তর",
       "কর্মসংস্থান সৃষ্টি এবং অংশীদারিত্বের মাধ্যমে স্থায়ী আয়ের সম্ভাবনা",
-      "সর্বনিম্ন ২,০০,০০০ (দুই লক্ষ) টাকা থেকে শুরু, লিখিত চুক্তিতে নিট মুনাফার ৫৬% বিনিয়োগকারীদের মাঝে বন্টন"
+      "সর্বনিম্ন ২,০০,০০০ (দুই লক্ষ) টাকা থেকে শুরু, লিখিত চুক্তিতে নিট মুনাফার ৬৫% বিনিয়োগকারীদের মাঝে বন্টন"
     ],
     rajukApprovalEn: "Govt. Livestock & Fisheries Registered Project",
     rajukApprovalBn: "সরকারি প্রাণিসম্পদ ও মৎস্য অধিদপ্তর নিবন্ধিত"
