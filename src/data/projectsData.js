@@ -8,7 +8,61 @@ export const projectsData = [
     status: "ongoing", // ongoing, upcoming, ready
     locationEn: "West Sanarpar, Madinabaag, Ward-66, Demra, Dhaka",
     locationBn: "পশ্চিম সানারপাড়, মদিনাবাগ, ৬৬ নং ওয়ার্ড, ডেমরা, ঢাকা",
-    mapUrl: "https://maps.app.goo.gl/4YmYYp469TZVYk2v5",
+    mapUrl: "https://maps.app.goo.gl/2qVAq5uPZf4Rtwqx7",
+    mapEmbedUrl: "https://maps.google.com/maps?q=23.727009,90.422822&hl=bn&z=16&output=embed",
+    connectivity: {
+      titleBn: "প্রকল্পের অবস্থান ও বহুমুখী যাতায়াত সুবিধা",
+      titleEn: "Project Location & Multi-Route Transit Connectivity",
+      addressBn: "পশ্চিম সানারপাড়, মদিনাবাগ (কোদালধোয়া), ৬৬ নং ওয়ার্ড, ডেমরা, ঢাকা। ঢাকা–চট্টগ্রাম মহাসড়ক থেকে আনুমানিক ৭০০–৮০০ মিটার দূরত্বে প্রকল্পটির অবস্থান।",
+      addressEn: "West Sanarpar, Madinabaag (Kodaldhoya), Ward-66, Demra, Dhaka — approximately 700–800 meters from Dhaka–Chittagong Highway.",
+      highwayDistanceBn: "ঢাকা–চট্টগ্রাম মহাসড়ক থেকে ৭০০–৮০০ মিটার",
+      highwayDistanceEn: "700–800m from Dhaka–Chittagong Highway",
+      highlightBn: "প্রকল্পটির অন্যতম বিশেষত্ব হলো—ঢাকার গুরুত্বপূর্ণ বাণিজ্যিক, আবাসিক ও যোগাযোগকেন্দ্রগুলোর সঙ্গে একাধিক রুটে যাতায়াতের সুবিধা।",
+      highlightEn: "One of the standout advantages is versatile multi-corridor transit connectivity to Dhaka's primary commercial, residential, and transport hubs.",
+      routes: [
+        {
+          id: "route-motijheel",
+          titleBn: "মতিঝিল–পল্টন–গুলিস্তান রুট",
+          titleEn: "Motijheel – Paltan – Gulistan Route",
+          timeBn: "১৫–২০ মিনিট",
+          timeEn: "15–20 Mins",
+          viaBn: "হানিফ ফ্লাইওভার হয়ে",
+          viaEn: "Via Hanif Flyover",
+          descBn: "ঢাকার ব্যস্ততম বাণিজ্যিক এলাকা মতিঝিল, পল্টন ও গুলিস্তান থেকে হানিফ ফ্লাইওভার ব্যবহার করে আনুমানিক ১৫–২০ মিনিটে ঢাকা–চট্টগ্রাম মহাসড়কের সাইনবোর্ড/সানারপাড় বাসস্ট্যান্ডে পৌঁছে সেখান থেকে মাত্র ৮০০ মিটার পথ পেরিয়ে প্রকল্পে আসা যায়।",
+          descEn: "From commercial centers Motijheel, Paltan & Gulistan via Mayor Hanif Flyover in approx. 15–20 mins to Signboard/Sanarpar bus stop, then only 800m directly to the project."
+        },
+        {
+          id: "route-banasree",
+          titleBn: "বনশ্রী–হাতিরঝিল–গুলশান–বারিধারা রুট",
+          titleEn: "Banasree – Hatirjheel – Gulshan – Baridhara Route",
+          timeBn: "১০ মিনিট (স্টাফ কোয়ার্টার)",
+          timeEn: "10 Mins (Staff Quarter)",
+          viaBn: "স্টাফ কোয়ার্টার ও হাতিরঝিল লিঙ্ক",
+          viaEn: "Via Staff Quarter & Hatirjheel Link",
+          descBn: "প্রকল্প থেকে স্টাফ কোয়ার্টার হয়ে বনশ্রী রুট ব্যবহার করে হাতিরঝিলের মাধ্যমে গুলশান ও বারিধারার দিকে যাতায়াতের সুযোগ রয়েছে। স্টাফ কোয়ার্টার এলাকা প্রকল্প থেকে আনুমানিক ১০ মিনিটের দূরত্বে।",
+          descEn: "Easy commute to Gulshan and Baridhara through Staff Quarter via Banasree and Hatirjheel express link. Staff Quarter is merely ~10 minutes from the project site."
+        },
+        {
+          id: "route-kanchpur",
+          titleBn: "কাঁচপুর–ভুলতা–নারায়ণগঞ্জ–৩০০ ফুট সড়ক রুট",
+          titleEn: "Kanchpur – Bhulta – Narayanganj – 300 Feet Highway Route",
+          timeBn: "উত্তর ও পূর্বাঞ্চল সংযোগ",
+          timeEn: "Northern & Regional Arteries",
+          viaBn: "৩০০ ফুট ও মহাসড়ক করিডোর",
+          viaEn: "Via 300ft Expressway & Highways",
+          descBn: "কাঁচপুর হয়ে ভুলতা–নারায়ণগঞ্জের সংযোগপথ এবং ৩০০ ফুট সড়ক ব্যবহার করে গাজীপুরসহ উত্তরাঞ্চলের দিকে যাতায়াতের সুযোগ রয়েছে।",
+          descEn: "Seamless access via Kanchpur toward Bhulta–Narayanganj and the 300 Feet Highway corridor, providing smooth connectivity towards Gazipur and northern districts."
+        }
+      ],
+      summaryBn: "অর্থাৎ, প্রকল্পটি শুধু একটি সড়কের ওপর নির্ভরশীল নয়; বরং ঢাকার বিভিন্ন গুরুত্বপূর্ণ এলাকার সঙ্গে একাধিক যোগাযোগপথে সংযুক্ত হওয়ার সুবিধা রয়েছে।",
+      summaryEn: "Thus, the project does not rely on a single roadway; instead, it enjoys multi-corridor transit accessibility linking all major zones of Dhaka.",
+      futureTransit: {
+        titleBn: "পরিকল্পিত MRT Line-4 (মেট্রোরেল) ও ভবিষ্যৎ সম্ভাবনা",
+        titleEn: "Planned MRT Line-4 Corridor & Future Growth",
+        descBn: "ভবিষ্যৎ যোগাযোগব্যবস্থার দিক থেকেও এলাকাটি অত্যন্ত গুরুত্বপূর্ণ। পরিকল্পিত MRT Line-4 চালু হলে প্রকল্পটি এর নিকটবর্তী এলাকার মধ্যে অবস্থান করবে।",
+        descEn: "The location is exceptionally strategic for future infrastructure. With the planned MRT Line-4 corridor, the project will be positioned right within its immediate transit zone."
+      }
+    },
     brochureUrl: "/documents/Al-Quds-Tower-Brochure.pdf",
     areaEn: "Sanarpar, Demra",
     areaBn: "সানারপাড়, ডেমরা",
