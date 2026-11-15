@@ -934,16 +934,49 @@ export default function ProjectDetailsPage({
                   </p>
                 </div>
 
-                {/* Wide Panoramic Google Map (No square look, no overlapping floating cards) */}
-                <div className="relative w-full h-52 sm:h-64 md:h-72 rounded-2xl overflow-hidden border border-gray-200 bg-gray-100 shadow-xs">
+                {/* Wide Panoramic Google Map with Centered Project Pin (Photo + Name) */}
+                <div className="relative w-full h-56 sm:h-64 md:h-72 rounded-2xl overflow-hidden border border-gray-200 bg-gray-100 shadow-xs group">
                   <iframe
                     title={isEn ? `${project.nameEn} Location on Google Maps` : `${project.nameBn} গুগল ম্যাপ লোকেশন`}
-                    src={project.mapEmbedUrl || "https://maps.google.com/maps?q=23.727009,90.422822&hl=bn&z=16&output=embed"}
+                    src={project.mapEmbedUrl || "https://maps.google.com/maps?q=23.70356,90.48669&hl=bn&z=16&output=embed"}
                     className="w-full h-full border-0"
                     allowFullScreen=""
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   ></iframe>
+
+                  {/* Centered Project Pin with Project Photo & Name */}
+                  <a
+                    href={project.mapUrl || "https://maps.app.goo.gl/2qVAq5uPZf4Rtwqx7"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={isEn ? "Open in Google Maps" : "গুগল ম্যাপে দেখুন"}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full z-10 flex flex-col items-center group/pin cursor-pointer transition-transform hover:scale-105 active:scale-95"
+                  >
+                    {/* Badge Card with Thumbnail Image & Project Name */}
+                    <div className="bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl border-2 border-[#CE2028] shadow-xl flex items-center space-x-2 whitespace-nowrap mb-0.5 group-hover/pin:bg-red-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg overflow-hidden border border-gray-200 shrink-0 shadow-2xs">
+                        <img 
+                          src={project.image || "/images/al_quds_tower.webp"} 
+                          alt="" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-xs font-black text-gray-900 leading-tight flex items-center gap-1">
+                          <span>{isEn ? project.nameEn : project.nameBn}</span>
+                          <ExternalLink className="w-2.5 h-2.5 text-[#CE2028]" />
+                        </div>
+                        <div className="text-[10px] text-[#CE2028] font-bold flex items-center gap-0.5">
+                          <span>📍</span> <span>{isEn ? 'Exact Pin Location' : 'প্রকল্পের সঠিক লোকেশন পিন'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Downward Pointer Needle pointing to exact map coordinates */}
+                    <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-[#CE2028]"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#CE2028] ring-4 ring-white shadow-md -mt-0.5 animate-pulse"></div>
+                  </a>
                 </div>
 
                 {/* Fixed Map Navigation & Information Banner (Clean, responsive, never broken) */}
