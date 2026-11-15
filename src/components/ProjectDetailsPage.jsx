@@ -548,68 +548,68 @@ export default function ProjectDetailsPage({
 
             {/* Quick Metrics Bar with Matching Icons */}
             {isAgro ? (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <Wallet className="w-4 h-4 text-[#CE2028]" />
-                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Min. Investment' : 'ন্যূনতম বিনিয়োগ'}</span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+                <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                  <div className="flex items-center space-x-1.5 text-gray-400">
+                    <Wallet className="w-3.5 h-3.5 shrink-0 text-[#CE2028]" />
+                    <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Min. Investment' : 'ন্যূনতম বিনিয়োগ'}</span>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-gray-900">
+                  <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                     {isEn ? project.minInvestmentEn : project.minInvestmentBn}
                   </div>
                 </div>
 
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <TrendingUp className="w-4 h-4 text-[#006231]" />
-                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Profit Share' : 'মুনাফার অংশ'}</span>
+                <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                  <div className="flex items-center space-x-1.5 text-gray-400">
+                    <TrendingUp className="w-3.5 h-3.5 shrink-0 text-[#006231]" />
+                    <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Profit Share' : 'মুনাফার অংশ'}</span>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-gray-900">
+                  <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                     {isEn ? project.profitShareEn : project.profitShareBn}
                   </div>
                 </div>
 
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <Calendar className="w-4 h-4 text-[#8EBF40]" />
-                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Payout Schedule' : 'লভ্যাংশ প্রদান'}</span>
+                <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                  <div className="flex items-center space-x-1.5 text-gray-400">
+                    <Calendar className="w-3.5 h-3.5 shrink-0 text-[#8EBF40]" />
+                    <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Payout Schedule' : 'লভ্যাংশ প্রদান'}</span>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-gray-900">
+                  <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                     {isEn ? project.payoutEn : project.payoutBn}
                   </div>
                 </div>
 
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <Layers className="w-4 h-4 text-purple-600" />
-                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Contract Term' : 'চুক্তির মেয়াদ'}</span>
+                <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                  <div className="flex items-center space-x-1.5 text-gray-400">
+                    <Layers className="w-3.5 h-3.5 shrink-0 text-purple-600" />
+                    <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Contract Term' : 'চুক্তির মেয়াদ'}</span>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-gray-900">
+                  <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                     {isEn ? project.durationEn : project.durationBn}
                   </div>
                 </div>
               </div>
             ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
               {/* Size */}
-              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <Maximize2 className="w-4 h-4 text-[#CE2028]" />
-                  <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Size / Area' : 'ফ্ল্যাটের সাইজ'}</span>
+              <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                <div className="flex items-center space-x-1.5 text-gray-400">
+                  <Maximize2 className="w-3.5 h-3.5 shrink-0 text-[#CE2028]" />
+                  <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Size / Area' : 'ফ্ল্যাটের সাইজ'}</span>
                 </div>
-                <div className="text-base sm:text-lg font-black text-gray-900">
+                <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                   {isEn ? (project.sizeNoteEn || `${project.sizeSqft} Sq.Ft.`) : (project.sizeNoteBn || `${project.sizeSqft} বর্গফুট`)}
                 </div>
               </div>
 
               {/* Beds */}
               {project.beds > 0 && (
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <Bed className="w-4 h-4 text-[#006231]" />
-                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Bedrooms' : 'বেডরুম'}</span>
+                <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                  <div className="flex items-center space-x-1.5 text-gray-400">
+                    <Bed className="w-3.5 h-3.5 shrink-0 text-[#006231]" />
+                    <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Bedrooms' : 'বেডরুম'}</span>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-gray-900">
+                  <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                     {isEn ? `${project.beds} Bedrooms` : `০${project.beds}টি বেডরুম`}
                   </div>
                 </div>
@@ -617,12 +617,12 @@ export default function ProjectDetailsPage({
 
               {/* Baths */}
               {project.baths > 0 && (
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <Bath className="w-4 h-4 text-blue-600" />
-                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Bathrooms' : 'বাথরুম'}</span>
+                <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                  <div className="flex items-center space-x-1.5 text-gray-400">
+                    <Bath className="w-3.5 h-3.5 shrink-0 text-blue-600" />
+                    <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Bathrooms' : 'বাথরুম'}</span>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-gray-900">
+                  <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                     {isEn ? `${project.baths} Bathrooms` : `০${project.baths}টি বাথরুম`}
                   </div>
                 </div>
@@ -630,59 +630,59 @@ export default function ProjectDetailsPage({
 
               {/* Balconies */}
               {project.balconies && (
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <Sun className="w-4 h-4 text-amber-500" />
-                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Balconies' : 'বারান্দা'}</span>
+                <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                  <div className="flex items-center space-x-1.5 text-gray-400">
+                    <Sun className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+                    <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Balconies' : 'বারান্দা'}</span>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-gray-900">
+                  <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                     {isEn ? `${project.balconies} Balconies` : `০${project.balconies}টি বারান্দা`}
                   </div>
                 </div>
               )}
 
               {/* Land Area */}
-              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <Compass className="w-4 h-4 text-[#8EBF40]" />
-                  <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Land Area' : 'জমির পরিমাণ'}</span>
+              <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                <div className="flex items-center space-x-1.5 text-gray-400">
+                  <Compass className="w-3.5 h-3.5 shrink-0 text-[#8EBF40]" />
+                  <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Land Area' : 'জমির পরিমাণ'}</span>
                 </div>
-                <div className="text-base sm:text-lg font-black text-gray-900">
+                <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                   {isEn ? project.landAreaEn : project.landAreaBn}
                 </div>
               </div>
 
               {/* Building Height */}
-              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <Layers className="w-4 h-4 text-purple-600" />
-                  <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Building Type' : 'ভবনের ধরণ'}</span>
+              <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                <div className="flex items-center space-x-1.5 text-gray-400">
+                  <Layers className="w-3.5 h-3.5 shrink-0 text-purple-600" />
+                  <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Building Type' : 'ভবনের ধরণ'}</span>
                 </div>
-                <div className="text-base sm:text-lg font-black text-gray-900">
+                <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                   {isEn ? project.buildingTypeEn : project.buildingTypeBn}
                 </div>
               </div>
 
               {/* Lifts */}
               {project.lifts && (
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <Zap className="w-4 h-4 text-orange-500" />
-                    <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Elevators' : 'লিফট ও সিঁড়ি'}</span>
+                <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                  <div className="flex items-center space-x-1.5 text-gray-400">
+                    <Zap className="w-3.5 h-3.5 shrink-0 text-orange-500" />
+                    <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Elevators' : 'লিফট ও সিঁড়ি'}</span>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-gray-900">
+                  <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                     {isEn ? `${project.lifts} Lifts, ${project.stairs || 1} Stair` : `০${project.lifts}টি লিফট ও ০১টি সিঁড়ি`}
                   </div>
                 </div>
               )}
 
               {/* Handover */}
-              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-1">
-                <div className="flex items-center space-x-2 text-gray-400">
-                  <Calendar className="w-4 h-4 text-[#CE2028]" />
-                  <span className="text-2xs uppercase tracking-wider font-bold">{isEn ? 'Handover' : 'হস্তান্তর'}</span>
+              <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-gray-200/90 shadow-2xs space-y-1">
+                <div className="flex items-center space-x-1.5 text-gray-400">
+                  <Calendar className="w-3.5 h-3.5 shrink-0 text-[#CE2028]" />
+                  <span className="text-2xs uppercase tracking-wider font-bold text-gray-500">{isEn ? 'Handover' : 'হস্তান্তর'}</span>
                 </div>
-                <div className="text-base sm:text-lg font-black text-gray-900">
+                <div className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
                   {isEn ? project.handoverEn : project.handoverBn}
                 </div>
               </div>
