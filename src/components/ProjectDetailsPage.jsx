@@ -63,21 +63,79 @@ import { projectsData } from '../data/projectsData';
 const getFeatureIconConfig = (text, idx) => {
   const t = (text || '').toLowerCase();
 
-  // Kitchen & Cooking
+  // 1. MRT / Metro Rail / Highway
+  if (t.includes('mrt') || t.includes('লাইন-৪') || t.includes('মেট্রোরেল')) {
+    return { Icon: Train, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
+
+  // 2. Flat Size / Measurement
+  if (t.includes('ফ্ল্যাটের সাইজ') || t.includes('বর্গফুট') || t.includes('sq. ft') || t.includes('sqft') || t.includes('1,265') || t.includes('১২৬৫') || t.includes('জফরি')) {
+    return { Icon: Maximize2, color: 'text-[#CE2028]', bg: 'bg-red-50 border-red-200/60' };
+  }
+
+  // 3. Multi-room Apartment Configuration (Bedrooms, Bathrooms, Living, Dining, Kitchen)
+  if (t.includes('বেডরুম') || t.includes('bedroom') || (t.includes('বাথরুম') && t.includes('বারান্দা'))) {
+    return { Icon: BedDouble, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200/60' };
+  }
+
+  // 4. Multi-story Building & Residential Units
+  if (t.includes('বিজি+') || t.includes('তলা') || t.includes('ভবন') || t.includes('বিল্ডিং') || t.includes('আবাসিক ইউনিট') || t.includes('residential unit')) {
+    return { Icon: Building2, color: 'text-[#CE2028]', bg: 'bg-red-50 border-red-200/60' };
+  }
+
+  // 5. Land Area & Clear Title
+  if (t.includes('জমির পরিমাণ') || t.includes('শতাংশ') || t.includes('নিষ্কণ্টক জমি') || t.includes('land area') || t.includes('clear title') || t.includes('প্লট')) {
+    return { Icon: Compass, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
+
+  // 6. Land Registry & Independent Share Ownership
+  if (t.includes('রেজিস্ট্রি') || t.includes('স্বতন্ত্র') || t.includes('মালিকানা') || t.includes('শেয়ার মালিকানা') || t.includes('registry') || t.includes('ownership')) {
+    return { Icon: FileCheck, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
+
+  // 7. Transparency & Shareholder Progress Monitoring
+  if (t.includes('স্বচ্ছতা') || t.includes('পর্যবেক্ষণ') || t.includes('অগ্রগতি') || t.includes('শেয়ারহোল্ডার') || t.includes('transparency') || t.includes('monitor')) {
+    return { Icon: ShieldCheck, color: 'text-[#006231]', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
+
+  // 8. Commercial Plaza / Market / Shops
+  if (t.includes('মার্কেট') || t.includes('দোকান') || t.includes('শপিং') || t.includes('বাণিজ্যিক') || t.includes('commercial') || t.includes('plaza') || t.includes('retail')) {
+    return { Icon: Store, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200/60' };
+  }
+
+  // 9. Prayer / Musalla / Rooftop Community & Play
+  if (t.includes('নামাজ') || t.includes('মুসাল্লা') || t.includes('prayer') || t.includes('মসজিদ') || t.includes('mosque')) {
+    return { Icon: Moon, color: 'text-emerald-800', bg: 'bg-emerald-50 border-emerald-200/60' };
+  }
+  if (t.includes('বারবিকিউ') || t.includes('bbq') || t.includes('খেলার') || t.includes('কমিউনিটি') || t.includes('play') || t.includes('community')) {
+    return { Icon: Sparkles, color: 'text-pink-600', bg: 'bg-pink-50 border-pink-200/60' };
+  }
+
+  // 10. Roads & Highway Access
+  if (t.includes('রাস্তা') || t.includes('সড়ক') || t.includes('road') || t.includes('মহাসড়ক') || t.includes('highway') || t.includes('ফুট রাস্তা')) {
+    return { Icon: Navigation, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200/60' };
+  }
+
+  // 11. Lift, Stairs, Basement Parking & Fire Safety
+  if (t.includes('লিফট') || t.includes('সিঁড়ি') || t.includes('lift') || t.includes('elevator') || t.includes('stair')) {
+    return { Icon: Layers, color: 'text-purple-600', bg: 'bg-purple-50 border-purple-200/60' };
+  }
+  if (t.includes('পার্কিং') || t.includes('parking') || t.includes('গাড়ি') || t.includes('কার')) {
+    return { Icon: Car, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200/60' };
+  }
+  if (t.includes('অগ্নিনিরাপত্তা') || t.includes('fire') || t.includes('নিরাপত্তা') || t.includes('security')) {
+    return { Icon: ShieldAlert, color: 'text-red-600', bg: 'bg-red-50 border-red-200/60' };
+  }
+
+  // Specific single-room utilities
   if (t.includes('কিচেন') || t.includes('kitchen') || t.includes('রান্না')) {
     return { Icon: ChefHat, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200/60' };
   }
-  // Dining
   if (t.includes('ডাইনিং') || t.includes('dining')) {
     return { Icon: Utensils, color: 'text-orange-600', bg: 'bg-orange-50 border-orange-200/60' };
   }
-  // Drawing / Living
   if (t.includes('ড্রয়িং') || t.includes('drawing')) {
     return { Icon: Sofa, color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-200/60' };
-  }
-  // Bed & Bath & Balcony
-  if (t.includes('বেডরুম') || t.includes('bedroom') || t.includes('bed')) {
-    return { Icon: BedDouble, color: 'text-[#006231]', bg: 'bg-emerald-50 border-emerald-200/60' };
   }
   if (t.includes('বাথরুম') || t.includes('bathroom') || t.includes('bath')) {
     return { Icon: Bath, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200/60' };
@@ -85,84 +143,35 @@ const getFeatureIconConfig = (text, idx) => {
   if (t.includes('বারান্দা') || t.includes('balcon')) {
     return { Icon: Sun, color: 'text-amber-500', bg: 'bg-amber-50 border-amber-200/60' };
   }
-  // Land / Clear Title / Plot
-  if (t.includes('জমির') || t.includes('নিষ্কণ্টক') || t.includes('land area') || t.includes('clear title') || t.includes('প্লট') || t.includes('plot')) {
-    return { Icon: FileText, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200/60' };
-  }
-  // Size / Measurement
-  if (t.includes('সাইজ') || t.includes('size') || t.includes('বর্গফুট') || t.includes('sq. ft') || t.includes('sqft') || t.includes('জফরি')) {
-    return { Icon: Ruler, color: 'text-[#CE2028]', bg: 'bg-red-50 border-red-200/60' };
-  }
-  // Lift / Elevator / Stairs / Escalator
-  if (t.includes('লিফট') || t.includes('lift') || t.includes('elevator') || t.includes('এসকেলেটর') || t.includes('escalator') || t.includes('সিঁড়ি') || t.includes('staircase')) {
-    return { Icon: Layers, color: 'text-purple-600', bg: 'bg-purple-50 border-purple-200/60' };
-  }
-  // Parking & Vehicle
-  if (t.includes('পার্কিং') || t.includes('parking') || t.includes('গাড়ি') || t.includes('কার')) {
-    return { Icon: Car, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200/60' };
-  }
-  // BBQ & Landscaping / Rooftop Garden
-  if (t.includes('বারবিকিউ') || t.includes('barbecue') || t.includes('bbq')) {
-    return { Icon: Flame, color: 'text-orange-600', bg: 'bg-orange-50 border-orange-200/60' };
-  }
-  if (t.includes('ল্যান্ডস্কেপ') || t.includes('বাগান') || t.includes('garden') || t.includes('সবুজ') || t.includes('green')) {
-    return { Icon: Trees, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200/60' };
-  }
-  // Prayer, Mosque, Musalla, Adhan
-  if (t.includes('নামাজ') || t.includes('মুসাল্লা') || t.includes('prayer') || t.includes('মসজিদ') || t.includes('mosque')) {
-    return { Icon: Moon, color: 'text-emerald-800', bg: 'bg-emerald-50 border-emerald-200/60' };
-  }
-  if (t.includes('আজান') || t.includes('adhan')) {
-    return { Icon: Volume2, color: 'text-teal-600', bg: 'bg-teal-50 border-teal-200/60' };
-  }
-  // Play / Children
-  if (t.includes('খেলার') || t.includes('play') || t.includes('শিশু') || t.includes('children')) {
-    return { Icon: Sparkles, color: 'text-pink-600', bg: 'bg-pink-50 border-pink-200/60' };
-  }
-  // Family / Community
-  if (t.includes('পারিবারিক') || t.includes('family') || t.includes('কমিউনিটি') || t.includes('community')) {
-    return { Icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-200/60' };
-  }
+
   // Generator & Electricity & AC
   if (t.includes('জেনারেটর') || t.includes('generator') || t.includes('বিদ্যুৎ') || t.includes('electric') || t.includes('এসি') || t.includes(' ac')) {
     return { Icon: Zap, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200/60' };
   }
-  // Road & Accessibility
-  if (t.includes('রাস্তা') || t.includes('সড়ক') || t.includes('road') || t.includes('frontage') || t.includes('যোগাযোগ') || t.includes('access')) {
-    return { Icon: Navigation, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200/60' };
-  }
-  // Commercial / Shop / Market / Plaza / Retail
-  if (t.includes('মার্কেট') || t.includes('দোকান') || t.includes('শপিং') || t.includes('বাণিজ্যিক') || t.includes('retail') || t.includes('plaza') || t.includes('mall') || t.includes('commercial')) {
-    return { Icon: Store, color: 'text-[#CE2028]', bg: 'bg-red-50 border-red-200/60' };
-  }
+
   // Financial, Rental, Income, Agreement, Investment
   if (t.includes('ভাড়া') || t.includes('লভ্যাংশ') || t.includes('আয়') || t.includes('income') || t.includes('lease') || t.includes('টাকা')) {
     return { Icon: Coins, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200/60' };
   }
-  if (t.includes('চুক্তি') || t.includes('agreement') || t.includes('অংশীদারিত্ব') || t.includes('ownership')) {
+  if (t.includes('চুক্তি') || t.includes('agreement') || t.includes('অংশীদারিত্ব')) {
     return { Icon: Handshake, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200/60' };
   }
+
   // Security, CCTV, Surveillance
-  if (t.includes('সিসিটিভি') || t.includes('cctv') || t.includes('surveillance') || t.includes('নিরাপদ') || t.includes('security') || t.includes('guard')) {
+  if (t.includes('সিসিটিভি') || t.includes('cctv') || t.includes('surveillance')) {
     return { Icon: Cctv, color: 'text-slate-800', bg: 'bg-slate-100 border-slate-200' };
   }
-  // Residential Units / Apartment
-  if (t.includes('ইউনিট') || t.includes('unit') || t.includes('আবাসিক') || t.includes('apartment')) {
-    return { Icon: Building, color: 'text-[#CE2028]', bg: 'bg-red-50 border-red-200/60' };
-  }
+
   // Agro, Cattle, Dairy, Livestock
   if (t.includes('গরু') || t.includes('দুগ্ধ') || t.includes('ক্যাটল') || t.includes('cattle') || t.includes('dairy') || t.includes('মাংস')) {
     return { Icon: Sprout, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200/60' };
   }
-  // Fisheries / Fish
   if (t.includes('মাছ') || t.includes('fish')) {
     return { Icon: Fish, color: 'text-cyan-700', bg: 'bg-cyan-50 border-cyan-200/60' };
   }
-  // Agriculture / Crops
-  if (t.includes('মুরগি') || t.includes('হাঁস') || t.includes('ডিম') || t.includes('poultry') || t.includes('egg') || t.includes('duck') || t.includes('কৃষি') || t.includes('খামার') || t.includes('farm') || t.includes('agro') || t.includes('agriculture')) {
+  if (t.includes('মুরগি') || t.includes('হাঁস') || t.includes('ডিম') || t.includes('poultry') || t.includes('egg') || t.includes('কৃষি') || t.includes('খামার') || t.includes('farm') || t.includes('agro')) {
     return { Icon: Wheat, color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200/60' };
   }
-  // Employment
   if (t.includes('কর্মসংস্থান') || t.includes('employment') || t.includes('job')) {
     return { Icon: Briefcase, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200/60' };
   }
@@ -690,33 +699,33 @@ export default function ProjectDetailsPage({
             </div>
             )}
 
-            {/* Comprehensive Features & Specifications with Dedicated Icons */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                <div className="space-y-1">
+            {/* Comprehensive Features & Specifications without bulky nested boxes */}
+            <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <div className="space-y-0.5">
                   <div className="text-xs font-bold text-[#CE2028] uppercase tracking-wider flex items-center space-x-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>{isEn ? 'Project Specifications' : 'প্রকল্পের পুঙ্খানুপুঙ্খ বিবরণ ও সুযোগ-সুবিধা'}</span>
+                    <span>{isEn ? 'Project Specifications' : 'প্রকল্পের সুযোগ-সুবিধা ও বিবরণ'}</span>
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-gray-900">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                     {isEn ? 'Detailed Features & Amenities' : 'বৈশিষ্ট্য ও আধুনিক সুযোগ-সুবিধাসমূহ'}
                   </h3>
                 </div>
               </div>
 
-              {/* Specific breakdown grid with distinct premium vector icons */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
+              {/* Clean, space-saving specification list without separate card boxes */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                 {((isEn ? project.featuresEn : project.featuresBn) || []).map((feature, idx) => {
                   const { Icon: FeatureIcon, color, bg } = getFeatureIconConfig(feature, idx);
                   return (
                     <div 
                       key={idx} 
-                      className="p-4 rounded-2xl bg-white border border-gray-100 shadow-2xs hover:shadow-md hover:border-gray-200 transition-all flex items-start space-x-3.5 group"
+                      className="flex items-start space-x-3 py-2 border-b border-gray-100/70 last:border-b-0 hover:bg-gray-50/60 rounded-lg px-2 transition-colors"
                     >
-                      <div className={`w-10 h-10 rounded-xl ${bg} border flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform`}>
-                        <FeatureIcon className={`w-5 h-5 ${color}`} />
+                      <div className={`w-7 h-7 rounded-lg ${bg} border flex items-center justify-center shrink-0 mt-0.5 shadow-2xs`}>
+                        <FeatureIcon className={`w-3.5 h-3.5 ${color}`} />
                       </div>
-                      <div className="text-xs sm:text-sm font-semibold text-gray-800 leading-relaxed pt-2">
+                      <div className="text-xs sm:text-sm font-semibold text-gray-800 leading-snug flex-1 pt-0.5">
                         {feature}
                       </div>
                     </div>
@@ -876,17 +885,17 @@ export default function ProjectDetailsPage({
               </div>
             )}
 
-            {/* Location & Multi-Route Connectivity with Interactive Google Map & Custom Pinned Badge */}
+            {/* Location & Multi-Route Connectivity with Panoramic Google Map */}
             {(project.connectivity || project.id === 'al-quds-tower') && (
-              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6">
+              <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-xs space-y-4 sm:space-y-5">
                 {/* Section Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
-                  <div className="space-y-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-gray-100 pb-3">
+                  <div className="space-y-0.5">
                     <div className="text-xs font-bold text-[#CE2028] uppercase tracking-wider flex items-center space-x-1.5">
-                      <MapPin className="w-4 h-4 text-[#CE2028]" />
-                      <span>{isEn ? (project.connectivity?.titleEn || 'Project Location & Multi-Route Transit') : (project.connectivity?.titleBn || 'প্রকল্পের অবস্থান ও বহুমুখী যাতায়াত সুবিধা')}</span>
+                      <MapPin className="w-3.5 h-3.5 text-[#CE2028]" />
+                      <span>{isEn ? (project.connectivity?.titleEn || 'Location & Transit Connectivity') : (project.connectivity?.titleBn || 'প্রকল্পের অবস্থান ও বহুমুখী যাতায়াত সুবিধা')}</span>
                     </div>
-                    <h3 className="text-xl sm:text-2xl font-black text-gray-900">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                       {isEn ? 'Strategic Connectivity Across Greater Dhaka' : 'কৌশলগত অবস্থান ও ঢাকার সঙ্গে বহুমুখী যোগাযোগ'}
                     </h3>
                   </div>
@@ -894,7 +903,7 @@ export default function ProjectDetailsPage({
                     href={project.mapUrl || "https://maps.app.goo.gl/2qVAq5uPZf4Rtwqx7"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-red-50 hover:text-[#CE2028] text-gray-700 text-xs font-bold transition-all border border-gray-200 shrink-0 self-start sm:self-center"
+                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-red-50 hover:text-[#CE2028] text-gray-700 text-xs font-bold transition-all border border-gray-200 shrink-0 self-start sm:self-center"
                   >
                     <MapPin className="w-3.5 h-3.5 text-[#CE2028]" />
                     <span>{isEn ? 'Open in Google Maps' : 'গুগল ম্যাপে বড় করে দেখুন'}</span>
@@ -902,38 +911,31 @@ export default function ProjectDetailsPage({
                   </a>
                 </div>
 
-                {/* Address & Highway Distance Highlight */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-red-50/60 via-amber-50/40 to-emerald-50/40 border border-gray-200/80 space-y-2">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 rounded-xl bg-[#CE2028] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                      <MapPin className="w-4 h-4" />
-                    </div>
-                    <div className="space-y-1 text-xs sm:text-sm text-gray-800">
-                      <div>
-                        <span className="font-black text-gray-900">{isEn ? 'Address: ' : 'ঠিকানা: '}</span>
-                        <span className="font-semibold text-gray-800">
-                          {isEn 
-                            ? (project.connectivity?.addressEn || 'West Sanarpar, Madinabaag (Kodaldhoya), Ward-66, Demra, Dhaka.') 
-                            : (project.connectivity?.addressBn || 'পশ্চিম সানারপাড়, মদিনাবাগ (কোদালধোয়া), ৬৬ নং ওয়ার্ড, ডেমরা, ঢাকা।')}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white/90 border border-red-200 text-[#CE2028] text-xs font-bold shadow-2xs">
-                          📍 {isEn ? (project.connectivity?.highwayDistanceEn || '700–800m from Dhaka–Chittagong Highway') : (project.connectivity?.highwayDistanceBn || 'ঢাকা–চট্টগ্রাম মহাসড়ক থেকে আনুমানিক ৭০০–৮০০ মিটার দূরত্বে')}
-                        </span>
-                      </div>
+                {/* Clean Address & Distance Header (No nested bulky boxes) */}
+                <div className="space-y-1.5 py-0.5">
+                  <div className="flex items-start space-x-2 text-xs sm:text-sm text-gray-800">
+                    <MapPin className="w-4 h-4 text-[#CE2028] shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold text-gray-900">{isEn ? 'Address: ' : 'ঠিকানা: '}</span>
+                      <span className="font-medium text-gray-700">
+                        {isEn 
+                          ? (project.connectivity?.addressEn || 'West Sanarpar, Madinabaag (Kodaldhoya), Ward-66, Demra, Dhaka.') 
+                          : (project.connectivity?.addressBn || 'পশ্চিম সানারপাড়, মদিনাবাগ (কোদালধোয়া), ৬৬ নং ওয়ার্ড, ডেমরা, ঢাকা।')}
+                      </span>
+                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md bg-red-50 border border-red-200 text-[#CE2028] text-2xs sm:text-xs font-bold whitespace-nowrap">
+                        📍 {isEn ? (project.connectivity?.highwayDistanceEn || '700–800m from Highway') : (project.connectivity?.highwayDistanceBn || 'ঢাকা–চট্টগ্রাম মহাসড়ক থেকে আনুমানিক ৭০০–৮০০ মিটার')}
+                      </span>
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed font-normal pt-1 border-t border-gray-200/60">
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed pl-6">
                     {isEn
                       ? (project.connectivity?.highlightEn || "One of the standout advantages of the project is its versatile multi-route connectivity to Dhaka's major commercial, residential, and transit corridors.")
                       : (project.connectivity?.highlightBn || "প্রকল্পটির অন্যতম বিশেষত্ব হলো—ঢাকার গুরুত্বপূর্ণ বাণিজ্যিক, আবাসিক ও যোগাযোগকেন্দ্রগুলোর সঙ্গে একাধিক রুটে যাতায়াতের সুবিধা।")}
                   </p>
                 </div>
 
-                {/* Interactive Google Map with Custom Pinned Badge & Center Marker */}
-                <div className="relative w-full h-[360px] sm:h-[430px] rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-gray-100 group">
-                  {/* The Google Map Iframe */}
+                {/* Wide Panoramic Google Map (No square look, no overlapping floating cards) */}
+                <div className="relative w-full h-52 sm:h-64 md:h-72 rounded-2xl overflow-hidden border border-gray-200 bg-gray-100 shadow-xs">
                   <iframe
                     title={isEn ? `${project.nameEn} Location on Google Maps` : `${project.nameBn} গুগল ম্যাপ লোকেশন`}
                     src={project.mapEmbedUrl || "https://maps.google.com/maps?q=23.727009,90.422822&hl=bn&z=16&output=embed"}
@@ -942,97 +944,63 @@ export default function ProjectDetailsPage({
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   ></iframe>
+                </div>
 
-                  {/* Floating Pinned Card with Mini Project Image & Title (Top-Left) */}
-                  <div className="absolute top-3.5 left-3.5 z-10 max-w-[270px] sm:max-w-xs bg-white/95 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-white/90 transition-all hover:scale-[1.02]">
-                    <div className="flex items-center space-x-2.5">
-                      <div className="relative shrink-0">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-[#CE2028] shadow-sm">
-                          <img 
-                            src={project.image || "/images/al_quds_tower.webp"} 
-                            alt={isEn ? project.nameEn : project.nameBn}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#CE2028] opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-4 w-4 bg-[#CE2028] text-white items-center justify-center text-[9px] font-black shadow-xs">
-                            📍
-                          </span>
+                {/* Fixed Map Navigation & Information Banner (Clean, responsive, never broken) */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                  <div className="flex items-center space-x-2.5 min-w-0">
+                    <img 
+                      src={project.image || "/images/al_quds_tower.webp"} 
+                      alt={isEn ? project.nameEn : project.nameBn} 
+                      className="w-10 h-10 rounded-lg object-cover border border-gray-200 shrink-0 shadow-2xs"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs sm:text-sm font-bold text-gray-900 truncate">{isEn ? project.nameEn : project.nameBn}</span>
+                        <span className="text-3xs font-bold text-[#006231] bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded shrink-0">
+                          {isEn ? 'Live Project Pin' : 'সরাসরি প্রজেক্ট পিন'}
                         </span>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center space-x-1">
-                          <span className="text-3xs font-bold text-[#006231] uppercase tracking-wider bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
-                            {isEn ? 'Live Site Pin' : 'সরাসরি প্রজেক্ট পিন'}
-                          </span>
-                        </div>
-                        <h4 className="text-xs sm:text-sm font-black text-gray-900 truncate mt-0.5">
-                          {isEn ? project.nameEn : project.nameBn}
-                        </h4>
-                        <p className="text-3xs sm:text-2xs text-gray-500 truncate">
-                          {isEn ? 'West Sanarpar, Madinabaag, Demra' : 'পশ্চিম সানারপাড়, মদিনাবাগ, ডেমরা'}
-                        </p>
-                      </div>
+                      <p className="text-3xs sm:text-2xs text-gray-500 truncate">
+                        {isEn ? 'West Sanarpar, Madinabaag, Demra, Dhaka' : 'পশ্চিম সানারপাড়, মদিনাবাগ, ডেমরা, ঢাকা'}
+                      </p>
                     </div>
-                    <a
-                      href={project.mapUrl || "https://maps.app.goo.gl/2qVAq5uPZf4Rtwqx7"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2.5 w-full flex items-center justify-center space-x-1.5 py-1.5 px-3 rounded-xl bg-[#CE2028] hover:bg-[#A9141B] text-white text-2xs font-bold shadow-xs transition-colors"
-                    >
-                      <MapPin className="w-3 h-3" />
-                      <span>{isEn ? 'View in Google Maps' : 'গুগল ম্যাপে পিন দেখুন'}</span>
-                      <ExternalLink className="w-2.5 h-2.5 ml-0.5 opacity-80" />
-                    </a>
                   </div>
 
-                  {/* Center Needle Pin with Mini Thumbnail and Title */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full pointer-events-none drop-shadow-2xl flex flex-col items-center">
-                    <div className="bg-gray-900/95 backdrop-blur-md text-white px-2.5 py-1.5 rounded-xl border border-white/20 shadow-2xl flex items-center space-x-2 whitespace-nowrap mb-0.5 animate-bounce">
-                      <img 
-                        src={project.image || "/images/al_quds_tower.webp"} 
-                        alt="" 
-                        className="w-7 h-7 rounded-lg object-cover border border-white/50 shadow-xs"
-                      />
-                      <div className="text-left">
-                        <div className="text-xs font-black text-white">{isEn ? project.nameEn : project.nameBn}</div>
-                        <div className="text-[10px] text-amber-300 font-semibold flex items-center gap-1">
-                          <span>📍</span> <span>{isEn ? 'Project Location Pin' : 'প্রকল্পের লোকেশন পিন'}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-gray-900/95"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#CE2028] ring-4 ring-white/60 shadow-md"></div>
-                  </div>
+                  <a
+                    href={project.mapUrl || "https://maps.app.goo.gl/2qVAq5uPZf4Rtwqx7"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center space-x-1.5 py-2 px-3.5 rounded-lg bg-[#CE2028] hover:bg-[#A9141B] text-white text-xs font-bold shadow-xs transition-colors shrink-0"
+                  >
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span>{isEn ? 'Open in Google Maps' : 'গুগল ম্যাপে পিন দেখুন'}</span>
+                    <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
+                  </a>
                 </div>
 
                 {/* 3 Major Routes Grid */}
-                <div className="space-y-3">
+                <div className="space-y-2.5 pt-1">
                   <div className="flex items-center space-x-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
                     <Navigation className="w-3.5 h-3.5 text-[#006231]" />
                     <span>{isEn ? 'Key Commuter & Commercial Routes' : 'প্রধান ৩টি সহজ যাতায়াত রুটসমূহ'}</span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {/* Route 1: Motijheel - Paltan - Gulistan */}
-                    <div className="p-4 rounded-2xl bg-gradient-to-b from-blue-50/70 via-white to-white border border-blue-100/90 shadow-2xs space-y-2.5 hover:border-blue-300 transition-all">
-                      <div className="flex items-center justify-between pb-2 border-b border-blue-100/80">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                            <Car className="w-4 h-4" />
-                          </div>
-                          <span className="text-xs font-bold text-blue-900">
-                            {isEn ? 'Commercial Hub' : 'বাণিজ্যিক কেন্দ্র'}
-                          </span>
-                        </div>
+                    <div className="p-3 sm:p-3.5 rounded-xl bg-gray-50/70 border border-gray-200/80 space-y-2">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-gray-200/60">
+                        <span className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                          <Car className="w-3.5 h-3.5 text-blue-600" />
+                          {isEn ? 'Commercial Hub' : 'বাণিজ্যিক কেন্দ্র'}
+                        </span>
                         <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-3xs font-extrabold">
                           {isEn ? '15–20 Mins' : '১৫–২০ মিনিট'}
                         </span>
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-gray-900 leading-snug">
-                          {isEn ? 'Motijheel – Paltan – Gulistan Route' : 'মতিঝিল–পল্টন–গুলিস্তান রুট'}
+                        <h4 className="text-xs sm:text-sm font-bold text-gray-900 leading-snug">
+                          {isEn ? 'Motijheel – Paltan – Gulistan' : 'মতিঝিল–পল্টন–গুলিস্তান রুট'}
                         </h4>
                         <span className="text-3xs text-blue-600 font-semibold block mt-0.5">
                           {isEn ? 'Via Mayor Hanif Flyover' : 'হানিফ ফ্লাইওভার ব্যবহার করে'}
@@ -1046,26 +1014,22 @@ export default function ProjectDetailsPage({
                     </div>
 
                     {/* Route 2: Banasree - Hatirjheel - Gulshan - Baridhara */}
-                    <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-50/70 via-white to-white border border-emerald-100/90 shadow-2xs space-y-2.5 hover:border-emerald-300 transition-all">
-                      <div className="flex items-center justify-between pb-2 border-b border-emerald-100/80">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-7 h-7 rounded-lg bg-[#006231] text-white flex items-center justify-center shrink-0 shadow-xs">
-                            <Navigation className="w-4 h-4" />
-                          </div>
-                          <span className="text-xs font-bold text-emerald-900">
-                            {isEn ? 'Diplomatic & Prime Zone' : 'কূটনৈতিক ও অভিজাত জোন'}
-                          </span>
-                        </div>
+                    <div className="p-3 sm:p-3.5 rounded-xl bg-gray-50/70 border border-gray-200/80 space-y-2">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-gray-200/60">
+                        <span className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                          <Navigation className="w-3.5 h-3.5 text-emerald-600" />
+                          {isEn ? 'Diplomatic Zone' : 'কূটনৈতিক ও অভিজাত জোন'}
+                        </span>
                         <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-3xs font-extrabold">
                           {isEn ? '~10 Mins (Staff Qtr)' : '~১০ মিনিট (স্টাফ কোয়ার্টার)'}
                         </span>
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-gray-900 leading-snug">
-                          {isEn ? 'Banasree – Hatirjheel – Gulshan – Baridhara Route' : 'বনশ্রী–হাতিরঝিল–গুলশান–বারিধারা রুট'}
+                        <h4 className="text-xs sm:text-sm font-bold text-gray-900 leading-snug">
+                          {isEn ? 'Banasree – Hatirjheel – Gulshan – Baridhara' : 'বনশ্রী–হাতিরঝিল–গুলশান–বারিধারা রুট'}
                         </h4>
                         <span className="text-3xs text-emerald-600 font-semibold block mt-0.5">
-                          {isEn ? 'Via Staff Quarter & Hatirjheel Link' : 'স্টাফ কোয়ার্টার ও হাতিরঝিল লিঙ্ক দিয়ে'}
+                          {isEn ? 'Via Staff Quarter & Hatirjheel' : 'স্টাফ কোয়ার্টার ও হাতিরঝিল লিঙ্ক দিয়ে'}
                         </span>
                       </div>
                       <p className="text-xs text-gray-600 leading-relaxed">
@@ -1076,23 +1040,19 @@ export default function ProjectDetailsPage({
                     </div>
 
                     {/* Route 3: Kanchpur - Bhulta - Narayanganj - 300 Feet Highway */}
-                    <div className="p-4 rounded-2xl bg-gradient-to-b from-amber-50/70 via-white to-white border border-amber-100/90 shadow-2xs space-y-2.5 hover:border-amber-300 transition-all">
-                      <div className="flex items-center justify-between pb-2 border-b border-amber-100/80">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-7 h-7 rounded-lg bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                            <Compass className="w-4 h-4" />
-                          </div>
-                          <span className="text-xs font-bold text-amber-900">
-                            {isEn ? 'Regional Arteries' : 'উত্তর ও পূর্বাঞ্চল সংযোগ'}
-                          </span>
-                        </div>
+                    <div className="p-3 sm:p-3.5 rounded-xl bg-gray-50/70 border border-gray-200/80 space-y-2">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-gray-200/60">
+                        <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                          <Compass className="w-3.5 h-3.5 text-amber-600" />
+                          {isEn ? 'Regional Arteries' : 'উত্তর ও পূর্বাঞ্চল সংযোগ'}
+                        </span>
                         <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-3xs font-extrabold">
                           {isEn ? 'Direct Access' : 'সরাসরি সংযোগ'}
                         </span>
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-gray-900 leading-snug">
-                          {isEn ? 'Kanchpur – Bhulta – Narayanganj – 300 Feet Road' : 'কাঁচপুর–ভুলতা–নারায়ণগঞ্জ–৩০০ ফুট সড়ক রুট'}
+                        <h4 className="text-xs sm:text-sm font-bold text-gray-900 leading-snug">
+                          {isEn ? 'Kanchpur – Bhulta – Narayanganj – 300 Feet' : 'কাঁচপুর–ভুলতা–নারায়ণগঞ্জ–৩০০ ফুট সড়ক রুট'}
                         </h4>
                         <span className="text-3xs text-amber-600 font-semibold block mt-0.5">
                           {isEn ? 'Via 300ft Expressway & Highways' : '৩০০ ফুট ও মহাসড়ক করিডোর দিয়ে'}
@@ -1108,7 +1068,7 @@ export default function ProjectDetailsPage({
                 </div>
 
                 {/* Multi-connectivity Summary */}
-                <div className="p-3.5 sm:p-4 rounded-xl bg-gray-50 border border-gray-200 text-xs sm:text-sm text-gray-700 leading-relaxed flex items-start space-x-2.5">
+                <div className="p-3 rounded-xl bg-gray-50 border border-gray-200/80 text-xs sm:text-sm text-gray-700 leading-relaxed flex items-start space-x-2">
                   <CheckCircle2 className="w-4 h-4 text-[#006231] shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-gray-900">{isEn ? 'Key Advantage: ' : 'সারসংক্ষেপ: '}</span>
@@ -1121,15 +1081,15 @@ export default function ProjectDetailsPage({
                 </div>
 
                 {/* Future Infrastructure / MRT Line-4 Feature Card */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-gray-900 via-[#1C1819] to-gray-900 text-white space-y-2 shadow-md">
+                <div className="p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-gray-900 via-[#1C1819] to-gray-900 text-white space-y-1.5 shadow-sm">
                   <div className="flex items-center space-x-2 text-[#8EBF40] text-xs font-bold uppercase tracking-wider">
-                    <Train className="w-4 h-4 text-emerald-400" />
+                    <Train className="w-3.5 h-3.5 text-emerald-400" />
                     <span>{isEn ? 'Future Mega Infrastructure' : 'মেগাপ্রকল্প ও ভবিষ্যৎ যোগাযোগ ব্যবস্থা'}</span>
                   </div>
-                  <h4 className="text-sm sm:text-base font-bold text-white">
+                  <h4 className="text-xs sm:text-sm font-bold text-white">
                     {isEn ? 'Planned MRT Line-4 (Metro Rail) Corridor' : 'পরিকল্পিত MRT Line-4 (মেট্রোরেল লাইন-৪) ও সমৃদ্ধ ভবিষ্যৎ'}
                   </h4>
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  <p className="text-xs text-gray-300 leading-relaxed">
                     {isEn
                       ? 'From the perspective of future urban connectivity, the location is immensely strategic. Once the planned MRT Line-4 begins operations, the project will be situated right within its immediate transit catchment zone.'
                       : 'ভবিষ্যৎ যোগাযোগব্যবস্থার দিক থেকেও এলাকাটি অত্যন্ত গুরুত্বপূর্ণ। পরিকল্পিত MRT Line-4 চালু হলে প্রকল্পটি এর নিকটবর্তী এলাকার মধ্যে অবস্থান করবে।'}
@@ -1140,7 +1100,7 @@ export default function ProjectDetailsPage({
 
             {/* Nearby Amenities / Religious & Educational Institutions */}
             {project.nearbyInstitutions && (
-              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xs space-y-6">
+              <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-xs space-y-4 sm:space-y-5">
                 <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                   <div className="space-y-1">
                     <div className="text-xs font-bold text-[#CE2028] uppercase tracking-wider flex items-center space-x-1.5">
